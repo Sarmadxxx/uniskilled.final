@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sarah's Dashboard — UniSkilled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400;1,9..144,700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --blue:#2563eb;--blue-v:#1d4ed8;--blue-l:#eff6ff;--blue-m:#dbeafe;
+  --ink:#0f172a;--ink2:#1e293b;--mid:#64748b;--soft:#94a3b8;
+  --border:#e2e8f0;--white:#ffffff;--bg:#f0f4ff;--surface:#f8fafc;
+  --green:#059669;--green-l:#d1fae5;--green-d:#ecfdf5;
+  --orange:#ea580c;--orange-l:#ffedd5;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --amber:#d97706;--amber-l:#fef3c7;
+  --red:#dc2626;--red-l:#fee2e2;
+  --sw:260px;
+}
+html,body{height:100%;background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);overflow-x:hidden;line-height:1.5}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+
+/* ── SHELL ── */
+.shell{display:flex;min-height:100vh}
+
+/* ── SIDEBAR ── */
+.sidebar{width:var(--sw);background:var(--ink2);flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:200;display:flex;flex-direction:column;transition:transform .3s ease}
+.sb-head{padding:1.4rem 1.2rem 1rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-logo{width:32px;height:32px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#fff;flex-shrink:0}
+.sb-brand{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:#fff;letter-spacing:-.01em}
+.sb-tagline{font-size:.6rem;color:rgba(255,255,255,.28);margin-top:1px}
+
+.sb-user{padding:1rem 1.2rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-av{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:.88rem;font-weight:700;color:#fff;flex-shrink:0;position:relative}
+.sb-dot{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;background:#10b981;border-radius:50%;border:2px solid var(--ink2)}
+.sb-uname{font-size:.85rem;font-weight:600;color:#fff;line-height:1.2}
+.sb-urole{font-size:.6rem;color:rgba(255,255,255,.36)}
+
+.sb-scroll{flex:1;overflow-y:auto;padding:.6rem 0}
+.sb-scroll::-webkit-scrollbar{display:none}
+.sb-sec{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.2);padding:.7rem 1.2rem .28rem}
+.sb-a{display:flex;align-items:center;gap:9px;padding:.58rem 1.2rem;cursor:pointer;transition:all .17s;color:rgba(255,255,255,.44);font-size:.82rem;font-weight:500;border-left:3px solid transparent;text-decoration:none;user-select:none}
+.sb-a:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.8)}
+.sb-a.on{background:rgba(37,99,235,.18);border-left-color:var(--blue);color:#fff;font-weight:600}
+.sb-a-ico{width:17px;text-align:center;font-size:.9rem;flex-shrink:0}
+.sb-badge{margin-left:auto;font-size:.57rem;font-weight:800;min-width:16px;height:16px;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.br{background:var(--red);color:#fff}
+.bg{background:#10b981;color:#fff}
+.bb{background:var(--blue);color:#fff}
+
+.sb-bottom{margin-top:auto;padding:1rem 1.2rem;border-top:1px solid rgba(255,255,255,.06)}
+.streak-box{background:linear-gradient(135deg,rgba(251,191,36,.16),rgba(249,115,22,.1));border:1px solid rgba(251,191,36,.22);border-radius:13px;padding:.75rem .9rem;display:flex;align-items:center;gap:10px}
+.streak-n{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:#fbbf24;line-height:1}
+.streak-txt{font-size:.65rem;color:rgba(255,255,255,.42);line-height:1.35;margin-top:1px}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOPBAR ── */
+.topbar{height:60px;background:rgba(255,255,255,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100}
+.tb-l{display:flex;align-items:center;gap:11px}
+.hbtn{display:none;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--ink);padding:4px}
+.tb-title{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.tb-sub{font-size:.7rem;color:var(--mid)}
+.tb-r{display:flex;align-items:center;gap:7px}
+.ib{height:34px;border-radius:9px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:.79rem;font-weight:600;transition:all .17s;display:flex;align-items:center;gap:5px;padding:0 .82rem}
+.ico-btn{width:34px;padding:0;justify-content:center;background:var(--surface);border:1.5px solid var(--border);color:var(--mid);position:relative}
+.ico-btn:hover{background:var(--blue-l);border-color:var(--blue-m);color:var(--blue)}
+.pri-btn{background:var(--blue);color:#fff}
+.pri-btn:hover{background:var(--blue-v);box-shadow:0 4px 14px rgba(37,99,235,.28)}
+.ndot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid #fff}
+
+/* ── CONTENT AREA ── */
+.content{flex:1;padding:1.75rem 2rem 5rem}
+.page{display:none;animation:fadeUp .27s ease}
+.page.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── HERO BANNER ── */
+.hero{border-radius:22px;padding:2rem 2.25rem;margin-bottom:1.5rem;background:linear-gradient(130deg,#1e40af 0%,#2563eb 40%,#7c3aed 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:280px;height:280px;border-radius:50%;background:rgba(255,255,255,.06);top:-80px;right:-50px;pointer-events:none}
+.hero::after{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04);bottom:-60px;left:35%;pointer-events:none}
+.hero-eyebrow{font-size:.7rem;font-weight:700;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem;position:relative;z-index:1}
+.hero-title{font-family:'Fraunces',serif;font-size:1.8rem;font-weight:700;color:#fff;line-height:1.15;letter-spacing:-.02em;margin-bottom:.5rem;position:relative;z-index:1}
+.hero-title i{font-style:italic;opacity:.75}
+.hero-sub{font-size:.83rem;color:rgba(255,255,255,.6);line-height:1.65;max-width:420px;margin-bottom:1.35rem;position:relative;z-index:1}
+.hero-kpis{display:flex;gap:2rem;flex-wrap:wrap;position:relative;z-index:1}
+.hkpi-num{font-family:'Fraunces',serif;font-size:1.55rem;font-weight:700;color:#fff;line-height:1;letter-spacing:-.02em}
+.hkpi-lbl{font-size:.62rem;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;font-weight:600}
+.hero-live{position:absolute;top:1.25rem;right:1.5rem;background:rgba(255,255,255,.14);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);border-radius:100px;padding:.32rem .82rem;font-size:.7rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:5px;z-index:1}
+.live-dot{width:6px;height:6px;background:#4ade80;border-radius:50%;animation:ping 1.8s infinite}
+@keyframes ping{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ── QUICK ACTIONS ── */
+.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem}
+.qa-card{background:var(--white);border:1.5px solid var(--border);border-radius:15px;padding:.88rem .75rem;cursor:pointer;transition:all .2s cubic-bezier(.34,1.2,.64,1);text-align:center;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative;overflow:hidden}
+.qa-card:hover{border-color:var(--blue);transform:translateY(-3px);box-shadow:0 8px 24px rgba(37,99,235,.1)}
+.qa-card:active{transform:translateY(0) scale(.97)}
+.qa-ico{font-size:1.4rem}
+.qa-lbl{font-size:.72rem;font-weight:700;color:var(--ink2)}
+
+/* ── LAYOUT GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
+.g-aside{display:grid;grid-template-columns:1fr 330px;gap:1.2rem;align-items:start}
+
+/* ── SECTION HEADING ── */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.sh-title{font-family:'Fraunces',serif;font-size:.95rem;font-weight:700;color:var(--ink)}
+.sh-btn{font-size:.77rem;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;transition:opacity .17s}
+.sh-btn:hover{opacity:.65}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:1.35rem;position:relative;overflow:hidden}
+.clbl{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--soft);margin-bottom:.9rem;display:flex;align-items:center;justify-content:space-between}
+.clbl button,.clbl a{font-size:.72rem;color:var(--blue);font-weight:600;text-transform:none;letter-spacing:0;background:none;border:none;cursor:pointer;text-decoration:none}
+
+/* ── KPI CARDS ── */
+.kpi{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:1.15rem;transition:all .2s;overflow:hidden;position:relative}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.07);border-color:var(--border)}
+.kpi-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:18px 18px 0 0}
+.kpi-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.08rem;margin-bottom:.8rem}
+.kpi-num{font-family:'Fraunces',serif;font-size:2rem;font-weight:700;color:var(--ink);letter-spacing:-.04em;line-height:1}
+.kpi-lbl{font-size:.73rem;color:var(--mid);margin-top:3px}
+.kpi-delta{font-size:.69rem;font-weight:700;margin-top:5px;display:flex;align-items:center;gap:3px}
+.up{color:var(--green)}.down{color:var(--red)}
+
+/* ── PROGRESS ── */
+.pb{margin-bottom:.85rem}
+.pb:last-child{margin-bottom:0}
+.pb-h{display:flex;justify-content:space-between;margin-bottom:5px}
+.pb-l{font-size:.82rem;font-weight:600;color:var(--ink)}
+.pb-v{font-size:.74rem;font-weight:700;color:var(--mid)}
+.pb-track{height:7px;background:var(--surface);border-radius:99px;overflow:hidden}
+.pb-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.34,1,.64,1)}
+
+/* ── SESSION CARD ── */
+.sc{display:flex;align-items:center;gap:12px;padding:.88rem 1rem;background:var(--white);border:1.5px solid var(--border);border-radius:14px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.sc:hover{border-color:#bfdbfe;box-shadow:0 4px 16px rgba(37,99,235,.08);transform:translateX(3px)}
+.sc-time{text-align:center;width:48px;flex-shrink:0}
+.sc-t{font-family:'Fraunces',serif;font-size:1rem;font-weight:700;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.sc-d{font-size:.59rem;color:var(--soft);text-transform:uppercase;font-weight:600}
+.sc-pipe{width:2px;height:36px;border-radius:99px;flex-shrink:0}
+.sc-info{flex:1;min-width:0}
+.sc-name{font-size:.87rem;font-weight:600;color:var(--ink);margin-bottom:2px}
+.sc-meta{font-size:.7rem;color:var(--mid)}
+.sc-r{text-align:right;flex-shrink:0}
+.sc-tag{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:100px;display:inline-block;margin-bottom:3px}
+.tag-now{background:var(--green-l);color:var(--green)}
+.tag-soon{background:var(--blue-m);color:var(--blue)}
+.tag-done{background:var(--surface);color:var(--soft);border:1px solid var(--border)}
+.tag-pend{background:var(--amber-l);color:var(--amber)}
+.sc-price{font-size:.8rem;font-weight:700;color:var(--ink)}
+
+/* ── TUTOR CARD ── */
+.tc{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:1.15rem;transition:all .22s;cursor:pointer;position:relative;overflow:hidden}
+.tc:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.08);border-color:#bfdbfe}
+.tc-shine{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple));transform:scaleX(0);transform-origin:left;transition:transform .32s}
+.tc:hover .tc-shine{transform:scaleX(1)}
+.tc-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:.8rem}
+.tc-av{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:.92rem;font-weight:700;color:#fff;flex-shrink:0;position:relative;font-family:'Fraunces',serif}
+.tc-live{position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;background:#10b981;border-radius:50%;border:2.5px solid #fff}
+.tc-info{flex:1;min-width:0}
+.tc-name{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:1px}
+.tc-uni{font-size:.69rem;color:var(--mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tc-score{text-align:right;flex-shrink:0}
+.tc-snum{font-family:'Fraunces',serif;font-size:1.3rem;font-weight:700;color:var(--blue);letter-spacing:-.03em;line-height:1}
+.tc-slbl{font-size:.56rem;color:var(--soft);text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+.tc-sbar{height:3px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:3px;width:46px}
+.tc-sfill{height:100%;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.tc-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.7rem}
+.tc-rate{font-family:'Fraunces',serif;font-size:.9rem;font-weight:700;color:var(--ink)}
+.tc-stars{font-size:.74rem;color:var(--amber);display:flex;align-items:center;gap:3px}
+.tc-rc{font-size:.66rem;color:var(--soft)}
+.tc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:.75rem}
+.tt{font-size:.66rem;padding:2px 8px;border-radius:100px;font-weight:600;background:var(--blue-l);color:var(--blue);border:1px solid var(--blue-m)}
+.tt-g{background:var(--green-d);color:var(--green);border-color:rgba(16,185,129,.15)}
+.tc-btns{display:flex;gap:6px}
+.tb2{flex:1;border-radius:9px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:.74rem;font-weight:600;padding:.5rem;cursor:pointer;transition:all .17s}
+.tb-bk{background:var(--blue);color:#fff}
+.tb-bk:hover{background:var(--blue-v)}
+.tb-ms{background:var(--surface);color:var(--ink2);border:1.5px solid var(--border)}
+.tb-ms:hover{border-color:var(--ink2)}
+.tb-sv{background:var(--surface);color:var(--mid);border:1.5px solid var(--border);flex:0;padding:.5rem .7rem}
+.tb-sv:hover,.tb-sv.saved{background:var(--red-l);border-color:rgba(220,38,38,.28);color:var(--red)}
+
+/* ── INSIGHT ── */
+.ins{background:var(--surface);border:1.5px solid var(--border);border-radius:14px;padding:.88rem 1rem;margin-bottom:8px;display:flex;align-items:flex-start;gap:9px;cursor:pointer;transition:all .2s}
+.ins:hover{background:var(--blue-l);border-color:var(--blue-m)}
+.ins-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.ins-title{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:2px}
+.ins-desc{font-size:.72rem;color:var(--mid);line-height:1.45}
+.ins-cta{font-size:.69rem;font-weight:700;color:var(--blue);margin-top:4px}
+
+/* ── GOAL ITEMS ── */
+.gi{display:flex;align-items:center;gap:11px;padding:.82rem 1rem;background:var(--white);border:1.5px solid var(--border);border-radius:13px;margin-bottom:7px;cursor:pointer;transition:all .17s;user-select:none}
+.gi:hover{border-color:#bfdbfe}
+.gi.done{background:var(--green-d);border-color:rgba(5,150,105,.18)}
+.gi-chk{width:22px;height:22px;border-radius:7px;border:2px solid var(--border);background:var(--white);display:flex;align-items:center;justify-content:center;font-size:.68rem;flex-shrink:0;font-weight:800;transition:all .17s}
+.gi.done .gi-chk{background:var(--green);border-color:var(--green);color:#fff}
+.gi-text{font-size:.83rem;font-weight:500;color:var(--ink);flex:1;line-height:1.4}
+.gi.done .gi-text{text-decoration:line-through;color:var(--green);opacity:.65}
+.gi-pts{font-size:.66rem;font-weight:700;color:var(--blue);flex-shrink:0;background:var(--blue-l);padding:2px 7px;border-radius:100px}
+
+/* ── FILE ITEM ── */
+.fi{display:flex;align-items:center;gap:10px;padding:.7rem .88rem;background:var(--surface);border:1.5px solid var(--border);border-radius:12px;margin-bottom:6px;cursor:pointer;transition:all .2s}
+.fi:hover{border-color:#bfdbfe;background:var(--blue-l)}
+.fi-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.fi-name{font-size:.8rem;font-weight:600;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi-meta{font-size:.65rem;color:var(--soft);flex-shrink:0}
+.fi-dl{font-size:.69rem;font-weight:700;color:var(--blue);flex-shrink:0;background:var(--blue-l);padding:3px 8px;border-radius:6px}
+
+/* ── INVOICE ── */
+.ii{display:flex;align-items:center;gap:11px;padding:.78rem .95rem;background:var(--white);border:1.5px solid var(--border);border-radius:13px;margin-bottom:7px;transition:all .2s}
+.ii:hover{border-color:#bfdbfe}
+.ii-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.ii-name{font-size:.82rem;font-weight:600;color:var(--ink);margin-bottom:1px}
+.ii-meta{font-size:.67rem;color:var(--mid)}
+.ii-r{text-align:right;flex-shrink:0}
+.ii-amt{font-family:'Fraunces',serif;font-size:.9rem;font-weight:700;color:var(--ink)}
+.ii-status{font-size:.59rem;font-weight:700;padding:2px 7px;border-radius:100px;display:inline-block;margin-top:3px}
+.spaid{background:var(--green-l);color:var(--green)}
+.sesc{background:var(--amber-l);color:var(--amber)}
+.sfail{background:var(--red-l);color:var(--red)}
+
+/* ── REVIEW ── */
+.ri{padding:.82rem 0;border-bottom:1px solid var(--surface)}
+.ri:last-child{border-bottom:none;padding-bottom:0}
+.ri-top{display:flex;align-items:center;gap:9px;margin-bottom:.5rem}
+.ri-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.77rem;font-weight:700;color:#fff;flex-shrink:0;font-family:'Fraunces',serif}
+.ri-name{font-size:.82rem;font-weight:700;color:var(--ink)}
+.ri-sub{font-size:.66rem;color:var(--mid)}
+.ri-stars{margin-left:auto;color:var(--amber);font-size:.76rem}
+.ri-text{font-size:.78rem;color:var(--mid);line-height:1.65;font-style:italic}
+.ri-date{font-size:.62rem;color:var(--soft);margin-top:4px}
+
+/* ── MSG ROW ── */
+.mr{display:flex;align-items:center;gap:10px;padding:.8rem 1.2rem;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--surface)}
+.mr:last-child{border-bottom:none}
+.mr:hover{background:var(--surface)}
+.mr.unread{background:var(--blue-l)}
+.mr-av-w{position:relative;flex-shrink:0}
+.mr-av{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.87rem;font-weight:700;color:#fff;font-family:'Fraunces',serif}
+.mr-olive{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;background:#10b981;border-radius:50%;border:2px solid #fff}
+.mr-name{font-size:.84rem;font-weight:700;color:var(--ink);margin-bottom:1px}
+.mr-prev{font-size:.73rem;color:var(--mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mr-time{font-size:.62rem;color:var(--soft);flex-shrink:0}
+.mr-dot{width:8px;height:8px;background:var(--blue);border-radius:50%;margin-top:3px}
+
+/* ── NOTIF ── */
+.ni{display:flex;align-items:flex-start;gap:10px;padding:.8rem 1rem;border-bottom:1px solid var(--surface);cursor:pointer;transition:background .14s}
+.ni:last-child{border-bottom:none}
+.ni:hover{background:var(--surface)}
+.ni.unread{background:var(--blue-l)}
+.ni-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.ni-title{font-size:.81rem;font-weight:600;color:var(--ink);line-height:1.35;margin-bottom:1px}
+.ni-time{font-size:.64rem;color:var(--soft)}
+.ni-dot{width:7px;height:7px;background:var(--blue);border-radius:50%;flex-shrink:0;margin-top:4px}
+
+/* ── CALENDAR ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:.7rem}
+.cal-dn{font-size:.59rem;font-weight:700;color:var(--soft);text-align:center;text-transform:uppercase;letter-spacing:.04em;padding-bottom:3px}
+.cal-d{height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.77rem;font-weight:500;color:var(--mid);cursor:pointer;transition:all .17s;position:relative}
+.cal-d:hover{background:var(--surface)}
+.cal-d.today{background:var(--blue);color:#fff;font-weight:800;font-family:'Fraunces',serif}
+.cal-d.sess{background:var(--blue-m);color:var(--blue);font-weight:700}
+.cal-d.goal{background:var(--green-l);color:var(--green)}
+.cal-d.empty{opacity:.18;pointer-events:none}
+.cal-pip{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:currentColor}
+
+/* ── ANALYTICS ROW ── */
+.ar{display:flex;gap:1px;background:var(--border);border-radius:15px;overflow:hidden;margin-bottom:1.2rem}
+.ar-cell{background:var(--white);padding:.95rem 1rem;flex:1;text-align:center}
+.ar-num{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;color:var(--ink);letter-spacing:-.03em}
+.ar-lbl{font-size:.64rem;color:var(--mid);margin-top:2px}
+.ar-trend{font-size:.64rem;font-weight:700;margin-top:3px}
+
+/* ── MINI CHART ── */
+.chart{display:flex;align-items:flex-end;gap:4px;height:48px}
+.ch-b{flex:1;border-radius:4px 4px 0 0;transition:height .9s cubic-bezier(.34,1,.64,1)}
+
+/* ── SCORE RING ── */
+.sr-wrap{position:relative;width:80px;height:80px;flex-shrink:0}
+.sr-wrap svg{transform:rotate(-90deg)}
+.sr-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+
+/* ── UPLOAD ── */
+.uz{border:2px dashed var(--border);border-radius:14px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;margin-top:.75rem}
+.uz:hover{border-color:var(--blue);background:var(--blue-l)}
+
+/* ── AI FLOAT ── */
+.ai-float{position:fixed;bottom:1.5rem;right:1.5rem;z-index:500}
+.ai-btn{width:54px;height:54px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:17px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;box-shadow:0 6px 24px rgba(37,99,235,.35);transition:all .22s}
+.ai-btn:hover{transform:scale(1.08);box-shadow:0 10px 30px rgba(37,99,235,.45)}
+.ai-panel{position:absolute;bottom:64px;right:0;width:320px;background:var(--white);border:1.5px solid var(--border);border-radius:20px;box-shadow:0 16px 48px rgba(0,0,0,.12);display:none;flex-direction:column;overflow:hidden}
+.ai-panel.show{display:flex}
+.ai-hd{background:linear-gradient(135deg,var(--ink2),#1e3a5f);padding:.88rem 1rem;display:flex;align-items:center;gap:9px}
+.ai-hd-t{font-family:'Fraunces',serif;font-size:.88rem;font-weight:700;color:#fff;flex:1}
+.ai-hd-s{font-size:.64rem;color:rgba(255,255,255,.38)}
+.ai-x{background:rgba(255,255,255,.1);border:none;border-radius:7px;width:26px;height:26px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+.ai-body{max-height:256px;overflow-y:auto;padding:.8rem;display:flex;flex-direction:column;gap:7px}
+.ai-msg{padding:.56rem .76rem;border-radius:11px;font-size:.8rem;line-height:1.5;max-width:88%}
+.ai-bot{background:var(--blue-l);border:1px solid var(--blue-m);color:var(--ink2);align-self:flex-start;border-radius:4px 11px 11px 11px}
+.ai-user{background:var(--blue);color:#fff;align-self:flex-end;border-radius:11px 4px 11px 11px}
+.ai-chips{display:flex;gap:5px;padding:.5rem .8rem 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ai-chips::-webkit-scrollbar{display:none}
+.ai-chip{background:var(--surface);border:1.5px solid var(--border);border-radius:100px;padding:3px 9px;font-size:.71rem;font-weight:600;color:var(--ink2);white-space:nowrap;cursor:pointer;flex-shrink:0;transition:all .17s}
+.ai-chip:hover{background:var(--blue-l);border-color:var(--blue-m);color:var(--blue)}
+.ai-inp-row{display:flex;gap:6px;padding:.7rem;border-top:1px solid var(--border)}
+.ai-inp{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:.48rem .72rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.8rem;color:var(--ink);outline:none}
+.ai-inp:focus{border-color:var(--blue)}
+.ai-send{width:31px;height:31px;background:var(--blue);border:none;border-radius:8px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem}
+.ai-send:hover{background:var(--blue-v)}
+
+/* ── TOAST ── */
+.toast-stack{position:fixed;top:68px;right:1.5rem;z-index:600;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:.8rem .95rem;box-shadow:0 8px 28px rgba(0,0,0,.1);display:flex;align-items:center;gap:9px;min-width:270px;transform:translateX(115%);transition:transform .3s cubic-bezier(.34,1.2,.64,1)}
+.toast.show{transform:translateX(0)}
+.toast-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.88rem;flex-shrink:0}
+.toast-title{font-size:.8rem;font-weight:700;color:var(--ink)}
+.toast-msg{font-size:.69rem;color:var(--mid)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(8px);z-index:300;display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.sheet{background:var(--white);border-radius:24px 24px 0 0;padding:1.75rem 1.5rem 2.5rem;width:100%;max-width:520px;max-height:92vh;overflow-y:auto}
+.sheet-h{width:38px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 1.25rem}
+.sheet-title{font-family:'Fraunces',serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:4px;letter-spacing:-.01em}
+.sheet-sub{font-size:.82rem;color:var(--mid);margin-bottom:1.2rem;line-height:1.55}
+.fl{margin-bottom:.88rem}
+.fl-l{display:block;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mid);margin-bottom:.35rem}
+.fi2{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:.7rem .9rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.87rem;color:var(--ink);outline:none;transition:all .17s;-webkit-appearance:none}
+.fi2:focus{border-color:var(--blue);background:var(--white);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.fi2::placeholder{color:var(--soft)}
+textarea.fi2{resize:vertical;min-height:75px;line-height:1.6}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.st-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:.88rem}
+.st{background:var(--surface);border:2px solid var(--border);border-radius:10px;padding:.7rem .82rem;cursor:pointer;transition:all .17s;text-align:center;user-select:none}
+.st:hover{border-color:#bfdbfe}
+.st.sel{background:var(--blue-l);border-color:var(--blue)}
+.st-ico{font-size:1.25rem;margin-bottom:3px}
+.st-n{font-size:.8rem;font-weight:700;color:var(--ink)}
+.price-box{background:var(--blue-l);border:1.5px solid var(--blue-m);border-radius:10px;padding:.82rem .95rem;margin-bottom:.9rem}
+.pb-r{display:flex;justify-content:space-between;font-size:.81rem;color:var(--mid);margin-bottom:3px}
+.pb-r.total{font-weight:700;color:var(--ink);font-size:.88rem;padding-top:5px;border-top:1px solid var(--blue-m);margin-top:4px}
+.sbtn{width:100%;padding:.86rem;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .17s;border:none;margin-bottom:7px}
+.sbtn-p{background:var(--blue);color:#fff}
+.sbtn-p:hover{background:var(--blue-v);box-shadow:0 5px 18px rgba(37,99,235,.28)}
+.sbtn-g{background:var(--surface);color:var(--mid);border:1.5px solid var(--border)}
+
+/* ── OVERLAY BG ── */
+.bg-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:190}
+.bg-overlay.show{display:block}
+
+/* ── RESPONSIVE ── */
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.qa-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hbtn{display:flex}
+  .g3{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+  .g-aside{grid-template-columns:1fr}
+  .ar{flex-wrap:wrap}
+  .ar-cell{min-width:50%}
+}
+@media(max-width:640px){
+  .content{padding:1rem 1rem 5rem}
+  .topbar{padding:0 1rem}
+  .g3,.g4{grid-template-columns:1fr 1fr}
+  .qa-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-title{font-size:1.45rem}
+  .hero-kpis{gap:1.25rem}
+}
+@media(max-width:400px){
+  .g3,.g4{grid-template-columns:1fr}
+  .ar-cell{min-width:100%}
+}
+</style>
+</head>
+<body>
+
+<div class="toast-stack" id="toastStack"></div>
+<div class="bg-overlay" id="bgOverlay" onclick="closeSidebar()"></div>
+
+<!-- SIDEBAR -->
+<div class="shell">
+<div class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">U</div>
+    <div><div class="sb-brand">UniSkilled</div><div class="sb-tagline">Student Dashboard</div></div>
+  </div>
+  <div class="sb-user">
+    <div class="sb-av">SJ<div class="sb-dot"></div></div>
+    <div><div class="sb-uname">Sarah Johnson</div><div class="sb-urole">TU Berlin · 3rd year · CS</div></div>
+  </div>
+  <div class="sb-scroll">
+    <div class="sb-sec">Main</div>
+    <div class="sb-a on" onclick="go('overview',this)"><div class="sb-a-ico">🏠</div>Overview</div>
+    <div class="sb-a" onclick="go('find',this)"><div class="sb-a-ico">🤖</div>Find a Tutor<span class="sb-badge bb">5</span></div>
+    <div class="sb-a" onclick="go('sessions',this)"><div class="sb-a-ico">📅</div>My Sessions<span class="sb-badge br">1</span></div>
+    <div class="sb-a" onclick="go('saved',this)"><div class="sb-a-ico">❤️</div>Saved Tutors</div>
+    <div class="sb-a" onclick="go('messages',this)"><div class="sb-a-ico">💬</div>Messages<span class="sb-badge br">3</span></div>
+    <div class="sb-sec">Learning</div>
+    <div class="sb-a" onclick="go('progress',this)"><div class="sb-a-ico">📈</div>My Progress</div>
+    <div class="sb-a" onclick="go('goals',this)"><div class="sb-a-ico">🎯</div>Goals</div>
+    <div class="sb-a" onclick="go('files',this)"><div class="sb-a-ico">📎</div>Files & Homework</div>
+    <div class="sb-a" onclick="go('calendar',this)"><div class="sb-a-ico">🗓️</div>Calendar</div>
+    <div class="sb-sec">Account</div>
+    <div class="sb-a" onclick="go('payments',this)"><div class="sb-a-ico">💳</div>Payments</div>
+    <div class="sb-a" onclick="go('reviews',this)"><div class="sb-a-ico">⭐</div>My Reviews</div>
+    <div class="sb-a" onclick="go('notifications',this)"><div class="sb-a-ico">🔔</div>Notifications<span class="sb-badge br">5</span></div>
+  </div>
+  <div class="sb-bottom">
+    <div class="streak-box">
+      <span style="font-size:1.4rem">🔥</span>
+      <div><div class="streak-n">14</div><div class="streak-txt">day streak — keep it going!</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-l">
+      <button class="hbtn" onclick="toggleSidebar()">☰</button>
+      <div><div class="tb-title" id="tbTitle">Overview</div><div class="tb-sub" id="tbSub">Good morning, Sarah 👋</div></div>
+    </div>
+    <div class="tb-r">
+      <button class="ib ico-btn" onclick="go('sessions')">📅<div class="ndot"></div></button>
+      <button class="ib ico-btn" onclick="go('notifications')">🔔<div class="ndot"></div></button>
+      <button class="ib pri-btn" onclick="openBook()">+ Book Session</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ══ OVERVIEW ══ -->
+    <div class="page on" id="page-overview">
+      <div class="hero">
+        <div class="hero-live"><span class="live-dot"></span>Active</div>
+        <div class="hero-eyebrow">Welcome back</div>
+        <div class="hero-title">Ready to learn something<br><i>great today?</i></div>
+        <div class="hero-sub">You have a session with Nina Mueller at 4:00 PM. Your Linear Algebra exam is in 9 days. Let's make them count.</div>
+        <div class="hero-kpis">
+          <div><div class="hkpi-num">14</div><div class="hkpi-lbl">Sessions</div></div>
+          <div><div class="hkpi-num">3/5</div><div class="hkpi-lbl">Goals done</div></div>
+          <div><div class="hkpi-num">+18%</div><div class="hkpi-lbl">Grade boost</div></div>
+          <div><div class="hkpi-num">🔥 14</div><div class="hkpi-lbl">Day streak</div></div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="qa-grid">
+        <button class="qa-card" onclick="openBook()"><div class="qa-ico">📅</div><div class="qa-lbl">Book Session</div></button>
+        <button class="qa-card" onclick="go('find')"><div class="qa-ico">🤖</div><div class="qa-lbl">Find Tutor</div></button>
+        <button class="qa-card" onclick="go('files')"><div class="qa-ico">📎</div><div class="qa-lbl">Upload HW</div></button>
+        <button class="qa-card" onclick="go('messages')"><div class="qa-ico">💬</div><div class="qa-lbl">Messages</div></button>
+      </div>
+
+      <div class="g-aside" style="margin-bottom:1.2rem">
+        <div style="display:flex;flex-direction:column;gap:1.2rem">
+          <!-- Today -->
+          <div class="card">
+            <div class="clbl">Today & upcoming <button onclick="go('sessions')">View all</button></div>
+            <div id="ov-sessions"></div>
+          </div>
+          <!-- Progress -->
+          <div class="card">
+            <div class="clbl">Subject progress</div>
+            <div class="pb"><div class="pb-h"><span class="pb-l">📐 Linear Algebra</span><span class="pb-v">72%</span></div><div class="pb-track"><div class="pb-fill" style="width:72%;background:var(--blue)"></div></div></div>
+            <div class="pb"><div class="pb-h"><span class="pb-l">🐍 Python</span><span class="pb-v">58%</span></div><div class="pb-track"><div class="pb-fill" style="width:58%;background:var(--purple)"></div></div></div>
+            <div class="pb"><div class="pb-h"><span class="pb-l">🔗 Data Structures</span><span class="pb-v">45%</span></div><div class="pb-track"><div class="pb-fill" style="width:45%;background:var(--green)"></div></div></div>
+            <div class="pb"><div class="pb-h"><span class="pb-l">🤖 Machine Learning</span><span class="pb-v">28%</span></div><div class="pb-track"><div class="pb-fill" style="width:28%;background:var(--orange)"></div></div></div>
+          </div>
+        </div>
+        <!-- AI Insights sidebar -->
+        <div style="display:flex;flex-direction:column;gap:1.2rem">
+          <div class="card">
+            <div class="clbl" style="margin-bottom:.6rem">🤖 AI study insights</div>
+            <div class="ins" onclick="toast('💡','AI Insight','Exam in 9 days — book 2 more sessions to stay on track.')">
+              <div class="ins-ico" style="background:var(--red-l)">⚠️</div>
+              <div><div class="ins-title">Exam in 9 days — boost pace</div><div class="ins-desc">You need 2 more sessions before your Linear Algebra exam.</div><div class="ins-cta">→ Book with Nina</div></div>
+            </div>
+            <div class="ins" onclick="go('find')">
+              <div class="ins-ico" style="background:var(--green-d)">🎯</div>
+              <div><div class="ins-title">3 new Python tutors matched</div><div class="ins-desc">Students like you improved +23% in 4 sessions with Marcus.</div><div class="ins-cta">→ View matches</div></div>
+            </div>
+            <div class="ins" onclick="toast('📚','Reminder','Review eigenspace notes — 5 days since last review.')">
+              <div class="ins-ico" style="background:var(--amber-l)">📚</div>
+              <div><div class="ins-title">Review eigenspace notes</div><div class="ins-desc">Spaced repetition suggests revisiting this topic today.</div><div class="ins-cta">→ Open notes</div></div>
+            </div>
+          </div>
+          <!-- Sessions chart -->
+          <div class="card">
+            <div class="clbl">Sessions · 8 weeks</div>
+            <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:.8rem">
+              <span style="font-family:'Fraunces',serif;font-size:1.7rem;font-weight:700;color:var(--ink);letter-spacing:-.04em">14</span>
+              <span class="up" style="font-size:.74rem;font-weight:700">↑ +3</span>
+            </div>
+            <div class="chart" id="sessChart"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:5px"><span style="font-size:.62rem;color:var(--soft)">Apr 1</span><span style="font-size:.62rem;color:var(--soft)">May 23</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="g4">
+        <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--blue),#60a5fa)"></div><div class="kpi-ico" style="background:var(--blue-l)">📅</div><div class="kpi-num">14</div><div class="kpi-lbl">Sessions attended</div><div class="kpi-delta up">↑ 3 more than last month</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--green),#34d399)"></div><div class="kpi-ico" style="background:var(--green-d)">🎯</div><div class="kpi-num">3/5</div><div class="kpi-lbl">Goals achieved</div><div class="kpi-delta up">60% complete</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),#a78bfa)"></div><div class="kpi-ico" style="background:var(--purple-l)">📈</div><div class="kpi-num">+18%</div><div class="kpi-lbl">Grade improvement</div><div class="kpi-delta up">↑ since start of term</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--orange),#fb923c)"></div><div class="kpi-ico" style="background:var(--orange-l)">💷</div><div class="kpi-num">£280</div><div class="kpi-lbl">Spent on tutoring</div><div class="kpi-delta" style="color:var(--mid)">10 sessions · avg £28</div></div>
+      </div>
+    </div>
+
+    <!-- ══ FIND A TUTOR ══ -->
+    <div class="page" id="page-find">
+      <div class="hero" style="padding:1.5rem 2rem;margin-bottom:1.2rem">
+        <div class="hero-live"><span class="live-dot"></span>Live</div>
+        <div class="hero-eyebrow">AI Matching Engine</div>
+        <div class="hero-title" style="font-size:1.45rem">Tutors matched to <i>you</i></div>
+        <div class="hero-sub" style="margin-bottom:0;font-size:.8rem">Based on your subjects, goals, budget, language and availability. Scores update in real-time.</div>
+      </div>
+      <div class="ar" style="margin-bottom:1.2rem">
+        <div class="ar-cell"><div class="ar-num">5</div><div class="ar-lbl">New today</div></div>
+        <div class="ar-cell"><div class="ar-num">94%</div><div class="ar-lbl">Avg AI score</div></div>
+        <div class="ar-cell"><div class="ar-num">28</div><div class="ar-lbl">Total matches</div></div>
+        <div class="ar-cell"><div class="ar-num">£24</div><div class="ar-lbl">Avg rate</div></div>
+      </div>
+      <!-- Filters -->
+      <div class="card" style="padding:.9rem 1.1rem;margin-bottom:1.2rem">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <span style="font-size:.7rem;font-weight:700;color:var(--soft);text-transform:uppercase;letter-spacing:.07em;flex-shrink:0">Filter:</span>
+          <div id="subjectChips" style="display:flex;gap:6px;flex-wrap:wrap;flex:1"></div>
+          <select class="fi2" style="width:auto;padding:.38rem .7rem;font-size:.78rem">
+            <option>Any budget</option><option>Under £20/hr</option><option>Under £30/hr</option><option>Under £40/hr</option>
+          </select>
+          <select class="fi2" style="width:auto;padding:.38rem .7rem;font-size:.78rem">
+            <option>Any language</option><option>English</option><option>German</option><option>French</option>
+          </select>
+          <select class="fi2" style="width:auto;padding:.38rem .7rem;font-size:.78rem">
+            <option>Best match</option><option>Highest rated</option><option>Lowest price</option>
+          </select>
+        </div>
+      </div>
+      <div class="sh"><div class="sh-title">⭐ Best matches for you</div><button class="sh-btn" onclick="toast('🔄','Refreshing','AI scanning for new tutors...')">Refresh</button></div>
+      <div class="g3" id="tutorGrid"></div>
+    </div>
+
+    <!-- ══ MY SESSIONS ══ -->
+    <div class="page" id="page-sessions">
+      <div class="ar" style="margin-bottom:1.2rem">
+        <div class="ar-cell"><div class="ar-num">14</div><div class="ar-lbl">Total sessions</div><div class="ar-trend up">↑ +3 this month</div></div>
+        <div class="ar-cell"><div class="ar-num">21h</div><div class="ar-lbl">Hours studied</div></div>
+        <div class="ar-cell"><div class="ar-num">3</div><div class="ar-lbl">Tutors worked with</div></div>
+        <div class="ar-cell"><div class="ar-num">4.9</div><div class="ar-lbl">Avg tutor rating</div></div>
+      </div>
+      <div class="g2">
+        <div><div class="sh"><div class="sh-title">📅 Upcoming</div><button class="sh-btn" onclick="openBook()">+ Book</button></div><div id="upcomingList"></div></div>
+        <div><div class="sh"><div class="sh-title">✅ History</div></div><div id="historyList"></div></div>
+      </div>
+    </div>
+
+    <!-- ══ SAVED TUTORS ══ -->
+    <div class="page" id="page-saved">
+      <div class="sh"><div class="sh-title">❤️ Saved Tutors</div><button class="sh-btn" onclick="go('find')">Browse more</button></div>
+      <div class="g3" id="savedGrid"></div>
+    </div>
+
+    <!-- ══ MESSAGES ══ -->
+    <div class="page" id="page-messages">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div class="sh-title">Messages <span style="background:var(--red-l);color:var(--red);font-size:.64rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:5px">3 unread</span></div>
+          <button class="ib pri-btn" style="height:30px;font-size:.73rem" onclick="window.location.href='messages.html'">Open inbox →</button>
+        </div>
+        <div id="msgList"></div>
+      </div>
+    </div>
+
+    <!-- ══ PROGRESS ══ -->
+    <div class="page" id="page-progress">
+      <div class="ar" style="margin-bottom:1.2rem">
+        <div class="ar-cell"><div class="ar-num">14</div><div class="ar-lbl">Sessions done</div><div class="ar-trend up">↑ +3</div></div>
+        <div class="ar-cell"><div class="ar-num">+18%</div><div class="ar-lbl">Grade boost</div><div class="ar-trend up">↑ since start</div></div>
+        <div class="ar-cell"><div class="ar-num">6</div><div class="ar-lbl">Subjects touched</div></div>
+        <div class="ar-cell"><div class="ar-num">3/5</div><div class="ar-lbl">Goals hit</div></div>
+      </div>
+      <div class="g2" style="margin-bottom:1.2rem">
+        <div class="card">
+          <div class="clbl">Subject progress</div>
+          <div class="pb"><div class="pb-h"><span class="pb-l">📐 Linear Algebra</span><span class="pb-v">72%</span></div><div class="pb-track"><div class="pb-fill" style="width:72%;background:var(--blue)"></div></div></div>
+          <div class="pb"><div class="pb-h"><span class="pb-l">🐍 Python</span><span class="pb-v">58%</span></div><div class="pb-track"><div class="pb-fill" style="width:58%;background:var(--purple)"></div></div></div>
+          <div class="pb"><div class="pb-h"><span class="pb-l">🔗 Data Structures</span><span class="pb-v">45%</span></div><div class="pb-track"><div class="pb-fill" style="width:45%;background:var(--green)"></div></div></div>
+          <div class="pb"><div class="pb-h"><span class="pb-l">🤖 Machine Learning</span><span class="pb-v">28%</span></div><div class="pb-track"><div class="pb-fill" style="width:28%;background:var(--orange)"></div></div></div>
+          <div class="pb"><div class="pb-h"><span class="pb-l">⚡ Algorithms</span><span class="pb-v">52%</span></div><div class="pb-track"><div class="pb-fill" style="width:52%;background:var(--amber)"></div></div></div>
+        </div>
+        <div class="card">
+          <div class="clbl">Profile strength</div>
+          <div style="display:flex;align-items:center;gap:1.2rem;margin-bottom:1rem">
+            <div class="sr-wrap">
+              <svg width="80" height="80" viewBox="0 0 80 80"><circle cx="40" cy="40" r="30" fill="none" stroke="var(--surface)" stroke-width="6"/><circle cx="40" cy="40" r="30" fill="none" stroke="var(--blue)" stroke-width="6" stroke-dasharray="188" stroke-dashoffset="47" stroke-linecap="round"/></svg>
+              <div class="sr-num">75%</div>
+            </div>
+            <div><div style="font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:3px">Good standing</div><div style="font-size:.75rem;color:var(--mid);line-height:1.5">Complete your profile to get better tutor matches</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:5px;font-size:.76rem">
+            <div style="color:var(--green)">✓ University email verified</div>
+            <div style="color:var(--green)">✓ 3 subjects listed</div>
+            <div style="color:var(--green)">✓ Learning goals set</div>
+            <div style="color:var(--orange)">⚠ Add a profile photo (+20%)</div>
+            <div style="color:var(--mid)">○ Set budget preference</div>
+            <div style="color:var(--mid)">○ Set timezone</div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="clbl" style="margin-bottom:.6rem">🤖 AI personalised study suggestions</div>
+        <div class="ins" onclick="toast('📚','Study Plan','Generating personalised study schedule for your exam...')"><div class="ins-ico" style="background:var(--blue-l)">📖</div><div><div class="ins-title">Study 1hr of Linear Algebra today</div><div class="ins-desc">Exam in 9 days. Focus on eigenspaces and diagonalisation this week.</div><div class="ins-cta">→ Generate study plan</div></div></div>
+        <div class="ins" onclick="toast('🤖','AI Insight','2 Python sessions/week will boost your CS grade ~15%.')"><div class="ins-ico" style="background:var(--purple-l)">🐍</div><div><div class="ins-title">Add 2 Python sessions per week</div><div class="ins-desc">Students with your profile who did this improved CS by 15% in 4 weeks.</div><div class="ins-cta">→ Find Python tutors</div></div></div>
+        <div class="ins" onclick="toast('🧠','Spaced Repetition','Review Data Structures today for 40% better retention.')"><div class="ins-ico" style="background:var(--green-d)">🧠</div><div><div class="ins-title">Review Data Structures — 4 days overdue</div><div class="ins-desc">Reviewing today improves long-term retention by 40%.</div><div class="ins-cta">→ Review now</div></div></div>
+      </div>
+    </div>
+
+    <!-- ══ GOALS ══ -->
+    <div class="page" id="page-goals">
+      <div class="g2">
+        <div>
+          <div class="sh"><div class="sh-title">🎯 Learning goals</div><button class="sh-btn" onclick="showAddGoal()">+ Add goal</button></div>
+          <div id="goalsList"></div>
+          <div id="addGoalArea" style="display:none;margin-top:8px">
+            <input type="text" class="fi2" id="goalInput" placeholder="e.g. Pass Linear Algebra with B+ or above..." style="margin-bottom:7px">
+            <div style="display:flex;gap:7px">
+              <button onclick="saveGoal()" style="flex:1;padding:.58rem;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer">Add goal</button>
+              <button onclick="document.getElementById('addGoalArea').style.display='none'" style="padding:.58rem .82rem;background:var(--surface);color:var(--mid);border:1.5px solid var(--border);border-radius:9px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:.82rem;cursor:pointer">Cancel</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="sh"><div class="sh-title">Summary</div></div>
+          <div class="ar" style="margin-bottom:1.2rem;border-radius:14px">
+            <div class="ar-cell"><div class="ar-num" style="color:var(--green)">3</div><div class="ar-lbl">Done</div></div>
+            <div class="ar-cell"><div class="ar-num" style="color:var(--orange)">2</div><div class="ar-lbl">In progress</div></div>
+            <div class="ar-cell"><div class="ar-num" style="color:var(--blue)">60%</div><div class="ar-lbl">Overall</div></div>
+          </div>
+          <div class="card">
+            <div class="clbl" style="margin-bottom:.6rem">🤖 AI goal tips</div>
+            <div class="ins" onclick="toast('🎯','AI Tip','Break big goals into weekly milestones — 60% more likely to succeed.')"><div class="ins-ico" style="background:var(--blue-l)">💡</div><div><div class="ins-title">Break goals into weekly milestones</div><div class="ins-desc">Students with sub-goals are 60% more likely to succeed.</div><div class="ins-cta">→ Create weekly plan</div></div></div>
+            <div class="ins" onclick="toast('⏰','Reminder set','Daily study reminder set for 7pm.')"><div class="ins-ico" style="background:var(--amber-l)">⏰</div><div><div class="ins-title">Set a daily study reminder</div><div class="ins-desc">Students with reminders hit goals 45% faster.</div><div class="ins-cta">→ Set reminder</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ FILES ══ -->
+    <div class="page" id="page-files">
+      <div class="g2">
+        <div>
+          <div class="sh"><div class="sh-title">📎 My uploads</div></div>
+          <div id="filesList"></div>
+          <div class="uz" onclick="toast('📎','Upload','Select files to send to your tutor')">
+            <div style="font-size:1.8rem;margin-bottom:6px">📎</div>
+            <div style="font-size:.87rem;font-weight:600;color:var(--ink2);margin-bottom:3px">Upload homework or files</div>
+            <div style="font-size:.7rem;color:var(--soft)">PDF, DOCX, PNG, JPG · Max 20MB</div>
+          </div>
+        </div>
+        <div>
+          <div class="sh"><div class="sh-title">📚 From tutors</div></div>
+          <div id="materialsList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CALENDAR ══ -->
+    <div class="page" id="page-calendar">
+      <div class="g2">
+        <div class="card">
+          <div class="clbl">May 2025 <button onclick="openBook()">+ Book session</button></div>
+          <div class="cal-grid" id="calGrid"></div>
+          <div style="display:flex;gap:12px;margin-top:.85rem;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:5px;font-size:.69rem;color:var(--mid)"><div style="width:9px;height:9px;border-radius:2px;background:var(--blue)"></div>Session</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:.69rem;color:var(--mid)"><div style="width:9px;height:9px;border-radius:2px;background:var(--green-l);border:1px solid var(--green)"></div>Goal due</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:.69rem;color:var(--mid)"><div style="width:9px;height:9px;border-radius:2px;background:var(--ink2)"></div>Today</div>
+          </div>
+        </div>
+        <div>
+          <div class="sh"><div class="sh-title">This week</div></div>
+          <div id="calWeek"></div>
+          <div class="card" style="margin-top:1rem;background:linear-gradient(135deg,var(--ink2),#1e3a5f);border-color:transparent">
+            <div style="font-size:.68rem;font-weight:700;color:rgba(255,255,255,.32);text-transform:uppercase;letter-spacing:.09em;margin-bottom:.6rem">🤖 Smart schedule tip</div>
+            <div style="font-size:.82rem;color:rgba(255,255,255,.68);line-height:1.6">Your most productive study window is <strong style="color:#fff">Tuesday 3–6pm</strong>. Book your Linear Algebra session then for best retention.</div>
+            <button onclick="openBook()" style="margin-top:.85rem;width:100%;background:var(--blue);color:#fff;border:none;border-radius:9px;padding:.62rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;transition:all .17s">Book for Tuesday →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAYMENTS ══ -->
+    <div class="page" id="page-payments">
+      <div class="ar" style="margin-bottom:1.2rem">
+        <div class="ar-cell"><div class="ar-num">£280</div><div class="ar-lbl">Spent this month</div></div>
+        <div class="ar-cell"><div class="ar-num">10</div><div class="ar-lbl">Sessions paid</div></div>
+        <div class="ar-cell"><div class="ar-num">£28</div><div class="ar-lbl">Avg per session</div></div>
+        <div class="ar-cell"><div class="ar-num">£28</div><div class="ar-lbl">Pending escrow</div></div>
+      </div>
+      <div class="g2">
+        <div class="card"><div class="clbl">Invoices & payments</div><div id="invoiceList"></div></div>
+        <div class="card">
+          <div class="clbl">Payment method</div>
+          <div style="background:linear-gradient(135deg,var(--ink2),#1e3a5f);border-radius:14px;padding:1.25rem 1.35rem;margin-bottom:1rem;position:relative;overflow:hidden">
+            <div style="position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(37,99,235,.2)"></div>
+            <div style="font-size:.6rem;color:rgba(255,255,255,.38);margin-bottom:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em">UniSkilled Escrow</div>
+            <div style="font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:.12em;margin-bottom:.65rem;font-family:'Fraunces',serif">•••• •••• •••• 4242</div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-end">
+              <div><div style="font-size:.58rem;color:rgba(255,255,255,.38)">Card holder</div><div style="font-size:.8rem;font-weight:600;color:#fff">Sarah Johnson</div></div>
+              <div style="text-align:right"><div style="font-size:.58rem;color:rgba(255,255,255,.38)">Expires</div><div style="font-size:.8rem;font-weight:600;color:#fff">09/27</div></div>
+            </div>
+          </div>
+          <div style="background:var(--green-d);border:1px solid rgba(5,150,105,.2);border-radius:11px;padding:.82rem 1rem;display:flex;align-items:flex-start;gap:8px;font-size:.77rem;color:var(--ink2)"><span>🔐</span><span><strong>Payments are secure.</strong> All payments are held in escrow and released only after your session is confirmed complete.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ REVIEWS ══ -->
+    <div class="page" id="page-reviews">
+      <div class="sh"><div class="sh-title">⭐ Reviews I have left for tutors</div></div>
+      <div class="card" style="margin-bottom:1.2rem"><div id="reviewList"></div></div>
+      <div class="sh"><div class="sh-title">Awaiting review</div></div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:11px;padding:.9rem 1.1rem">
+          <div style="width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#1e293b,#2d3f5e);display:flex;align-items:center;justify-content:center;font-size:.87rem;font-weight:700;color:#fff;flex-shrink:0;font-family:'Fraunces',serif">NM</div>
+          <div style="flex:1"><div style="font-size:.87rem;font-weight:700;color:var(--ink)">Nina Mueller — Linear Algebra</div><div style="font-size:.7rem;color:var(--mid)">Session · 19 May 2025</div></div>
+          <button onclick="openReviewModal('Nina Mueller')" style="background:var(--blue);color:#fff;border:none;border-radius:9px;padding:.5rem .95rem;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.77rem;cursor:pointer;transition:all .17s">Leave review</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ NOTIFICATIONS ══ -->
+    <div class="page" id="page-notifications">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <div class="sh-title">Notifications <span style="background:var(--red-l);color:var(--red);font-size:.64rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:5px">5 unread</span></div>
+          <button class="sh-btn" onclick="markAllRead()">Mark all read</button>
+        </div>
+        <div id="notifList"></div>
+      </div>
+    </div>
+
+  </div><!-- content -->
+</div><!-- main -->
+</div><!-- shell -->
+
+<!-- BOOK MODAL -->
+<div class="overlay" id="bookOverlay" onclick="closeModal('bookOverlay',event)">
+  <div class="sheet">
+    <div class="sheet-h"></div>
+    <div class="sheet-title">Book a session</div>
+    <div class="sheet-sub" id="bookSub">Choose a tutor, subject and time. Payment held securely in escrow.</div>
+    <div class="fl"><label class="fl-l">Tutor</label><select class="fi2"><option>Nina Mueller — Linear Algebra · £28/hr</option><option>Marcus Okonkwo — Python · £22/hr</option><option>Aisha Kamara — Economics · £25/hr</option></select></div>
+    <div class="fl"><label class="fl-l">Session type</label>
+      <div class="st-row">
+        <div class="st sel" onclick="pickStype(this)"><div class="st-ico">💻</div><div class="st-n">Online</div></div>
+        <div class="st" onclick="pickStype(this)"><div class="st-ico">📍</div><div class="st-n">In-person</div></div>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fl"><label class="fl-l">Date</label><input type="date" class="fi2"></div>
+      <div class="fl"><label class="fl-l">Time (CET)</label><input type="time" class="fi2"></div>
+    </div>
+    <div class="fl"><label class="fl-l">Duration</label><select class="fi2" onchange="updateBookPrice(this)"><option value="1">1 hour — £28</option><option value="1.5">1.5 hours — £42</option><option value="2">2 hours — £56</option></select></div>
+    <div class="fl"><label class="fl-l">What do you need help with?</label><textarea class="fi2" placeholder="e.g. Eigenvalues — I understand the mechanics but not the geometric intuition..."></textarea></div>
+    <div class="price-box">
+      <div class="pb-r"><span>Session (1 hour)</span><span>£28.00</span></div>
+      <div class="pb-r"><span>Platform fee</span><span>Free</span></div>
+      <div class="pb-r total"><span>Total (held in escrow)</span><span id="bookTotal">£28.00</span></div>
+    </div>
+    <button class="sbtn sbtn-p" onclick="confirmBook()">🔐 Confirm booking</button>
+    <button class="sbtn sbtn-g" onclick="document.getElementById('bookOverlay').classList.remove('open')">Cancel</button>
+    <div style="text-align:center;font-size:.69rem;color:var(--soft)">🔐 Escrow payment · Free cancellation 24hrs before</div>
+  </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="overlay" id="reviewOverlay" onclick="closeModal('reviewOverlay',event)">
+  <div class="sheet">
+    <div class="sheet-h"></div>
+    <div class="sheet-title">Leave a review</div>
+    <div class="sheet-sub" id="revSub">How was your session?</div>
+    <div class="fl"><label class="fl-l">Star rating</label>
+      <div style="display:flex;gap:8px;margin-bottom:.5rem" id="starRow">
+        <span onclick="setStars(1)" style="font-size:1.9rem;cursor:pointer;transition:transform .15s" class="star">☆</span>
+        <span onclick="setStars(2)" style="font-size:1.9rem;cursor:pointer;transition:transform .15s" class="star">☆</span>
+        <span onclick="setStars(3)" style="font-size:1.9rem;cursor:pointer;transition:transform .15s" class="star">☆</span>
+        <span onclick="setStars(4)" style="font-size:1.9rem;cursor:pointer;transition:transform .15s" class="star">☆</span>
+        <span onclick="setStars(5)" style="font-size:1.9rem;cursor:pointer;transition:transform .15s" class="star">☆</span>
+      </div>
+    </div>
+    <div class="fl"><label class="fl-l">Your review</label><textarea class="fi2" id="reviewText" placeholder="How was the session? Would you recommend this tutor?" rows="4"></textarea></div>
+    <button class="sbtn sbtn-p" onclick="submitReview()">Submit review</button>
+    <button class="sbtn sbtn-g" onclick="document.getElementById('reviewOverlay').classList.remove('open')">Cancel</button>
+  </div>
+</div>
+
+<!-- AI ASSISTANT -->
+<div class="ai-float">
+  <div class="ai-panel" id="aiPanel">
+    <div class="ai-hd">
+      <div><div class="ai-hd-t">🤖 AI Study Assistant</div><div class="ai-hd-s">Ask me anything about your studies</div></div>
+      <button class="ai-x" onclick="toggleAI()">✕</button>
+    </div>
+    <div class="ai-body" id="aiBody">
+      <div class="ai-msg ai-bot">Hi Sarah! 👋 I am your AI study assistant. I can help with tutor recommendations, study plans, goal setting and exam prep. What do you need?</div>
+    </div>
+    <div class="ai-chips">
+      <div class="ai-chip" onclick="sendAI(this)">Study plan</div>
+      <div class="ai-chip" onclick="sendAI(this)">Find a tutor</div>
+      <div class="ai-chip" onclick="sendAI(this)">Exam tips</div>
+      <div class="ai-chip" onclick="sendAI(this)">My progress</div>
+    </div>
+    <div class="ai-inp-row">
+      <input class="ai-inp" id="aiInp" placeholder="Ask anything..." onkeydown="if(event.key==='Enter')sendAIMsg()">
+      <button class="ai-send" onclick="sendAIMsg()">➤</button>
+    </div>
+  </div>
+  <button class="ai-btn" onclick="toggleAI()">🤖</button>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* DATA */
+// ── REAL DATA FROM BACKEND ──
+var tutors = [];
+var savedIds = [];
+var upcoming = [];
+var history = [];
+var invoices = [];
+var reviews = [];
+var notifs = [];
+var msgs = [];
+
+async function loadDashboardData() {
+  if (typeof UniSkilled === 'undefined') return;
+
+  // Require login
+  if (!UniSkilled.Auth.isLoggedIn()) {
+    window.location.href = 'signin.html?redirect=student-dashboard.html';
+    return;
+  }
+
+  // Load all data in parallel
+  const [sessionsRes, tutorsRes, notifRes, profileRes] = await Promise.all([
+    UniSkilled.Sessions.list('student'),
+    UniSkilled.Tutors.search({ limit: 20 }),
+    UniSkilled.Notifications.list(),
+    UniSkilled.Profile.get()
+  ]);
+
+  // Wire tutors
+  if (tutorsRes.data) {
+    tutors = tutorsRes.data.map(function(t) {
+      var initials = (t.full_name || 'TU').split(' ').map(function(n){ return n[0]; }).join('').slice(0,2).toUpperCase();
+      return {
+        id: t.user_id,
+        i: initials,
+        c: 'linear-gradient(135deg,#1e293b,#2d3f5e)',
+        name: t.full_name,
+        uni: (t.city || '') + (t.country ? ' · ' + t.country : ''),
+        rate: t.hourly_rate,
+        rating: t.rating_avg,
+        reviews: t.review_count,
+        score: t.match_score || 0,
+        subs: t.subjects || [],
+        lang: (t.languages || []).join(', '),
+        avail: t.next_available || 'Available',
+        online: false,
+        sessions: t.sessions_count,
+        badge: t.top_rated ? 'top' : (t.uniskilled_certified ? 'cert' : ''),
+        tutor_profile_id: t.id
+      };
+    });
+    renderTutors();
+  }
+
+  // Wire sessions
+  if (sessionsRes.data) {
+    upcoming = sessionsRes.data
+      .filter(function(s){ return s.status === 'confirmed'; })
+      .map(function(s) {
+        var d = new Date(s.scheduled_at_utc);
+        return {
+          id: s.id,
+          name: s.tutor_profiles ? 'Tutor' : 'Tutor',
+          sub: s.subject,
+          fmt: s.video_link ? '💻 Online' : '📍 In-person',
+          t: d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+          d: d.toLocaleDateString([], {weekday:'short', day:'numeric', month:'short'}),
+          price: '€' + s.total_charged,
+          badge: 'tag-soon',
+          badgeText: 'Confirmed',
+          stripe_payment_intent_id: s.stripe_payment_intent_id,
+          video_link: s.video_link
+        };
+      });
+
+    history = sessionsRes.data
+      .filter(function(s){ return s.status === 'completed' || s.status === 'cancelled'; })
+      .map(function(s) {
+        var d = new Date(s.scheduled_at_utc);
+        return {
+          id: s.id,
+          name: 'Tutor',
+          sub: s.subject,
+          fmt: s.video_link ? '💻 Online' : '📍 In-person',
+          t: d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+          d: d.toLocaleDateString([], {weekday:'short', day:'numeric', month:'short'}),
+          price: '€' + s.total_charged,
+          badge: s.status === 'completed' ? 'tag-done' : 'tag-cancel',
+          badgeText: s.status === 'completed' ? 'Done' : 'Cancelled'
+        };
+      });
+  }
+
+  // Wire notifications
+  if (notifRes.data) {
+    notifs = notifRes.data.map(function(n) {
+      return {
+        ico: '🔔',
+        bg: 'var(--blue-l)',
+        title: n.title + (n.body ? ' — ' + n.body : ''),
+        t: new Date(n.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}),
+        unread: !n.is_read
+      };
+    });
+  }
+
+  // Update overview stats
+  if (profileRes) {
+    var sp = profileRes.student_profile;
+    var completedCount = (sessionsRes.data || []).filter(function(s){ return s.status === 'completed'; }).length;
+    document.querySelectorAll('[data-stat="sessions"]').forEach(function(el){ el.textContent = completedCount; });
+    document.querySelectorAll('[data-stat="earnings"]').forEach(function(el){ el.textContent = '€' + (sp ? sp.total_earnings || 0 : 0); });
+  }
+
+  // Re-render all sections with real data
+  if (typeof renderAll === 'function') renderAll();
+  if (typeof renderSessions === 'function') renderSessions();
+  if (typeof renderNotifs === 'function') renderNotifs();
+}
+
+// Load data when API is ready
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(loadDashboardData, 500);
+});
+
+var upcoming=[
+  {i:'NM',c:'linear-gradient(135deg,#1e293b,#2d3f5e)',name:'Nina Mueller',sub:'Linear Algebra',fmt:'💻 Online',t:'16:00',d:'Today',price:'£28',badge:'tag-now',badgeText:'In 2 hrs'},
+  {i:'MO',c:'linear-gradient(135deg,#1d4ed8,#3b82f6)',name:'Marcus Okonkwo',sub:'Python · Decorators',fmt:'💻 Online',t:'10:00',d:'Mon 26',price:'£22',badge:'tag-soon',badgeText:'Mon'},
+  {i:'NM',c:'linear-gradient(135deg,#1e293b,#2d3f5e)',name:'Nina Mueller',sub:'Eigenvalues exam prep',fmt:'💻 Online',t:'14:00',d:'Wed 28',price:'£28',badge:'tag-soon',badgeText:'Wed'},
+];
+var history=[
+  {i:'NM',c:'linear-gradient(135deg,#1e293b,#2d3f5e)',name:'Nina Mueller',sub:'Linear Algebra · Ch4',fmt:'💻 Online',t:'14:00',d:'Mon 19',price:'£28',badge:'tag-done',badgeText:'Done'},
+  {i:'MO',c:'linear-gradient(135deg,#1d4ed8,#3b82f6)',name:'Marcus Okonkwo',sub:'Python · Data structures',fmt:'💻 Online',t:'10:00',d:'Fri 16',price:'£22',badge:'tag-done',badgeText:'Done'},
+  {i:'AK',c:'linear-gradient(135deg,#065f46,#059669)',name:'Aisha Kamara',sub:'Microeconomics · Demand',fmt:'📍 In-person',t:'15:00',d:'Tue 13',price:'£37.50',badge:'tag-done',badgeText:'Done'},
+];
+
+var goals=[
+  {text:'Pass Linear Algebra mid-term with B+ or above',pts:'+50 pts',done:false},
+  {text:'Complete 3 Python modules on Coursera',pts:'+30 pts',done:true},
+  {text:'Attend 10 tutoring sessions this month',pts:'+40 pts',done:true},
+  {text:'Build a React project for CV',pts:'+60 pts',done:false},
+  {text:'Submit EU Law essay draft to Lena',pts:'+25 pts',done:true},
+];
+
+var myFiles=[
+  {name:'Practice_Problems_Ch4.pdf',ico:'📄',bg:'var(--blue-l)',meta:'To Nina · 33KB'},
+  {name:'Python_Homework_Week3.py',ico:'📝',bg:'var(--purple-l)',meta:'To Marcus · 8KB'},
+  {name:'Algorithm_Analysis_Draft.docx',ico:'📝',bg:'var(--surface)',meta:'To Marcus · 22KB'},
+];
+var tutorFiles=[
+  {name:'Exercise_Sheet_Eigenvalues.pdf',ico:'📄',bg:'var(--blue-l)',meta:'From Nina Mueller · 245KB'},
+  {name:'Notes_Calculus_Integration.pdf',ico:'📄',bg:'var(--blue-l)',meta:'From Nina Mueller · 180KB'},
+  {name:'Algorithms_Week3_Notes.pdf',ico:'📄',bg:'var(--purple-l)',meta:'From Marcus Okonkwo · 312KB'},
+  {name:'Statistics_Cheatsheet.png',ico:'🖼️',bg:'var(--green-d)',meta:'From Nina Mueller · 95KB'},
+];
+
+var invoices=[
+  {ico:'💷',bg:'var(--blue-l)',name:'Nina Mueller — Linear Algebra',meta:'19 May 2025 · 1 hour',amt:'£28.00',status:'spaid',stxt:'Paid'},
+  {ico:'💷',bg:'var(--blue-l)',name:'Marcus Okonkwo — Python',meta:'16 May 2025 · 1 hour',amt:'£22.00',status:'spaid',stxt:'Paid'},
+  {ico:'💷',bg:'var(--amber-l)',name:'Nina Mueller — Linear Algebra',meta:'23 May 2025 · upcoming',amt:'£28.00',status:'sesc',stxt:'Escrow'},
+  {ico:'💷',bg:'var(--blue-l)',name:'Aisha Kamara — Economics',meta:'13 May 2025 · 1.5 hours',amt:'£37.50',status:'spaid',stxt:'Paid'},
+];
+
+var reviews=[
+  {i:'NM',c:'linear-gradient(135deg,#1e293b,#2d3f5e)',name:'Nina Mueller',sub:'Linear Algebra · TU Berlin',stars:'★★★★★',text:'Nina explained eigenvalues in a way no lecture had managed. Patient, visual and genuinely effective.',date:'19 May 2025 · Session #4'},
+  {i:'MO',c:'linear-gradient(135deg,#1d4ed8,#3b82f6)',name:'Marcus Okonkwo',sub:'Python · HU Berlin',stars:'★★★★★',text:'Marcus debugged my project in 20 minutes after I had been stuck for 2 days. Great energy.',date:'16 May 2025 · Session #2'},
+  {i:'AK',c:'linear-gradient(135deg,#065f46,#059669)',name:'Aisha Kamara',sub:'Microeconomics · FU Berlin',stars:'★★★★☆',text:'Very clear explanations of demand curves. Would have liked a few more worked examples.',date:'13 May 2025 · Session #1'},
+];
+
+var msgs=[
+  {i:'NM',c:'linear-gradient(135deg,#1e293b,#2d3f5e)',name:'Nina Mueller',prev:'Sure! I have slots Monday afternoon free.',t:'10:42',unread:true,online:true},
+  {i:'MO',c:'linear-gradient(135deg,#1d4ed8,#3b82f6)',name:'Marcus Okonkwo',prev:'Here are the algorithm notes',t:'09:15',unread:true,online:true},
+  {i:'US',c:'linear-gradient(135deg,#1d4ed8,#7c3aed)',name:'UniSkilled Support',prev:'Your university email has been verified',t:'Mon',unread:true,online:false},
+  {i:'AK',c:'linear-gradient(135deg,#065f46,#059669)',name:'Aisha Kamara',prev:'Can we reschedule to Thursday?',t:'Yesterday',unread:false,online:false},
+];
+
+var notifs=[
+  {ico:'📅',bg:'var(--blue-l)',title:'Upcoming session today — Nina Mueller at 4:00 PM',t:'2 min ago',unread:true},
+  {ico:'🤖',bg:'var(--purple-l)',title:'AI found 5 new tutors matching your Python goal',t:'30 min ago',unread:true},
+  {ico:'💷',bg:'var(--green-d)',title:'Payment confirmed: £28 to Nina Mueller (escrow)',t:'1 hour ago',unread:true},
+  {ico:'📚',bg:'var(--amber-l)',title:'Study reminder: Review eigenspace notes today',t:'2 hours ago',unread:true},
+  {ico:'⭐',bg:'var(--amber-l)',title:'Leave a review for your session with Marcus',t:'Yesterday',unread:true},
+  {ico:'💬',bg:'var(--blue-l)',title:'New message from Marcus Okonkwo',t:'Yesterday',unread:false},
+  {ico:'🎯',bg:'var(--green-d)',title:'Goal completed: 3 Python modules on Coursera',t:'2 days ago',unread:false},
+];
+
+/* NAV */
+var titles={overview:'Overview',find:'Find a Tutor',sessions:'My Sessions',saved:'Saved Tutors',messages:'Messages',progress:'My Progress',goals:'Goals',files:'Files & Homework',calendar:'Calendar',payments:'Payments',reviews:'My Reviews',notifications:'Notifications'};
+
+window.go=function(page,el){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  var pg=document.getElementById('page-'+page);
+  if(pg)pg.classList.add('on');
+  document.querySelectorAll('.sb-a').forEach(function(a){a.classList.remove('on');});
+  if(el&&el.classList)el.classList.add('on');
+  document.getElementById('tbTitle').textContent=titles[page]||page;
+  if(window.innerWidth<=900)closeSidebar();
+};
+
+window.toggleSidebar=function(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('bgOverlay').classList.toggle('show');
+};
+window.closeSidebar=function(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('bgOverlay').classList.remove('show');
+};
+
+/* RENDER HELPERS */
+function sessCard(s){
+  return '<div class="sc"><div class="sc-time"><div class="sc-t">'+s.t+'</div><div class="sc-d">'+s.d+'</div></div>'
+    +'<div class="sc-pipe" style="background:'+(s.badge==='tag-now'?'linear-gradient(180deg,var(--green),#34d399)':s.badge==='tag-soon'?'linear-gradient(180deg,var(--blue),var(--purple))':'var(--border)')+'"></div>'
+    +'<div class="sc-info"><div class="sc-name">'+s.name+'</div><div class="sc-meta">'+s.sub+' · '+s.fmt+'</div></div>'
+    +'<div class="sc-r"><div class="sc-tag '+s.badge+'">'+s.badgeText+'</div><div class="sc-price">'+s.price+'</div></div></div>';
+}
+
+function tutorCard(t,showSave){
+  var isSaved=savedIds.includes(t.id);
+  var badge=t.badge==='top'?'<span style="font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:100px;background:var(--amber-l);color:var(--amber);border:1px solid rgba(217,119,6,.18);margin-left:4px">⭐ Top</span>':t.badge==='new'?'<span style="font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:100px;background:var(--green-d);color:var(--green);border:1px solid rgba(5,150,105,.18);margin-left:4px">New</span>':'';
+  return '<div class="tc">'
+    +'<div class="tc-shine"></div>'
+    +'<div class="tc-top">'
+      +'<div class="tc-av" style="background:'+t.c+'">'+(t.online?'<div class="tc-live"></div>':'')+t.i+'</div>'
+      +'<div class="tc-info"><div class="tc-name">'+t.name+badge+'</div><div class="tc-uni">'+t.uni+'</div></div>'
+      +'<div class="tc-score"><div class="tc-snum">'+t.score+'%</div><div class="tc-slbl">AI match</div><div class="tc-sbar"><div class="tc-sfill" style="width:'+t.score+'%"></div></div></div>'
+    +'</div>'
+    +'<div class="tc-row"><div class="tc-rate">£'+t.rate+'/hr</div><div class="tc-stars">★ '+t.rating+' <span class="tc-rc">('+t.reviews+')</span></div></div>'
+    +'<div class="tc-tags">'+t.subs.map(function(s){return '<span class="tt">'+s+'</span>';}).join('')+'<span class="tt tc-tag-g">🌍 '+t.lang.split(',')[0]+'</span></div>'
+    +'<div style="font-size:.69rem;color:var(--mid);margin-bottom:.72rem">⏰ '+t.avail+' · '+t.sessions+' sessions</div>'
+    +'<div class="tc-btns">'
+      +'<button class="tb2 tb-bk" onclick="bookTutor(\''+t.name+'\','+t.rate+')">Book session</button>'
+      +'<button class="tb2 tb-ms" onclick="toast(\'💬\',\'Messaging\',\'Opening chat with '+t.name+'...\')">Message</button>'
+      +(showSave?'<button class="tb2 tb-sv'+(isSaved?' saved':'')+'" onclick="toggleSave('+t.id+',this)">'+(isSaved?'♥':'♡')+'</button>':'')
+    +'</div>'
+  +'</div>';
+}
+
+/* RENDER FUNCTIONS */
+function renderSessions(){
+  var ul=document.getElementById('upcomingList'),hl=document.getElementById('historyList'),ov=document.getElementById('ov-sessions'),cw=document.getElementById('calWeek');
+  if(ul)ul.innerHTML=upcoming.map(sessCard).join('');
+  if(hl)hl.innerHTML=history.map(sessCard).join('');
+  if(ov)ov.innerHTML=upcoming.map(sessCard).join('');
+  if(cw)cw.innerHTML=upcoming.map(sessCard).join('');
+}
+function renderTutors(){
+  var g=document.getElementById('tutorGrid');
+  if(g)g.innerHTML=tutors.map(function(t){return tutorCard(t,true);}).join('');
+  var chips=document.getElementById('subjectChips');
+  if(chips){
+    ['All','Linear Algebra','Python','Economics','Law','ML'].forEach(function(s,i){
+      var el=document.createElement('span');
+      el.className='tt'+(i===0?' tc-tag-g':'');
+      el.style.cssText='cursor:pointer;padding:3px 9px';
+      el.textContent=s;
+      el.onclick=function(){document.querySelectorAll('#subjectChips .tt').forEach(function(x){x.className='tt';x.style.cssText='cursor:pointer;padding:3px 9px';});el.className='tt tc-tag-g';el.style.cssText='cursor:pointer;padding:3px 9px';};
+      chips.appendChild(el);
+    });
+  }
+}
+function renderSaved(){
+  var g=document.getElementById('savedGrid');
+  if(!g)return;
+  g.innerHTML=tutors.filter(function(t){return savedIds.includes(t.id);}).map(function(t){return tutorCard(t,true);}).join('');
+}
+function renderGoals(){
+  var el=document.getElementById('goalsList');
+  if(!el)return;
+  el.innerHTML=goals.map(function(g,i){
+    return '<div class="gi'+(g.done?' done':'')+'" onclick="toggleGoal('+i+')">'
+      +'<div class="gi-chk">'+(g.done?'✓':'')+'</div>'
+      +'<div class="gi-text">'+g.text+'</div>'
+      +'<div class="gi-pts">'+g.pts+'</div>'
+    +'</div>';
+  }).join('');
+}
+function renderFiles(){
+  var fl=document.getElementById('filesList'),ml=document.getElementById('materialsList');
+  function row(f){return '<div class="fi"><div class="fi-ico" style="background:'+f.bg+'">'+f.ico+'</div><div style="flex:1;min-width:0"><div class="fi-name">'+f.name+'</div><div style="font-size:.63rem;color:var(--soft);margin-top:1px">'+f.meta+'</div></div><div class="fi-dl" onclick="toast(\'⬇\',\'Downloading\',\''+f.name+'\')">↓</div></div>';}
+  if(fl)fl.innerHTML=myFiles.map(row).join('');
+  if(ml)ml.innerHTML=tutorFiles.map(row).join('');
+}
+function renderMsgs(){
+  var el=document.getElementById('msgList');
+  if(!el)return;
+  el.innerHTML=msgs.map(function(m){
+    return '<div class="mr'+(m.unread?' unread':'')+'" onclick="toast(\'💬\',\'Opening chat\',\'Navigating to messages...\');setTimeout(function(){window.location.href=\'messages.html\';},700)">'
+      +'<div class="mr-av-w"><div class="mr-av" style="background:'+m.c+'">'+m.i+'</div>'+(m.online?'<div class="mr-olive"></div>':'')+'</div>'
+      +'<div style="flex:1;min-width:0"><div class="mr-name">'+m.name+'</div><div class="mr-prev">'+m.prev+'</div></div>'
+      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="mr-time">'+m.t+'</div>'+(m.unread?'<div class="mr-dot"></div>':'')+'</div>'
+    +'</div>';
+  }).join('');
+}
+function renderInvoices(){
+  var el=document.getElementById('invoiceList');
+  if(!el)return;
+  el.innerHTML=invoices.map(function(v){
+    return '<div class="ii"><div class="ii-ico" style="background:'+v.bg+'">'+v.ico+'</div>'
+      +'<div><div class="ii-name">'+v.name+'</div><div class="ii-meta">'+v.meta+'</div></div>'
+      +'<div class="ii-r"><div class="ii-amt">'+v.amt+'</div><div class="ii-status '+v.status+'">'+v.stxt+'</div></div>'
+    +'</div>';
+  }).join('');
+}
+function renderReviews(){
+  var el=document.getElementById('reviewList');
+  if(!el)return;
+  el.innerHTML=reviews.map(function(r){
+    return '<div class="ri"><div class="ri-top"><div class="ri-av" style="background:'+r.c+'">'+r.i+'</div><div><div class="ri-name">'+r.name+'</div><div class="ri-sub">'+r.sub+'</div></div><div class="ri-stars">'+r.stars+'</div></div><div class="ri-text">'+r.text+'</div><div class="ri-date">'+r.date+'</div></div>';
+  }).join('');
+}
+function renderNotifs(){
+  var el=document.getElementById('notifList');
+  if(!el)return;
+  el.innerHTML=notifs.map(function(n,i){
+    return '<div class="ni'+(n.unread?' unread':'')+'" onclick="notifs['+i+'].unread=false;this.classList.remove(\'unread\');var d=this.querySelector(\'.ni-dot\');if(d)d.remove()">'
+      +'<div class="ni-ico" style="background:'+n.bg+'">'+n.ico+'</div>'
+      +'<div style="flex:1"><div class="ni-title">'+n.title+'</div><div class="ni-time">'+n.t+'</div></div>'
+      +(n.unread?'<div class="ni-dot"></div>':'')
+    +'</div>';
+  }).join('');
+}
+function renderCalendar(){
+  var el=document.getElementById('calGrid');
+  if(!el)return;
+  var days=['M','T','W','T','F','S','S'];
+  var html=days.map(function(d){return '<div class="cal-dn">'+d+'</div>';}).join('');
+  var sessDays=[23,26,28],goalDays=[31];
+  for(var i=0;i<1;i++)html+='<div class="cal-d empty">-</div>';
+  for(var d=1;d<=31;d++){
+    var cls='cal-d',dot='';
+    if(d===23)cls+=' today';
+    else if(sessDays.includes(d))cls+=' sess';
+    else if(goalDays.includes(d))cls+=' goal';
+    if(sessDays.includes(d)||d===23||goalDays.includes(d))dot='<div class="cal-pip"></div>';
+    html+='<div class="'+cls+'">'+d+dot+'</div>';
+  }
+  el.innerHTML=html;
+}
+function buildChart(id,vals,h){
+  var el=document.getElementById(id);
+  if(!el)return;
+  var max=Math.max.apply(null,vals);
+  el.innerHTML=vals.map(function(v,i){
+    var ht=Math.round((v/max)*(h||48));
+    return '<div class="ch-b" style="height:'+ht+'px;background:'+(i===vals.length-1?'var(--blue)':'var(--blue-m)')+';opacity:'+(i===vals.length-1?1:.65)+'"></div>';
+  }).join('');
+}
+
+/* INTERACTIONS */
+window.toggleGoal=function(i){
+  goals[i].done=!goals[i].done;
+  renderGoals();
+  toast(goals[i].done?'✅':'↩️',goals[i].done?'Goal completed!':'Goal unchecked',goals[i].text);
+};
+window.showAddGoal=function(){
+  var a=document.getElementById('addGoalArea');
+  a.style.display=a.style.display==='none'?'block':'none';
+  if(a.style.display==='block')document.getElementById('goalInput').focus();
+};
+window.saveGoal=function(){
+  var v=document.getElementById('goalInput').value.trim();
+  if(!v)return;
+  goals.push({text:v,pts:'+20 pts',done:false});
+  renderGoals();
+  document.getElementById('addGoalArea').style.display='none';
+  document.getElementById('goalInput').value='';
+  toast('🎯','Goal added!',v);
+};
+window.toggleSave=function(id,btn){
+  var idx=savedIds.indexOf(id);
+  if(idx===-1){savedIds.push(id);btn.textContent='♥';btn.classList.add('saved');}
+  else{savedIds.splice(idx,1);btn.textContent='♡';btn.classList.remove('saved');}
+  renderSaved();
+  toast(idx===-1?'❤️':'💔',idx===-1?'Tutor saved':'Removed',idx===-1?'Added to saved tutors':'Removed from saved tutors');
+};
+window.bookTutor=function(name,rate){
+  document.getElementById('bookSub').textContent='Booking with '+name+' · £'+rate+'/hr';
+  openBook();
+};
+window.markAllRead=function(){
+  notifs.forEach(function(n){n.unread=false;});
+  renderNotifs();
+  toast('✅','Done','All notifications marked as read.');
+};
+
+/* MODALS */
+window.openBook=function(){document.getElementById('bookOverlay').classList.add('open');};
+window.closeModal=function(id,e){if(e.target===document.getElementById(id))document.getElementById(id).classList.remove('open');};
+window.pickStype=function(el){el.closest('.st-row').querySelectorAll('.st').forEach(function(s){s.classList.remove('sel');});el.classList.add('sel');};
+var bPrices={1:28,'1.5':42,2:56};
+window.updateBookPrice=function(sel){var p=bPrices[sel.value]||28;document.getElementById('bookTotal').textContent='£'+p+'.00';};
+window.confirmBook=function(){document.getElementById('bookOverlay').classList.remove('open');toast('📅','Session booked!','Confirmed. Payment held in escrow. Your tutor has been notified.');};
+
+var selStars=0;
+window.openReviewModal=function(name){document.getElementById('revSub').textContent='How was your session with '+name+'?';document.getElementById('reviewOverlay').classList.add('open');};
+window.setStars=function(n){
+  selStars=n;
+  document.querySelectorAll('.star').forEach(function(s,i){s.textContent=i<n?'★':'☆';s.style.color=i<n?'var(--amber)':'var(--soft)';});
+};
+window.submitReview=function(){
+  var txt=document.getElementById('reviewText').value.trim();
+  if(!selStars||!txt){toast('⚠️','Missing info','Please select a rating and write a review.');return;}
+  document.getElementById('reviewOverlay').classList.remove('open');
+  toast('⭐','Review submitted!','Thank you for your feedback!');
+  selStars=0;
+  document.querySelectorAll('.star').forEach(function(s){s.textContent='☆';s.style.color='';});
+  document.getElementById('reviewText').value='';
+};
+
+/* TOAST */
+window.toast=function(ico,title,msg){
+  var stack=document.getElementById('toastStack');
+  var t=document.createElement('div');
+  t.className='toast';
+  t.innerHTML='<div class="toast-ico" style="background:var(--blue-l)">'+ico+'</div><div><div class="toast-title">'+title+'</div><div class="toast-msg">'+msg+'</div></div>';
+  stack.appendChild(t);
+  requestAnimationFrame(function(){t.classList.add('show');});
+  setTimeout(function(){t.classList.remove('show');setTimeout(function(){if(stack.contains(t))stack.removeChild(t);},350);},3500);
+};
+
+/* AI CHAT */
+var aiOpen=false;
+window.toggleAI=function(){aiOpen=!aiOpen;document.getElementById('aiPanel').classList.toggle('show',aiOpen);};
+window.sendAI=function(el){document.getElementById('aiInp').value=el.textContent;sendAIMsg();};
+window.sendAIMsg=function(){
+  var inp=document.getElementById('aiInp'),val=inp.value.trim();
+  if(!val)return;
+  var body=document.getElementById('aiBody');
+  var um=document.createElement('div');um.className='ai-msg ai-user';um.textContent=val;body.appendChild(um);
+  inp.value='';body.scrollTop=body.scrollHeight;
+  var replies={
+    'study plan':'Based on your Linear Algebra exam in 9 days, I suggest: 3 sessions with Nina, 45 min daily review, focus on eigenspaces Mon–Wed and past papers Thu–Fri.',
+    'find a tutor':'I found 5 new high-match tutors for you. Nina Mueller (98%) is your top pick for maths. Marcus (95%) is ideal for Python. View them in Find a Tutor.',
+    'exam':'For your Linear Algebra exam: review Chapter 4, do 2 more sessions with Nina, and complete past papers from 2022 and 2023.',
+    'progress':'You are at 72% in Linear Algebra and 58% in Python. Your streak is 14 days — great momentum! Book 2 more sessions this week to stay on track.',
+    'tips':'Top 3 tips: 1) Review notes within 24hrs of each session. 2) Practice past papers under timed conditions. 3) Book sessions 2x this week before your exam.',
+  };
+  var lv=val.toLowerCase(),reply='I am analysing your learning data... Based on your current progress, I recommend focusing on Linear Algebra this week before your exam. Would you like me to generate a study plan?';
+  Object.keys(replies).forEach(function(k){if(lv.includes(k))reply=replies[k];});
+  setTimeout(function(){var bm=document.createElement('div');bm.className='ai-msg ai-bot';bm.textContent=reply;body.appendChild(bm);body.scrollTop=body.scrollHeight;},750);
+};
+
+/* VALIDATE JS BEFORE INIT */
+function init(){
+  renderSessions();
+  renderTutors();
+  renderSaved();
+  renderGoals();
+  renderFiles();
+  renderMsgs();
+  renderInvoices();
+  renderReviews();
+  renderNotifs();
+  renderCalendar();
+  buildChart('sessChart',[1,2,2,1,3,2,3,4],48);
+  setTimeout(function(){toast('📅','Session in 2 hours','Nina Mueller · Linear Algebra · 4:00 PM today');},6000);
+}
+init();
+})();
+</script>
+<script src="uniskilled-api.js"></script>
+</body>
+</html>
