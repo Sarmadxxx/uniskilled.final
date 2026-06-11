@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Dashboard — Momentum Digital · UniSkilled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400;1,9..144,700&display=swap" rel="stylesheet">
+<style>
+/* ── GLOBAL NUMBER FONT OVERRIDE ── */
+.kpi-num,.hkpi-num,.sb-item-num,.sb-num,.sb-num-main,.or-amt,.inv-amt,.tp-rate,.ar-num,
+[class*="num"],[class*="amount"],[class*="kpi"]{
+  font-family:'Plus Jakarta Sans',sans-serif !important;
+  font-variant-numeric:normal !important;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --blue:#2563eb;--blue-v:#1d4ed8;--blue-l:#eff6ff;--blue-m:#dbeafe;
+  --ink:#0f172a;--ink2:#1e293b;--mid:#64748b;--soft:#94a3b8;
+  --border:#e2e8f0;--white:#fff;--bg:#f0f4ff;--surface:#f8fafc;
+  --green:#059669;--green-l:#d1fae5;--green-d:#ecfdf5;
+  --orange:#ea580c;--orange-l:#ffedd5;
+  --purple:#7c3aed;--purple-l:#ede9fe;
+  --amber:#d97706;--amber-l:#fef3c7;
+  --red:#dc2626;--red-l:#fee2e2;
+  --teal:#0891b2;--teal-l:#ecfeff;
+  --sw:264px;
+}
+html,body{height:100%;background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);overflow-x:hidden}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px}
+.shell{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{width:var(--sw);background:var(--ink2);flex-shrink:0;position:fixed;top:0;left:0;bottom:0;z-index:200;display:flex;flex-direction:column;transition:transform .3s}
+.sb-head{padding:1.3rem 1.2rem 1rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-logo{width:32px;height:32px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.9rem;color:#fff;flex-shrink:0}
+.sb-brand{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:#fff}
+.sb-tagline{font-size:.58rem;color:rgba(255,255,255,.28)}
+.sb-company{padding:.9rem 1.2rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sb-av{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:800;color:#fff;flex-shrink:0}
+.sb-cname{font-size:.85rem;font-weight:700;color:#fff;line-height:1.2}
+.sb-crole{font-size:.6rem;color:rgba(255,255,255,.35)}
+.sb-badge-row{display:flex;gap:.3rem;margin-top:.25rem}
+.sb-badge{font-size:.55rem;font-weight:700;padding:1px 6px;border-radius:10px}
+.sb-badge-blue{background:rgba(37,99,235,.25);color:#93c5fd}
+.sb-badge-green{background:rgba(5,150,105,.2);color:#6ee7b7}
+.sb-scroll{flex:1;overflow-y:auto;padding:.5rem 0}
+.sb-scroll::-webkit-scrollbar{display:none}
+.sb-sec{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.2);padding:.65rem 1.2rem .25rem}
+.sb-a{display:flex;align-items:center;gap:9px;padding:.55rem 1.2rem;cursor:pointer;transition:all .17s;color:rgba(255,255,255,.44);font-size:.82rem;font-weight:500;border-left:3px solid transparent;text-decoration:none;user-select:none}
+.sb-a:hover{background:rgba(255,255,255,.05);color:rgba(255,255,255,.8)}
+.sb-a.on{background:rgba(37,99,235,.18);border-left-color:var(--blue);color:#fff;font-weight:600}
+.sb-a-ico{width:16px;text-align:center;font-size:.88rem;flex-shrink:0}
+.sb-num{margin-left:auto;font-size:.65rem;font-weight:700;min-width:18px;height:18px;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 5px;font-family:"Plus Jakarta Sans",sans-serif;letter-spacing:0}
+.nr{background:var(--red);color:#fff}.nb{background:var(--blue);color:#fff}.ng{background:#059669;color:#fff}
+.sb-bottom{padding:.9rem 1.2rem;border-top:1px solid rgba(255,255,255,.06)}
+.plan-card{background:rgba(37,99,235,.14);border:1px solid rgba(37,99,235,.22);border-radius:12px;padding:.72rem .88rem}
+.plan-name{font-size:.72rem;font-weight:700;color:#93c5fd;margin-bottom:.2rem}
+.plan-desc{font-size:.6rem;color:rgba(255,255,255,.3);margin-bottom:.55rem}
+.plan-upgrade{width:100%;background:var(--blue);color:#fff;border:none;border-radius:7px;padding:.4rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .17s}
+.plan-upgrade:hover{background:var(--blue-v)}
+
+/* MAIN */
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{height:60px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;position:sticky;top:0;z-index:100}
+.tb-l{display:flex;align-items:center;gap:10px}
+.hbtn{display:none;background:none;border:none;cursor:pointer;font-size:1.2rem;color:var(--ink)}
+.tb-title{font-family:'Fraunces',serif;font-size:1.05rem;font-weight:700;color:var(--ink)}
+.tb-sub{font-size:.68rem;color:var(--mid)}
+.tb-r{display:flex;align-items:center;gap:.6rem}
+.ib{height:34px;border-radius:9px;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-size:.79rem;font-weight:600;transition:all .17s;display:flex;align-items:center;gap:5px;padding:0 .82rem}
+.ico-btn{width:34px;padding:0;justify-content:center;background:var(--surface);border:1.5px solid var(--border);color:var(--mid);position:relative}
+.ico-btn:hover{background:var(--blue-l);border-color:var(--blue-m);color:var(--blue)}
+.pri-btn{background:var(--blue);color:#fff}
+.pri-btn:hover{background:var(--blue-v);box-shadow:0 4px 14px rgba(37,99,235,.28)}
+.ndot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid #fff}
+.content{flex:1;padding:1.75rem 2rem 5rem}
+.page{display:none;animation:fadeUp .27s ease}
+.page.on{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{border-radius:22px;padding:2rem 2.25rem;margin-bottom:1.5rem;background:linear-gradient(130deg,#0f2044 0%,#1e3a8a 45%,#2563eb 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;width:320px;height:320px;border-radius:50%;background:rgba(255,255,255,.05);top:-100px;right:-60px}
+.hero::after{content:'';position:absolute;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.03);bottom:-50px;left:40%}
+.hero-eyebrow{font-size:.68rem;font-weight:700;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.35rem;position:relative;z-index:1}
+.hero-title{font-family:"Plus Jakarta Sans",sans-serif;font-size:clamp(1.45rem,2.5vw,1.9rem);font-weight:800;color:#fff;line-height:1.2;margin-bottom:.45rem;position:relative;z-index:1;letter-spacing:-.02em}
+.hero-title i{font-style:normal;opacity:.75;font-weight:700}
+.hero-sub{font-size:.82rem;color:rgba(255,255,255,.5);max-width:480px;margin-bottom:1.25rem;position:relative;z-index:1;line-height:1.65}
+.hero-kpis{display:flex;gap:2rem;flex-wrap:wrap;position:relative;z-index:1}
+.hkpi{}.hkpi-num{font-family:"Plus Jakarta Sans",sans-serif;font-size:1.5rem;font-weight:800;color:#fff;line-height:1;letter-spacing:-.03em}
+.hkpi-lbl{font-size:.6rem;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.07em;margin-top:2px;font-weight:600}
+.hero-tag{position:absolute;top:1.25rem;right:1.5rem;background:rgba(5,150,105,.2);border:1px solid rgba(5,150,105,.3);border-radius:100px;padding:.28rem .82rem;font-size:.68rem;font-weight:700;color:#6ee7b7;display:flex;align-items:center;gap:4px;z-index:1}
+.hero-tag-dot{width:5px;height:5px;background:#4ade80;border-radius:50%;animation:ping 1.8s infinite}
+@keyframes ping{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* LAYOUT HELPERS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem}
+.g-aside{display:grid;grid-template-columns:1fr 300px;gap:1.2rem;align-items:start}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.9rem}
+.sh-title{font-family:'Fraunces',serif;font-size:.92rem;font-weight:700;color:var(--ink)}
+.sh-btn{font-size:.75rem;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif}
+
+/* CARDS */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:1.25rem;position:relative;overflow:hidden}
+.clbl{font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--soft);margin-bottom:.85rem;display:flex;align-items:center;justify-content:space-between}
+.clbl button,.clbl a{font-size:.72rem;color:var(--blue);font-weight:600;text-transform:none;letter-spacing:0;background:none;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;text-decoration:none}
+
+/* KPI */
+.kpi{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:1.15rem;transition:all .2s;overflow:hidden;position:relative}
+.kpi:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.07)}
+.kpi-bar{position:absolute;top:0;left:0;right:0;height:3px;border-radius:18px 18px 0 0}
+.kpi-ico{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:.75rem}
+.kpi-num{font-family:"Plus Jakarta Sans",sans-serif;font-size:1.85rem;font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1}
+.kpi-lbl{font-size:.7rem;color:var(--mid);margin-top:3px}
+.kpi-delta{font-size:.67rem;font-weight:700;margin-top:4px;display:flex;align-items:center;gap:3px}
+.up{color:var(--green)}.dn{color:var(--red)}
+
+/* STUDENT CARD */
+.sc{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1rem;transition:all .2s;cursor:pointer;display:flex;align-items:flex-start;gap:.85rem}
+.sc:hover{border-color:#bfdbfe;box-shadow:0 6px 20px rgba(37,99,235,.08);transform:translateY(-2px)}
+.sc-av{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:.88rem;font-weight:700;color:#fff;flex-shrink:0;font-family:'Fraunces',serif}
+.sc-name{font-size:.85rem;font-weight:700;color:var(--ink);margin-bottom:1px}
+.sc-role{font-size:.7rem;color:var(--mid);margin-bottom:.4rem}
+.sc-skills{display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.45rem}
+.sc-skill{font-size:.62rem;font-weight:600;background:var(--blue-l);border:1px solid var(--blue-m);color:var(--blue);padding:1px 7px;border-radius:5px}
+.sc-foot{display:flex;align-items:center;gap:.6rem;font-size:.68rem;color:var(--soft)}
+.sc-btns{display:flex;gap:.4rem;margin-top:.6rem}
+.sc-btn{height:27px;border-radius:7px;border:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:.7rem;font-weight:600;cursor:pointer;padding:0 .75rem;transition:all .17s}
+.sc-btn-p{background:var(--blue);color:#fff}
+.sc-btn-p:hover{background:var(--blue-v)}
+.sc-btn-s{background:var(--surface);color:var(--mid);border:1.5px solid var(--border)}
+.sc-btn-s:hover{border-color:var(--amber);color:var(--amber)}
+.ai-score{font-size:.68rem;font-weight:700;color:var(--green);display:flex;align-items:center;gap:3px}
+.ai-dot{width:6px;height:6px;background:var(--green);border-radius:50%}
+
+/* ORDER ROW */
+.or{display:flex;align-items:center;gap:11px;padding:.82rem 1rem;background:var(--white);border:1.5px solid var(--border);border-radius:14px;margin-bottom:7px;cursor:pointer;transition:all .2s}
+.or:hover{border-color:#bfdbfe;box-shadow:0 3px 12px rgba(37,99,235,.06)}
+.or-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0}
+.or-title{font-size:.83rem;font-weight:600;color:var(--ink);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.or-meta{font-size:.68rem;color:var(--mid)}
+.or-r{text-align:right;flex-shrink:0}
+.or-amt{font-family:'Plus Jakarta Sans',sans-serif;font-size:.9rem;font-weight:700;color:var(--ink)}
+.or-st{font-size:.59rem;font-weight:700;padding:2px 7px;border-radius:100px;display:inline-block;margin-top:3px}
+.s-act{background:var(--blue-m);color:var(--blue)}
+.s-rev{background:var(--amber-l);color:var(--amber)}
+.s-don{background:var(--green-l);color:var(--green)}
+.s-new{background:var(--purple-l);color:var(--purple)}
+
+/* JOB POST */
+.jp{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1rem;transition:all .2s;cursor:pointer;position:relative}
+.jp:hover{border-color:#bfdbfe;transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.07)}
+.jp-title{font-size:.88rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;line-height:1.35}
+.jp-meta{font-size:.7rem;color:var(--mid);margin-bottom:.55rem;display:flex;flex-wrap:wrap;gap:.4rem}
+.jp-tag{font-size:.65rem;font-weight:600;padding:2px 8px;border-radius:5px}
+.jp-stats{display:flex;gap:.75rem;font-size:.68rem;color:var(--mid);border-top:1px solid var(--border);padding-top:.6rem;margin-top:.55rem}
+.jp-status{position:absolute;top:.75rem;right:.75rem;font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:100px}
+.jp-live{background:var(--green-d);color:var(--green)}
+.jp-closed{background:var(--surface);color:var(--soft)}
+.jp-draft{background:var(--amber-l);color:var(--amber)}
+
+/* TALENT POOL */
+.tp-item{display:flex;align-items:center;gap:.85rem;padding:.75rem;background:var(--white);border:1.5px solid var(--border);border-radius:13px;margin-bottom:7px;transition:all .2s;cursor:pointer}
+.tp-item:hover{border-color:#bfdbfe}
+.tp-av{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0;font-family:'Fraunces',serif}
+.tp-name{font-size:.82rem;font-weight:700;color:var(--ink)}
+.tp-role{font-size:.67rem;color:var(--mid)}
+.tp-r{margin-left:auto;text-align:right;flex-shrink:0}
+.tp-rate{font-size:.78rem;font-weight:700;color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif}
+.tp-hired{font-size:.62rem;color:var(--soft);margin-top:1px}
+
+/* ANALYTICS BARS */
+.ab{margin-bottom:.82rem}
+.ab:last-child{margin-bottom:0}
+.ab-h{display:flex;justify-content:space-between;margin-bottom:4px}
+.ab-l{font-size:.8rem;font-weight:600;color:var(--ink)}
+.ab-v{font-size:.72rem;font-weight:700;color:var(--mid)}
+.ab-track{height:7px;background:var(--surface);border-radius:99px;overflow:hidden}
+.ab-fill{height:100%;border-radius:99px;transition:width 1.2s cubic-bezier(.34,1,.64,1)}
+
+/* MESSAGES */
+.mr{display:flex;align-items:center;gap:10px;padding:.78rem 1.1rem;cursor:pointer;transition:background .14s;border-bottom:1px solid var(--surface)}
+.mr:last-child{border-bottom:none}
+.mr:hover{background:var(--surface)}
+.mr.unread{background:var(--blue-l)}
+.mr-av{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:#fff;flex-shrink:0;font-family:'Fraunces',serif;position:relative}
+.mr-olive{position:absolute;bottom:-1px;right:-1px;width:10px;height:10px;background:#10b981;border-radius:50%;border:2px solid #fff}
+.mr-name{font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:1px}
+.mr-prev{font-size:.71rem;color:var(--mid);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.mr-dot{width:8px;height:8px;background:var(--blue);border-radius:50%;flex-shrink:0;margin-left:auto}
+
+/* INV */
+.inv{display:flex;align-items:center;gap:10px;padding:.72rem .9rem;background:var(--white);border:1.5px solid var(--border);border-radius:12px;margin-bottom:6px;transition:all .2s}
+.inv:hover{border-color:#bfdbfe}
+.inv-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.inv-name{font-size:.8rem;font-weight:600;color:var(--ink);margin-bottom:1px}
+.inv-meta{font-size:.65rem;color:var(--mid)}
+.inv-r{margin-left:auto;text-align:right;flex-shrink:0}
+.inv-amt{font-family:'Plus Jakarta Sans',sans-serif;font-size:.88rem;font-weight:700;color:var(--ink)}
+.inv-st{font-size:.58rem;font-weight:700;padding:1px 7px;border-radius:100px;display:inline-block;margin-top:2px}
+.si-paid{background:var(--green-l);color:var(--green)}
+.si-esc{background:var(--amber-l);color:var(--amber)}
+.si-pen{background:var(--blue-m);color:var(--blue)}
+
+/* INSIGHT */
+.ins{background:var(--surface);border:1.5px solid var(--border);border-radius:13px;padding:.82rem .95rem;margin-bottom:7px;cursor:pointer;transition:all .2s;display:flex;align-items:flex-start;gap:8px}
+.ins:hover{background:var(--blue-l);border-color:var(--blue-m)}
+.ins-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0}
+.ins-title{font-size:.8rem;font-weight:700;color:var(--ink);margin-bottom:1px}
+.ins-desc{font-size:.7rem;color:var(--mid);line-height:1.5}
+.ins-cta{font-size:.67rem;font-weight:700;color:var(--blue);margin-top:3px}
+
+/* SAVINGS BANNER */
+.savings-banner{background:linear-gradient(130deg,var(--ink2),#1e3a5f);border-radius:16px;padding:1.25rem 1.5rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1.5rem;flex-wrap:wrap;position:relative;overflow:hidden}
+.savings-banner::before{content:'';position:absolute;width:200px;height:200px;border-radius:50%;background:rgba(37,99,235,.15);top:-60px;right:-40px}
+.sb-label{font-size:.62rem;font-weight:700;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.3rem}
+.sb-num-main{font-family:'Plus Jakarta Sans',sans-serif;font-size:2rem;font-weight:800;color:#fff;letter-spacing:-.02em;line-height:1;margin-bottom:.2rem}
+.sb-sub{font-size:.75rem;color:rgba(255,255,255,.4)}
+.sb-breakdown{display:flex;gap:1.5rem;flex-wrap:wrap;position:relative;z-index:1}
+.sb-item{text-align:center}
+.sb-item-num{font-family:"Plus Jakarta Sans",sans-serif;font-size:1.2rem;font-weight:800;color:#93c5fd;letter-spacing:-.02em}
+.sb-item-lbl{font-size:.6rem;color:rgba(255,255,255,.35);margin-top:1px}
+
+/* CHART */
+.chart{display:flex;align-items:flex-end;gap:5px;height:52px}
+.ch-b{flex:1;border-radius:4px 4px 0 0;transition:height .9s cubic-bezier(.34,1,.64,1);cursor:pointer}
+.ch-b:hover{opacity:.8}
+
+/* NOTIF */
+.ni{display:flex;align-items:flex-start;gap:9px;padding:.75rem 1rem;border-bottom:1px solid var(--surface);cursor:pointer;transition:background .14s}
+.ni:last-child{border-bottom:none}
+.ni:hover{background:var(--surface)}
+.ni.unread{background:var(--blue-l)}
+.ni-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0}
+.ni-title{font-size:.79rem;font-weight:600;color:var(--ink);line-height:1.35;margin-bottom:1px}
+.ni-time{font-size:.62rem;color:var(--soft)}
+.ni-dot{width:7px;height:7px;background:var(--blue);border-radius:50%;flex-shrink:0;margin-top:4px}
+
+/* SHEET / MODAL */
+.overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(8px);z-index:300;display:none;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.sheet{background:var(--white);border-radius:24px 24px 0 0;padding:1.75rem 1.5rem 2.5rem;width:100%;max-width:540px;max-height:90vh;overflow-y:auto}
+.sheet-h{width:36px;height:4px;background:var(--border);border-radius:99px;margin:0 auto 1.2rem}
+.sheet-title{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.2rem;font-weight:700;color:var(--ink);margin-bottom:.3rem}
+.sheet-sub{font-size:.8rem;color:var(--mid);margin-bottom:1.1rem;line-height:1.55}
+.fl{margin-bottom:.82rem}
+.fl-l{display:block;font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--mid);margin-bottom:.32rem}
+.fi{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:.65rem .9rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.87rem;color:var(--ink);outline:none;transition:all .17s}
+.fi:focus{border-color:var(--blue);background:var(--white);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+textarea.fi{resize:vertical;min-height:80px;line-height:1.6}
+.sbtn{width:100%;padding:.82rem;border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;transition:all .17s;border:none;margin-bottom:6px}
+.sbtn-p{background:var(--blue);color:#fff}
+.sbtn-p:hover{background:var(--blue-v);box-shadow:0 5px 16px rgba(37,99,235,.28)}
+.sbtn-g{background:var(--surface);color:var(--mid);border:1.5px solid var(--border)}
+
+/* TOAST */
+.toast-stack{position:fixed;top:68px;right:1.5rem;z-index:600;display:flex;flex-direction:column;gap:7px}
+.toast{background:var(--white);border:1.5px solid var(--border);border-radius:13px;padding:.75rem .9rem;box-shadow:0 8px 28px rgba(0,0,0,.1);display:flex;align-items:center;gap:8px;min-width:265px;transform:translateX(115%);transition:transform .3s cubic-bezier(.34,1.2,.64,1)}
+.toast.show{transform:translateX(0)}
+
+/* BG OVERLAY */
+.bg-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:190}
+.bg-overlay.show{display:block}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hbtn{display:flex}
+  .g3,.g4{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+  .g-aside{grid-template-columns:1fr}
+  .topbar{padding:0 1rem}
+  .content{padding:1.25rem 1rem 6rem}
+}
+@media(max-width:620px){
+  .content{padding:1rem .85rem 6rem}
+  .topbar{padding:0 .85rem;height:56px}
+  .tb-title{font-size:.92rem}
+  .tb-sub{font-size:.62rem}
+  .g3,.g4{grid-template-columns:1fr 1fr}
+  .g2{grid-template-columns:1fr}
+  .hero{padding:1.25rem 1.25rem 1.5rem;border-radius:16px}
+  .hero-title{font-size:1.25rem;line-height:1.25}
+  .hero-sub{font-size:.78rem}
+  .hero-kpis{gap:1.1rem}
+  .hkpi-num{font-size:1.2rem}
+  .hkpi-lbl{font-size:.55rem}
+  .kpi{padding:.95rem}
+  .kpi-num{font-size:1.6rem}
+  .qa-grid{grid-template-columns:repeat(2,1fr)}
+  .qa-card{padding:.75rem .6rem}
+  .qa-ico{font-size:1.2rem}
+  .qa-lbl{font-size:.68rem}
+  .or,.oi,.inv,.tp-item,.ins{padding:.7rem .8rem}
+  .or-title,.oi-title{font-size:.8rem}
+  .sc{flex-direction:column}
+  .tb-r .ib:not(.pri-btn){display:none}
+  .topbar .nb-ghost{display:none}
+  .jp-title{font-size:.83rem}
+  .sheet{padding:1.25rem 1.1rem 2rem}
+  .fi{font-size:.85rem}
+}
+@media(max-width:420px){
+  .g3,.g4{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .hero-kpis{gap:.85rem}
+  .hkpi-num{font-size:1.1rem}
+  .ar{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<div class="toast-stack" id="toastStack"></div>
+<div class="bg-overlay" id="bgOverlay" onclick="closeSidebar()"></div>
+<div class="shell">
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-head">
+    <div class="sb-logo">U</div>
+    <div><div class="sb-brand">UniSkilled</div><div class="sb-tagline">Business Portal</div></div>
+  </div>
+  <div class="sb-company">
+    <div class="sb-av">MD</div>
+    <div>
+      <div class="sb-cname">Momentum Digital</div>
+      <div class="sb-crole">Berlin · SaaS · Growth Plan</div>
+      <div class="sb-badge-row">
+        <span class="sb-badge sb-badge-green">✓ Verified</span>
+        <span class="sb-badge sb-badge-blue">Growth</span>
+      </div>
+    </div>
+  </div>
+  <div class="sb-scroll">
+    <div class="sb-sec">Overview</div>
+    <div class="sb-a on" onclick="go('overview',this)"><div class="sb-a-ico">🏠</div>Dashboard</div>
+    <div class="sb-a" onclick="go('talent',this)"><div class="sb-a-ico">🔍</div>Find Talent<span class="sb-num nb">12</span></div>
+    <div class="sb-sec">Hiring</div>
+    <div class="sb-a" onclick="go('jobs',this)"><div class="sb-a-ico">📋</div>Job Posts<span class="sb-num ng">3</span></div>
+    <div class="sb-a" onclick="go('orders',this)"><div class="sb-a-ico">📦</div>Active Orders<span class="sb-num nr">2</span></div>
+    <div class="sb-a" onclick="go('pool',this)"><div class="sb-a-ico">⭐</div>Talent Pool<span class="sb-num nb">8</span></div>
+    <div class="sb-a" onclick="go('pipeline',this)"><div class="sb-a-ico">🎓</div>Grad Pipeline</div>
+    <div class="sb-sec">Finance</div>
+    <div class="sb-a" onclick="go('payments',this)"><div class="sb-a-ico">💳</div>Payments & Invoices</div>
+    <div class="sb-a" onclick="go('analytics',this)"><div class="sb-a-ico">📊</div>Analytics</div>
+    <div class="sb-sec">Account</div>
+    <div class="sb-a" onclick="go('messages',this)"><div class="sb-a-ico">💬</div>Messages<span class="sb-num nr">3</span></div>
+    <div class="sb-a" onclick="go('notifications',this)"><div class="sb-a-ico">🔔</div>Notifications<span class="sb-num nr">4</span></div>
+    <div class="sb-a" onclick="window.open('business-profile.html','_blank')"><div class="sb-a-ico">🏢</div>View Public Profile ↗</div>
+  </div>
+  <div class="sb-bottom">
+    <div class="plan-card">
+      <div class="plan-name">Growth Plan · €49/mo</div>
+      <div class="plan-desc">Unlimited posts · AI matching · 0% order fee</div>
+      <button class="plan-upgrade" onclick="toast('⬆️','Upgrade','Opening Pro plan details...')">Upgrade to Pro →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="tb-l">
+      <button class="hbtn" onclick="toggleSidebar()">☰</button>
+      <div><div class="tb-title" id="tbTitle">Dashboard</div><div class="tb-sub" id="tbSub">Good morning, Momentum Digital 👋</div></div>
+    </div>
+    <div class="tb-r">
+      <button class="ib ico-btn" onclick="go('notifications')">🔔<div class="ndot"></div></button>
+      <button class="ib ico-btn" onclick="go('messages')">💬<div class="ndot"></div></button>
+      <button class="ib" style="background:var(--surface);border:1.5px solid var(--border);color:var(--ink2)" onclick="window.open('business-profile.html','_blank')">🏢 My Profile</button>
+      <button class="ib pri-btn" onclick="openPostJob()">+ Post a Job</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW -->
+    <div class="page on" id="page-overview">
+      <div class="hero">
+        <div class="hero-tag"><span class="hero-tag-dot"></span>Profile verified</div>
+        <div class="hero-eyebrow">Business Dashboard</div>
+        <div class="hero-title" id="heroTitle">2 orders in progress.<br><i>12 new talent matches</i> today.</div>
+        <div class="hero-sub" id="heroSubText">Your AI matching is running. Based on your hiring history, UniSkilled has found 12 students matching your requirements.</div>
+        <div class="hero-kpis">
+          <div class="hkpi"><div class="hkpi-num">€2,840</div><div class="hkpi-lbl">Spent this month</div></div>
+          <div class="hkpi"><div class="hkpi-num">8</div><div class="hkpi-lbl">Students hired</div></div>
+          <div class="hkpi"><div class="hkpi-num">€18,400</div><div class="hkpi-lbl">Saved vs agencies</div></div>
+          <div class="hkpi"><div class="hkpi-num">4.8★</div><div class="hkpi-lbl">Your employer rating</div></div>
+        </div>
+      </div>
+
+      <!-- KPI row -->
+      <div class="g4" style="margin-bottom:1.2rem">
+        <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--blue),#60a5fa)"></div><div class="kpi-ico" style="background:var(--blue-l)">📦</div><div class="kpi-num">2</div><div class="kpi-lbl">Active orders</div><div class="kpi-delta" style="color:var(--amber)">1 needs approval</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--green),#34d399)"></div><div class="kpi-ico" style="background:var(--green-d)">🔍</div><div class="kpi-num">12</div><div class="kpi-lbl">AI talent matches</div><div class="kpi-delta up">↑ New today</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--purple),#a78bfa)"></div><div class="kpi-ico" style="background:var(--purple-l)">📋</div><div class="kpi-num">3</div><div class="kpi-lbl">Live job posts</div><div class="kpi-delta up">↑ 47 applicants</div></div>
+        <div class="kpi"><div class="kpi-bar" style="background:linear-gradient(90deg,var(--amber),#fcd34d)"></div><div class="kpi-ico" style="background:var(--amber-l)">⭐</div><div class="kpi-num">8</div><div class="kpi-lbl">Saved students</div><div class="kpi-delta" style="color:var(--mid)">Talent pool</div></div>
+      </div>
+
+      <div class="g-aside">
+        <div style="display:flex;flex-direction:column;gap:1.2rem">
+          <!-- Active orders -->
+          <div class="card">
+            <div class="clbl">Active orders <button onclick="go('orders')">View all</button></div>
+            <div class="or"><div class="or-ico" style="background:var(--blue-l)">⚛️</div><div style="flex:1;min-width:0"><div class="or-title">React Dashboard — Sarah Johnson</div><div class="or-meta">Due May 28 · €450 in escrow</div></div><div class="or-r"><div class="or-amt">€450</div><div class="or-st s-act">In Progress</div></div></div>
+            <div class="or"><div class="or-ico" style="background:var(--green-d)">📊</div><div style="flex:1;min-width:0"><div class="or-title">Data Analysis Script — Marco Bianchi</div><div class="or-meta">Delivered — awaiting your approval</div></div><div class="or-r"><div class="or-amt">€180</div><div class="or-st s-rev">Needs Approval !</div></div></div>
+          </div>
+          <!-- AI matches -->
+          <div class="card">
+            <div class="clbl">✦ AI matched talent <button onclick="go('talent')">Browse all 12</button></div>
+            <div style="display:flex;flex-direction:column;gap:.6rem">
+              <div class="sc" onclick="toast('👤','Profile','Opening Sarah Johnson\'s full profile...')">
+                <div class="sc-av" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">SJ</div>
+                <div style="flex:1;min-width:0">
+                  <div class="sc-name">Sarah Johnson</div>
+                  <div class="sc-role">CS · TU Berlin · 3rd year</div>
+                  <div class="sc-skills"><span class="sc-skill">React</span><span class="sc-skill">TypeScript</span><span class="sc-skill">Python</span></div>
+                  <div class="sc-foot">⭐ 4.9 · 12 orders · €30/hr · 🌐 Remote<div class="ai-score" style="margin-left:auto"><div class="ai-dot"></div>97%</div></div>
+                </div>
+              </div>
+              <div class="sc" onclick="toast('👤','Profile','Opening Arjun Mehta\'s full profile...')">
+                <div class="sc-av" style="background:linear-gradient(135deg,#059669,#10b981)">AM</div>
+                <div style="flex:1;min-width:0">
+                  <div class="sc-name">Arjun Mehta</div>
+                  <div class="sc-role">CS · University of Amsterdam · 4th year</div>
+                  <div class="sc-skills"><span class="sc-skill">React</span><span class="sc-skill">Next.js</span><span class="sc-skill">SQL</span></div>
+                  <div class="sc-foot">⭐ 4.8 · 7 orders · €28/hr · 🌐 Remote<div class="ai-score" style="margin-left:auto"><div class="ai-dot"></div>94%</div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Right -->
+        <div style="display:flex;flex-direction:column;gap:1.2rem">
+          <div class="card">
+            <div class="clbl">💡 AI insights</div>
+            <div class="ins" onclick="go('pool')"><div class="ins-ico" style="background:var(--blue-l)">🎓</div><div><div class="ins-title">Sarah Johnson graduates in June</div><div class="ins-desc">You've hired her 4 times. Express interest in a full-time offer for €499 — agencies charge €10k+.</div><div class="ins-cta">→ Hire-to-graduate</div></div></div>
+            <div class="ins" onclick="go('jobs')"><div class="ins-ico" style="background:var(--green-d)">📈</div><div><div class="ins-title">React post has 47 applicants</div><div class="ins-desc">3 candidates match 95%+. Review them before the post expires in 3 days.</div><div class="ins-cta">→ Review applicants</div></div></div>
+            <div class="ins" onclick="toast('⬆️','Plan','Opening plan comparison...')"><div class="ins-ico" style="background:var(--amber-l)">⚡</div><div><div class="ins-title">Upgrade to unlock priority talent</div><div class="ins-desc">Pro plan surfaces your posts to top-rated students first. €149/mo.</div><div class="ins-cta">→ See Pro features</div></div></div>
+          </div>
+          <div class="card">
+            <div class="clbl">Spending · 8 weeks</div>
+            <div style="display:flex;align-items:baseline;gap:7px;margin-bottom:.75rem"><span style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.6rem;font-weight:700;color:var(--ink);letter-spacing:-.04em">€2,840</span><span class="up" style="font-size:.72rem;font-weight:700">↑ +18%</span></div>
+            <div class="chart" id="spendChart"></div>
+            <div style="display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:.6rem;color:var(--soft)">Apr 1</span><span style="font-size:.6rem;color:var(--soft)">May 25</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FIND TALENT -->
+    <div class="page" id="page-talent">
+      <div class="hero" style="padding:1.5rem 2rem;margin-bottom:1.2rem">
+        <div class="hero-tag"><span class="hero-tag-dot"></span>AI Matching</div>
+        <div class="hero-eyebrow">Talent Search</div>
+        <div class="hero-title" style="font-size:1.45rem"><i>12 students</i> matched to your profile</div>
+        <div class="hero-sub" style="margin-bottom:0;font-size:.8rem">Based on your hiring history — React, Python, Berlin-based, 4.8★+. Updated in real time.</div>
+      </div>
+      <!-- Search bar -->
+      <div style="background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:.85rem 1.1rem;display:flex;align-items:center;gap:.75rem;margin-bottom:1.2rem;flex-wrap:wrap">
+        <input class="fi" style="flex:1;min-width:160px;border:none;background:none;padding:0" placeholder="Search by skill, university, name…" oninput="filterTalent(this.value)">
+        <select class="fi" style="flex:none;width:auto;padding:.35rem .7rem;border:1.5px solid var(--border);font-size:.8rem">
+          <option>Any major</option><option>Computer Science</option><option>Design</option><option>Business</option></select>
+        <select class="fi" style="flex:none;width:auto;padding:.35rem .7rem;border:1.5px solid var(--border);font-size:.8rem">
+          <option>Any rate</option><option>Under €20/hr</option><option>€20–35/hr</option><option>€35+/hr</option></select>
+        <button class="ib pri-btn" onclick="toast('🔍','Searching','AI scanning talent pool...')">Search</button>
+      </div>
+      <div class="g3" id="talentGrid"></div>
+    </div>
+
+    <!-- JOB POSTS -->
+    <div class="page" id="page-jobs">
+      <div class="sh"><div class="sh-title">📋 Job Posts</div><button class="ib pri-btn" style="height:32px;font-size:.77rem" onclick="openPostJob()">+ Post a Job</button></div>
+      <div class="g3" id="jobsGrid"></div>
+    </div>
+
+    <!-- ORDERS -->
+    <div class="page" id="page-orders">
+      <div style="display:flex;gap:1px;background:var(--border);border-radius:14px;overflow:hidden;margin-bottom:1.2rem">
+        <div style="background:#fff;padding:.9rem 1rem;flex:1;text-align:center"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:700;color:var(--ink)">2</div><div style="font-size:.63rem;color:var(--mid);margin-top:2px">Active</div></div>
+        <div style="background:#fff;padding:.9rem 1rem;flex:1;text-align:center"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:700;color:var(--amber)">1</div><div style="font-size:.63rem;color:var(--mid);margin-top:2px">Needs approval</div></div>
+        <div style="background:#fff;padding:.9rem 1rem;flex:1;text-align:center"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:700;color:var(--green)">6</div><div style="font-size:.63rem;color:var(--mid);margin-top:2px">Completed</div></div>
+        <div style="background:#fff;padding:.9rem 1rem;flex:1;text-align:center"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:700;color:var(--ink)">€2,840</div><div style="font-size:.63rem;color:var(--mid);margin-top:2px">Total spent</div></div>
+      </div>
+      <div class="g2">
+        <div>
+          <div class="sh"><div class="sh-title">🔴 Active & pending</div></div>
+          <div class="or" onclick="openOrderDetail('React Dashboard')"><div class="or-ico" style="background:var(--blue-l)">⚛️</div><div style="flex:1;min-width:0"><div class="or-title">React Dashboard — Sarah Johnson</div><div class="or-meta">Due May 28 · Started May 14</div></div><div class="or-r"><div class="or-amt">€450</div><div class="or-st s-act">In Progress</div></div></div>
+          <div class="or" onclick="openApproval()"><div class="or-ico" style="background:var(--green-d)">📊</div><div style="flex:1;min-width:0"><div class="or-title">Data Analysis — Marco Bianchi</div><div class="or-meta">Delivered May 24 · Awaiting your approval</div></div><div class="or-r"><div class="or-amt">€180</div><div class="or-st s-rev">Approve !</div></div></div>
+        </div>
+        <div>
+          <div class="sh"><div class="sh-title">✅ Completed</div></div>
+          <div class="or"><div class="or-ico" style="background:var(--purple-l)">🎨</div><div style="flex:1;min-width:0"><div class="or-title">Figma Screens — Lena Fischer</div><div class="or-meta">Completed May 20 · ⭐ 5.0</div></div><div class="or-r"><div class="or-amt">€320</div><div class="or-st s-don">Done ✓</div></div></div>
+          <div class="or"><div class="or-ico" style="background:var(--blue-l)">⚛️</div><div style="flex:1;min-width:0"><div class="or-title">Landing Page — Sarah Johnson</div><div class="or-meta">Completed May 12 · ⭐ 4.8</div></div><div class="or-r"><div class="or-amt">€350</div><div class="or-st s-don">Done ✓</div></div></div>
+          <div class="or"><div class="or-ico" style="background:var(--amber-l)">🐍</div><div style="flex:1;min-width:0"><div class="or-title">Python Script — Arjun Mehta</div><div class="or-meta">Completed May 5 · ⭐ 5.0</div></div><div class="or-r"><div class="or-amt">€120</div><div class="or-st s-don">Done ✓</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TALENT POOL -->
+    <div class="page" id="page-pool">
+      <div class="sh"><div class="sh-title">⭐ Saved Talent Pool</div><button class="sh-btn" onclick="go('talent')">+ Find more talent</button></div>
+      <div class="card" style="margin-bottom:1.2rem">
+        <div class="clbl">Students you've worked with or saved — one-click rehire</div>
+        <div id="poolList"></div>
+      </div>
+    </div>
+
+    <!-- GRAD PIPELINE -->
+    <div class="page" id="page-pipeline">
+      <div class="hero" style="padding:1.5rem 2rem;margin-bottom:1.2rem;background:linear-gradient(130deg,#065f46,#059669,#10b981)">
+        <div class="hero-eyebrow">Hire-to-Graduate Pipeline</div>
+        <div class="hero-title" style="font-size:1.4rem">Turn great students into <i>full-time hires</i></div>
+        <div class="hero-sub" style="margin-bottom:0;font-size:.8rem">One-time €499 fee. Agencies charge €5,000–€15,000 for the same graduate placement.</div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="clbl">Students graduating soon</div>
+          <div class="tp-item" onclick="toast('🎓','Express interest','Opening hire-to-graduate flow for Sarah Johnson...')">
+            <div class="tp-av" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">SJ</div>
+            <div><div class="tp-name">Sarah Johnson</div><div class="tp-role">CS · TU Berlin · Graduates June 2026</div><div style="font-size:.67rem;color:var(--green);font-weight:700;margin-top:2px">Hired 4 times · 4.9★ · React + Python</div></div>
+            <div class="tp-r"><div style="font-size:.72rem;font-weight:700;color:var(--blue)">Express interest →</div><div class="tp-hired">€499 placement fee</div></div>
+          </div>
+          <div class="tp-item" onclick="toast('🎓','Express interest','Opening hire-to-graduate flow for Arjun Mehta...')">
+            <div class="tp-av" style="background:linear-gradient(135deg,#059669,#10b981)">AM</div>
+            <div><div class="tp-name">Arjun Mehta</div><div class="tp-role">CS · University of Amsterdam · Graduates Aug 2026</div><div style="font-size:.67rem;color:var(--green);font-weight:700;margin-top:2px">Hired 2 times · 4.8★ · React + SQL</div></div>
+            <div class="tp-r"><div style="font-size:.72rem;font-weight:700;color:var(--blue)">Express interest →</div><div class="tp-hired">€499 placement fee</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="clbl">Why hire through UniSkilled?</div>
+          <div style="display:flex;flex-direction:column;gap:.75rem">
+            <div style="display:flex;gap:.75rem;align-items:flex-start"><div style="width:32px;height:32px;background:var(--green-d);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">💰</div><div><div style="font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:2px">€499 vs €10,000+</div><div style="font-size:.73rem;color:var(--mid)">Graduate recruitment agencies in Germany charge €5,000–15,000. You already know this student works.</div></div></div>
+            <div style="display:flex;gap:.75rem;align-items:flex-start"><div style="width:32px;height:32px;background:var(--blue-l);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">✅</div><div><div style="font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:2px">Zero hiring risk</div><div style="font-size:.73rem;color:var(--mid)">You've already worked with them. You know their code quality, communication style, and reliability.</div></div></div>
+            <div style="display:flex;gap:.75rem;align-items:flex-start"><div style="width:32px;height:32px;background:var(--purple-l);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">🚀</div><div><div style="font-size:.82rem;font-weight:700;color:var(--ink);margin-bottom:2px">One fee, forever free</div><div style="font-size:.73rem;color:var(--mid)">After paying the placement fee, all future work with that student is 0% fee — through or outside UniSkilled.</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="page" id="page-payments">
+      <div style="display:flex;gap:1px;background:var(--border);border-radius:14px;overflow:hidden;margin-bottom:1.2rem">
+        <div style="background:#fff;padding:.9rem 1rem;flex:1;text-align:center"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:700;color:var(--ink)">€2,840</div><div style="font-size:.63rem;color:var(--mid);margin-top:2px">This month</div></div>
+        <div style="background:#fff;padding:.9rem 1rem;flex:1;text-align:center"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:700;color:var(--amber)">€630</div><div style="font-size:.63rem;color:var(--mid);margin-top:2px">In escrow</div></div>
+        <div style="background:#fff;padding:.9rem 1rem;flex:1;text-align:center"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:700;color:var(--ink)">€49</div><div style="font-size:.63rem;color:var(--mid);margin-top:2px">Subscription</div></div>
+        <div style="background:#fff;padding:.9rem 1rem;flex:1;text-align:center"><div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:1.3rem;font-weight:700;color:var(--green)">€18,400</div><div style="font-size:.63rem;color:var(--mid);margin-top:2px">Saved vs agencies</div></div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="clbl">Invoice history <button onclick="toast('📥','Downloading','Generating CSV export...')">Export CSV</button></div>
+          <div class="inv"><div class="inv-ico" style="background:var(--blue-l)">⚛️</div><div><div class="inv-name">React Dashboard · Sarah Johnson</div><div class="inv-meta">INV-2026-041 · May 28 · VAT incl.</div></div><div class="inv-r"><div class="inv-amt">€450</div><div class="inv-st si-esc">In Escrow</div></div></div>
+          <div class="inv"><div class="inv-ico" style="background:var(--green-d)">📊</div><div><div class="inv-name">Data Analysis · Marco Bianchi</div><div class="inv-meta">INV-2026-040 · May 24</div></div><div class="inv-r"><div class="inv-amt">€180</div><div class="inv-st si-pen">Pending release</div></div></div>
+          <div class="inv"><div class="inv-ico" style="background:var(--purple-l)">🎨</div><div><div class="inv-name">Figma Screens · Lena Fischer</div><div class="inv-meta">INV-2026-039 · May 20</div></div><div class="inv-r"><div class="inv-amt">€320</div><div class="inv-st si-paid">Paid</div></div></div>
+          <div class="inv"><div class="inv-ico" style="background:var(--blue-l)">⚛️</div><div><div class="inv-name">Landing Page · Sarah Johnson</div><div class="inv-meta">INV-2026-037 · May 12</div></div><div class="inv-r"><div class="inv-amt">€350</div><div class="inv-st si-paid">Paid</div></div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:1.2rem">
+          <div class="card">
+            <div class="clbl">Payment method</div>
+            <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:.85rem;display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem">
+              <div style="font-size:1.3rem">💳</div>
+              <div><div style="font-size:.82rem;font-weight:700;color:var(--ink)">Visa ending 4242</div><div style="font-size:.68rem;color:var(--mid)">Expires 08/2028 · Default</div></div>
+              <button style="margin-left:auto;font-size:.72rem;font-weight:600;color:var(--blue);background:none;border:none;cursor:pointer" onclick="toast('💳','Payment','Opening card management...')">Edit</button>
+            </div>
+            <button class="sbtn sbtn-g" onclick="toast('📄','Invoice settings','Opening VAT and invoice settings...')">VAT & invoice settings</button>
+          </div>
+          <div class="card">
+            <div class="clbl">Subscription</div>
+            <div style="background:var(--blue-l);border:1.5px solid var(--blue-m);border-radius:10px;padding:.85rem;margin-bottom:.75rem">
+              <div style="font-size:.82rem;font-weight:700;color:var(--blue);margin-bottom:.2rem">Growth Plan · €49/month</div>
+              <div style="font-size:.72rem;color:var(--mid)">Next billing: June 1, 2026</div>
+              <div style="font-size:.72rem;color:var(--mid);margin-top:.2rem">Unlimited posts · AI matching · 0% order fee</div>
+            </div>
+            <button class="sbtn sbtn-p" onclick="toast('⬆️','Upgrade','Opening Pro plan details...')">Upgrade to Pro — €149/mo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="page" id="page-analytics">
+      <div class="hero" style="padding:1.5rem 2rem;margin-bottom:1.2rem">
+        <div class="hero-eyebrow">Hiring Analytics</div>
+        <div class="hero-title" style="font-size:1.4rem">You've saved <i>€18,400</i> vs agency rates</div>
+        <div class="hero-sub" style="margin-bottom:0;font-size:.8rem">8 successful hires · 96% on-time delivery · 4.8★ average student rating</div>
+      </div>
+      <div class="g2">
+        <div class="card">
+          <div class="clbl">Spending by skill</div>
+          <div class="ab"><div class="ab-h"><span class="ab-l">⚛️ React / Frontend</span><span class="ab-v">€1,400</span></div><div class="ab-track"><div class="ab-fill" style="width:78%;background:var(--blue)"></div></div></div>
+          <div class="ab"><div class="ab-h"><span class="ab-l">🐍 Python / Backend</span><span class="ab-v">€820</span></div><div class="ab-track"><div class="ab-fill" style="width:46%;background:var(--green)"></div></div></div>
+          <div class="ab"><div class="ab-h"><span class="ab-l">🎨 Design / Figma</span><span class="ab-v">€620</span></div><div class="ab-track"><div class="ab-fill" style="width:35%;background:var(--purple)"></div></div></div>
+        </div>
+        <div class="card">
+          <div class="clbl">Hire quality</div>
+          <div class="ab"><div class="ab-h"><span class="ab-l">On-time delivery</span><span class="ab-v">96%</span></div><div class="ab-track"><div class="ab-fill" style="width:96%;background:var(--green)"></div></div></div>
+          <div class="ab"><div class="ab-h"><span class="ab-l">Avg student rating</span><span class="ab-v">4.8 / 5</span></div><div class="ab-track"><div class="ab-fill" style="width:96%;background:var(--amber)"></div></div></div>
+          <div class="ab"><div class="ab-h"><span class="ab-l">Repeat hire rate</span><span class="ab-v">62%</span></div><div class="ab-track"><div class="ab-fill" style="width:62%;background:var(--blue)"></div></div></div>
+          <div class="ab"><div class="ab-h"><span class="ab-l">Dispute rate</span><span class="ab-v">0%</span></div><div class="ab-track"><div class="ab-fill" style="width:0%;background:var(--red)"></div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="page" id="page-messages">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between"><div class="sh-title">Messages <span style="background:var(--red-l);color:var(--red);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:5px">3 unread</span></div></div>
+        <div class="mr unread"><div style="position:relative"><div class="mr-av" style="background:linear-gradient(135deg,#2563eb,#7c3aed)">SJ</div><div class="mr-olive"></div></div><div style="flex:1;min-width:0"><div class="mr-name">Sarah Johnson</div><div class="mr-prev">Hi! I've pushed the latest changes to the dashboard — ready for review</div></div><span style="font-size:.62rem;color:var(--soft);flex-shrink:0">10m ago</span><div class="mr-dot"></div></div>
+        <div class="mr unread"><div style="position:relative"><div class="mr-av" style="background:linear-gradient(135deg,#059669,#10b981)">MB</div></div><div style="flex:1;min-width:0"><div class="mr-name">Marco Bianchi</div><div class="mr-prev">Delivery submitted! Let me know if you need any adjustments to the script</div></div><span style="font-size:.62rem;color:var(--soft);flex-shrink:0">2h ago</span><div class="mr-dot"></div></div>
+        <div class="mr unread"><div style="position:relative"><div class="mr-av" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">LF</div></div><div style="flex:1;min-width:0"><div class="mr-name">Lena Fischer</div><div class="mr-prev">Thanks for the 5-star review! Would love to work on the next sprint too</div></div><span style="font-size:.62rem;color:var(--soft);flex-shrink:0">Yesterday</span><div class="mr-dot"></div></div>
+        <div class="mr"><div style="position:relative"><div class="mr-av" style="background:linear-gradient(135deg,#ea580c,#fb923c)">AM</div></div><div style="flex:1;min-width:0"><div class="mr-name">Arjun Mehta</div><div class="mr-prev">Available for the next project from June 5 — happy to start early if needed</div></div><span style="font-size:.62rem;color:var(--soft);flex-shrink:0">2 days ago</span></div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="padding:1rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between"><div class="sh-title">Notifications <span style="background:var(--red-l);color:var(--red);font-size:.62rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:5px">4 unread</span></div><button class="sh-btn">Mark all read</button></div>
+        <div class="ni unread"><div class="ni-ico" style="background:var(--amber-l)">📦</div><div style="flex:1"><div class="ni-title">Marco Bianchi delivered the Data Analysis script — approve to release €180 from escrow</div><div class="ni-time">2 hours ago</div></div><div class="ni-dot"></div></div>
+        <div class="ni unread"><div class="ni-ico" style="background:var(--blue-l)">🤖</div><div style="flex:1"><div class="ni-title">12 new AI-matched students for your React Developer post — 3 are 95%+ match</div><div class="ni-time">4 hours ago</div></div><div class="ni-dot"></div></div>
+        <div class="ni unread"><div class="ni-ico" style="background:var(--green-d)">🎓</div><div style="flex:1"><div class="ni-title">Sarah Johnson graduates in 3 weeks — express interest in a full-time hire for €499</div><div class="ni-time">Yesterday</div></div><div class="ni-dot"></div></div>
+        <div class="ni unread"><div class="ni-ico" style="background:var(--purple-l)">💬</div><div style="flex:1"><div class="ni-title">Sarah Johnson replied to your message about the dashboard scope</div><div class="ni-time">Yesterday</div></div><div class="ni-dot"></div></div>
+        <div class="ni"><div class="ni-ico" style="background:var(--blue-l)">📋</div><div style="flex:1"><div class="ni-title">Your React Developer post expires in 3 days — 47 applicants so far</div><div class="ni-time">2 days ago</div></div></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- POST JOB SHEET -->
+<div class="overlay" id="jobOverlay" onclick="closeJob(event)">
+  <div class="sheet" onclick="event.stopPropagation()">
+    <div class="sheet-h"></div>
+    <div class="sheet-title">Post a new job</div>
+    <div class="sheet-sub">Reach verified university students across Europe. Average response time: 4 hours.</div>
+    <div class="fl"><label class="fl-l">Job title</label><input class="fi" placeholder="e.g. React Developer for SaaS Dashboard"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+      <div class="fl"><label class="fl-l">Category</label><select class="fi"><option>Web Development</option><option>Design / UX</option><option>Data / Python</option><option>Marketing</option><option>Other</option></select></div>
+      <div class="fl"><label class="fl-l">Type</label><select class="fi"><option>Freelance task</option><option>Part-time ongoing</option><option>Internship</option></select></div>
+    </div>
+    <div class="fl"><label class="fl-l">Description</label><textarea class="fi" placeholder="Describe the work, deliverables, and what you're looking for…"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem">
+      <div class="fl"><label class="fl-l">Budget</label><input class="fi" placeholder="e.g. €200 fixed or €30/hr"></div>
+      <div class="fl"><label class="fl-l">Deadline</label><input class="fi" type="date"></div>
+    </div>
+    <div class="fl"><label class="fl-l">Required skills</label><input class="fi" placeholder="React, TypeScript, Figma…"></div>
+    <div class="fl"><label class="fl-l">Work mode</label><select class="fi"><option>Remote</option><option>Hybrid (Berlin)</option><option>On-site</option></select></div>
+    <button class="sbtn sbtn-p" onclick="postJob()">✓ Publish Job Post</button>
+    <button class="sbtn sbtn-g" onclick="closeJobModal()">Save as draft</button>
+  </div>
+</div>
+
+<script>
+var pages={overview:'Dashboard',talent:'Find Talent',jobs:'Job Posts',orders:'Orders',pool:'Talent Pool',pipeline:'Grad Pipeline',payments:'Payments & Invoices',analytics:'Analytics',messages:'Messages',notifications:'Notifications'};
+var subs={overview:'Good morning, Momentum Digital 👋',talent:'AI-matched students for your requirements',jobs:'Manage your active and draft job posts',orders:'Track deliveries and approve work',pool:'Students you\'ve worked with or saved',pipeline:'Convert great students to full-time hires',payments:'Invoices, escrow, and subscription',analytics:'Hiring performance and savings',messages:'Conversations with students',notifications:'Updates and reminders'};
+
+function go(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  var pg=document.getElementById('page-'+id);
+  if(pg)pg.classList.add('on');
+  document.querySelectorAll('.sb-a').forEach(a=>a.classList.remove('on'));
+  if(el)el.classList.add('on');
+  else document.querySelectorAll('.sb-a').forEach(a=>{if(a.getAttribute('onclick')&&a.getAttribute('onclick').includes("'"+id+"'"))a.classList.add('on');});
+  document.getElementById('tbTitle').textContent=pages[id]||id;
+  document.getElementById('tbSub').textContent=subs[id]||'';
+  if(window.innerWidth<900)closeSidebar();
+}
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('bgOverlay').classList.toggle('show');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('bgOverlay').classList.remove('show');}
+
+// ── CENTRAL BUSINESS DATA (replace values with real API data) ──
+var bizData = {
+  companyName: 'Momentum Digital',
+  companyInitials: 'MD',
+  city: 'Berlin',
+  industry: 'SaaS',
+  plan: 'Growth',
+  activeOrders: 2,
+  ordersNeedApproval: 1,
+  aiMatches: 12,
+  liveJobs: 3,
+  totalApplicants: 47,
+  savedStudents: 8,
+  studentsHired: 8,
+  spentThisMonth: '€2,840',
+  savedVsAgencies: '€18,400',
+  agencyEquivalent: '€21,240',
+  avgCostPerStudent: '€355',
+  onTimeDelivery: '96%',
+  avgStudentRating: '4.8',
+  employerRating: '4.8★',
+  repeatHireRate: '62%',
+  unreadMessages: 3,
+  unreadNotifications: 4,
+  escrowAmount: '€630',
+  totalSpent: '€2,840',
+  subscriptionCost: '€49',
+};
+
+function updateDashboardData() {
+  var d = bizData;
+  // Sidebar company info
+  var sbCname = document.querySelector('.sb-cname');
+  if(sbCname) sbCname.textContent = d.companyName;
+  var sbCrole = document.querySelector('.sb-crole');
+  if(sbCrole) sbCrole.textContent = d.city + ' · ' + d.industry + ' · ' + d.plan + ' Plan';
+  var sbAv = document.querySelector('.sb-av');
+  if(sbAv) sbAv.textContent = d.companyInitials;
+  // Hero title - dynamic from real data
+  var heroTitle = document.getElementById('heroTitle');
+  if(heroTitle) {
+    var word = d.activeOrders === 1 ? 'order' : 'orders';
+    heroTitle.innerHTML = d.activeOrders + ' ' + word + ' in progress.<br><i>' + d.aiMatches + ' new talent matches</i> today.';
+  }
+  var heroSubText = document.getElementById('heroSubText');
+  if(heroSubText) heroSubText.textContent = 'Your AI matching is running. Based on your hiring history, UniSkilled has found ' + d.aiMatches + ' students matching your requirements.';
+  // Hero KPI numbers
+  var hkpis = document.querySelectorAll('.hkpi-num');
+  if(hkpis[0]) hkpis[0].textContent = d.spentThisMonth;
+  if(hkpis[1]) hkpis[1].textContent = d.studentsHired;
+  if(hkpis[2]) hkpis[2].textContent = d.savedVsAgencies;
+  if(hkpis[3]) hkpis[3].textContent = d.employerRating;
+  // KPI cards
+  var kpiNums = document.querySelectorAll('.kpi-num');
+  if(kpiNums[0]) kpiNums[0].textContent = d.activeOrders;
+  if(kpiNums[1]) kpiNums[1].textContent = d.aiMatches;
+  if(kpiNums[2]) kpiNums[2].textContent = d.liveJobs;
+  if(kpiNums[3]) kpiNums[3].textContent = d.savedStudents;
+  var kpiDeltas = document.querySelectorAll('.kpi-delta');
+  if(kpiDeltas[0]) kpiDeltas[0].textContent = d.ordersNeedApproval + ' needs approval';
+  if(kpiDeltas[2]) kpiDeltas[2].textContent = '↑ ' + d.totalApplicants + ' applicants';
+  // Savings banner
+  var sbItems = document.querySelectorAll('.sb-item-num');
+  if(sbItems[0]) sbItems[0].textContent = d.studentsHired;
+  if(sbItems[1]) sbItems[1].textContent = d.avgCostPerStudent;
+  if(sbItems[2]) sbItems[2].textContent = d.onTimeDelivery;
+  if(sbItems[3]) sbItems[3].textContent = d.avgStudentRating + '★';
+  var sbMainNum = document.querySelector('.sb-num-main');
+  if(sbMainNum) sbMainNum.textContent = d.savedVsAgencies;
+  var sbSubText = document.querySelector('.sb-sub-text');
+  if(sbSubText) sbSubText.textContent = 'Agencies would have charged ~' + d.agencyEquivalent + ' for the same hires';
+  // Topbar greeting
+  var hr = new Date().getHours();
+  var greeting = hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening';
+  var tbSub = document.getElementById('tbSub');
+  if(tbSub) tbSub.textContent = greeting + ', ' + d.companyName + ' 👋';
+  subs['overview'] = greeting + ', ' + d.companyName + ' 👋';
+}
+
+// Talent data
+var talent=[
+  {init:'SJ',name:'Sarah Johnson',role:'CS · TU Berlin · 3rd year',skills:['React','TypeScript','Python'],rate:'€30/hr',rating:'4.9',orders:12,match:97,bg:'linear-gradient(135deg,#2563eb,#7c3aed)',hired:true},
+  {init:'AM',name:'Arjun Mehta',role:'CS · Amsterdam · 4th year',skills:['React','Next.js','SQL'],rate:'€28/hr',rating:'4.8',orders:7,match:94,bg:'linear-gradient(135deg,#059669,#10b981)',hired:true},
+  {init:'LF',name:'Lena Fischer',role:'Design · TU Munich · 3rd year',skills:['Figma','UI Design','CSS'],rate:'€25/hr',rating:'5.0',orders:5,match:88,bg:'linear-gradient(135deg,#7c3aed,#a78bfa)',hired:false},
+  {init:'MB',name:'Marco Bianchi',role:'Data Science · Bologna · MSc',skills:['Python','SQL','Tableau'],rate:'€32/hr',rating:'4.7',orders:9,match:91,bg:'linear-gradient(135deg,#ea580c,#fb923c)',hired:false},
+  {init:'KP',name:'Kavya Patel',role:'CS · TU Delft · 4th year',skills:['Python','FastAPI','ML'],rate:'€35/hr',rating:'4.9',orders:11,match:93,bg:'linear-gradient(135deg,#0891b2,#06b6d4)',hired:false},
+  {init:'FS',name:'Felix Schmidt',role:'CS · FU Berlin · 2nd year',skills:['React','Vue.js','CSS'],rate:'€22/hr',rating:'4.6',orders:3,match:82,bg:'linear-gradient(135deg,#d97706,#fbbf24)',hired:false},
+];
+function renderTalent(filter){
+  var grid=document.getElementById('talentGrid');if(!grid)return;
+  var data=filter?talent.filter(t=>t.name.toLowerCase().includes(filter)||t.skills.join(' ').toLowerCase().includes(filter)):talent;
+  grid.innerHTML='';
+  data.forEach(function(t){
+    var div=document.createElement('div');
+    div.className='sc';div.style.flexDirection='column';div.style.alignItems='stretch';div.style.cursor='pointer';
+    div.innerHTML=`<div style="display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.6rem">
+      <div class="sc-av" style="background:${t.bg}">${t.init}</div>
+      <div style="flex:1;min-width:0">
+        <div class="sc-name">${t.name}${t.hired?'<span style="font-size:.6rem;background:var(--green-d);color:var(--green);font-weight:700;padding:1px 6px;border-radius:5px;margin-left:4px">Worked with</span>':''}</div>
+        <div class="sc-role">${t.role}</div>
+        <div class="sc-skills">${t.skills.map(s=>`<span class="sc-skill">${s}</span>`).join('')}</div>
+        <div class="sc-foot">${t.rate} · ⭐${t.rating} · ${t.orders} orders<div class="ai-score" style="margin-left:auto"><div class="ai-dot"></div>${t.match}%</div></div>
+      </div></div>
+      <div style="display:flex;gap:.4rem">
+        <button class="sc-btn sc-btn-p" style="flex:1" onclick="event.stopPropagation();toast('📋','Order placed','Opening order form for ${t.name}...')">Hire now</button>
+        <button class="sc-btn sc-btn-s" onclick="event.stopPropagation();toast('⭐','Saved','${t.name} added to your talent pool')">Save</button>
+        <button class="sc-btn sc-btn-s" onclick="event.stopPropagation();window.open('business-profile.html','_blank')">Profile</button>
+      </div>`;
+    grid.appendChild(div);
+  });
+}
+function filterTalent(v){renderTalent(v.toLowerCase());}
+
+// Jobs data
+var jobs=[
+  {title:'React Developer for SaaS Dashboard',type:'Freelance',budget:'€30–45/hr',mode:'Remote',status:'live',applicants:47,views:182,skills:['React','TypeScript'],bg:'linear-gradient(135deg,#1e40af,#3b82f6)'},
+  {title:'Python Data Pipeline — Backend',type:'Freelance',budget:'€35–50/hr',mode:'Remote',status:'live',applicants:23,views:91,skills:['Python','FastAPI'],bg:'linear-gradient(135deg,#065f46,#059669)'},
+  {title:'Figma UI Kit — Mobile App Redesign',type:'Fixed task',budget:'€400 fixed',mode:'Remote',status:'live',applicants:18,views:74,skills:['Figma','UI/UX'],bg:'linear-gradient(135deg,#4c1d95,#7c3aed)'},
+  {title:'Marketing Content Writer',type:'Part-time',budget:'€18/hr',mode:'Remote',status:'draft',applicants:0,views:0,skills:['Copywriting','SEO'],bg:'linear-gradient(135deg,#92400e,#d97706)'},
+];
+function renderJobs(){
+  var grid=document.getElementById('jobsGrid');if(!grid)return;
+  grid.innerHTML='';
+  jobs.forEach(function(j){
+    var statusClass=j.status==='live'?'jp-live':j.status==='draft'?'jp-draft':'jp-closed';
+    var statusLabel=j.status==='live'?'● Live':j.status==='draft'?'Draft':'Closed';
+    var div=document.createElement('div');div.className='jp';
+    div.innerHTML=`<span class="jp-status ${statusClass}">${statusLabel}</span>
+      <div style="width:42px;height:42px;border-radius:11px;background:${j.bg};display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:.6rem">💼</div>
+      <div class="jp-title">${j.title}</div>
+      <div class="jp-meta">
+        <span class="jp-tag" style="background:var(--blue-l);color:var(--blue)">${j.type}</span>
+        <span class="jp-tag" style="background:var(--green-d);color:var(--green)">${j.budget}</span>
+        <span class="jp-tag" style="background:var(--surface);color:var(--mid)">🌐 ${j.mode}</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:.5rem">${j.skills.map(s=>`<span class="sc-skill">${s}</span>`).join('')}</div>
+      <div class="jp-stats">
+        <span>👤 ${j.applicants} applicants</span>
+        <span>👁 ${j.views} views</span>
+        <span style="margin-left:auto;color:var(--blue);font-weight:600;font-size:.68rem;cursor:pointer" onclick="toast('👥','Applicants','Opening applicants list...')">Review →</span>
+      </div>`;
+    div.onclick=function(){toast('📋','Job post','Opening full job post management...');};
+    grid.appendChild(div);
+  });
+  // Add new
+  var add=document.createElement('div');add.className='jp';add.style='border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:200px;cursor:pointer';
+  add.onclick=openPostJob;add.innerHTML='<div style="text-align:center"><div style="font-size:1.8rem;margin-bottom:.4rem">➕</div><div style="font-size:.8rem;font-weight:700;color:var(--mid)">Post a new job</div></div>';
+  grid.appendChild(add);
+}
+
+// Pool
+var pool=[
+  {init:'SJ',name:'Sarah Johnson',role:'CS · TU Berlin',rate:'€30/hr',times:4,bg:'linear-gradient(135deg,#2563eb,#7c3aed)'},
+  {init:'AM',name:'Arjun Mehta',role:'CS · Amsterdam',rate:'€28/hr',times:2,bg:'linear-gradient(135deg,#059669,#10b981)'},
+  {init:'LF',name:'Lena Fischer',role:'Design · TU Munich',rate:'€25/hr',times:1,bg:'linear-gradient(135deg,#7c3aed,#a78bfa)'},
+  {init:'MB',name:'Marco Bianchi',role:'Data · Bologna',rate:'€32/hr',times:1,bg:'linear-gradient(135deg,#ea580c,#fb923c)'},
+];
+function renderPool(){
+  var list=document.getElementById('poolList');if(!list)return;
+  list.innerHTML='';
+  pool.forEach(function(p){
+    var div=document.createElement('div');div.className='tp-item';
+    div.innerHTML=`<div class="tp-av" style="background:${p.bg}">${p.init}</div>
+      <div><div class="tp-name">${p.name}</div><div class="tp-role">${p.role}</div></div>
+      <div class="tp-r"><div class="tp-rate">${p.rate}</div><div class="tp-hired">Hired ${p.times}× · in pool</div></div>
+      <button class="sc-btn sc-btn-p" style="margin-left:.5rem" onclick="event.stopPropagation();toast('📋','Rehire','Opening order form for ${p.name}...')">Rehire</button>`;
+    list.appendChild(div);
+  });
+}
+
+// Chart
+function renderChart(){
+  var el=document.getElementById('spendChart');if(!el)return;
+  var vals=[180,320,240,480,380,620,440,840];
+  var max=Math.max.apply(null,vals);
+  var cols=['#2563eb','#3b82f6','#2563eb','#7c3aed','#2563eb','#059669','#2563eb','#059669'];
+  el.innerHTML='';
+  vals.forEach(function(v,i){
+    var b=document.createElement('div');b.className='ch-b';
+    b.style.cssText='height:4px;background:'+cols[i]+';opacity:.75;border-radius:4px 4px 0 0;transition:height .9s cubic-bezier(.34,1,.64,1) '+(i*0.07)+'s';
+    el.appendChild(b);
+    setTimeout(function(){b.style.height=Math.round((v/max)*48)+'px';},200);
+  });
+}
+
+// Job sheet
+function openPostJob(){document.getElementById('jobOverlay').classList.add('open');}
+function closeJob(e){if(e.target===document.getElementById('jobOverlay'))closeJobModal();}
+function closeJobModal(){document.getElementById('jobOverlay').classList.remove('open');}
+function postJob(){closeJobModal();toast('✅','Job published','Your job post is now live and visible to students!');}
+
+// Order actions
+function openOrderDetail(name){toast('📦',name,'Opening order management panel...');}
+function openApproval(){toast('✅','Approve delivery','Opening delivery review for Marco Bianchi — €180 to be released from escrow...');}
+
+// Toast
+function toast(ico,title,msg){
+  var stack=document.getElementById('toastStack');
+  var t=document.createElement('div');t.className='toast';
+  t.innerHTML='<span style="font-size:1rem">'+ico+'</span><div><div style="font-size:.8rem;font-weight:700;color:var(--ink)">'+title+'</div><div style="font-size:.68rem;color:var(--mid);margin-top:1px">'+(msg||'')+'</div></div>';
+  stack.appendChild(t);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400);},3200);
+}
+
+// Entry animations
+(function(){
+  var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}});},{threshold:.05});
+  document.querySelectorAll('.kpi,.card,.or,.sc,.jp,.inv,.ins,.tp-item,.savings-banner').forEach(function(el,i){
+    el.style.opacity='0';el.style.transform='translateY(14px)';
+    el.style.transition='opacity .35s '+(i*.055)+'s ease, transform .35s '+(i*.055)+'s ease';
+    io.observe(el);
+  });
+})();
+
+updateDashboardData();renderTalent();renderJobs();renderPool();renderChart();
+</script>
+
+// ── REAL DATA FROM BACKEND ──
+async function loadBusinessDashboard() {
+  if (typeof UniSkilled === 'undefined') return;
+  if (!UniSkilled.Auth.isLoggedIn()) {
+    window.location.href = 'signin.html?redirect=business-dashboard.html';
+    return;
+  }
+
+  const [ordersRes, jobsRes, notifRes, profileRes, studentsRes] = await Promise.all([
+    UniSkilled.Orders.list('business'),
+    UniSkilled.Jobs.list({ limit: 20 }),
+    UniSkilled.Notifications.list(),
+    UniSkilled.Profile.get(),
+    UniSkilled.Students ? UniSkilled.Students.search([], null, 10) : Promise.resolve({ data: [] })
+  ]);
+
+  var activeOrders = (ordersRes.data || []).filter(function(o){ return o.status === 'active' || o.status === 'delivered'; });
+  var liveJobs = (jobsRes.data || []).filter(function(j){ return j.status === 'live'; });
+  var totalSpent = (ordersRes.data || []).filter(function(o){ return o.status === 'approved'; }).reduce(function(sum, o){ return sum + parseFloat(o.amount || 0); }, 0);
+
+  // Update KPI cards
+  document.querySelectorAll('[data-stat="active-orders"]').forEach(function(el){ el.textContent = activeOrders.length; });
+  document.querySelectorAll('[data-stat="live-jobs"]').forEach(function(el){ el.textContent = liveJobs.length; });
+  document.querySelectorAll('[data-stat="total-spent"]').forEach(function(el){ el.textContent = '€' + totalSpent.toFixed(2); });
+
+  if (profileRes && profileRes.business_profile) {
+    var bp = profileRes.business_profile;
+    document.querySelectorAll('[data-stat="plan"]').forEach(function(el){ el.textContent = (bp.plan || 'free').toUpperCase(); });
+    document.querySelectorAll('[data-biz-name]').forEach(function(el){ el.textContent = bp.company_name || ''; });
+  }
+
+  if (typeof renderAll === 'function') renderAll();
+  if (typeof renderOrders === 'function') renderOrders(activeOrders);
+  if (typeof renderJobs === 'function') renderJobs(liveJobs);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(loadBusinessDashboard, 500);
+});
+
+<script src="uniskilled-api.js"></script>
+</body>
+</html>
