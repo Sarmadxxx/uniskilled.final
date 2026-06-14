@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — UniSkilled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#ffffff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;}
+body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
+/* Left side */
+.left{background:linear-gradient(135deg,#0f2460 0%,#1a6bff 100%);display:flex;flex-direction:column;justify-content:center;padding:4rem;position:relative;overflow:hidden;}
+.left::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.06) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;}
+.left-logo{display:flex;align-items:center;gap:10px;margin-bottom:3rem;position:relative;z-index:1;}
+.logo-icon{width:36px;height:36px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;}
+.logo-text{font-weight:800;font-size:1.2rem;color:#fff;letter-spacing:-0.02em;}
+.left-content{position:relative;z-index:1;}
+.left-content h1{font-size:clamp(2rem,3vw,2.8rem);font-weight:800;color:#fff;line-height:1.15;letter-spacing:-0.03em;margin-bottom:1rem;}
+.left-content h1 span{color:#f7e049;}
+.left-content p{font-size:1rem;color:rgba(255,255,255,0.6);line-height:1.75;max-width:360px;margin-bottom:2.5rem;}
+.trust-items{display:flex;flex-direction:column;gap:0.8rem;}
+.trust-item{display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.75);font-size:0.88rem;font-weight:500;}
+.trust-icon{width:32px;height:32px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
+/* Right side */
+.right{display:flex;flex-direction:column;justify-content:center;padding:4rem 5rem;background:var(--white);}
+.right-header{margin-bottom:2.5rem;}
+.right-header h2{font-size:1.8rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.4rem;}
+.right-header p{font-size:0.9rem;color:var(--mid);}
+.right-header p a{color:var(--blue);text-decoration:none;font-weight:600;}
+.form-group{margin-bottom:1.2rem;}
+.form-label{display:block;font-size:0.82rem;font-weight:700;color:var(--ink2);margin-bottom:0.5rem;}
+.form-input{width:100%;padding:0.85rem 1.1rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .18s,box-shadow .18s;}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,0.1);}
+.form-input::placeholder{color:var(--light);}
+.form-input.error{border-color:var(--red);}
+.forgot{text-align:right;margin-top:0.4rem;}
+.forgot a{font-size:0.8rem;color:var(--blue);text-decoration:none;font-weight:600;}
+.btn-submit{width:100%;padding:0.95rem;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all .18s;margin-top:0.5rem;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-submit:hover{background:#1558e0;box-shadow:0 6px 20px rgba(26,107,255,0.35);}
+.btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.divider{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:var(--light);font-size:0.8rem;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.alert{padding:0.85rem 1.1rem;border-radius:9px;font-size:0.85rem;font-weight:500;margin-bottom:1.2rem;display:none;}
+.alert.error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;display:block;}
+.alert.success{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0;display:block;}
+.signup-link{text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--mid);}
+.signup-link a{color:var(--blue);font-weight:700;text-decoration:none;}
+@media(max-width:768px){body{grid-template-columns:1fr;}.left{display:none;}.right{padding:3rem 2rem;}}
+</style>
+</head>
+<body>
+
+<!-- LEFT -->
+<div class="left">
+  <div class="left-logo">
+    <div class="logo-icon">U</div>
+    <span class="logo-text">UniSkilled</span>
+  </div>
+  <div class="left-content">
+    <h1>Welcome back to <span>UniSkilled</span></h1>
+    <p>Sign in to access your dashboard, manage your gigs, and keep earning.</p>
+    <div class="trust-items">
+      <div class="trust-item"><div class="trust-icon">🎓</div>University verified platform</div>
+      <div class="trust-item"><div class="trust-icon">🔐</div>Escrow protected payments</div>
+      <div class="trust-item"><div class="trust-icon">⚡</div>AI-matched opportunities</div>
+    </div>
+  </div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+  <div class="right-header">
+    <h2>Sign in</h2>
+    <p>Don't have an account? <a href="onboarding.html">Get started free</a></p>
+  </div>
+
+  <div id="alert" class="alert"></div>
+
+  <form id="signinForm">
+    <div class="form-group">
+      <label class="form-label">Email address</label>
+      <input type="email" id="email" class="form-input" placeholder="your@university.ac.uk" required>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+      <div class="forgot"><a href="#" id="forgotLink">Forgot password?</a></div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="submitBtn">
+      <span id="btnText">Sign in</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </form>
+
+  <div class="signup-link">
+    New to UniSkilled? <a href="onboarding.html">Create an account</a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function showAlert(msg, type) {
+  const el = document.getElementById('alert');
+  el.textContent = msg;
+  el.className = 'alert ' + type;
+}
+
+function setLoading(loading) {
+  const btn = document.getElementById('submitBtn');
+  const text = document.getElementById('btnText');
+  const spinner = document.getElementById('spinner');
+  btn.disabled = loading;
+  text.textContent = loading ? 'Signing in...' : 'Sign in';
+  spinner.style.display = loading ? 'block' : 'none';
+}
+
+document.getElementById('signinForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  setLoading(true);
+
+  const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    showAlert(error.message === 'Invalid login credentials'
+      ? 'Incorrect email or password. Please try again.'
+      : error.message, 'error');
+    setLoading(false);
+    return;
+  }
+
+  // Get user role and redirect accordingly
+  try {
+    const { data: profile } = await _supabase
+      .from('users')
+      .select('roles')
+      .eq('id', data.user.id)
+      .single();
+
+    // Postgres returns roles as {tutor} string or array - handle both
+    const rolesRaw = (profile && profile.roles) ? profile.roles : ['student'];
+    const rolesStr = JSON.stringify(rolesRaw).toLowerCase();
+
+    if (rolesStr.includes('admin')) {
+      window.location.href = 'admin-dashboard.html';
+    } else if (rolesStr.includes('tutor')) {
+      window.location.href = 'tutor-dashboard.html';
+    } else if (rolesStr.includes('business')) {
+      window.location.href = 'business-dashboard.html';
+    } else {
+      window.location.href = 'student-dashboard.html';
+    }
+  } catch(e) {
+    window.location.href = 'student-dashboard.html';
+  }
+});
+
+// Forgot password
+document.getElementById('forgotLink').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value.trim();
+  if (!email) {
+    showAlert('Please enter your email address first.', 'error');
+    return;
+  }
+  const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://uniskilled.com/signin.html'
+  });
+  if (error) {
+    showAlert(error.message, 'error');
+  } else {
+    showAlert('Password reset email sent! Check your inbox.', 'success');
+  }
+});
+</script>
+</body>
+</html>
