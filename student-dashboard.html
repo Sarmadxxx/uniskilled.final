@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sarah's Dashboard — UniSkilled</title>
+<title>My Dashboard — UniSkilled</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,400;1,9..144,700&display=swap" rel="stylesheet">
 <style>
@@ -717,7 +717,7 @@ textarea.fi2{resize:vertical;min-height:75px;line-height:1.6}
             <div style="font-size:.6rem;color:rgba(255,255,255,.38);margin-bottom:.5rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em">UniSkilled Escrow</div>
             <div style="font-size:1.1rem;font-weight:700;color:#fff;letter-spacing:.12em;margin-bottom:.65rem;font-family:'Fraunces',serif">•••• •••• •••• 4242</div>
             <div style="display:flex;justify-content:space-between;align-items:flex-end">
-              <div><div style="font-size:.58rem;color:rgba(255,255,255,.38)">Card holder</div><div style="font-size:.8rem;font-weight:600;color:#fff">Sarah Johnson</div></div>
+              <div><div style="font-size:.58rem;color:rgba(255,255,255,.38)">Card holder</div><div style="font-size:.8rem;font-weight:600;color:#fff" data-cardholder="">Sarah Johnson</div></div>
               <div style="text-align:right"><div style="font-size:.58rem;color:rgba(255,255,255,.38)">Expires</div><div style="font-size:.8rem;font-weight:600;color:#fff">09/27</div></div>
             </div>
           </div>
@@ -830,6 +830,86 @@ textarea.fi2{resize:vertical;min-height:75px;line-height:1.6}
   <button class="ai-btn" onclick="toggleAI()">🤖</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ── SUPABASE AUTH + REAL USER DATA ──
+(function(){
+  const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
+  const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  async function loadRealUser() {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) {
+      window.location.href = 'signin.html';
+      return;
+    }
+    const user = session.user;
+
+    // Get profile from users table
+    const { data: profile } = await _sb.from('users')
+      .select('full_name, university_email, country, language')
+      .eq('id', user.id)
+      .single();
+
+    // Get student profile
+    const { data: studentProfile } = await _sb.from('student_profiles')
+      .select('university, degree, year_of_study, country')
+      .eq('user_id', user.id)
+      .single();
+
+    const fullName = (profile && profile.full_name) ? profile.full_name : (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name : 'Student';
+    const firstName = fullName.split(' ')[0];
+    const initials = fullName.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+    const university = (studentProfile && studentProfile.university) ? studentProfile.university : '';
+    const degree = (studentProfile && studentProfile.degree) ? studentProfile.degree : '';
+    const year = (studentProfile && studentProfile.year_of_study) ? studentProfile.year_of_study + (studentProfile.year_of_study == 1 ? 'st' : studentProfile.year_of_study == 2 ? 'nd' : studentProfile.year_of_study == 3 ? 'rd' : 'th') + ' year' : '';
+    const roleInfo = [university, year, degree].filter(Boolean).join(' · ');
+
+    // Update all name/role references in the DOM
+    document.querySelectorAll('.sb-uname').forEach(el => el.textContent = fullName);
+    document.querySelectorAll('.sb-urole').forEach(el => el.textContent = roleInfo);
+
+    // Update topbar greeting
+    const tbSub = document.getElementById('tbSub');
+    if (tbSub) {
+      const hour = new Date().getHours();
+      const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+      tbSub.textContent = greeting + ', ' + firstName + ' 👋';
+    }
+
+    // Update hero welcome
+    const heroTitle = document.querySelector('.hero-title');
+    if (heroTitle) heroTitle.textContent = 'Welcome back, ' + firstName + '!';
+
+    const heroSub = document.querySelector('.hero-sub');
+    if (heroSub) heroSub.textContent = 'Your UniSkilled dashboard is ready. Start exploring opportunities matched to your skills.';
+
+    // Update page title
+    document.title = firstName + "'s Dashboard — UniSkilled";
+
+    // Update avatar initials
+    document.querySelectorAll('.sb-av').forEach(el => {
+      if (el.tagName !== 'IMG') el.textContent = initials;
+    });
+
+    // Update card holder name in payments
+    document.querySelectorAll('[data-cardholder]').forEach(el => el.textContent = fullName);
+
+    // Update AI chat greeting
+    const aiGreeting = document.querySelector('.ai-msg.ai-bot');
+    if (aiGreeting) aiGreeting.textContent = 'Hi ' + firstName + '! 👋 I am your AI study assistant. I can help with tutor recommendations, study plans, goal setting and exam prep. What do you need?';
+
+    // Reset fake stats to 0 for new users
+    const totalSessions = (studentProfile && studentProfile.total_orders) ? studentProfile.total_orders : 0;
+    document.querySelectorAll('.hkpi-num').forEach((el, i) => {
+      if (i === 0) el.textContent = totalSessions; // sessions
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', loadRealUser);
+})();
+</script>
 <script>
 (function(){
 'use strict';
