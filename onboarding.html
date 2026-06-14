@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get Started — UniSkilled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#ffffff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--purple:#7c3aed;--purple-bg:#f5f3ff;}
+body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;}
+.container{width:100%;max-width:560px;}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:2.5rem;justify-content:center;}
+.logo-icon{width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;}
+.logo-text{font-weight:800;font-size:1.2rem;color:var(--ink);letter-spacing:-0.02em;}
+
+/* Steps indicator */
+.steps{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:2.5rem;}
+.step{display:flex;align-items:center;gap:8px;font-size:0.78rem;font-weight:600;color:var(--light);}
+.step.active{color:var(--blue);}
+.step.done{color:var(--green);}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;background:var(--white);}
+.step.active .step-num{border-color:var(--blue);color:var(--blue);background:var(--blue);color:#fff;}
+.step.done .step-num{border-color:var(--green);background:var(--green);color:#fff;}
+.step-line{width:40px;height:2px;background:var(--border);margin:0 4px;}
+.step-line.done{background:var(--green);}
+
+/* Card */
+.card{background:var(--white);border-radius:20px;padding:2.5rem;box-shadow:0 4px 24px rgba(0,0,0,0.06);border:1px solid var(--border);}
+.card h2{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.4rem;}
+.card p.subtitle{font-size:0.9rem;color:var(--mid);margin-bottom:2rem;line-height:1.6;}
+
+/* Role selector */
+.role-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin-bottom:1.5rem;}
+.role-card{border:2px solid var(--border);border-radius:14px;padding:1.4rem 1rem;text-align:center;cursor:pointer;transition:all .18s;background:var(--white);}
+.role-card:hover{border-color:var(--blue);transform:translateY(-2px);}
+.role-card.selected{border-color:var(--blue);background:var(--blue);color:#fff;}
+.role-card.selected .role-desc{color:rgba(255,255,255,0.7);}
+.role-icon{font-size:1.8rem;margin-bottom:0.6rem;display:block;}
+.role-name{font-weight:800;font-size:0.9rem;margin-bottom:0.3rem;}
+.role-desc{font-size:0.74rem;color:var(--mid);line-height:1.4;}
+.role-card.coming-soon{opacity:0.65;position:relative;}
+.cs-badge{position:absolute;top:8px;right:8px;background:var(--purple-bg);color:var(--purple);font-size:0.6rem;font-weight:700;padding:2px 6px;border-radius:100px;text-transform:uppercase;letter-spacing:0.05em;}
+
+/* Form */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.form-group{margin-bottom:1.1rem;}
+.form-label{display:block;font-size:0.82rem;font-weight:700;color:var(--ink2);margin-bottom:0.45rem;}
+.form-input{width:100%;padding:0.82rem 1rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .18s,box-shadow .18s;}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,0.1);}
+.form-input::placeholder{color:var(--light);}
+.password-hint{font-size:0.75rem;color:var(--light);margin-top:0.3rem;}
+
+/* Buttons */
+.btn-primary{width:100%;padding:0.95rem;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary:hover{background:#1558e0;box-shadow:0 6px 20px rgba(26,107,255,0.35);}
+.btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
+.btn-secondary{width:100%;padding:0.85rem;background:transparent;color:var(--ink2);border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .18s;margin-top:0.7rem;}
+.btn-secondary:hover{border-color:var(--ink2);}
+
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.alert{padding:0.85rem 1.1rem;border-radius:9px;font-size:0.85rem;font-weight:500;margin-bottom:1.2rem;display:none;}
+.alert.error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;display:block;}
+.alert.success{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0;display:block;}
+
+.signin-link{text-align:center;margin-top:1.2rem;font-size:0.85rem;color:var(--mid);}
+.signin-link a{color:var(--blue);font-weight:700;text-decoration:none;}
+
+/* Success screen */
+.success-screen{text-align:center;padding:1rem 0;}
+.success-icon{width:72px;height:72px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 1.5rem;}
+.success-screen h2{font-size:1.6rem;font-weight:800;margin-bottom:0.6rem;}
+.success-screen p{color:var(--mid);font-size:0.9rem;line-height:1.7;margin-bottom:1.5rem;}
+.email-highlight{background:var(--off);border:1px solid var(--border);border-radius:8px;padding:0.6rem 1rem;display:inline-block;font-weight:700;color:var(--ink);font-size:0.9rem;margin-bottom:1.5rem;}
+
+/* Screens */
+.screen{display:none;}
+.screen.active{display:block;}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="logo">
+    <div class="logo-icon">U</div>
+    <span class="logo-text">UniSkilled</span>
+  </div>
+
+  <!-- Steps -->
+  <div class="steps" id="stepsBar">
+    <div class="step active" id="s1"><div class="step-num">1</div><span>Role</span></div>
+    <div class="step-line" id="l1"></div>
+    <div class="step" id="s2"><div class="step-num">2</div><span>Details</span></div>
+    <div class="step-line" id="l2"></div>
+    <div class="step" id="s3"><div class="step-num">3</div><span>Confirm</span></div>
+  </div>
+
+  <div class="card">
+    <div id="alert" class="alert"></div>
+
+    <!-- SCREEN 1: Choose role -->
+    <div class="screen active" id="screen1">
+      <h2>How will you use UniSkilled?</h2>
+      <p class="subtitle">Choose your role to get started. You can add more roles later.</p>
+      <div class="role-cards">
+        <div class="role-card" data-role="student">
+          <span class="role-icon">🎓</span>
+          <div class="role-name">Student</div>
+          <div class="role-desc">Earn through freelance and tutoring</div>
+        </div>
+        <div class="role-card" data-role="tutor">
+          <span class="role-icon">📚</span>
+          <div class="role-name">Tutor</div>
+          <div class="role-desc">Teach students in your subject</div>
+        </div>
+        <div class="role-card coming-soon" data-role="business">
+          <span class="cs-badge">Soon</span>
+          <span class="role-icon">🏢</span>
+          <div class="role-name">Business</div>
+          <div class="role-desc">Hire verified student talent</div>
+        </div>
+      </div>
+      <button class="btn-primary" id="nextBtn1" disabled>Continue →</button>
+      <div class="signin-link">Already have an account? <a href="signin.html">Sign in</a></div>
+    </div>
+
+    <!-- SCREEN 2: Fill in details -->
+    <div class="screen" id="screen2">
+      <h2 id="step2Title">Create your account</h2>
+      <p class="subtitle" id="step2Subtitle">Fill in your details to get started.</p>
+      <form id="signupForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">First name</label>
+            <input type="text" id="firstName" class="form-input" placeholder="Sara" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Last name</label>
+            <input type="text" id="lastName" class="form-input" placeholder="Johnson" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">University email</label>
+          <input type="email" id="email" class="form-input" placeholder="you@university.ac.uk" required>
+        </div>
+        <div class="form-group" id="universityGroup">
+          <label class="form-label">University name</label>
+          <input type="text" id="university" class="form-input" placeholder="e.g. University of Edinburgh">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" id="password" class="form-input" placeholder="Min. 8 characters" required minlength="8">
+          <div class="password-hint">At least 8 characters</div>
+        </div>
+        <button type="submit" class="btn-primary" id="submitBtn">
+          <span id="btnText">Create account</span>
+          <div class="spinner" id="spinner"></div>
+        </button>
+        <button type="button" class="btn-secondary" id="backBtn">← Back</button>
+      </form>
+    </div>
+
+    <!-- SCREEN 3: Success / Check email -->
+    <div class="screen" id="screen3">
+      <div class="success-screen">
+        <div class="success-icon">✉️</div>
+        <h2>Check your email!</h2>
+        <p>We've sent a confirmation link to:</p>
+        <div class="email-highlight" id="confirmedEmail"></div>
+        <p>Click the link in the email to verify your account and complete setup. Check your spam folder if you don't see it.</p>
+        <button class="btn-primary" id="goSignin" style="max-width:280px;margin:0 auto;">
+          Go to Sign in →
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let selectedRole = null;
+
+function showAlert(msg, type) {
+  const el = document.getElementById('alert');
+  el.textContent = msg;
+  el.className = 'alert ' + type;
+}
+
+function hideAlert() {
+  const el = document.getElementById('alert');
+  el.className = 'alert';
+}
+
+function setStep(step) {
+  [1,2,3].forEach(i => {
+    document.getElementById('screen' + i).classList.remove('active');
+    const sEl = document.getElementById('s' + i);
+    sEl.classList.remove('active', 'done');
+    sEl.querySelector('.step-num').textContent = i;
+  });
+  document.getElementById('screen' + step).classList.add('active');
+  for(let i = 1; i < step; i++) {
+    const sEl = document.getElementById('s' + i);
+    sEl.classList.add('done');
+    sEl.querySelector('.step-num').textContent = '✓';
+    const lEl = document.getElementById('l' + i);
+    if(lEl) lEl.classList.add('done');
+  }
+  document.getElementById('s' + step).classList.add('active');
+}
+
+function goToStep1() {
+  hideAlert();
+  setStep(1);
+}
+
+function goToStep2() {
+  if (!selectedRole) return;
+  hideAlert();
+  if (selectedRole === 'tutor') {
+    document.getElementById('step2Title').textContent = 'Create your tutor account';
+    document.getElementById('step2Subtitle').textContent = 'Set up your profile to start teaching students.';
+  } else {
+    document.getElementById('step2Title').textContent = 'Create your student account';
+    document.getElementById('step2Subtitle').textContent = 'Set up your profile to start earning.';
+  }
+  setStep(2);
+}
+
+function setLoading(loading) {
+  const btn = document.getElementById('submitBtn');
+  const text = document.getElementById('btnText');
+  const spinner = document.getElementById('spinner');
+  btn.disabled = loading;
+  text.textContent = loading ? 'Creating account...' : 'Create account';
+  spinner.style.display = loading ? 'block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Role card clicks
+  document.querySelectorAll('.role-card').forEach(function(card) {
+    card.addEventListener('click', function() {
+      const role = card.getAttribute('data-role');
+      if (role === 'business') {
+        window.location.href = 'coming-soon.html';
+        return;
+      }
+      selectedRole = role;
+      document.querySelectorAll('.role-card').forEach(function(c) {
+        c.classList.remove('selected');
+      });
+      card.classList.add('selected');
+      document.getElementById('nextBtn1').disabled = false;
+    });
+  });
+
+  // Continue button
+  document.getElementById('nextBtn1').addEventListener('click', function() {
+    goToStep2();
+  });
+
+  // Back button
+  document.getElementById('backBtn').addEventListener('click', function() {
+    goToStep1();
+  });
+
+  // Go to signin button on success
+  const goSignin = document.getElementById('goSignin');
+  if (goSignin) {
+    goSignin.addEventListener('click', function() {
+      window.location.href = 'signin.html';
+    });
+  }
+
+  // Signup form
+  document.getElementById('signupForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    hideAlert();
+
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const university = document.getElementById('university').value.trim();
+    const fullName = firstName + ' ' + lastName;
+
+    if (password.length < 8) {
+      showAlert('Password must be at least 8 characters.', 'error');
+      return;
+    }
+
+    setLoading(true);
+
+    const { data, error } = await _supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName, role: selectedRole, university: university },
+        emailRedirectTo: 'https://uniskilled.com/signin.html'
+      }
+    });
+
+    if (error) {
+      if (error.message.includes('already registered')) {
+        showAlert('This email is already registered. Try signing in instead.', 'error');
+      } else {
+        showAlert(error.message, 'error');
+      }
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      await _supabase.from('users').upsert({
+        id: data.user.id,
+        email: email,
+        full_name: fullName,
+        roles: [selectedRole],
+        university_email: email
+      });
+      if (selectedRole === 'student') {
+        await _supabase.from('student_profiles').upsert({ user_id: data.user.id, university: university });
+      } else if (selectedRole === 'tutor') {
+        await _supabase.from('tutor_profiles').upsert({ user_id: data.user.id, location: university });
+      }
+    }
+
+    setLoading(false);
+    document.getElementById('confirmedEmail').textContent = email;
+    setStep(3);
+  });
+
+});
+</script>
+</body>
+</html>
