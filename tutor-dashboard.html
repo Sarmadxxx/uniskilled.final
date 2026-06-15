@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutor Dashboard — UniSkilled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#1a6bff;--blue-mid:#4d8fff;--blue-light:#e8f0ff;--blue-pale:#f0f5ff;
+  --ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;
+  --border:#e5e7eb;--white:#fff;--off:#f9fafb;
+  --green:#059669;--green-bg:#ecfdf5;
+  --orange:#ea580c;--orange-bg:#fff7ed;
+  --purple:#7c3aed;--purple-bg:#f5f3ff;
+  --yellow:#d97706;--yellow-bg:#fffbeb;
+  --red:#ef4444;--red-bg:#fef2f2;
+  --sidebar-w:240px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);overflow-x:hidden;line-height:1.5}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--ink);display:flex;flex-direction:column;z-index:200;transition:transform .3s ease}
+.sb-logo{padding:1.4rem 1.25rem 1rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sb-logo-icon{width:32px;height:32px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;font-weight:800;flex-shrink:0}
+.sb-logo-text{font-weight:800;font-size:1.05rem;color:#fff;letter-spacing:-0.02em}
+.sb-logo-sub{font-size:0.62rem;color:rgba(255,255,255,0.35);margin-top:1px}
+.sb-tutor{padding:1rem 1.25rem;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sb-av{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--blue),#7c3aed);display:flex;align-items:center;justify-content:center;font-size:0.9rem;font-weight:800;color:#fff;flex-shrink:0;position:relative}
+.sb-av-online{position:absolute;bottom:-2px;right:-2px;width:10px;height:10px;background:var(--green);border-radius:50%;border:2px solid var(--ink)}
+.sb-tutor-name{font-size:0.85rem;font-weight:700;color:#fff;line-height:1.2}
+.sb-tutor-role{font-size:0.65rem;color:rgba(255,255,255,0.4)}
+.sb-nav{flex:1;padding:0.75rem 0;overflow-y:auto}
+.sb-nav::-webkit-scrollbar{display:none}
+.sb-section{font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:rgba(255,255,255,0.25);padding:0.75rem 1.25rem 0.35rem}
+.sb-item{display:flex;align-items:center;gap:9px;padding:0.6rem 1.25rem;cursor:pointer;transition:all .18s;border-left:3px solid transparent;color:rgba(255,255,255,0.5);font-size:0.84rem;font-weight:500;text-decoration:none;position:relative}
+.sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85)}
+.sb-item.active{background:rgba(26,107,255,0.18);border-left-color:var(--blue);color:#fff;font-weight:700}
+.sb-item-ico{width:18px;text-align:center;flex-shrink:0;font-size:0.95rem}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:0.58rem;font-weight:800;min-width:16px;height:16px;border-radius:99px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.sb-badge.green{background:var(--green)}
+.sb-bottom{padding:1rem 1.25rem;border-top:1px solid rgba(255,255,255,0.07)}
+.sb-verify{background:rgba(5,150,105,0.15);border:1px solid rgba(5,150,105,0.3);border-radius:10px;padding:0.7rem 0.85rem;display:flex;align-items:center;gap:8px}
+.sb-verify-ico{font-size:1rem}
+.sb-verify-text{font-size:0.72rem;color:rgba(255,255,255,0.7);line-height:1.4}
+.sb-verify-text strong{color:#6ee7b7;display:block;font-size:0.75rem}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar-w);min-height:100vh;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.mobile-menu-btn{display:none;background:none;border:none;cursor:pointer;font-size:1.2rem;padding:4px}
+.topbar-title{font-size:1rem;font-weight:800;color:var(--ink);letter-spacing:-0.02em}
+.topbar-sub{font-size:0.75rem;color:var(--mid)}
+.topbar-right{display:flex;align-items:center;gap:8px}
+.tb-btn{height:34px;border-radius:9px;border:none;cursor:pointer;font-family:'Manrope',sans-serif;font-size:0.8rem;font-weight:700;transition:all .18s;display:flex;align-items:center;gap:6px;padding:0 0.85rem}
+.tb-btn-icon{width:34px;padding:0;justify-content:center;background:var(--off);border:1.5px solid var(--border);color:var(--mid);position:relative}
+.tb-btn-icon:hover{background:var(--blue-light);border-color:rgba(26,107,255,0.3);color:var(--blue)}
+.tb-btn-primary{background:var(--blue);color:#fff}
+.tb-btn-primary:hover{background:#1558e0}
+.tb-notif-dot{position:absolute;top:-3px;right:-3px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--white)}
+
+/* ── PAGE ── */
+.page{display:none;padding:1.75rem 2rem 3rem;animation:fadeIn .28s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── GRID HELPERS ── */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.25rem}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem}
+.col-span-2{grid-column:span 2}
+.col-span-3{grid-column:span 3}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:1.4rem;position:relative;overflow:hidden}
+.card-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--light);margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
+.card-title a,.card-title button{font-size:0.75rem;color:var(--blue);font-weight:600;text-transform:none;letter-spacing:0;background:none;border:none;cursor:pointer;transition:opacity .18s;text-decoration:none}
+.card-title a:hover,.card-title button:hover{opacity:0.7}
+.card h3{font-size:1rem;font-weight:700;color:var(--ink);margin-bottom:4px;letter-spacing:-0.01em}
+
+/* ── STAT CARDS ── */
+.stat-card{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:1.25rem;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.stat-card:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,0.07)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.blue::before{background:linear-gradient(90deg,var(--blue),var(--blue-mid))}
+.stat-card.green::before{background:linear-gradient(90deg,var(--green),#34d399)}
+.stat-card.purple::before{background:linear-gradient(90deg,var(--purple),#a78bfa)}
+.stat-card.orange::before{background:linear-gradient(90deg,var(--orange),#fb923c)}
+.stat-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;margin-bottom:0.75rem}
+.stat-ico.blue-bg{background:var(--blue-light)}
+.stat-ico.green-bg{background:var(--green-bg)}
+.stat-ico.purple-bg{background:var(--purple-bg)}
+.stat-ico.orange-bg{background:var(--orange-bg)}
+.stat-num{font-family:'Manrope',sans-serif;font-size:1.9rem;font-weight:800;color:var(--ink);letter-spacing:-0.04em;line-height:1}
+.stat-label{font-size:0.75rem;color:var(--mid);margin-top:3px;font-weight:500}
+.stat-delta{font-size:0.72rem;font-weight:700;margin-top:6px;display:flex;align-items:center;gap:3px}
+.stat-delta.up{color:var(--green)}
+.stat-delta.down{color:var(--red)}
+
+/* ── AI MATCH CARD ── */
+.ai-header{background:var(--ink);border-radius:18px;padding:1.4rem 1.5rem;display:flex;align-items:center;gap:14px;margin-bottom:1.25rem;position:relative;overflow:hidden}
+.ai-header::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(26,107,255,0.2),transparent 70%);pointer-events:none}
+.ai-header::after{content:'';position:absolute;bottom:-30px;left:60px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,0.15),transparent 70%);pointer-events:none}
+.ai-ico{font-size:2rem;flex-shrink:0;position:relative;z-index:1}
+.ai-header-text{flex:1;position:relative;z-index:1}
+.ai-header-title{font-size:1rem;font-weight:800;color:#fff;margin-bottom:3px;letter-spacing:-0.02em}
+.ai-header-sub{font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.5}
+.ai-live-badge{background:var(--green);color:#fff;font-size:0.62rem;font-weight:800;padding:3px 9px;border-radius:100px;flex-shrink:0;position:relative;z-index:1}
+
+/* ── STUDENT MATCH CARD ── */
+.match-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1.1rem;transition:all .22s;cursor:pointer;position:relative;overflow:hidden}
+.match-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--purple));transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.match-card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,0.08);border-color:rgba(26,107,255,0.25)}
+.match-card:hover::before{transform:scaleX(1)}
+.match-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:0.75rem}
+.match-av{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:0.92rem;font-weight:800;color:#fff;flex-shrink:0}
+.match-info{flex:1;min-width:0}
+.match-name{font-size:0.9rem;font-weight:700;color:var(--ink);margin-bottom:1px}
+.match-uni{font-size:0.72rem;color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.match-score-wrap{flex-shrink:0;text-align:right}
+.match-score{font-family:'Manrope',sans-serif;font-size:1.3rem;font-weight:800;color:var(--blue);letter-spacing:-0.03em;line-height:1}
+.match-score-label{font-size:0.58rem;color:var(--light);text-transform:uppercase;letter-spacing:0.06em;font-weight:700}
+.match-score-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:4px;width:50px}
+.match-score-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--purple))}
+.match-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:0.75rem}
+.mtag{font-size:0.68rem;padding:2px 8px;border-radius:100px;font-weight:600}
+.mtag-blue{background:var(--blue-light);color:var(--blue);border:1px solid rgba(26,107,255,0.15)}
+.mtag-green{background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,0.15)}
+.mtag-purple{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(124,58,237,0.15)}
+.match-actions{display:flex;gap:6px}
+.match-btn{flex:1;border-radius:8px;border:none;font-family:'Manrope',sans-serif;font-size:0.75rem;font-weight:700;padding:0.5rem;cursor:pointer;transition:all .18s}
+.match-btn-primary{background:var(--blue);color:#fff}
+.match-btn-primary:hover{background:#1558e0}
+.match-btn-secondary{background:var(--off);color:var(--ink2);border:1.5px solid var(--border)}
+.match-btn-secondary:hover{border-color:var(--ink2)}
+
+/* ── SESSION CARD ── */
+.session-card{display:flex;align-items:center;gap:12px;padding:0.9rem;background:var(--white);border:1.5px solid var(--border);border-radius:14px;transition:all .2s;margin-bottom:8px}
+.session-card:hover{border-color:rgba(26,107,255,0.25);box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+.session-time-col{flex-shrink:0;text-align:center;width:52px}
+.session-time{font-size:1rem;font-weight:800;color:var(--ink);letter-spacing:-0.03em;line-height:1}
+.session-ampm{font-size:0.6rem;color:var(--mid);text-transform:uppercase;font-weight:700}
+.session-bar{width:2px;height:36px;background:var(--border);border-radius:99px;flex-shrink:0}
+.session-bar.upcoming{background:linear-gradient(180deg,var(--blue),var(--purple))}
+.session-bar.today{background:var(--green)}
+.session-info{flex:1;min-width:0}
+.session-name{font-size:0.88rem;font-weight:700;color:var(--ink);margin-bottom:2px}
+.session-meta{font-size:0.72rem;color:var(--mid);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.session-right{flex-shrink:0;text-align:right}
+.session-status{font-size:0.65rem;font-weight:700;padding:3px 9px;border-radius:100px;display:inline-block;margin-bottom:4px}
+.ss-upcoming{background:var(--blue-light);color:var(--blue)}
+.ss-today{background:var(--green-bg);color:var(--green)}
+.ss-pending{background:var(--yellow-bg);color:var(--yellow)}
+.ss-completed{background:var(--off);color:var(--mid);border:1px solid var(--border)}
+.session-price{font-size:0.82rem;font-weight:800;color:var(--ink)}
+
+/* ── MINI CHART ── */
+.mini-chart{display:flex;align-items:flex-end;gap:4px;height:56px}
+.mc-bar{flex:1;border-radius:4px 4px 0 0;transition:height .8s cubic-bezier(.34,1,.64,1),opacity .3s}
+.mc-bar:hover{opacity:0.75}
+
+/* ── PROGRESS BAR ── */
+.prog-item{margin-bottom:0.85rem}
+.prog-item:last-child{margin-bottom:0}
+.prog-head{display:flex;justify-content:space-between;margin-bottom:5px}
+.prog-label{font-size:0.82rem;font-weight:600;color:var(--ink)}
+.prog-val{font-size:0.78rem;font-weight:700;color:var(--mid)}
+.prog-track{height:6px;background:var(--off);border-radius:99px;overflow:hidden;border:1px solid var(--border)}
+.prog-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.34,1,.64,1)}
+
+/* ── AI INSIGHT CARD ── */
+.insight-card{background:var(--off);border:1.5px solid var(--border);border-radius:14px;padding:0.95rem 1.1rem;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px;transition:all .2s;cursor:pointer}
+.insight-card:hover{background:var(--blue-pale);border-color:rgba(26,107,255,0.2)}
+.insight-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0}
+.insight-text{flex:1}
+.insight-title{font-size:0.84rem;font-weight:700;color:var(--ink);margin-bottom:2px}
+.insight-desc{font-size:0.75rem;color:var(--mid);line-height:1.45}
+.insight-action{font-size:0.7rem;font-weight:700;color:var(--blue);margin-top:4px}
+
+/* ── REVIEW CARD ── */
+.review-row{display:flex;align-items:flex-start;gap:10px;padding:0.85rem 0;border-bottom:1px solid var(--off)}
+.review-row:last-child{border-bottom:none;padding-bottom:0}
+.rev-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:800;color:#fff;flex-shrink:0}
+.rev-info{flex:1}
+.rev-name{font-size:0.84rem;font-weight:700;color:var(--ink);margin-bottom:1px}
+.rev-sub{font-size:0.7rem;color:var(--mid)}
+.rev-stars{color:var(--yellow);font-size:0.78rem;margin-top:3px;margin-bottom:4px}
+.rev-text{font-size:0.8rem;color:var(--ink2);line-height:1.55;font-style:italic}
+.rev-date{font-size:0.65rem;color:var(--light);margin-top:4px}
+
+/* ── REQUEST CARD ── */
+.req-card{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:1rem 1.1rem;margin-bottom:8px;transition:all .2s}
+.req-card:hover{border-color:rgba(26,107,255,0.25);box-shadow:0 4px 14px rgba(0,0,0,0.06)}
+.req-card-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:0.6rem}
+.req-info{flex:1}
+.req-name{font-size:0.88rem;font-weight:700;color:var(--ink);margin-bottom:2px}
+.req-meta{font-size:0.72rem;color:var(--mid);display:flex;gap:6px;flex-wrap:wrap}
+.req-right{flex-shrink:0}
+.req-badge{font-size:0.62rem;font-weight:700;padding:2px 8px;border-radius:100px}
+.req-badge-new{background:var(--green-bg);color:var(--green);border:1px solid rgba(5,150,105,0.2)}
+.req-badge-urgent{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.req-note{font-size:0.8rem;color:var(--ink2);line-height:1.55;margin-bottom:0.65rem}
+.req-actions{display:flex;gap:6px}
+.req-btn{flex:1;border-radius:8px;border:none;font-family:'Manrope',sans-serif;font-size:0.78rem;font-weight:700;padding:0.5rem;cursor:pointer;transition:all .18s}
+.req-btn-accept{background:var(--green);color:#fff}
+.req-btn-accept:hover{background:#047857}
+.req-btn-decline{background:var(--off);color:var(--mid);border:1.5px solid var(--border)}
+.req-btn-msg{background:var(--blue-light);color:var(--blue);border:1px solid rgba(26,107,255,0.2)}
+
+/* ── EARNINGS ── */
+.earn-big{font-family:'Manrope',sans-serif;font-size:2.6rem;font-weight:800;color:var(--ink);letter-spacing:-0.05em;line-height:1;margin-bottom:4px}
+.earn-period{font-size:0.78rem;color:var(--mid)}
+.earn-breakdown{display:flex;flex-direction:column;gap:8px;margin-top:1rem}
+.earn-row{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.85rem;background:var(--off);border-radius:10px;border:1px solid var(--border)}
+.earn-row-label{font-size:0.82rem;color:var(--mid);font-weight:500;display:flex;align-items:center;gap:6px}
+.earn-row-val{font-size:0.88rem;font-weight:800;color:var(--ink)}
+.earn-row-val.green{color:var(--green)}
+
+/* ── CALENDAR ── */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:0.75rem}
+.cal-day-name{font-size:0.62rem;font-weight:700;color:var(--light);text-align:center;text-transform:uppercase;letter-spacing:0.05em;padding-bottom:4px}
+.cal-day{height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:600;color:var(--mid);cursor:pointer;transition:all .18s;border:1.5px solid transparent;position:relative}
+.cal-day:hover{background:var(--off);border-color:var(--border)}
+.cal-day.has-session{background:var(--blue-light);color:var(--blue);font-weight:700}
+.cal-day.today{background:var(--blue);color:#fff;font-weight:800}
+.cal-day.busy{background:var(--yellow-bg);color:var(--yellow)}
+.cal-day.empty{opacity:0.25;pointer-events:none}
+.cal-day-dot{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--blue)}
+.cal-day.today .cal-day-dot{background:#fff}
+.avail-row{display:flex;align-items:center;gap:8px;padding:0.6rem 0;border-bottom:1px solid var(--off)}
+.avail-row:last-child{border-bottom:none}
+.avail-day{font-size:0.82rem;font-weight:600;color:var(--ink);width:36px;flex-shrink:0}
+.avail-toggle{width:40px;height:22px;border-radius:99px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.avail-toggle.on{background:var(--green)}
+.avail-toggle.off{background:var(--border)}
+.avail-toggle::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,0.2)}
+.avail-toggle.on::after{left:21px}
+.avail-toggle.off::after{left:3px}
+.avail-times{flex:1;font-size:0.75rem;color:var(--mid)}
+
+/* ── NOTIFICATION ── */
+.notif-item{display:flex;align-items:flex-start;gap:10px;padding:0.85rem 1rem;border-bottom:1px solid var(--off);transition:background .15s;cursor:pointer}
+.notif-item:hover{background:var(--off)}
+.notif-item.unread{background:var(--blue-pale)}
+.notif-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:0.95rem;flex-shrink:0}
+.notif-text{flex:1}
+.notif-title{font-size:0.84rem;font-weight:600;color:var(--ink);margin-bottom:1px;line-height:1.35}
+.notif-time{font-size:0.68rem;color:var(--light)}
+.notif-dot{width:8px;height:8px;background:var(--blue);border-radius:50%;flex-shrink:0;margin-top:4px}
+
+/* ── MATERIAL UPLOAD ── */
+.mat-card{display:flex;align-items:center;gap:10px;padding:0.75rem 0.9rem;background:var(--off);border:1.5px solid var(--border);border-radius:12px;margin-bottom:6px;transition:all .2s;cursor:pointer}
+.mat-card:hover{border-color:rgba(26,107,255,0.3);background:var(--blue-pale)}
+.mat-ico{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0}
+.mat-name{font-size:0.82rem;font-weight:600;color:var(--ink);flex:1}
+.mat-meta{font-size:0.68rem;color:var(--light)}
+.mat-actions{display:flex;gap:5px}
+.mat-action{font-size:0.7rem;font-weight:700;padding:3px 8px;border-radius:6px;border:1.5px solid var(--border);background:var(--white);color:var(--mid);cursor:pointer;transition:all .18s}
+.mat-action:hover{border-color:var(--blue);color:var(--blue)}
+.upload-zone{border:2px dashed var(--border);border-radius:14px;padding:1.75rem;text-align:center;cursor:pointer;transition:all .2s;margin-top:0.75rem}
+.upload-zone:hover{border-color:rgba(26,107,255,0.4);background:var(--blue-pale)}
+
+/* ── AI ASSISTANT ── */
+.ai-assistant{position:fixed;bottom:1.5rem;right:1.5rem;z-index:500}
+.ai-trigger{width:52px;height:52px;background:linear-gradient(135deg,var(--blue),var(--purple));border-radius:16px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 4px 20px rgba(26,107,255,0.35);transition:all .2s}
+.ai-trigger:hover{transform:scale(1.08);box-shadow:0 8px 28px rgba(26,107,255,0.45)}
+.ai-chat-panel{position:absolute;bottom:60px;right:0;width:320px;background:var(--white);border:1.5px solid var(--border);border-radius:20px;box-shadow:0 12px 48px rgba(0,0,0,0.15);display:none;flex-direction:column;overflow:hidden}
+.ai-chat-panel.open{display:flex}
+.ai-chat-header{background:linear-gradient(135deg,var(--ink),#1e3a5f);padding:0.9rem 1rem;display:flex;align-items:center;gap:9px}
+.ai-chat-title{font-size:0.88rem;font-weight:700;color:#fff}
+.ai-chat-sub{font-size:0.68rem;color:rgba(255,255,255,0.5)}
+.ai-chat-close{margin-left:auto;background:rgba(255,255,255,0.1);border:none;border-radius:7px;width:26px;height:26px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem}
+.ai-chat-body{max-height:260px;overflow-y:auto;padding:0.85rem;display:flex;flex-direction:column;gap:8px}
+.ai-msg{padding:0.6rem 0.8rem;border-radius:12px;font-size:0.82rem;line-height:1.5;max-width:90%}
+.ai-msg.bot{background:var(--blue-pale);border:1px solid rgba(26,107,255,0.15);color:var(--ink2);align-self:flex-start;border-radius:4px 12px 12px 12px}
+.ai-msg.user{background:var(--blue);color:#fff;align-self:flex-end;border-radius:12px 4px 12px 12px}
+.ai-chat-input-row{display:flex;gap:6px;padding:0.75rem;border-top:1px solid var(--border)}
+.ai-input{flex:1;background:var(--off);border:1.5px solid var(--border);border-radius:9px;padding:0.5rem 0.75rem;font-family:'Manrope',sans-serif;font-size:0.82rem;color:var(--ink);outline:none}
+.ai-input:focus{border-color:var(--blue)}
+.ai-send{width:32px;height:32px;background:var(--blue);border:none;border-radius:8px;cursor:pointer;color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.8rem;transition:all .18s}
+.ai-send:hover{background:#1558e0}
+
+/* ── TOAST ── */
+.toast-container{position:fixed;top:70px;right:1.5rem;z-index:600;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:0.85rem 1rem;box-shadow:0 8px 28px rgba(0,0,0,0.1);display:flex;align-items:center;gap:10px;min-width:280px;transform:translateX(120%);transition:transform .3s cubic-bezier(.34,1,.64,1)}
+.toast.show{transform:translateX(0)}
+.toast-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0}
+.toast-title{font-size:0.82rem;font-weight:700;color:var(--ink)}
+.toast-msg{font-size:0.72rem;color:var(--mid)}
+
+/* ── QUICK ACTIONS ── */
+.qa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.qa-btn{background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:0.9rem 0.75rem;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.qa-btn:hover{border-color:rgba(26,107,255,0.3);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.07)}
+.qa-ico{font-size:1.4rem}
+.qa-label{font-size:0.72rem;font-weight:700;color:var(--ink2)}
+
+/* ── TAGS ── */
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:0.5rem}
+.tag{font-size:0.72rem;padding:2px 9px;border-radius:100px;background:var(--off);border:1.5px solid var(--border);color:var(--mid);font-weight:500}
+.tag.blue{background:var(--blue-light);color:var(--blue);border-color:rgba(26,107,255,0.2)}
+
+/* ── ANALYTICS ── */
+.analytics-row{display:flex;gap:1px;background:var(--border);border-radius:14px;overflow:hidden;margin-bottom:1.25rem}
+.analytics-cell{background:var(--white);padding:1rem 1.25rem;flex:1;text-align:center}
+.analytics-num{font-size:1.4rem;font-weight:800;color:var(--ink);letter-spacing:-0.03em}
+.analytics-lbl{font-size:0.68rem;color:var(--mid);margin-top:2px}
+.analytics-trend{font-size:0.68rem;font-weight:700;margin-top:4px}
+.trend-up{color:var(--green)}
+.trend-down{color:var(--red)}
+
+/* ── DIVIDER ── */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem}
+.section-title{font-size:0.95rem;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.section-link{font-size:0.78rem;color:var(--blue);font-weight:600;cursor:pointer;background:none;border:none;transition:opacity .18s}
+.section-link:hover{opacity:0.7}
+
+/* ── SCORE RING ── */
+.score-ring{position:relative;width:80px;height:80px;flex-shrink:0}
+.score-ring svg{transform:rotate(-90deg)}
+.score-ring-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:800;color:var(--ink);letter-spacing:-0.03em}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:2.5rem 1rem;opacity:0.6}
+.empty-ico{font-size:2.5rem;margin-bottom:0.75rem}
+.empty-text{font-size:0.9rem;font-weight:600;color:var(--mid)}
+
+/* ── MOBILE ── */
+@media(max-width:1100px){.grid-4{grid-template-columns:repeat(2,1fr)}.qa-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .main{margin-left:0}
+  .mobile-menu-btn{display:flex}
+  .grid-3{grid-template-columns:1fr 1fr}
+  .grid-2{grid-template-columns:1fr}
+  .analytics-row{flex-wrap:wrap}
+  .analytics-cell{min-width:50%}
+}
+@media(max-width:640px){
+  .page{padding:1rem 1rem 3rem}
+  .topbar{padding:0 1rem}
+  .grid-3,.grid-4{grid-template-columns:1fr 1fr}
+  .qa-grid{grid-template-columns:repeat(2,1fr)}
+  .col-span-2,.col-span-3{grid-column:1}
+}
+@media(max-width:400px){
+  .grid-3,.grid-4{grid-template-columns:1fr}
+  .analytics-cell{min-width:100%}
+}
+.overlay-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:190}
+.overlay-bg.show{display:block}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar" id="sidebar">
+  <div class="sb-top">
+    <a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;margin-bottom:0.5rem;">
+      <div style="width:28px;height:28px;background:var(--blue);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.85rem;">U</div>
+      <span style="font-weight:800;font-size:1rem;color:#fff;letter-spacing:-0.02em;">UniSkilled</span>
+    </a>
+    <div style="font-size:0.68rem;color:rgba(255,255,255,0.35);font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Tutor Dashboard</div>
+  </div>
+
+  <!-- Profile at top -->
+  <div onclick="window.location.href='tutor-public-profile.html'" style="display:flex;align-items:center;gap:10px;padding:1rem 1.2rem;margin:0.5rem 0.75rem;background:rgba(255,255,255,0.08);border-radius:10px;cursor:pointer;border:1px solid rgba(255,255,255,0.1);">
+    <div id="sidebarAvatar" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.9rem;flex-shrink:0;overflow:hidden;">?</div>
+    <div>
+      <div class="sb-uname" style="font-size:0.88rem;font-weight:700;color:#fff;">Loading...</div>
+      <div class="sb-tutor-role" style="font-size:0.68rem;color:rgba(255,255,255,0.4);">View profile →</div>
+    </div>
+  </div>
+
+  <div class="sb-nav">
+    <div class="sb-section-label">MAIN</div>
+    <div class="sb-item active" id="nav-overview" onclick="showPage('overview',this)"><div class="sb-item-ico">🏠</div>Overview</div>
+    <div class="sb-item" id="nav-sessions" onclick="showPage('sessions',this)"><div class="sb-item-ico">📅</div>Sessions<span class="sb-badge" id="badge-sessions" style="display:none">0</span></div>
+    <div class="sb-item" id="nav-requests" onclick="showPage('requests',this)"><div class="sb-item-ico">📥</div>Student Requests<span class="sb-badge" id="badge-requests" style="display:none">0</span></div>
+    <div class="sb-item" id="nav-messages" onclick="showPage('messages',this)"><div class="sb-item-ico">💬</div>Messages<span class="sb-badge" id="badge-messages" style="display:none">0</span></div>
+    <div class="sb-section-label">INSIGHTS</div>
+    <div class="sb-item" id="nav-earnings" onclick="showPage('earnings',this)"><div class="sb-item-ico">💷</div>Earnings</div>
+    <div class="sb-item" id="nav-analytics" onclick="showPage('analytics',this)"><div class="sb-item-ico">📈</div>Analytics</div>
+    <div class="sb-item" id="nav-reviews" onclick="showPage('reviews',this)"><div class="sb-item-ico">⭐</div>Ratings & Reviews</div>
+    <div class="sb-section-label">MANAGE</div>
+    <div class="sb-item" id="nav-calendar" onclick="showPage('calendar',this)"><div class="sb-item-ico">🗓️</div>Calendar</div>
+    <div class="sb-item" id="nav-materials" onclick="showPage('materials',this)"><div class="sb-item-ico">📚</div>Study Materials</div>
+    <div class="sb-item" id="nav-notifications" onclick="showPage('notifications',this)"><div class="sb-item-ico">🔔</div>Notifications<span class="sb-badge" id="badge-notifs" style="display:none">0</span></div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div>
+      <div style="font-size:1rem;font-weight:800;color:var(--ink)" id="tbTitle">Overview</div>
+      <div style="font-size:0.78rem;color:var(--mid)" id="tbSub">Loading...</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button onclick="window.location.href='tutor-public-profile.html'" style="background:var(--blue);color:#fff;border:none;padding:0.55rem 1.2rem;border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;">Edit Profile</button>
+    </div>
+  </div>
+
+  <!-- OVERVIEW PAGE -->
+  <div class="page active" id="page-overview">
+    <div style="padding:1.5rem 1.5rem 0;">
+      <div style="background:linear-gradient(135deg,#1a6bff,#7c3aed);border-radius:16px;padding:1.8rem 2rem;margin-bottom:1.5rem;color:#fff;">
+        <div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;opacity:0.65;margin-bottom:0.5rem;">WELCOME BACK</div>
+        <div class="hero-title" style="font-size:1.7rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.4rem;">Welcome, Tutor!</div>
+        <div class="hero-sub" style="font-size:0.88rem;opacity:0.75;">Complete your profile to start attracting students.</div>
+        <div style="display:flex;gap:2rem;margin-top:1.2rem;">
+          <div><div style="font-size:1.6rem;font-weight:800;" id="kpi-sessions">0</div><div style="font-size:0.68rem;opacity:0.6;text-transform:uppercase;letter-spacing:0.06em;">Sessions</div></div>
+          <div><div style="font-size:1.6rem;font-weight:800;" id="kpi-earnings">£0</div><div style="font-size:0.68rem;opacity:0.6;text-transform:uppercase;letter-spacing:0.06em;">Earned</div></div>
+          <div><div style="font-size:1.6rem;font-weight:800;" id="kpi-rating">—</div><div style="font-size:0.68rem;opacity:0.6;text-transform:uppercase;letter-spacing:0.06em;">Rating</div></div>
+          <div><div style="font-size:1.6rem;font-weight:800;" id="kpi-reviews">0</div><div style="font-size:0.68rem;opacity:0.6;text-transform:uppercase;letter-spacing:0.06em;">Reviews</div></div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;margin-bottom:1.5rem;">
+        <button onclick="showPage('sessions')" style="background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:1.2rem;cursor:pointer;text-align:center;transition:border-color .18s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:1.4rem;margin-bottom:0.4rem;">📅</div><div style="font-size:0.8rem;font-weight:700;">Sessions</div>
+        </button>
+        <button onclick="showPage('reviews')" style="background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:1.2rem;cursor:pointer;text-align:center;transition:border-color .18s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:1.4rem;margin-bottom:0.4rem;">⭐</div><div style="font-size:0.8rem;font-weight:700;">Reviews</div>
+        </button>
+        <button onclick="showPage('earnings')" style="background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:1.2rem;cursor:pointer;text-align:center;transition:border-color .18s;" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:1.4rem;margin-bottom:0.4rem;">💷</div><div style="font-size:0.8rem;font-weight:700;">Earnings</div>
+        </button>
+      </div>
+
+      <!-- Today & Upcoming -->
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.2rem;">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--light);margin-bottom:1.2rem;">TODAY & UPCOMING</div>
+        <div id="overviewSessions"><p style="color:var(--mid);font-size:0.85rem;text-align:center;padding:1rem 0;">No upcoming sessions. Students will appear here when they book.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSIONS PAGE -->
+  <div class="page" id="page-sessions">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;">Sessions</h2>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1.2rem;">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--light);margin-bottom:1rem;">UPCOMING</div>
+        <div id="upcomingSessions"><p style="color:var(--mid);font-size:0.85rem;text-align:center;padding:1rem 0;">No upcoming sessions yet.</p></div>
+      </div>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;">
+        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--light);margin-bottom:1rem;">COMPLETED</div>
+        <div id="completedSessions"><p style="color:var(--mid);font-size:0.85rem;text-align:center;padding:1rem 0;">No completed sessions yet.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENT REQUESTS PAGE -->
+  <div class="page" id="page-requests">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;">Student Requests</h2>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.8rem;">📥</div>
+        <div style="font-weight:700;margin-bottom:0.4rem;">No requests yet</div>
+        <p style="color:var(--mid);font-size:0.85rem;">When students request to book a session with you, they will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MESSAGES PAGE -->
+  <div class="page" id="page-messages">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;">Messages</h2>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.8rem;">💬</div>
+        <div style="font-weight:700;margin-bottom:0.4rem;">No messages yet</div>
+        <p style="color:var(--mid);font-size:0.85rem;">Messages from students will appear here.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EARNINGS PAGE -->
+  <div class="page" id="page-earnings">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;">Earnings</h2>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.2rem;">
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:1.3rem;text-align:center;">
+          <div style="font-size:1.8rem;font-weight:800;color:var(--ink);" id="earn-total">£0</div>
+          <div style="font-size:0.72rem;color:var(--mid);margin-top:0.3rem;">Total earned</div>
+        </div>
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:1.3rem;text-align:center;">
+          <div style="font-size:1.8rem;font-weight:800;color:var(--ink);" id="earn-month">£0</div>
+          <div style="font-size:0.72rem;color:var(--mid);margin-top:0.3rem;">This month</div>
+        </div>
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:1.3rem;text-align:center;">
+          <div style="font-size:1.8rem;font-weight:800;color:var(--ink);" id="earn-sessions">0</div>
+          <div style="font-size:0.72rem;color:var(--mid);margin-top:0.3rem;">Paid sessions</div>
+        </div>
+      </div>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem;text-align:center;">
+        <p style="color:var(--mid);font-size:0.85rem;">Earnings will appear here after completing paid sessions with students.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANALYTICS PAGE -->
+  <div class="page" id="page-analytics">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;">Analytics</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.2rem;">
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:1.3rem;text-align:center;">
+          <div style="font-size:1.8rem;font-weight:800;" id="analytics-views">0</div>
+          <div style="font-size:0.72rem;color:var(--mid);margin-top:0.3rem;">Profile views</div>
+        </div>
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:14px;padding:1.3rem;text-align:center;">
+          <div style="font-size:1.8rem;font-weight:800;" id="analytics-sessions">0</div>
+          <div style="font-size:0.72rem;color:var(--mid);margin-top:0.3rem;">Total sessions</div>
+        </div>
+      </div>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem;text-align:center;">
+        <p style="color:var(--mid);font-size:0.85rem;">Analytics will populate as you complete sessions and receive student engagement.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVIEWS PAGE -->
+  <div class="page" id="page-reviews">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:0.5rem;">Ratings & Reviews</h2>
+      <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.2rem;">
+        <div style="font-size:3rem;font-weight:800;" id="avg-rating">—</div>
+        <div>
+          <div style="color:#f59e0b;font-size:1.2rem;" id="avg-stars">☆☆☆☆☆</div>
+          <div style="font-size:0.8rem;color:var(--mid);" id="review-count">0 reviews</div>
+        </div>
+      </div>
+      <div id="reviewsList">
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:0.8rem;">⭐</div>
+          <div style="font-weight:700;margin-bottom:0.4rem;">No reviews yet</div>
+          <p style="color:var(--mid);font-size:0.85rem;">Students can leave reviews after completing sessions with you.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALENDAR PAGE -->
+  <div class="page" id="page-calendar">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;">Calendar</h2>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.8rem;">🗓️</div>
+        <div style="font-weight:700;margin-bottom:0.4rem;">No sessions scheduled</div>
+        <p style="color:var(--mid);font-size:0.85rem;">Your booked sessions will appear here in calendar view.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDY MATERIALS PAGE -->
+  <div class="page" id="page-materials">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;">Study Materials</h2>
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.8rem;">📚</div>
+        <div style="font-weight:700;margin-bottom:0.4rem;">No materials yet</div>
+        <p style="color:var(--mid);font-size:0.85rem;">Upload study materials to share with your students during sessions.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS PAGE -->
+  <div class="page" id="page-notifications">
+    <div style="padding:1.5rem;">
+      <h2 style="font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;">Notifications</h2>
+      <div id="notifList">
+        <div style="background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:2rem;text-align:center;">
+          <div style="font-size:2rem;margin-bottom:0.8rem;">🔔</div>
+          <div style="font-weight:700;margin-bottom:0.4rem;">No notifications</div>
+          <p style="color:var(--mid);font-size:0.85rem;">Activity notifications will appear here.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://orghkbbohnabcietidiv.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
+const _sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+// Navigation
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const page = document.getElementById('page-' + id);
+  if (page) page.classList.add('active');
+  if (el) el.classList.add('active');
+  const titles = {
+    overview:'Overview', sessions:'Sessions', requests:'Student Requests',
+    messages:'Messages', earnings:'Earnings', analytics:'Analytics',
+    reviews:'Ratings & Reviews', calendar:'Calendar', materials:'Study Materials',
+    notifications:'Notifications'
+  };
+  const tb = document.getElementById('tbTitle');
+  if (tb) tb.textContent = titles[id] || id;
+}
+
+async function init() {
+  const {data:{session}} = await _sb.auth.getSession();
+  if (!session) { window.location.href = 'signin.html'; return; }
+  const user = session.user;
+
+  // Check role
+  const meta = user.user_metadata || {};
+  if (meta.role === 'student') { window.location.href = 'student-dashboard.html'; return; }
+
+  // Load profile
+  const {data:profile} = await _sb.from('users').select('full_name,country,language,avatar_url').eq('id',user.id).single();
+  const {data:tp} = await _sb.from('tutor_profiles').select('*').eq('user_id',user.id).single();
+
+  const fullName = (profile&&profile.full_name) ? profile.full_name : (meta.full_name||'Tutor');
+  const firstName = fullName.split(' ')[0];
+  const initials = fullName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+
+  // Update sidebar profile
+  document.querySelectorAll('.sb-uname').forEach(el => el.textContent = fullName);
+  const av = document.getElementById('sidebarAvatar');
+  if (av) {
+    const avatarUrl = (tp&&tp.avatar_url) || (profile&&profile.avatar_url);
+    if (avatarUrl) av.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+    else av.textContent = initials;
+  }
+
+  // Greeting
+  const hour = new Date().getHours();
+  const g = hour<12?'Good morning':hour<17?'Good afternoon':'Good evening';
+  const tbSub = document.getElementById('tbSub');
+  if (tbSub) tbSub.textContent = g + ', ' + firstName + ' 👋';
+
+  // Hero
+  const heroTitle = document.querySelector('.hero-title');
+  if (heroTitle) heroTitle.textContent = 'Welcome back, ' + firstName + '!';
+  const heroSub = document.querySelector('.hero-sub');
+  if (heroSub) {
+    const subjects = (tp&&tp.subjects) ? (Array.isArray(tp.subjects)?tp.subjects:[]) : [];
+    const rate = (tp&&tp.hourly_rate) ? '£'+tp.hourly_rate+'/hr' : null;
+    heroSub.textContent = subjects.length > 0
+      ? 'Teaching: ' + subjects.join(', ') + (rate?' · '+rate:'')
+      : 'Complete your profile to start attracting students.';
+  }
+
+  // Page title
+  document.title = firstName + "'s Dashboard — UniSkilled";
+
+  // Load sessions
+  const {data:sessions} = await _sb.from('sessions').select('*').eq('tutor_id',user.id);
+  const allSessions = sessions || [];
+  const now = new Date();
+  const upcoming = allSessions.filter(s => s.status==='confirmed' && new Date(s.scheduled_at_utc) > now);
+  const completed = allSessions.filter(s => s.status==='completed');
+
+  // Update KPIs
+  const kpiS = document.getElementById('kpi-sessions');
+  if (kpiS) kpiS.textContent = allSessions.length;
+  const statS = document.getElementById('analytics-sessions');
+  if (statS) statS.textContent = allSessions.length;
+
+  // Earnings
+  const totalEarned = completed.reduce((a,s) => a+(s.price||0), 0);
+  const thisMonthSessions = completed.filter(s => {
+    const d = new Date(s.scheduled_at_utc);
+    return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+  });
+  const monthEarned = thisMonthSessions.reduce((a,s) => a+(s.price||0), 0);
+  const kpiE = document.getElementById('kpi-earnings');
+  if (kpiE) kpiE.textContent = '£'+totalEarned;
+  const earnTotal = document.getElementById('earn-total');
+  if (earnTotal) earnTotal.textContent = '£'+totalEarned;
+  const earnMonth = document.getElementById('earn-month');
+  if (earnMonth) earnMonth.textContent = '£'+monthEarned;
+  const earnSess = document.getElementById('earn-sessions');
+  if (earnSess) earnSess.textContent = completed.length;
+
+  // Sessions badge
+  const badge = document.getElementById('badge-sessions');
+  if (badge) { badge.textContent = upcoming.length; badge.style.display = upcoming.length>0?'':'none'; }
+
+  // Render upcoming sessions
+  const ovSess = document.getElementById('overviewSessions');
+  const upSess = document.getElementById('upcomingSessions');
+  if (upcoming.length > 0) {
+    const html = upcoming.map(s => {
+      const d = new Date(s.scheduled_at_utc);
+      return `<div style="display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid var(--border);">
+        <div style="text-align:center;min-width:50px;"><div style="font-size:1rem;font-weight:800;">${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</div><div style="font-size:0.65rem;color:var(--mid);">${d.toLocaleDateString()}</div></div>
+        <div><div style="font-weight:700;font-size:0.88rem;">${s.subject||'Session'}</div><div style="font-size:0.75rem;color:var(--mid);">${s.format||'Online'}</div></div>
+        ${s.price?`<div style="margin-left:auto;font-weight:700;">£${s.price}</div>`:''}
+      </div>`;
+    }).join('');
+    if (ovSess) ovSess.innerHTML = html;
+    if (upSess) upSess.innerHTML = html;
+  }
+
+  // Render completed sessions
+  const compSess = document.getElementById('completedSessions');
+  if (compSess && completed.length > 0) {
+    compSess.innerHTML = completed.map(s => {
+      const d = new Date(s.scheduled_at_utc);
+      return `<div style="display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid var(--border);">
+        <div style="text-align:center;min-width:50px;"><div style="font-size:0.85rem;font-weight:700;">${d.toLocaleDateString()}</div></div>
+        <div><div style="font-weight:700;font-size:0.88rem;">${s.subject||'Session'}</div></div>
+        <div style="margin-left:auto;"><span style="background:var(--green-bg);color:var(--green);font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:100px;">Done</span></div>
+        ${s.price?`<div style="font-weight:700;">£${s.price}</div>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  // Load reviews
+  const {data:reviews} = await _sb.from('reviews').select('*').eq('tutor_id',user.id).order('created_at',{ascending:false});
+  const allReviews = reviews || [];
+  const kpiRev = document.getElementById('kpi-reviews');
+  if (kpiRev) kpiRev.textContent = allReviews.length;
+  const revCount = document.getElementById('review-count');
+  if (revCount) revCount.textContent = allReviews.length + ' review' + (allReviews.length!==1?'s':'');
+
+  if (allReviews.length > 0) {
+    const avg = (allReviews.reduce((a,r)=>a+r.rating,0)/allReviews.length).toFixed(1);
+    const kpiRat = document.getElementById('kpi-rating');
+    if (kpiRat) kpiRat.textContent = avg;
+    const avgRat = document.getElementById('avg-rating');
+    if (avgRat) avgRat.textContent = avg;
+    const avgStars = document.getElementById('avg-stars');
+    if (avgStars) avgStars.textContent = '★'.repeat(Math.round(avg)) + '☆'.repeat(5-Math.round(avg));
+
+    const rl = document.getElementById('reviewsList');
+    if (rl) rl.innerHTML = allReviews.map(r => `
+      <div style="background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:1.2rem;margin-bottom:0.8rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <div style="font-weight:700;font-size:0.88rem;">${r.student_name||'Student'}</div>
+          <div style="color:#f59e0b;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+        </div>
+        <p style="font-size:0.84rem;color:var(--mid);line-height:1.6;">${r.comment||''}</p>
+        <div style="font-size:0.72rem;color:var(--light);margin-top:0.4rem;">${new Date(r.created_at).toLocaleDateString()}</div>
+      </div>`).join('');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
