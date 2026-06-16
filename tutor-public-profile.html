@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutor Profile — UniSkilled</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#fff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;}
+body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;}
+nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
+.logo-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;}
+.nav-actions{display:flex;align-items:center;gap:0.8rem;}
+.btn-outline{font-size:0.83rem;font-weight:600;color:var(--ink2);text-decoration:none;border:1.5px solid var(--border);padding:0.45rem 1rem;border-radius:8px;}
+.btn-blue{font-size:0.83rem;font-weight:700;color:#fff;background:var(--blue);text-decoration:none;padding:0.45rem 1rem;border-radius:8px;border:none;cursor:pointer;}
+.hero{background:linear-gradient(135deg,#0f2460,#1a6bff);padding:3rem 5% 2rem;}
+.hero-inner{max-width:800px;margin:0 auto;display:flex;align-items:flex-end;gap:2rem;}
+.hero-avatar{width:100px;height:100px;border-radius:50%;border:4px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.2rem;font-weight:800;flex-shrink:0;overflow:hidden;}
+.hero-avatar img{width:100%;height:100%;object-fit:cover;}
+.hero-info{flex:1;}
+.hero-name{font-size:1.8rem;font-weight:800;color:#fff;letter-spacing:-0.03em;margin-bottom:0.3rem;}
+.hero-sub{font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:0.7rem;}
+.hero-tags{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.hero-tag{background:rgba(255,255,255,0.15);color:#fff;font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:100px;}
+.verified-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-bg);color:var(--green);font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:100px;}
+.page{max-width:800px;margin:0 auto;padding:2rem 5%;display:grid;grid-template-columns:1fr 280px;gap:1.5rem;}
+.main-col{display:flex;flex-direction:column;gap:1.2rem;}
+.side-col{display:flex;flex-direction:column;gap:1.2rem;}
+.card{background:var(--white);border-radius:16px;border:1px solid var(--border);padding:1.5rem;}
+.card-title{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--light);margin-bottom:1rem;padding-bottom:0.7rem;border-bottom:1px solid var(--border);}
+.stars{color:var(--yellow);font-size:1.1rem;letter-spacing:2px;}
+.tag{display:inline-block;background:#e8f0ff;color:var(--blue);font-size:0.78rem;font-weight:600;padding:4px 12px;border-radius:100px;margin:2px;}
+.avail-days{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.avail-day{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;background:var(--blue);color:#fff;}
+.avail-day.off{background:var(--off);color:var(--light);}
+.cert-item{display:flex;align-items:center;gap:0.8rem;padding:0.7rem 0;border-bottom:1px solid var(--border);}
+.cert-item:last-child{border-bottom:none;}
+.review-item{padding:1rem 0;border-bottom:1px solid var(--border);}
+.review-item:last-child{border-bottom:none;}
+.review-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;}
+.review-name{font-weight:700;font-size:0.88rem;}
+.review-date{font-size:0.72rem;color:var(--light);}
+.review-text{font-size:0.84rem;color:var(--mid);line-height:1.6;}
+.book-btn{width:100%;padding:0.9rem;background:var(--blue);color:#fff;border:none;border-radius:10px;font-family:'Manrope',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all .18s;}
+.book-btn:hover{background:#1558e0;box-shadow:0 6px 20px rgba(26,107,255,0.35);}
+.rate-big{font-size:2.5rem;font-weight:800;color:var(--ink);}
+.edit-btn{width:100%;padding:0.7rem;background:var(--off);color:var(--ink2);border:1.5px solid var(--border);border-radius:10px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:600;cursor:pointer;margin-top:0.6rem;transition:border-color .18s;}
+.edit-btn:hover{border-color:var(--blue);color:var(--blue);}
+.empty{color:var(--mid);font-size:0.85rem;text-align:center;padding:1rem 0;}
+/* Review form */
+.review-form{background:var(--off);border-radius:12px;padding:1.2rem;margin-top:1rem;}
+.star-select{display:flex;gap:0.3rem;margin-bottom:0.8rem;}
+.star-btn{background:none;border:none;font-size:1.5rem;cursor:pointer;color:var(--light);transition:color .1s;}
+.star-btn.active{color:var(--yellow);}
+textarea.review-input{width:100%;padding:0.75rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;resize:vertical;min-height:80px;outline:none;}
+textarea.review-input:focus{border-color:var(--blue);}
+.submit-review{width:100%;padding:0.75rem;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;margin-top:0.6rem;}
+.alert{padding:0.7rem 1rem;border-radius:9px;font-size:0.82rem;font-weight:500;margin-top:0.8rem;display:none;}
+.alert.success{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0;display:block;}
+.alert.error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;display:block;}
+@media(max-width:700px){.page{grid-template-columns:1fr;}.hero-inner{flex-direction:column;align-items:flex-start;}.side-col{order:-1;}}
+</style>
+<style>
+@media(max-width:768px){
+  .nav-links{display:none!important;}
+  .nav-burger{display:block!important;}
+  .nav-brand{display:none;}
+}
+</style>
+</head>
+<body>
+<nav style="position:sticky;top:0;z-index:200;height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;padding:0 5%;font-family:'Manrope',sans-serif;">
+  <a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:#111827;">
+    <div style="width:30px;height:30px;background:#1a6bff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.9rem;">U</div>
+    <span class="nav-brand">UniSkilled</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:0.5rem;" class="nav-links">
+    <a href="index.html" style="font-size:0.82rem;font-weight:600;color:#6b7280;text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">🏠 Home</a>
+    <a href="tutor-dashboard.html" style="font-size:0.82rem;font-weight:600;color:#6b7280;text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">📊 Dashboard</a>
+    <a href="messages.html" style="font-size:0.82rem;font-weight:600;color:#6b7280;text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">💬 Messages</a>
+    <a href="tutor-public-profile.html" style="font-size:0.82rem;font-weight:700;background:#1a6bff;color:#fff;text-decoration:none;padding:0.4rem 0.9rem;border-radius:8px;">My Profile</a>
+  </div>
+  <button class="nav-burger" onclick="toggleMobileNav(this)" style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#111827;">☰</button>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-avatar" id="heroAvatar">?</div>
+    <div class="hero-info">
+      <div class="hero-name" id="heroName">Loading...</div>
+      <div class="hero-sub" id="heroSub"></div>
+      <div class="hero-tags" id="heroTags"></div>
+    </div>
+    <div style="flex-shrink:0;text-align:right;">
+      <div style="font-size:2rem;font-weight:800;color:#fff;" id="heroRating">—</div>
+      <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);" id="heroReviewCount">No reviews yet</div>
+      <div style="color:var(--yellow);font-size:1rem;margin-top:2px;" id="heroStars"></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+  <!-- MAIN COL -->
+  <div class="main-col">
+
+    <!-- About -->
+    <div class="card">
+      <div class="card-title">About</div>
+      <p id="bioPara" style="font-size:0.9rem;color:var(--ink2);line-height:1.75;"></p>
+    </div>
+
+    <!-- Subjects -->
+    <div class="card">
+      <div class="card-title">Subjects I teach</div>
+      <div id="subjectsTags"><p class="empty">No subjects added yet.</p></div>
+    </div>
+
+    <!-- Academic -->
+    <div class="card" id="academicCard">
+      <div class="card-title">Academic Background</div>
+      <div id="academicInfo"></div>
+    </div>
+
+    <!-- Certificates -->
+    <div class="card" id="certsCard">
+      <div class="card-title">Certificates & Grades</div>
+      <div id="certsList"><p class="empty">No certificates added yet.</p></div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="card">
+      <div class="card-title">Student Reviews</div>
+      <div id="reviewsList"><p class="empty">No reviews yet.</p></div>
+
+      <!-- Leave a review (only for logged-in students) -->
+      <div id="reviewFormWrap" style="display:none;">
+        <div style="font-size:0.85rem;font-weight:700;margin-top:1.2rem;margin-bottom:0.5rem;">Leave a review</div>
+        <div class="review-form">
+          <div style="font-size:0.78rem;color:var(--mid);margin-bottom:0.5rem;">Your rating</div>
+          <div class="star-select" id="starSelect">
+            <button class="star-btn" data-val="1">★</button>
+            <button class="star-btn" data-val="2">★</button>
+            <button class="star-btn" data-val="3">★</button>
+            <button class="star-btn" data-val="4">★</button>
+            <button class="star-btn" data-val="5">★</button>
+          </div>
+          <textarea class="review-input" id="reviewComment" placeholder="Share your experience with this tutor..."></textarea>
+          <button class="submit-review" id="submitReview">Submit review</button>
+          <div class="alert" id="reviewAlert"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDE COL -->
+  <div class="side-col">
+    <!-- Book / Edit card -->
+    <div class="card">
+      <div style="font-size:1.8rem;font-weight:800;color:var(--ink);" id="rateDisplay">—</div>
+      <div style="font-size:0.78rem;color:var(--mid);margin-bottom:1rem;">per hour</div>
+      <button class="book-btn" id="bookBtn" style="display:none;">Book a session</button>
+      <button class="edit-btn" id="editBtn" style="display:none;" onclick="window.location.href='tutor-profile.html'">✏️ Edit my profile</button>
+      <div id="signinPrompt" style="font-size:0.82rem;color:var(--mid);text-align:center;padding:0.5rem 0;">
+        <a href="signin.html" style="color:var(--blue);font-weight:600;">Sign in</a> to book a session
+      </div>
+    </div>
+
+    <!-- Availability -->
+    <div class="card">
+      <div class="card-title">Availability</div>
+      <div class="avail-days" id="availDays">
+        <div class="avail-day off">M</div><div class="avail-day off">T</div><div class="avail-day off">W</div>
+        <div class="avail-day off">T</div><div class="avail-day off">F</div><div class="avail-day off">S</div><div class="avail-day off">S</div>
+      </div>
+      <div style="font-size:0.78rem;color:var(--mid);margin-top:0.7rem;" id="preferredTimeDisplay"></div>
+    </div>
+
+    <!-- Teaching format -->
+    <div class="card">
+      <div class="card-title">Teaching Format</div>
+      <div id="formatDisplay" style="font-size:0.88rem;color:var(--ink2);">—</div>
+      <div style="font-size:0.78rem;color:var(--mid);margin-top:0.4rem;" id="sessionLenDisplay"></div>
+    </div>
+
+    <!-- Verified -->
+    <div class="card" style="text-align:center;">
+      <div class="verified-badge" style="margin:0 auto;">✓ Verified Tutor</div>
+      <div style="font-size:0.78rem;color:var(--mid);margin-top:0.7rem;">University verified via UniSkilled</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://orghkbbohnabcietidiv.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
+const _sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+let tutorId = null;
+let currentUserId = null;
+let selectedRating = 0;
+
+// Star rating
+document.querySelectorAll('.star-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    selectedRating = parseInt(btn.getAttribute('data-val'));
+    document.querySelectorAll('.star-btn').forEach((b,i) => {
+      b.classList.toggle('active', i < selectedRating);
+    });
+  });
+});
+
+async function init() {
+  // Get tutor ID from URL or use current logged-in tutor
+  const params = new URLSearchParams(window.location.search);
+  const urlTutorId = params.get('id');
+
+  const {data:{session}} = await _sb.auth.getSession();
+  if (session) {
+    currentUserId = session.user.id;
+    const meta = session.user.user_metadata || {};
+
+    // Determine whose profile to show
+    // If no ?id= param AND user is tutor → show own profile
+    tutorId = urlTutorId || (meta.role === 'tutor' ? currentUserId : null);
+
+    if (!tutorId) { document.getElementById('heroName').textContent = 'Profile not found'; return; }
+
+    // Show dashboard link based on role
+    const dashLink = document.getElementById('dashboardLink');
+    if (dashLink) {
+      dashLink.style.display = 'block';
+      dashLink.href = meta.role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
+      dashLink.textContent = meta.role === 'tutor' ? '← Tutor Dashboard' : '← Student Dashboard';
+    }
+    document.getElementById('signinLink').style.display = 'none';
+
+    // Show edit btn if own tutor profile, book btn if student viewing
+    if (tutorId === currentUserId && meta.role === 'tutor') {
+      document.getElementById('editBtn').style.display = 'block';
+      document.getElementById('signinPrompt').style.display = 'none';
+    } else if (meta.role === 'student') {
+      document.getElementById('bookBtn').style.display = 'block';
+      document.getElementById('signinPrompt').style.display = 'none';
+      document.getElementById('reviewFormWrap').style.display = 'block';
+    }
+  } else {
+    tutorId = urlTutorId;
+    if (!tutorId) {
+      // Not logged in, no ID param - redirect to signin
+      window.location.href = 'signin.html';
+      return;
+    }
+  }
+
+  // Load tutor data
+  const {data:p} = await _sb.from('users').select('full_name,avatar_url,country,language').eq('id',tutorId).single();
+  const {data:tp} = await _sb.from('tutor_profiles').select('*').eq('user_id',tutorId).single();
+
+  if (!p) { document.getElementById('heroName').textContent = 'Tutor not found'; return; }
+
+  const fullName = p.full_name || 'Tutor';
+  const initials = fullName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+
+  // Avatar
+  const av = document.getElementById('heroAvatar');
+  const avatarUrl = (tp&&tp.avatar_url)||(p&&p.avatar_url);
+  if (avatarUrl) av.innerHTML = `<img src="${avatarUrl}" alt="${fullName}">`;
+  else av.textContent = initials;
+
+  // Hero info
+  document.getElementById('heroName').textContent = fullName;
+  document.title = fullName + ' — UniSkilled Tutor';
+
+  const subjects = (tp&&tp.subjects)?(Array.isArray(tp.subjects)?tp.subjects:[]):[];
+  const rate = (tp&&tp.hourly_rate)?'£'+tp.hourly_rate+'/hr':'';
+  const location = p.country||'';
+
+  document.getElementById('heroSub').textContent = [
+    tp&&tp.degree_level ? tp.degree_level.charAt(0).toUpperCase()+tp.degree_level.slice(1)+"'s" : '',
+    tp&&tp.major||'',
+    tp&&tp.location||'',
+    location
+  ].filter(Boolean).join(' · ');
+
+  // Tags
+  const tagsEl = document.getElementById('heroTags');
+  const tagItems = [rate, p.language, ...subjects.slice(0,3)].filter(Boolean);
+  tagsEl.innerHTML = tagItems.map(t=>`<span class="hero-tag">${t}</span>`).join('');
+
+  // Rate display
+  document.getElementById('rateDisplay').textContent = rate || 'Rate not set';
+
+  // Bio
+  const bioEl = document.getElementById('bioPara');
+  bioEl.textContent = (tp&&tp.bio) || 'This tutor hasn\'t added a bio yet.';
+
+  // Subjects
+  const subEl = document.getElementById('subjectsTags');
+  if (subjects.length > 0) subEl.innerHTML = subjects.map(s=>`<span class="tag">${s}</span>`).join('');
+
+  // Academic
+  const acadEl = document.getElementById('academicInfo');
+  const acadItems = [
+    tp&&tp.degree_level ? ['Degree level', tp.degree_level.charAt(0).toUpperCase()+tp.degree_level.slice(1)+"'s"] : null,
+    tp&&tp.major ? ['Major', tp.major] : null,
+    tp&&tp.location ? ['University', tp.location] : null,
+    tp&&tp.study_year ? ['Year', tp.study_year] : null,
+    tp&&tp.overall_grade ? ['Overall grade', tp.overall_grade] : null,
+  ].filter(Boolean);
+
+  if (acadItems.length > 0) {
+    acadEl.innerHTML = acadItems.map(([label,val])=>`
+      <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid var(--border);">
+        <span style="font-size:0.82rem;color:var(--mid);">${label}</span>
+        <span style="font-size:0.82rem;font-weight:600;">${val}</span>
+      </div>`).join('');
+  } else {
+    acadEl.innerHTML = '<p class="empty">No academic info added yet.</p>';
+  }
+
+  // Certificates
+  const certsEl = document.getElementById('certsList');
+  const certs = (tp&&tp.certificates)?(Array.isArray(tp.certificates)?tp.certificates:[]):[];
+  if (certs.length > 0) {
+    certsEl.innerHTML = certs.map(c=>`
+      <div class="cert-item">
+        <span style="font-size:1.2rem;">🏅</span>
+        <div style="flex:1;">
+          <div style="font-size:0.85rem;font-weight:700;">${c.subject}</div>
+          <div style="font-size:0.75rem;color:var(--green);font-weight:600;">Grade: ${c.grade}</div>
+        </div>
+        ${c.fileUrl?`<a href="${c.fileUrl}" target="_blank" style="font-size:0.75rem;color:var(--blue);font-weight:600;white-space:nowrap;">📎 View proof</a>`:''}
+      </div>`).join('');
+  }
+
+  // Availability
+  const days = (tp&&tp.availability)?(Array.isArray(tp.availability)?tp.availability:[]):[];
+  const dayMap = {mon:'M',tue:'T',wed:'W',thu:'T',fri:'F',sat:'S',sun:'S'};
+  const dayOrder = ['mon','tue','wed','thu','fri','sat','sun'];
+  const availEl = document.getElementById('availDays');
+  availEl.innerHTML = dayOrder.map(d=>`<div class="avail-day ${days.includes(d)?'':'off'}">${dayMap[d]}</div>`).join('');
+
+  const ptEl = document.getElementById('preferredTimeDisplay');
+  if (tp&&tp.preferred_time) ptEl.textContent = 'Preferred: ' + tp.preferred_time;
+
+  // Teaching format
+  const fmtMap = {online:'💻 Online only',inperson:'📍 In-person only',both:'💻 Online & 📍 In-person'};
+  document.getElementById('formatDisplay').textContent = (tp&&tp.teaching_format&&fmtMap[tp.teaching_format])||'Not specified';
+  const slEl = document.getElementById('sessionLenDisplay');
+  if (tp&&tp.session_length) slEl.textContent = tp.session_length === 'flexible' ? 'Flexible duration' : tp.session_length + ' min sessions';
+
+  // Reviews
+  const {data:reviews} = await _sb.from('reviews').select('*').eq('tutor_id',tutorId).order('created_at',{ascending:false});
+  const allReviews = reviews || [];
+
+  if (allReviews.length > 0) {
+    const avg = (allReviews.reduce((a,r)=>a+r.rating,0)/allReviews.length).toFixed(1);
+    document.getElementById('heroRating').textContent = avg;
+    document.getElementById('heroReviewCount').textContent = allReviews.length + ' review' + (allReviews.length!==1?'s':'');
+    document.getElementById('heroStars').textContent = '★'.repeat(Math.round(avg)) + '☆'.repeat(5-Math.round(avg));
+    document.getElementById('reviewsList').innerHTML = allReviews.map(r=>`
+      <div class="review-item">
+        <div class="review-header">
+          <span class="review-name">${r.student_name||'Student'}</span>
+          <span class="review-date">${new Date(r.created_at).toLocaleDateString()}</span>
+        </div>
+        <div style="color:var(--yellow);margin-bottom:0.4rem;">${'★'.repeat(r.rating)}${'☆'.repeat(5-r.rating)}</div>
+        <p class="review-text">${r.comment||''}</p>
+      </div>`).join('');
+  }
+
+  // Submit review
+  document.getElementById('submitReview') && document.getElementById('submitReview').addEventListener('click', async function() {
+    if (!selectedRating) { showReviewAlert('Please select a star rating.','error'); return; }
+    const comment = document.getElementById('reviewComment').value.trim();
+    if (!comment) { showReviewAlert('Please write a comment.','error'); return; }
+    if (!currentUserId) { showReviewAlert('Please sign in to leave a review.','error'); return; }
+
+    // Get student name
+    const {data:sp} = await _sb.from('users').select('full_name').eq('id',currentUserId).single();
+    const studentName = (sp&&sp.full_name) || 'Student';
+
+    const {error} = await _sb.from('reviews').insert({
+      tutor_id: tutorId,
+      student_id: currentUserId,
+      student_name: studentName,
+      rating: selectedRating,
+      comment: comment
+    });
+
+    if (error) { showReviewAlert('Error: '+error.message,'error'); return; }
+    showReviewAlert('Review submitted! Thank you.','success');
+    document.getElementById('reviewComment').value = '';
+    selectedRating = 0;
+    document.querySelectorAll('.star-btn').forEach(b=>b.classList.remove('active'));
+    // Reload reviews
+    setTimeout(()=>window.location.reload(), 1500);
+  });
+}
+
+function showReviewAlert(msg, type) {
+  const el = document.getElementById('reviewAlert');
+  el.textContent = msg; el.className = 'alert ' + type;
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+<script>
+function toggleMobileNav(btn){
+  const nav=document.getElementById('mobileNav');
+  const isOpen=nav.style.display==='flex';
+  nav.style.display=isOpen?'none':'flex';
+  btn.textContent=isOpen?'☰':'✕';
+}
+</script>
+</body>
+</html>
