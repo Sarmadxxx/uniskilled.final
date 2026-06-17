@@ -4,98 +4,94 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Find a Tutor — UniSkilled</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1a6bff;--ink:#111827;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#fff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--yellow:#f59e0b;}
 body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);}
-nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;}
+nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;}
 .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
 .logo-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;}
-.hero-search{background:linear-gradient(135deg,#0f2460,#1a6bff);padding:3rem 5%;text-align:center;}
+.nav-links{display:flex;align-items:center;gap:0.5rem;}
+.nav-link{font-size:0.83rem;font-weight:600;color:var(--mid);text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;}
+.nav-link:hover{background:var(--off);color:var(--ink);}
+.nav-cta{font-size:0.83rem;font-weight:700;background:var(--blue);color:#fff;text-decoration:none;padding:0.4rem 1rem;border-radius:8px;}
+.nav-burger{display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;}
+.mobile-nav{display:none;position:fixed;top:60px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:99;padding:1rem;flex-direction:column;gap:0.5rem;}
+.mobile-nav a{display:block;padding:0.7rem 1rem;font-weight:600;color:var(--ink);text-decoration:none;border-radius:8px;background:var(--off);}
+.hero-search{background:linear-gradient(135deg,#0b1f4a,#1a6bff);padding:3rem 5%;text-align:center;}
 .hero-search h1{font-size:2rem;font-weight:800;color:#fff;margin-bottom:0.5rem;}
-.hero-search p{color:rgba(255,255,255,0.7);margin-bottom:1.5rem;}
-.search-bar{display:flex;gap:0.8rem;max-width:600px;margin:0 auto;}
+.hero-search p{color:rgba(255,255,255,0.65);margin-bottom:1.5rem;}
+.search-bar{display:flex;gap:0.7rem;max-width:580px;margin:0 auto;}
 .search-input{flex:1;padding:0.9rem 1.2rem;border:none;border-radius:10px;font-family:'Manrope',sans-serif;font-size:0.95rem;outline:none;}
 .search-btn{padding:0.9rem 1.6rem;background:#f7e049;color:var(--ink);border:none;border-radius:10px;font-family:'Manrope',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;}
-.filters{padding:1.2rem 5%;display:flex;gap:0.8rem;flex-wrap:wrap;background:var(--white);border-bottom:1px solid var(--border);}
-.filter-select{padding:0.55rem 0.9rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.83rem;color:var(--ink);background:var(--white);outline:none;cursor:pointer;}
-.filter-select:focus{border-color:var(--blue);}
+.filters{padding:1rem 5%;background:#fff;border-bottom:1px solid var(--border);display:flex;gap:0.7rem;flex-wrap:wrap;}
+.filter-select{padding:0.5rem 0.85rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.83rem;color:var(--ink);background:#fff;outline:none;cursor:pointer;}
 .main{max-width:1100px;margin:0 auto;padding:2rem 5%;}
-.results-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;}
-.results-count{font-size:0.85rem;color:var(--mid);font-weight:600;}
+.results-count{font-size:0.85rem;color:var(--mid);font-weight:600;margin-bottom:1.2rem;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem;}
-.tutor-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;transition:transform .2s,box-shadow .2s,border-color .2s;cursor:pointer;}
-.tutor-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,0.08);border-color:var(--blue);}
+.tutor-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;}
+.tutor-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.08);border-color:var(--blue);}
 .card-top{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;}
 .tutor-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;font-weight:800;flex-shrink:0;overflow:hidden;}
-.tutor-av img{width:100%;height:100%;object-fit:cover;}
+.tutor-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .tutor-name{font-weight:800;font-size:1rem;margin-bottom:2px;}
 .tutor-uni{font-size:0.75rem;color:var(--mid);}
-.tutor-rating{display:flex;align-items:center;gap:4px;margin-top:3px;}
-.tutor-stars{color:var(--yellow);font-size:0.8rem;}
-.tutor-rc{font-size:0.72rem;color:var(--mid);}
+.stars{color:var(--yellow);font-size:0.8rem;}
 .verified{display:inline-flex;align-items:center;gap:4px;background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-top:3px;}
 .subjects{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.9rem;}
 .subject-tag{background:#e8f0ff;color:var(--blue);font-size:0.72rem;font-weight:600;padding:3px 9px;border-radius:100px;}
 .card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:0.9rem;border-top:1px solid var(--border);}
-.tutor-rate{font-size:1.1rem;font-weight:800;color:var(--ink);}
+.tutor-rate{font-size:1.1rem;font-weight:800;}
 .tutor-rate span{font-size:0.72rem;color:var(--mid);font-weight:400;}
-.book-btn{background:var(--blue);color:#fff;border:none;padding:0.5rem 1.1rem;border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;transition:background .18s;}
-.book-btn:hover{background:#1558e0;}
-.empty-state{text-align:center;padding:4rem 2rem;color:var(--mid);}
-.empty-state div{font-size:2.5rem;margin-bottom:1rem;}
-.loading{text-align:center;padding:3rem;color:var(--mid);}
-@media(max-width:600px){.search-bar{flex-direction:column;}.grid{grid-template-columns:1fr;}}
-</style>
-<style>
-@media(max-width:768px){
-  .nav-links{display:none!important;}
-  .nav-burger{display:block!important;}
-  .nav-brand{display:none;}
-}
+.book-btn{background:var(--blue);color:#fff;border:none;padding:0.5rem 1.1rem;border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;}
+.empty{text-align:center;padding:4rem 2rem;color:var(--mid);grid-column:1/-1;}
+.loading-text{text-align:center;padding:3rem;color:var(--mid);grid-column:1/-1;}
+@media(max-width:768px){.nav-links{display:none;}.nav-burger{display:block;}.search-bar{flex-direction:column;}.grid{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
-<nav style="position:sticky;top:0;z-index:200;height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;padding:0 5%;font-family:'Manrope',sans-serif;">
-  <a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:#111827;">
-    <div style="width:30px;height:30px;background:#1a6bff;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.9rem;">U</div>
-    <span class="nav-brand">UniSkilled</span>
-  </a>
-  <div style="display:flex;align-items:center;gap:0.5rem;" class="nav-links">
-    <a href="index.html" style="font-size:0.82rem;font-weight:600;color:#6b7280;text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">🏠 Home</a>
-    <a href="student-dashboard.html" style="font-size:0.82rem;font-weight:600;color:#6b7280;text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">📊 Dashboard</a>
-    <a href="messages.html" style="font-size:0.82rem;font-weight:600;color:#6b7280;text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">💬 Messages</a>
-    <a href="find-tutors.html" style="font-size:0.82rem;font-weight:700;background:#1a6bff;color:#fff;text-decoration:none;padding:0.4rem 0.9rem;border-radius:8px;">Find Tutors</a>
+<nav>
+  <a class="nav-logo" href="index.html"><div class="logo-icon">U</div>UniSkilled</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="student-dashboard.html" class="nav-link">📊 Dashboard</a>
+    <a href="messages.html" class="nav-link">💬 Messages</a>
+    <a href="student-profile.html" class="nav-cta" id="navCta">My Profile</a>
   </div>
-  <button class="nav-burger" onclick="toggleMobileNav(this)" style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#111827;">☰</button>
+  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
 </nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">🏠 Home</a>
+  <a href="student-dashboard.html">📊 Dashboard</a>
+  <a href="messages.html">💬 Messages</a>
+</div>
 
 <div class="hero-search">
   <h1>Find your perfect tutor</h1>
   <p>University-verified tutors matched to your subjects</p>
   <div class="search-bar">
-    <input type="text" class="search-input" id="searchInput" placeholder="Search by subject, e.g. Linear Algebra, Python...">
-    <button class="search-btn" onclick="searchTutors()">Search</button>
+    <input type="text" class="search-input" id="searchInput" placeholder="Search by subject, name...">
+    <button class="search-btn" onclick="filterTutors()">Search</button>
   </div>
 </div>
 
 <div class="filters">
-  <select class="filter-select" id="filterFormat" onchange="searchTutors()">
+  <select class="filter-select" id="filterFormat" onchange="filterTutors()">
     <option value="">Any format</option>
     <option value="online">Online</option>
     <option value="inperson">In-person</option>
     <option value="both">Both</option>
   </select>
-  <select class="filter-select" id="filterPrice" onchange="searchTutors()">
+  <select class="filter-select" id="filterPrice" onchange="filterTutors()">
     <option value="">Any price</option>
     <option value="0-20">Up to £20/hr</option>
     <option value="20-40">£20–£40/hr</option>
     <option value="40-60">£40–£60/hr</option>
     <option value="60+">£60+/hr</option>
   </select>
-  <select class="filter-select" id="filterDay" onchange="searchTutors()">
+  <select class="filter-select" id="filterDay" onchange="filterTutors()">
     <option value="">Any day</option>
     <option value="mon">Monday</option>
     <option value="tue">Tuesday</option>
@@ -108,81 +104,77 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 </div>
 
 <div class="main">
-  <div class="results-header">
-    <div class="results-count" id="resultsCount">Loading tutors...</div>
-  </div>
+  <div class="results-count" id="resultsCount">Loading tutors...</div>
   <div class="grid" id="tutorGrid">
-    <div class="loading">Loading tutors...</div>
+    <div class="loading-text">⏳ Loading tutors...</div>
   </div>
 </div>
 
 <script>
-const SUPABASE_URL='https://orghkbbohnabcietidiv.supabase.co';
-const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
-const _sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+const _sb = supabase.createClient(
+  'https://orghkbbohnabcietidiv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8',
+  { realtime: { params: { eventsPerSecond: 0 } }, global: { fetch: window.fetch.bind(window) } }
+);
 
-let allTutors=[];
+let allTutors = [];
 
-async function loadTutors(){
-  // Load all tutor profiles - filter out incomplete ones
-  const {data:tutorProfiles, error:tpError}=await _sb.from('tutor_profiles').select('*');
-  if(tpError) console.error('Error loading tutors:', tpError);
-  if(!tutorProfiles||tutorProfiles.length===0){
-    document.getElementById('tutorGrid').innerHTML='<div class="empty-state"><div>🎓</div><div style="font-weight:700;margin-bottom:0.5rem;">No tutors yet</div><p>Be the first to sign up as a tutor on UniSkilled!</p><a href="onboarding.html" style="display:inline-block;margin-top:1rem;background:#1a6bff;color:#fff;padding:0.6rem 1.4rem;border-radius:8px;text-decoration:none;font-weight:700;font-size:0.85rem;">Sign up as tutor →</a></div>';
-    document.getElementById('resultsCount').textContent='0 tutors found';
-    return;
+async function loadTutors() {
+  const grid = document.getElementById('tutorGrid');
+  try {
+    const { data: profiles } = await _sb.from('tutor_profiles').select('*');
+    if (!profiles || profiles.length === 0) {
+      grid.innerHTML = '<div class="empty"><div style="font-size:2.5rem;margin-bottom:1rem;">🎓</div><div style="font-weight:700;margin-bottom:0.5rem;">No tutors yet</div><p>Be the first to sign up as a tutor!</p></div>';
+      document.getElementById('resultsCount').textContent = '0 tutors found';
+      return;
+    }
+
+    const userIds = profiles.map(p => p.user_id).filter(Boolean);
+    const { data: users } = await _sb.from('users').select('id,full_name,avatar_url,country').in('id', userIds);
+    const { data: reviews } = await _sb.from('reviews').select('tutor_id,rating');
+
+    const userMap = {};
+    (users || []).forEach(u => userMap[u.id] = u);
+    const reviewMap = {};
+    (reviews || []).forEach(r => {
+      if (!reviewMap[r.tutor_id]) reviewMap[r.tutor_id] = { total: 0, count: 0 };
+      reviewMap[r.tutor_id].total += r.rating;
+      reviewMap[r.tutor_id].count++;
+    });
+
+    allTutors = profiles.map(tp => {
+      const u = userMap[tp.user_id] || {};
+      const rv = reviewMap[tp.user_id] || { total: 0, count: 0 };
+      return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || '', avgRating: rv.count > 0 ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count };
+    });
+
+    renderTutors(allTutors);
+  } catch(e) {
+    console.error(e);
+    grid.innerHTML = '<div class="empty"><div style="font-size:2rem;margin-bottom:1rem;">⚠️</div><div style="font-weight:700;">Could not load tutors</div><p style="margin-top:0.5rem;">'+e.message+'</p></div>';
+    document.getElementById('resultsCount').textContent = '';
   }
-
-  // Load user info for each tutor
-  const userIds=tutorProfiles.map(t=>t.user_id);
-  const {data:users}=await _sb.from('users').select('id,full_name,avatar_url,country').in('id',userIds);
-  const {data:reviews}=await _sb.from('reviews').select('tutor_id,rating');
-
-  const userMap={};
-  (users||[]).forEach(u=>userMap[u.id]=u);
-
-  const reviewMap={};
-  (reviews||[]).forEach(r=>{
-    if(!reviewMap[r.tutor_id])reviewMap[r.tutor_id]={total:0,count:0};
-    reviewMap[r.tutor_id].total+=r.rating;
-    reviewMap[r.tutor_id].count+=1;
-  });
-
-  allTutors=tutorProfiles.map(tp=>{
-    const user=userMap[tp.user_id]||{};
-    const rev=reviewMap[tp.user_id]||{total:0,count:0};
-    return{...tp,fullName:user.full_name||'Tutor',avatarUrl:tp.avatar_url||user.avatar_url,country:user.country||tp.country,avgRating:rev.count>0?(rev.total/rev.count).toFixed(1):null,reviewCount:rev.count};
-  });
-
-  renderTutors(allTutors);
 }
 
-function renderTutors(tutors){
-  const grid=document.getElementById('tutorGrid');
-  const count=document.getElementById('resultsCount');
-
-  if(tutors.length===0){
-    grid.innerHTML='<div class="empty-state"><div>🔍</div><div style="font-weight:700;margin-bottom:0.5rem;">No tutors match your search</div><p>Try different keywords or filters</p></div>';
-    count.textContent='0 tutors found';
+function renderTutors(tutors) {
+  document.getElementById('resultsCount').textContent = tutors.length + ' tutor' + (tutors.length !== 1 ? 's' : '') + ' found';
+  const grid = document.getElementById('tutorGrid');
+  if (!tutors.length) {
+    grid.innerHTML = '<div class="empty"><div style="font-size:2rem;margin-bottom:1rem;">🔍</div><div style="font-weight:700;">No tutors match</div><p>Try different filters</p></div>';
     return;
   }
-
-  count.textContent=tutors.length+' tutor'+(tutors.length!==1?'s':'')+' found';
-
-  grid.innerHTML=tutors.map(t=>{
-    const initials=(t.fullName||'T').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-    const subjects=Array.isArray(t.subjects)?t.subjects:[];
-    const avail=Array.isArray(t.availability)?t.availability:[];
-    const rate=t.hourly_rate?'£'+t.hourly_rate+'/hr':'Free';
-    const stars=t.avgRating?'★'.repeat(Math.round(t.avgRating))+'☆'.repeat(5-Math.round(t.avgRating)):'';
-
-    return`<div class="tutor-card" onclick="viewTutor('${t.user_id}')">
+  grid.innerHTML = tutors.map(t => {
+    const initials = (t.fullName||'T').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    const subjects = Array.isArray(t.subjects) ? t.subjects : [];
+    const rate = t.hourly_rate ? '£'+t.hourly_rate+'/hr' : 'Free';
+    const stars = t.avgRating ? '★'.repeat(Math.round(t.avgRating))+'☆'.repeat(5-Math.round(t.avgRating)) : '';
+    return `<div class="tutor-card" onclick="window.location.href='tutor-profile.html?id=${t.user_id}'">
       <div class="card-top">
-        <div class="tutor-av">${t.avatarUrl?`<img src="${t.avatarUrl}" alt="${t.fullName}">`:(initials)}</div>
+        <div class="tutor-av">${t.avatarUrl?`<img src="${t.avatarUrl}" alt="${t.fullName}">`:initials}</div>
         <div>
           <div class="tutor-name">${t.fullName}</div>
           <div class="tutor-uni">${t.location||t.country||''}</div>
-          ${t.avgRating?`<div class="tutor-rating"><span class="tutor-stars">${stars}</span><span class="tutor-rc">${t.avgRating} (${t.reviewCount})</span></div>`:''}
+          ${t.avgRating?`<div><span class="stars">${stars}</span> <span style="font-size:0.72rem;color:var(--mid);">${t.avgRating} (${t.reviewCount})</span></div>`:''}
           <div class="verified">✓ Verified</div>
         </div>
       </div>
@@ -190,53 +182,49 @@ function renderTutors(tutors){
       <div class="subjects">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${s}</span>`).join('')}</div>
       <div class="card-footer">
         <div class="tutor-rate">${rate} <span>per hour</span></div>
-        <button class="book-btn" onclick="event.stopPropagation();bookTutor('${t.user_id}','${t.fullName.replace(/'/g,"\\'")}')">Book session</button>
+        <button class="book-btn" onclick="event.stopPropagation();window.location.href='book-session.html?tutor=${t.user_id}&name=${encodeURIComponent(t.fullName)}'">Book session</button>
       </div>
     </div>`;
   }).join('');
 }
 
-function viewTutor(id){ window.location.href='tutor-public-profile.html?id='+id; }
-
-function bookTutor(id,name){
-  window.location.href='book-session.html?tutor='+id+'&name='+encodeURIComponent(name);
-}
-
-function searchTutors(){
-  const query=document.getElementById('searchInput').value.toLowerCase().trim();
-  const format=document.getElementById('filterFormat').value;
-  const price=document.getElementById('filterPrice').value;
-  const day=document.getElementById('filterDay').value;
-
-  let filtered=allTutors.filter(t=>{
-    const subjects=Array.isArray(t.subjects)?t.subjects:[];
-    const avail=Array.isArray(t.availability)?t.availability:[];
-
-    if(query&&!subjects.some(s=>s.toLowerCase().includes(query))&&!(t.fullName||'').toLowerCase().includes(query)&&!(t.bio||'').toLowerCase().includes(query))return false;
-    if(format&&t.teaching_format!==format&&t.teaching_format!=='both')return false;
-    if(day&&!avail.includes(day))return false;
-    if(price){
-      const r=t.hourly_rate||0;
-      if(price==='0-20'&&r>20)return false;
-      if(price==='20-40'&&(r<20||r>40))return false;
-      if(price==='40-60'&&(r<40||r>60))return false;
-      if(price==='60+'&&r<60)return false;
-    }
+function filterTutors() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const fmt = document.getElementById('filterFormat').value;
+  const price = document.getElementById('filterPrice').value;
+  const day = document.getElementById('filterDay').value;
+  renderTutors(allTutors.filter(t => {
+    const subjects = Array.isArray(t.subjects)?t.subjects:[];
+    const avail = Array.isArray(t.availability)?t.availability:[];
+    if(q && !subjects.some(s=>s.toLowerCase().includes(q)) && !(t.fullName||'').toLowerCase().includes(q)) return false;
+    if(fmt && t.teaching_format!==fmt && t.teaching_format!=='both') return false;
+    if(day && !avail.includes(day)) return false;
+    if(price){const r=t.hourly_rate||0;if(price==='0-20'&&r>20)return false;if(price==='20-40'&&(r<20||r>40))return false;if(price==='40-60'&&(r<40||r>60))return false;if(price==='60+'&&r<60)return false;}
     return true;
-  });
-  renderTutors(filtered);
+  }));
 }
 
-document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')searchTutors();});
-document.addEventListener('DOMContentLoaded',loadTutors);
-</script>
-<script>
-function toggleMobileNav(btn){
-  const nav=document.getElementById('mobileNav');
-  const isOpen=nav.style.display==='flex';
-  nav.style.display=isOpen?'none':'flex';
-  btn.textContent=isOpen?'☰':'✕';
+function toggleNav(btn){const n=document.getElementById('mobileNav');const o=n.style.display==='flex';n.style.display=o?'none':'flex';btn.textContent=o?'☰':'✕';}
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')filterTutors();});
+
+async function setNav(){
+  try {
+    const {data:{session}} = await _sb.auth.getSession();
+    if(session){
+      const meta = session.user.user_metadata||{};
+      const role = meta.role||'student';
+      const cta = document.getElementById('navCta');
+      if(role==='tutor'){
+        cta.href='tutor-profile.html';
+        cta.textContent='My Profile';
+        document.querySelector('a[href="student-dashboard.html"]').href='tutor-dashboard.html';
+        document.querySelector('a[href="student-dashboard.html"]').textContent='📊 Dashboard';
+      }
+    }
+  } catch(e){}
 }
+
+document.addEventListener('DOMContentLoaded',()=>{loadTutors();setNav();});
 </script>
 </body>
 </html>
