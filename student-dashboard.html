@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard — UniSkilled</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--yellow:#f59e0b;}
+body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV */
+nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
+.logo-icon{width:32px;height:32px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.9rem;}
+.nav-links{display:flex;align-items:center;gap:0.4rem;}
+.nav-link{font-size:0.83rem;font-weight:600;color:var(--mid);text-decoration:none;padding:0.45rem 0.8rem;border-radius:8px;}
+.nav-link:hover{background:var(--off);color:var(--ink);}
+.nav-cta{font-size:0.83rem;font-weight:700;background:var(--blue);color:#fff;text-decoration:none;padding:0.45rem 1.1rem;border-radius:8px;}
+.nav-burger{display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;}
+.mobile-nav{display:none;position:fixed;top:62px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:99;padding:1rem;flex-direction:column;gap:0.5rem;}
+.mobile-nav a{display:block;padding:0.75rem 1rem;font-weight:600;color:var(--ink);text-decoration:none;border-radius:10px;background:var(--off);}
+
+/* LAYOUT */
+.layout{flex:1;display:grid;grid-template-columns:260px 1fr;max-width:1200px;margin:0 auto;width:100%;padding:1.5rem 5%;gap:1.5rem;align-items:start;}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:1rem;position:sticky;top:78px;}
+.profile-card{background:#fff;border-radius:14px;border:1px solid var(--border);padding:1.4rem;text-align:center;}
+.profile-av{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.5rem;font-weight:800;margin:0 auto 0.8rem;overflow:hidden;cursor:pointer;}
+.profile-av img{width:100%;height:100%;object-fit:cover;}
+.profile-name{font-weight:800;font-size:0.95rem;margin-bottom:0.2rem;cursor:pointer;}
+.profile-name:hover{color:var(--blue);}
+.profile-sub{font-size:0.75rem;color:var(--mid);line-height:1.4;}
+.sidebar-nav{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.78rem 1.2rem;font-size:0.85rem;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;text-decoration:none;border-left:3px solid transparent;}
+.nav-item:hover{background:var(--off);color:var(--blue);}
+.nav-item.active{background:#eff6ff;color:var(--blue);border-left-color:var(--blue);}
+.nav-item .ico{font-size:1rem;width:20px;text-align:center;}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;gap:1.2rem;}
+
+/* HERO CARD */
+.hero-card{background:linear-gradient(135deg,#0b1f4a,#1a6bff);border-radius:16px;padding:2rem;color:#fff;position:relative;overflow:hidden;}
+.hero-card::before{content:'';position:absolute;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,0.05);top:-80px;right:-60px;}
+.hero-eyebrow{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;opacity:0.55;margin-bottom:0.4rem;}
+.hero-title{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.3rem;}
+.hero-sub{font-size:0.85rem;opacity:0.65;margin-bottom:1.2rem;}
+.hero-stats{display:flex;gap:2rem;}
+.hero-stat-n{font-size:1.5rem;font-weight:800;}
+.hero-stat-l{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.5;}
+
+/* QUICK ACTIONS */
+.quick-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:0.8rem;}
+.qa{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:1.2rem;text-align:center;cursor:pointer;transition:all .18s;text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:0.4rem;}
+.qa:hover{border-color:var(--blue);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.07);}
+.qa-ico{font-size:1.6rem;}
+.qa-lbl{font-size:0.8rem;font-weight:700;color:var(--ink2);}
+
+/* CARDS */
+.card{background:#fff;border-radius:14px;border:1px solid var(--border);}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);}
+.card-title{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--light);}
+.card-body{padding:1.2rem 1.4rem;}
+.empty-state{text-align:center;padding:2rem 1rem;color:var(--light);}
+.empty-state-icon{font-size:2rem;margin-bottom:0.6rem;}
+.empty-state-text{font-size:0.85rem;margin-bottom:0.8rem;}
+.btn-sm{display:inline-flex;align-items:center;gap:5px;padding:0.5rem 1rem;background:var(--blue);color:#fff;border:none;border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;text-decoration:none;}
+
+/* SESSIONS */
+.session-row{display:flex;align-items:center;gap:1rem;padding:0.9rem 0;border-bottom:1px solid var(--border);}
+.session-row:last-child{border-bottom:none;}
+.session-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.85rem;flex-shrink:0;}
+.session-info{flex:1;}
+.session-name{font-weight:700;font-size:0.88rem;}
+.session-sub{font-size:0.75rem;color:var(--mid);}
+.badge{display:inline-block;font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px;}
+.badge-pending{background:#fff7ed;color:#ea580c;}
+.badge-confirmed{background:var(--green-bg);color:var(--green);}
+.badge-completed{background:var(--off);color:var(--mid);}
+
+/* SUBJECTS */
+.subject-tag{display:inline-block;background:#eff6ff;color:var(--blue);font-size:0.78rem;font-weight:600;padding:4px 12px;border-radius:100px;margin:2px;}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static;}
+  .quick-actions{grid-template-columns:repeat(3,1fr);}
+  .nav-links{display:none;}
+  .nav-burger{display:block;}
+}
+@media(max-width:500px){
+  .quick-actions{grid-template-columns:1fr 1fr;}
+  .hero-stats{gap:1rem;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html"><div class="logo-icon">U</div>UniSkilled</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="student-profile.html" class="nav-link">👤 My Profile</a>
+    <a href="messages.html" class="nav-link">💬 Messages</a>
+    <a href="find-tutors.html" class="nav-cta">Find Tutors</a>
+  </div>
+  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">🏠 Home</a>
+  <a href="student-profile.html">👤 My Profile</a>
+  <a href="messages.html">💬 Messages</a>
+  <a href="find-tutors.html">🔍 Find Tutors</a>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="profile-card">
+      <div class="profile-av" id="sideAv" onclick="window.location.href='student-profile.html'">?</div>
+      <div class="profile-name" onclick="window.location.href='student-profile.html'" id="sideName">Loading...</div>
+      <div class="profile-sub" id="sideSub"></div>
+    </div>
+    <div class="sidebar-nav">
+      <a href="student-dashboard.html" class="nav-item active"><span class="ico">🏠</span>Overview</a>
+      <a href="find-tutors.html" class="nav-item"><span class="ico">🔍</span>Find a Tutor</a>
+      <a href="messages.html" class="nav-item"><span class="ico">💬</span>Messages</a>
+      <a href="student-profile.html" class="nav-item"><span class="ico">👤</span>My Profile</a>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- HERO -->
+    <div class="hero-card">
+      <div class="hero-eyebrow">WELCOME BACK</div>
+      <div class="hero-title" id="heroTitle">Hello!</div>
+      <div class="hero-sub" id="heroSub">Your dashboard is ready.</div>
+      <div class="hero-stats">
+        <div><div class="hero-stat-n" id="statSessions">—</div><div class="hero-stat-l">Sessions</div></div>
+        <div><div class="hero-stat-n" id="statSubjects">—</div><div class="hero-stat-l">Subjects</div></div>
+        <div><div class="hero-stat-n" id="statMessages">—</div><div class="hero-stat-l">Messages</div></div>
+      </div>
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="quick-actions">
+      <a href="find-tutors.html" class="qa"><div class="qa-ico">🔍</div><div class="qa-lbl">Find a Tutor</div></a>
+      <a href="messages.html" class="qa"><div class="qa-ico">💬</div><div class="qa-lbl">Messages</div></a>
+      <a href="student-profile.html" class="qa"><div class="qa-ico">👤</div><div class="qa-lbl">My Profile</div></a>
+    </div>
+
+    <!-- SESSIONS -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">My Sessions</div>
+        <a href="find-tutors.html" class="btn-sm">+ Book session</a>
+      </div>
+      <div class="card-body" id="sessionsBody">
+        <div class="empty-state">
+          <div class="empty-state-icon">📅</div>
+          <div class="empty-state-text">No sessions yet</div>
+          <a href="find-tutors.html" class="btn-sm">Find a tutor →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBJECTS -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">My Subjects</div>
+        <a href="student-profile.html" class="btn-sm">Edit</a>
+      </div>
+      <div class="card-body" id="subjectsBody">
+        <div class="empty-state">
+          <div class="empty-state-icon">📚</div>
+          <div class="empty-state-text">No subjects added yet</div>
+          <a href="student-profile.html" class="btn-sm">Add subjects →</a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const _sb = supabase.createClient(
+  'https://orghkbbohnabcietidiv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
+);
+
+async function init() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.href = 'signin.html'; return; }
+  const user = session.user;
+  const meta = user.user_metadata || {};
+
+  // Redirect tutors
+  if (meta.role === 'tutor') { window.location.href = 'tutor-dashboard.html'; return; }
+
+  // Load profile
+  const { data: p } = await _sb.from('users').select('*').eq('id', user.id).single();
+  const { data: sp } = await _sb.from('student_profiles').select('*').eq('user_id', user.id).single();
+
+  const fullName = (p && p.full_name) || (meta.full_name) || 'Student';
+  const firstName = fullName.split(' ')[0];
+  const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+  // Sidebar
+  const av = document.getElementById('sideAv');
+  if (p && p.avatar_url) av.innerHTML = `<img src="${p.avatar_url}" alt="${fullName}">`;
+  else av.textContent = initials;
+  document.getElementById('sideName').textContent = fullName;
+  const subLine = [sp?.university, sp?.year_of_study ? 'Year ' + sp.year_of_study : '', sp?.degree].filter(Boolean).join(' · ');
+  document.getElementById('sideSub').textContent = subLine;
+
+  // Hero
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('heroTitle').textContent = greeting + ', ' + firstName + '!';
+  document.getElementById('heroSub').textContent = subLine || 'Complete your profile to get started.';
+  document.title = firstName + "'s Dashboard — UniSkilled";
+
+  // Subjects
+  const subjects = Array.isArray(sp?.subjects) ? sp.subjects : [];
+  document.getElementById('statSubjects').textContent = subjects.length > 0 ? subjects.length : '—';
+  if (subjects.length > 0) {
+    document.getElementById('subjectsBody').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${s}</span>`).join('')}</div>`;
+  }
+
+  // Sessions
+  const { data: sessions } = await _sb.from('sessions').select('*').eq('student_id', user.id).order('created_at', { ascending: false });
+  const allSessions = sessions || [];
+  document.getElementById('statSessions').textContent = allSessions.length > 0 ? allSessions.length : '—';
+
+  if (allSessions.length > 0) {
+    document.getElementById('sessionsBody').innerHTML = allSessions.slice(0, 5).map(s => {
+      const initials = (s.tutor_name || 'T').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+      const date = s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+      const time = s.scheduled_time ? s.scheduled_time.slice(0, 5) : '';
+      const badgeClass = s.status === 'confirmed' ? 'badge-confirmed' : s.status === 'completed' ? 'badge-completed' : 'badge-pending';
+      return `<div class="session-row">
+        <div class="session-av">${initials}</div>
+        <div class="session-info">
+          <div class="session-name">${s.tutor_name || 'Tutor'}</div>
+          <div class="session-sub">${s.subject || ''} ${date ? '· ' + date : ''} ${time ? '· ' + time : ''}</div>
+        </div>
+        <span class="badge ${badgeClass}">${s.status}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Messages count
+  const { data: msgs } = await _sb.from('messages').select('id').eq('receiver_id', user.id).eq('read', false);
+  const msgCount = (msgs || []).length;
+  document.getElementById('statMessages').textContent = msgCount > 0 ? msgCount : '—';
+}
+
+function toggleNav(btn) {
+  const n = document.getElementById('mobileNav');
+  const o = n.style.display === 'flex';
+  n.style.display = o ? 'none' : 'flex';
+  btn.textContent = o ? '☰' : '✕';
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
