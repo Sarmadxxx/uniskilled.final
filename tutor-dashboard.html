@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutor Dashboard — UniSkilled</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;}
+body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+
+/* NAV */
+nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:100;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
+.logo-icon{width:32px;height:32px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.9rem;}
+.nav-links{display:flex;align-items:center;gap:0.4rem;}
+.nav-link{font-size:0.83rem;font-weight:600;color:var(--mid);text-decoration:none;padding:0.45rem 0.8rem;border-radius:8px;}
+.nav-link:hover{background:var(--off);color:var(--ink);}
+.nav-cta{font-size:0.83rem;font-weight:700;background:var(--blue);color:#fff;text-decoration:none;padding:0.45rem 1.1rem;border-radius:8px;}
+.nav-burger{display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;}
+.mobile-nav{display:none;position:fixed;top:62px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:99;padding:1rem;flex-direction:column;gap:0.5rem;}
+.mobile-nav a{display:block;padding:0.75rem 1rem;font-weight:600;color:var(--ink);text-decoration:none;border-radius:10px;background:var(--off);}
+
+/* LAYOUT */
+.layout{flex:1;display:grid;grid-template-columns:240px 1fr;max-width:1200px;margin:0 auto;width:100%;padding:1.5rem 5%;gap:1.5rem;align-items:start;}
+
+/* SIDEBAR */
+.sidebar{display:flex;flex-direction:column;gap:1rem;position:sticky;top:78px;}
+.profile-card{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.profile-cover{height:60px;background:linear-gradient(135deg,#0b1f4a,#1a6bff);}
+.profile-card-body{padding:0 1.2rem 1.2rem;text-align:center;margin-top:-30px;}
+.profile-av{width:60px;height:60px;border-radius:50%;border:3px solid #fff;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;margin:0 auto 0.6rem;overflow:hidden;cursor:pointer;}
+.profile-av img{width:100%;height:100%;object-fit:cover;}
+.profile-name{font-weight:800;font-size:0.9rem;cursor:pointer;margin-bottom:0.15rem;}
+.profile-name:hover{color:var(--blue);}
+.profile-sub{font-size:0.72rem;color:var(--mid);line-height:1.4;margin-bottom:0.8rem;}
+.profile-btn{display:block;width:100%;padding:0.5rem;background:var(--blue);color:#fff;border:none;border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;text-decoration:none;text-align:center;}
+.sidebar-nav{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+.nav-item{display:flex;align-items:center;justify-content:space-between;padding:0.78rem 1.2rem;font-size:0.85rem;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;text-decoration:none;border-left:3px solid transparent;}
+.nav-item:hover{background:var(--off);color:var(--blue);}
+.nav-item.active{background:#eff6ff;color:var(--blue);border-left-color:var(--blue);}
+.nav-item-left{display:flex;align-items:center;gap:0.75rem;}
+.nav-badge{background:var(--red);color:#fff;font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:100px;min-width:18px;text-align:center;}
+.nav-badge.green{background:var(--green);}
+
+/* MAIN */
+.main{display:flex;flex-direction:column;gap:1.2rem;}
+
+/* HERO */
+.hero-card{background:linear-gradient(135deg,#0b1f4a,#7c3aed,#1a6bff);border-radius:16px;padding:2rem;color:#fff;position:relative;overflow:hidden;}
+.hero-card::before{content:'';position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.05);top:-60px;right:-40px;}
+.hero-eyebrow{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;opacity:0.55;margin-bottom:0.3rem;}
+.hero-title{font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.25rem;}
+.hero-sub{font-size:0.85rem;opacity:0.65;margin-bottom:1.2rem;}
+.hero-stats{display:flex;gap:2rem;}
+.hero-stat-n{font-size:1.4rem;font-weight:800;}
+.hero-stat-l{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.5;}
+
+/* CARDS */
+.card{background:#fff;border-radius:14px;border:1px solid var(--border);}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);}
+.card-title{font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--light);}
+.card-body{padding:1.2rem 1.4rem;}
+.empty-state{text-align:center;padding:2rem 1rem;color:var(--light);}
+.empty-icon{font-size:2rem;margin-bottom:0.5rem;}
+.empty-text{font-size:0.85rem;}
+
+/* REQUEST ROWS */
+.request-row{background:var(--off);border:1.5px solid var(--border);border-radius:12px;padding:1.1rem 1.2rem;margin-bottom:0.8rem;}
+.request-row:last-child{margin-bottom:0;}
+.request-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.6rem;flex-wrap:wrap;gap:0.4rem;}
+.request-name{font-weight:700;font-size:0.9rem;}
+.request-subject{font-size:0.78rem;color:var(--mid);margin-top:2px;}
+.request-meta{font-size:0.75rem;color:var(--mid);margin-bottom:0.7rem;}
+.request-actions{display:flex;gap:0.6rem;flex-wrap:wrap;}
+.btn-accept{flex:1;min-width:140px;padding:0.55rem;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;}
+.btn-decline{flex:1;min-width:120px;padding:0.55rem;background:#fff;color:var(--red);border:1.5px solid var(--red);border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;}
+.btn-msg{padding:0.55rem 0.9rem;background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;}
+.btn-msg-wide{flex:1;min-width:140px;padding:0.55rem 0.9rem;background:#fff;color:var(--blue);border:1.5px solid var(--blue);border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;}
+
+/* SESSION ROWS */
+.session-row{display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid var(--border);}
+.session-row:last-child{border-bottom:none;}
+.session-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.8rem;flex-shrink:0;}
+.session-info{flex:1;}
+.session-name{font-weight:700;font-size:0.85rem;}
+.session-sub{font-size:0.72rem;color:var(--mid);}
+.badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px;white-space:nowrap;}
+.badge-pending{background:#fff7ed;color:#ea580c;}
+.badge-confirmed{background:var(--green-bg);color:var(--green);}
+.badge-completed{background:var(--off);color:var(--mid);}
+
+/* NOTIF ROWS */
+.notif-row{display:flex;gap:0.9rem;padding:0.9rem 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.notif-row:last-child{border-bottom:none;}
+.notif-row.unread{background:#fafbff;margin:0 -1.4rem;padding:0.9rem 1.4rem;}
+.notif-ico{width:36px;height:36px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.notif-info{flex:1;}
+.notif-title{font-weight:700;font-size:0.85rem;margin-bottom:2px;}
+.notif-body{font-size:0.75rem;color:var(--mid);}
+.notif-time{font-size:0.7rem;color:var(--light);white-space:nowrap;margin-top:2px;}
+
+/* REVIEWS */
+.review-row{padding:1rem 0;border-bottom:1px solid var(--border);}
+.review-row:last-child{border-bottom:none;}
+.review-header{display:flex;justify-content:space-between;margin-bottom:0.3rem;}
+.review-name{font-weight:700;font-size:0.85rem;}
+.review-stars{color:var(--yellow);font-size:0.85rem;}
+.review-text{font-size:0.82rem;color:var(--mid);line-height:1.5;}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:static;}
+  .nav-links{display:none;}
+  .nav-burger{display:block;}
+  .hero-stats{gap:1rem;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html"><div class="logo-icon">U</div>UniSkilled</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="tutor-profile.html" class="nav-link">👤 My Profile</a>
+    <a href="messages.html" class="nav-link">💬 Messages</a>
+    <a href="tutor-profile.html" class="nav-cta">Edit Profile</a>
+  </div>
+  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">🏠 Home</a>
+  <a href="tutor-profile.html">👤 My Profile</a>
+  <a href="messages.html">💬 Messages</a>
+  <a href="tutor-profile.html">✏️ Edit Profile</a>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="profile-card">
+      <div class="profile-cover"></div>
+      <div class="profile-card-body">
+        <div class="profile-av" id="sideAv" onclick="window.location.href='tutor-profile.html'">?</div>
+        <div class="profile-name" id="sideName" onclick="window.location.href='tutor-profile.html'">Loading...</div>
+        <div class="profile-sub" id="sideSub"></div>
+        <a href="tutor-profile.html" class="profile-btn">✏️ Edit Profile</a>
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <a class="nav-item active" onclick="showPage('overview',this)">
+        <div class="nav-item-left"><span>🏠</span>Overview</div>
+      </a>
+      <a class="nav-item" onclick="showPage('requests',this)">
+        <div class="nav-item-left"><span>📥</span>Booking Requests</div>
+        <span class="nav-badge" id="badgeRequests" style="display:none">0</span>
+      </a>
+      <a class="nav-item" onclick="showPage('subjectRequests',this)">
+        <div class="nav-item-left"><span>📋</span>Open Subject Requests</div>
+        <span class="nav-badge green" id="badgeSubjectRequests" style="display:none">0</span>
+      </a>
+      <a class="nav-item" onclick="showPage('sessions',this)">
+        <div class="nav-item-left"><span>📅</span>Sessions</div>
+      </a>
+      <a class="nav-item" onclick="showPage('reviews',this)">
+        <div class="nav-item-left"><span>⭐</span>Reviews</div>
+      </a>
+      <a class="nav-item" onclick="showPage('notifications',this)">
+        <div class="nav-item-left"><span>🔔</span>Notifications</div>
+        <span class="nav-badge" id="badgeNotifs" style="display:none">0</span>
+      </a>
+      <a class="nav-item" href="messages.html">
+        <div class="nav-item-left"><span>💬</span>Messages</div>
+        <span class="nav-badge" id="badgeMessages" style="display:none">0</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN PAGES -->
+  <div class="main">
+
+    <!-- OVERVIEW -->
+    <div id="page-overview">
+      <div class="hero-card" style="margin-bottom:1.2rem;">
+        <div class="hero-eyebrow">TUTOR DASHBOARD</div>
+        <div class="hero-title" id="heroTitle">Welcome!</div>
+        <div class="hero-sub" id="heroSub">Complete your profile to attract students.</div>
+        <div class="hero-stats">
+          <div><div class="hero-stat-n" id="statSessions">—</div><div class="hero-stat-l">Sessions</div></div>
+          <div><div class="hero-stat-n" id="statEarnings">£0</div><div class="hero-stat-l">Earned</div></div>
+          <div><div class="hero-stat-n" id="statRating">—</div><div class="hero-stat-l">Rating</div></div>
+          <div><div class="hero-stat-n" id="statReviews">—</div><div class="hero-stat-l">Reviews</div></div>
+        </div>
+      </div>
+
+      <!-- Booking requests preview -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <div class="card-head">
+          <div class="card-title">Booking Requests</div>
+          <a onclick="showPage('requests')" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
+        </div>
+        <div class="card-body" id="overviewRequests">
+          <div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>
+        </div>
+      </div>
+
+      <!-- Open subject requests preview -->
+      <div class="card" style="margin-bottom:1.2rem;">
+        <div class="card-head">
+          <div class="card-title">Open Subject Requests</div>
+          <a onclick="showPage('subjectRequests')" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
+        </div>
+        <div class="card-body" id="overviewSubjectRequests">
+          <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
+        </div>
+      </div>
+
+      <!-- Upcoming sessions preview -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Upcoming Sessions</div>
+        </div>
+        <div class="card-body" id="overviewSessions">
+          <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No upcoming sessions yet</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOOKING REQUESTS PAGE -->
+    <div id="page-requests" style="display:none;">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Booking Requests</div></div>
+        <div class="card-body" id="requestsList">
+          <div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OPEN SUBJECT REQUESTS PAGE -->
+    <div id="page-subjectRequests" style="display:none;">
+      <div class="card" style="margin-bottom:1rem;">
+        <div class="card-head"><div class="card-title">Open Subject Requests</div></div>
+        <div class="card-body" style="font-size:0.83rem;color:var(--mid);line-height:1.6;">
+          Students post subjects they need help with here. If you can teach one, click "I can offer this" — the student will be notified right away and you can confirm details by message.
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body" id="subjectRequestsList">
+          <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SESSIONS PAGE -->
+    <div id="page-sessions" style="display:none;">
+      <div class="card">
+        <div class="card-head"><div class="card-title">All Sessions</div></div>
+        <div class="card-body" id="sessionsList">
+          <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No sessions yet</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVIEWS PAGE -->
+    <div id="page-reviews" style="display:none;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Ratings & Reviews</div>
+          <div style="font-size:0.85rem;font-weight:700;" id="avgRatingDisplay"></div>
+        </div>
+        <div class="card-body" id="reviewsList">
+          <div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-text">No reviews yet</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS PAGE -->
+    <div id="page-notifications" style="display:none;">
+      <div class="card">
+        <div class="card-head"><div class="card-title">Notifications</div></div>
+        <div class="card-body" id="notifsList">
+          <div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-text">No notifications yet</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const _sb = window.supabase.createClient(
+  'https://orghkbbohnabcietidiv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
+);
+
+let userId = null;
+let tutorName = 'Tutor';
+let tutorSubjects = [];
+
+// ── NAVIGATION ──
+function showPage(id, el) {
+  document.querySelectorAll('.main > div[id^="page-"]').forEach(p => p.style.display = 'none');
+  document.getElementById('page-' + id).style.display = 'block';
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+
+// ── INIT ──
+async function init() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.href = 'signin.html'; return; }
+  userId = session.user.id;
+  const meta = session.user.user_metadata || {};
+  if (meta.role === 'student') { window.location.href = 'student-dashboard.html'; return; }
+
+  const { data: p } = await _sb.from('users').select('*').eq('id', userId).single();
+  const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', userId).single();
+
+  const fullName = (p && p.full_name) || (meta.full_name) || 'Tutor';
+  const firstName = fullName.split(' ')[0];
+  const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+  tutorName = fullName;
+  tutorSubjects = Array.isArray(tp?.subjects) ? tp.subjects : [];
+
+  // Sidebar profile
+  const av = document.getElementById('sideAv');
+  if (tp && tp.avatar_url) av.innerHTML = `<img src="${tp.avatar_url}" alt="${fullName}">`;
+  else av.textContent = initials;
+  document.getElementById('sideName').textContent = fullName;
+  const subjects = Array.isArray(tp?.subjects) ? tp.subjects : [];
+  const rate = tp?.hourly_rate ? '£' + tp.hourly_rate + '/hr' : '';
+  document.getElementById('sideSub').textContent = [subjects.slice(0, 2).join(', '), rate].filter(Boolean).join(' · ') || 'Complete your profile';
+
+  // Hero
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('heroTitle').textContent = greeting + ', ' + firstName + '!';
+  document.getElementById('heroSub').textContent = subjects.length > 0 ? 'Teaching: ' + subjects.join(', ') + (rate ? ' · ' + rate : '') : 'Complete your profile to attract students.';
+  document.title = firstName + "'s Dashboard — UniSkilled";
+
+  await loadAll();
+
+  // Realtime notifications
+  _sb.channel('notifs-' + userId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userId}` },
+      async () => await loadAll())
+    .subscribe();
+
+  // Realtime session requests
+  _sb.channel('sessions-' + userId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'sessions', filter: `tutor_id=eq.${userId}` },
+      async () => await loadAll())
+    .subscribe();
+
+  // Realtime open subject requests (visible to all tutors, no filter)
+  _sb.channel('subject-requests')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'subject_requests' },
+      async () => await loadSubjectRequests())
+    .subscribe();
+}
+
+async function loadAll() {
+  await Promise.all([loadRequests(), loadSubjectRequests(), loadSessions(), loadReviews(), loadNotifications()]);
+}
+
+// ── REQUESTS ──
+async function loadRequests() {
+  const { data } = await _sb.from('sessions').select('*').eq('tutor_id', userId).eq('status', 'pending').order('created_at', { ascending: false });
+  const requests = data || [];
+
+  // Badge
+  const badge = document.getElementById('badgeRequests');
+  if (requests.length > 0) { badge.textContent = requests.length; badge.style.display = 'block'; }
+  else badge.style.display = 'none';
+
+  const html = requests.length === 0
+    ? '<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>'
+    : requests.map(r => `
+      <div class="request-row">
+        <div class="request-header">
+          <div>
+            <div class="request-name">${r.student_name || 'Student'}</div>
+            <div class="request-subject">Subject: <strong>${r.subject || '—'}</strong></div>
+          </div>
+          <span style="font-size:0.75rem;color:var(--mid);">${r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : ''} ${r.scheduled_time ? r.scheduled_time.slice(0,5) : ''}</span>
+        </div>
+        <div class="request-meta">
+          📋 ${r.duration_minutes || 60} min · ${r.format || 'Online'} 
+          ${r.notes ? ' · "' + r.notes.slice(0, 60) + '"' : ''}
+        </div>
+        <div class="request-actions">
+          <button class="btn-accept" onclick="respond('${r.id}','confirmed','${r.student_id}','${(r.student_name||'').replace(/'/g,"\\'")}','${(r.subject||'').replace(/'/g,"\\'")}')">✓ Accept</button>
+          <button class="btn-decline" onclick="respond('${r.id}','declined','${r.student_id}','${(r.student_name||'').replace(/'/g,"\\'")}','${(r.subject||'').replace(/'/g,"\\'")}')">✗ Decline</button>
+          <button class="btn-msg" onclick="window.location.href='messages.html?with=${r.student_id}'">💬</button>
+        </div>
+      </div>`).join('');
+
+  document.getElementById('requestsList').innerHTML = html;
+  document.getElementById('overviewRequests').innerHTML = requests.length === 0
+    ? '<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>'
+    : html;
+}
+
+window.respond = async function(sessionId, status, studentId, studentName, subject) {
+  await _sb.from('sessions').update({ status }).eq('id', sessionId);
+  await _sb.from('notifications').insert({
+    user_id: studentId,
+    type: 'booking_' + status,
+    title: status === 'confirmed' ? '✅ Session confirmed!' : '❌ Session declined',
+    body: status === 'confirmed' ? 'Your ' + subject + ' session has been confirmed!' : 'Your ' + subject + ' session request was declined.',
+    link: 'student-dashboard.html', read: false
+  });
+  await loadAll();
+};
+
+// ── OPEN SUBJECT REQUESTS (students post; any tutor can offer to teach) ──
+function renderSubjectRequestRow(r) {
+  const isMatch = tutorSubjects.some(s => s.toLowerCase() === (r.subject || '').toLowerCase());
+  const safeName = (r.student_name || 'A student').replace(/'/g, "\\'");
+  const safeSubject = (r.subject || '').replace(/'/g, "\\'");
+  return `
+    <div class="request-row">
+      <div class="request-header">
+        <div>
+          <div class="request-name">${r.subject}${isMatch ? ' <span style="background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:6px;">Matches your subjects</span>' : ''}</div>
+          <div class="request-subject">Requested by ${r.student_name || 'a student'}${r.level ? ' · ' + r.level : ''}${r.frequency ? ' · ' + r.frequency : ''}</div>
+        </div>
+        <span style="font-size:0.75rem;color:var(--mid);">${new Date(r.created_at).toLocaleDateString()}</span>
+      </div>
+      ${r.notes ? `<div class="request-meta">💬 "${r.notes.slice(0, 160)}${r.notes.length > 160 ? '…' : ''}"</div>` : ''}
+      ${r.language ? `<div class="request-meta">🌍 ${r.language}</div>` : ''}
+      <div class="request-actions">
+        <button class="btn-accept" onclick="acceptSubjectRequest('${r.id}','${r.student_id}','${safeName}','${safeSubject}')">✓ I can offer this</button>
+        <button class="btn-msg-wide" onclick="window.location.href='messages.html?with=${r.student_id}'">💬 Message first</button>
+      </div>
+    </div>`;
+}
+
+async function loadSubjectRequests() {
+  const { data } = await _sb.from('subject_requests').select('*').eq('status', 'open').order('created_at', { ascending: false });
+  const reqs = data || [];
+
+  const badge = document.getElementById('badgeSubjectRequests');
+  if (reqs.length > 0) { badge.textContent = reqs.length; badge.style.display = 'block'; }
+  else badge.style.display = 'none';
+
+  const emptyHtml = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>';
+
+  document.getElementById('subjectRequestsList').innerHTML = reqs.length === 0
+    ? emptyHtml
+    : reqs.map(renderSubjectRequestRow).join('');
+
+  document.getElementById('overviewSubjectRequests').innerHTML = reqs.length === 0
+    ? emptyHtml
+    : reqs.slice(0, 3).map(renderSubjectRequestRow).join('');
+}
+
+window.acceptSubjectRequest = async function(requestId, studentId, studentName, subject) {
+  const { data, error } = await _sb.from('subject_requests').update({
+    status: 'accepted',
+    accepted_tutor_id: userId,
+    accepted_tutor_name: tutorName,
+    accepted_at: new Date().toISOString()
+  }).eq('id', requestId).eq('status', 'open').select(); // guard: only matches if still open (first-accept-wins)
+
+  if (error) { alert('Could not accept this request: ' + error.message); return; }
+  if (!data || data.length === 0) {
+    alert('Another tutor already accepted this request.');
+    await loadSubjectRequests();
+    return;
+  }
+
+  await _sb.from('notifications').insert({
+    user_id: studentId,
+    type: 'request_accepted',
+    title: '🎉 A tutor found you!',
+    body: tutorName + ' can help with ' + subject + '. Send them a message to set up your first session.',
+    link: 'tutor-profile.html?id=' + userId,
+    read: false
+  });
+
+  await loadSubjectRequests();
+  window.location.href = 'messages.html?with=' + studentId;
+};
+
+// ── SESSIONS ──
+async function loadSessions() {
+  const { data } = await _sb.from('sessions').select('*').eq('tutor_id', userId).order('created_at', { ascending: false });
+  const sessions = (data || []).filter(s => s.status !== 'pending');
+  const upcoming = sessions.filter(s => s.status === 'confirmed');
+
+  document.getElementById('statSessions').textContent = sessions.length || '—';
+  const earnings = sessions.filter(s => s.status === 'completed').reduce((a, s) => a + (s.price || 0), 0);
+  document.getElementById('statEarnings').textContent = '£' + earnings;
+
+  const sessionHtml = s => {
+    const ini = (s.student_name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+    const date = s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+    const badgeClass = s.status === 'confirmed' ? 'badge-confirmed' : s.status === 'completed' ? 'badge-completed' : 'badge-pending';
+    return `<div class="session-row">
+      <div class="session-av">${ini}</div>
+      <div class="session-info">
+        <div class="session-name">${s.student_name || 'Student'}</div>
+        <div class="session-sub">${s.subject || '—'} ${date ? '· ' + date : ''} ${s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) : ''}</div>
+      </div>
+      <span class="badge ${badgeClass}">${s.status}</span>
+    </div>`;
+  };
+
+  document.getElementById('sessionsList').innerHTML = sessions.length === 0
+    ? '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No sessions yet</div></div>'
+    : sessions.map(sessionHtml).join('');
+
+  document.getElementById('overviewSessions').innerHTML = upcoming.length === 0
+    ? '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No upcoming sessions</div></div>'
+    : upcoming.slice(0, 3).map(sessionHtml).join('');
+}
+
+// ── REVIEWS ──
+async function loadReviews() {
+  const { data } = await _sb.from('reviews').select('*').eq('tutor_id', userId).order('created_at', { ascending: false });
+  const reviews = data || [];
+  document.getElementById('statReviews').textContent = reviews.length || '—';
+  if (reviews.length > 0) {
+    const avg = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
+    document.getElementById('statRating').textContent = avg;
+    document.getElementById('avgRatingDisplay').textContent = '⭐ ' + avg + ' (' + reviews.length + ')';
+    document.getElementById('reviewsList').innerHTML = reviews.map(r => `
+      <div class="review-row">
+        <div class="review-header">
+          <span class="review-name">${r.student_name || 'Student'}</span>
+          <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
+        </div>
+        <div style="font-size:0.7rem;color:var(--light);margin-bottom:0.4rem;">${new Date(r.created_at).toLocaleDateString()}</div>
+        <div class="review-text">${r.comment || ''}</div>
+      </div>`).join('');
+  }
+}
+
+// ── NOTIFICATIONS ──
+async function loadNotifications() {
+  const { data } = await _sb.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(20);
+  const notifs = data || [];
+  const unread = notifs.filter(n => !n.read).length;
+
+  const badge = document.getElementById('badgeNotifs');
+  if (unread > 0) { badge.textContent = unread; badge.style.display = 'block'; }
+  else badge.style.display = 'none';
+
+  if (notifs.length === 0) return;
+
+  // Mark all as read when notifications page is shown
+  await _sb.from('notifications').update({ read: true }).eq('user_id', userId);
+
+  const typeIcons = { booking_request: '📥', booking_confirmed: '✅', booking_declined: '❌', new_message: '💬', new_review: '⭐' };
+
+  document.getElementById('notifsList').innerHTML = notifs.map(n => `
+    <div class="notif-row ${n.read ? '' : 'unread'}" onclick="if('${n.link}')window.location.href='${n.link}'">
+      <div class="notif-ico">${typeIcons[n.type] || '🔔'}</div>
+      <div class="notif-info">
+        <div class="notif-title">${n.title || ''}</div>
+        <div class="notif-body">${n.body || ''}</div>
+        <div class="notif-time">${new Date(n.created_at).toLocaleString()}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── UNREAD MESSAGES ──
+async function loadMessageBadge() {
+  const { data } = await _sb.from('messages').select('id').eq('receiver_id', userId).eq('read', false);
+  const count = (data || []).length;
+  const badge = document.getElementById('badgeMessages');
+  if (count > 0) { badge.textContent = count; badge.style.display = 'block'; }
+  else badge.style.display = 'none';
+}
+
+function toggleNav(btn) {
+  const n = document.getElementById('mobileNav');
+  const o = n.style.display === 'flex';
+  n.style.display = o ? 'none' : 'flex';
+  btn.textContent = o ? '☰' : '✕';
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
