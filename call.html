@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniSkilled · Session</title>
+<script src="https://meet.jit.si/external_api.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Manrope', sans-serif; background: #0b1220; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+.call-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 1.2rem; height: 50px; background: #0b1f4a; flex-shrink: 0;
+}
+.call-brand { display: flex; align-items: center; gap: 8px; color: #fff; font-weight: 800; font-size: 0.9rem; }
+.call-logo { width: 26px; height: 26px; background: #1a6bff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: #fff; }
+.call-title { color: rgba(255,255,255,0.75); font-size: 0.82rem; font-weight: 600; }
+.leave-btn { background: #dc2626; border: none; color: #fff; padding: 0.4rem 1rem; border-radius: 7px; font-family: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+.leave-btn:hover { background: #b91c1c; }
+
+#jitsiContainer { flex: 1; width: 100%; }
+
+.loading-screen {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #fff; gap: 1rem;
+}
+.loading-screen .spinner {
+  width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: #1a6bff; border-radius: 50%; animation: spin 0.9s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-screen p { font-size: 0.9rem; color: rgba(255,255,255,0.6); }
+</style>
+</head>
+<body>
+
+<nav class="call-nav">
+  <div class="call-brand">
+    <div class="call-logo">U</div>
+    UniSkilled
+  </div>
+  <div class="call-title" id="callTitle">Loading session...</div>
+  <button class="leave-btn" onclick="leaveCall()">Leave call ✕</button>
+</nav>
+
+<div id="loadingScreen" class="loading-screen">
+  <div class="spinner"></div>
+  <p>Connecting to session room…</p>
+</div>
+
+<div id="jitsiContainer" style="display:none;"></div>
+
+<script>
+// Read params from URL
+const params = new URLSearchParams(window.location.search);
+const room = params.get('room');
+const name = params.get('name') || 'User';
+const subject = params.get('subject') || 'Session';
+const other = params.get('with') || '';
+
+// Set title
+document.getElementById('callTitle').textContent =
+  '📹 ' + subject + (other ? ' · with ' + other : '');
+document.title = subject + ' · UniSkilled';
+
+if (!room) {
+  document.getElementById('loadingScreen').innerHTML =
+    '<p style="color:#dc2626">Invalid session link. Please go back and try again.</p>';
+} else {
+  // Small delay so the page renders before Jitsi loads
+  setTimeout(() => {
+    const container = document.getElementById('jitsiContainer');
+    container.style.display = 'block';
+    document.getElementById('loadingScreen').style.display = 'none';
+
+    const api = new JitsiMeetExternalAPI('meet.jit.si', {
+      roomName: room,
+      parentNode: container,
+      width: '100%',
+      height: '100%',
+      userInfo: { displayName: decodeURIComponent(name) },
+      configOverwrite: {
+        startWithAudioMuted: false,
+        startWithVideoMuted: false,
+        prejoinPageEnabled: false,
+        disableDeepLinking: true,
+        enableWelcomePage: false,
+        enableClosePage: false,
+      },
+      interfaceConfigOverwrite: {
+        SHOW_JITSI_WATERMARK: false,
+        SHOW_WATERMARK_FOR_GUESTS: false,
+        TOOLBAR_BUTTONS: [
+          'microphone', 'camera', 'desktop', 'fullscreen',
+          'hangup', 'chat', 'tileview', 'raisehand'
+        ],
+        HIDE_INVITE_MORE_HEADER: true,
+      }
+    });
+
+    api.on('readyToClose', () => leaveCall());
+    api.on('videoConferenceLeft', () => leaveCall());
+  }, 300);
+}
+
+function leaveCall() {
+  // Go back to whichever dashboard sent us here
+  const from = params.get('from') || 'index.html';
+  window.location.href = from;
+}
+</script>
+</body>
+</html>
