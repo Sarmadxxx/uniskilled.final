@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Legal — UniSkilled</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#1a6bff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;
+  --border:#e5e7eb;--off:#f9fafb;--green:#059669;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-height:1.75;overflow-x:hidden}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;height:62px;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:800;font-size:1rem;color:var(--ink);}
+.logo-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.82rem;font-weight:800;}
+.nav-back{font-size:.83rem;font-weight:600;color:var(--mid);text-decoration:none;display:flex;align-items:center;gap:5px;}
+.nav-back:hover{color:var(--blue);}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0b1f4a 0%,#1a3a8a 100%);padding:4rem 5% 3rem;color:#fff;}
+.hero h1{font-size:2rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.5rem;}
+.hero p{color:rgba(255,255,255,.65);font-size:.9rem;}
+.hero-updated{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);border-radius:100px;padding:.25rem .85rem;font-size:.75rem;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:1.2rem;}
+
+/* LAYOUT */
+.container{max-width:900px;margin:0 auto;padding:3rem 5%;}
+.toc{background:var(--off);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:2.5rem;}
+.toc h3{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--light);margin-bottom:1rem;}
+.toc ol{padding-left:1.2rem;}
+.toc li{margin-bottom:.35rem;}
+.toc a{color:var(--blue);text-decoration:none;font-size:.87rem;font-weight:600;}
+.toc a:hover{text-decoration:underline;}
+
+/* SECTIONS */
+.legal-section{margin-bottom:3rem;padding-bottom:3rem;border-bottom:1px solid var(--border);}
+.legal-section:last-child{border-bottom:none;}
+.section-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);margin-bottom:.5rem;}
+.legal-section h2{font-size:1.35rem;font-weight:800;letter-spacing:-.02em;margin-bottom:1.2rem;scroll-margin-top:80px;}
+.legal-section h3{font-size:1rem;font-weight:700;margin:1.4rem 0 .5rem;}
+.legal-section p{color:var(--ink2);margin-bottom:.9rem;font-size:.9rem;}
+.legal-section ul,.legal-section ol{color:var(--ink2);margin:.5rem 0 .9rem 1.4rem;font-size:.9rem;}
+.legal-section li{margin-bottom:.35rem;}
+
+/* CALLOUT BOXES */
+.callout{border-radius:10px;padding:1rem 1.2rem;margin:1.2rem 0;font-size:.87rem;}
+.callout-blue{background:#eff6ff;border-left:3px solid var(--blue);}
+.callout-green{background:#ecfdf5;border-left:3px solid var(--green);}
+.callout-amber{background:#fffbeb;border-left:3px solid #d97706;}
+.callout strong{display:block;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;color:var(--mid);}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.85rem;}
+.data-table th{text-align:left;padding:.65rem .9rem;background:var(--off);border:1px solid var(--border);font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mid);}
+.data-table td{padding:.65rem .9rem;border:1px solid var(--border);color:var(--ink2);vertical-align:top;}
+.data-table tr:hover td{background:#fafbfc;}
+
+/* IMPRESSUM CARD */
+.impressum-card{background:var(--off);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin:1rem 0;}
+.impressum-card .row{display:flex;gap:.5rem;margin-bottom:.5rem;font-size:.88rem;}
+.impressum-card .lbl{font-weight:700;color:var(--mid);min-width:140px;flex-shrink:0;}
+.impressum-card .val{color:var(--ink2);}
+
+/* FOOTER */
+.legal-footer{background:var(--off);border-top:1px solid var(--border);padding:2rem 5%;text-align:center;}
+.legal-footer p{font-size:.82rem;color:var(--mid);}
+.legal-footer a{color:var(--blue);text-decoration:none;}
+
+@media(max-width:600px){
+  .hero h1{font-size:1.5rem;}
+  .impressum-card .row{flex-direction:column;gap:.1rem;}
+  .impressum-card .lbl{min-width:auto;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <div class="logo-icon">U</div>
+    UniSkilled
+  </a>
+  <a href="index.html" class="nav-back">← Back to home</a>
+</nav>
+
+<div class="hero">
+  <div class="hero-updated">Last updated: 11 July 2026</div>
+  <h1>Legal Information</h1>
+  <p>Terms of Service · Privacy Policy · Cookie Policy · Refund Policy · Impressum</p>
+</div>
+
+<div class="container">
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h3>Contents</h3>
+    <ol>
+      <li><a href="#impressum">Impressum (Legal Notice)</a></li>
+      <li><a href="#terms">Terms of Service</a></li>
+      <li><a href="#privacy">Privacy Policy (GDPR)</a></li>
+      <li><a href="#cookies">Cookie Policy</a></li>
+      <li><a href="#refund">Refund &amp; Cancellation Policy</a></li>
+      <li><a href="#payment">Payment Terms</a></li>
+      <li><a href="#conduct">Community Guidelines &amp; Acceptable Use</a></li>
+      <li><a href="#dispute">Dispute Resolution</a></li>
+    </ol>
+  </div>
+
+  <!-- ── 1. IMPRESSUM ── -->
+  <div class="legal-section" id="impressum">
+    <div class="section-label">§ 5 DDG — Mandatory in Germany</div>
+    <h2>Impressum (Legal Notice)</h2>
+
+    <div class="callout callout-amber">
+      <strong>Action required</strong>
+      Replace the bracketed fields below with your real legal details before publishing. An incomplete Impressum can result in fines up to €50,000 and formal warning letters (Abmahnungen) under German law.
+    </div>
+
+    <div class="impressum-card">
+      <div class="row"><span class="lbl">Service name</span><span class="val">UniSkilled</span></div>
+      <div class="row"><span class="lbl">Operator</span><span class="val">[YOUR FULL LEGAL NAME or COMPANY NAME]</span></div>
+      <div class="row"><span class="lbl">Legal form</span><span class="val">[e.g. Einzelunternehmen / UG (haftungsbeschränkt) / GmbH]</span></div>
+      <div class="row"><span class="lbl">Postal address</span><span class="val">[Street and house number]<br>[Postcode City], Germany</span></div>
+      <div class="row"><span class="lbl">Email</span><span class="val">info@uniskilled.com</span></div>
+      <div class="row"><span class="lbl">Phone</span><span class="val">[Your phone number — required as second rapid contact method]</span></div>
+      <div class="row"><span class="lbl">VAT ID</span><span class="val">[DE followed by 9 digits — obtain from Finanzamt once registered]</span></div>
+      <div class="row"><span class="lbl">Trade register</span><span class="val">[e.g. Amtsgericht Berlin-Charlottenburg, HRB XXXXXX — if registered]</span></div>
+      <div class="row"><span class="lbl">Responsible for content (§ 18 Abs. 2 MStV)</span><span class="val">[Your Full Name], [Address above]</span></div>
+    </div>
+
+    <h3>Supervisory Authority</h3>
+    <p>UniSkilled is not subject to a sector-specific supervisory authority. Data protection matters are handled by the competent German state data protection authority (Datenschutzaufsichtsbehörde) for the operator's place of business.</p>
+  </div>
+
+  <!-- ── 2. TERMS OF SERVICE ── -->
+  <div class="legal-section" id="terms">
+    <div class="section-label">Last updated: 11 July 2026</div>
+    <h2>Terms of Service</h2>
+
+    <h3>1. About UniSkilled</h3>
+    <p>UniSkilled ("we", "us", "the platform") is an online marketplace that connects university students offering tutoring services ("Tutors") with individuals seeking tutoring ("Students"). UniSkilled acts as an intermediary platform only — we are not a party to the tutoring contract between Tutors and Students, and we do not employ Tutors.</p>
+
+    <h3>2. Eligibility</h3>
+    <p>To use UniSkilled you must:</p>
+    <ul>
+      <li>Be at least 18 years of age, or have verified parental/guardian consent</li>
+      <li>Be enrolled at or recently graduated from a recognised university (for Tutor accounts)</li>
+      <li>Provide accurate, current, and complete information during registration</li>
+      <li>Not be barred from using our services under applicable law</li>
+    </ul>
+
+    <h3>3. Account Registration</h3>
+    <p>You are responsible for maintaining the confidentiality of your login credentials and for all activity under your account. You must notify us immediately at <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> if you become aware of any unauthorised use of your account.</p>
+    <p>We reserve the right to suspend or terminate accounts that violate these Terms, contain false information, or engage in harmful behaviour.</p>
+
+    <h3>4. Tutor Responsibilities</h3>
+    <ul>
+      <li>Tutors represent that their qualifications, university affiliation, and subject expertise are accurate</li>
+      <li>Tutors are independent contractors, not employees of UniSkilled</li>
+      <li>Tutors are responsible for their own tax obligations, including income tax and VAT where applicable</li>
+      <li>Tutors must conduct sessions professionally, on time, and as agreed with Students</li>
+      <li>Tutors must not share session recording links, personal contact details, or payment links outside the platform during the initial booking process</li>
+    </ul>
+
+    <h3>5. Student Responsibilities</h3>
+    <ul>
+      <li>Students must attend booked sessions at the agreed time or cancel with adequate notice (see Refund Policy)</li>
+      <li>Students must treat Tutors with respect and not engage in harassment, discrimination, or abusive communication</li>
+      <li>Students must not attempt to circumvent the platform to arrange unpaid sessions with Tutors they found on UniSkilled</li>
+    </ul>
+
+    <h3>6. Platform Rules</h3>
+    <p>The following are strictly prohibited on UniSkilled:</p>
+    <ul>
+      <li>Impersonating another person or institution</li>
+      <li>Submitting false reviews or manipulating rating systems</li>
+      <li>Using the platform for academic fraud (e.g. contract cheating, essay writing services)</li>
+      <li>Sharing or soliciting personal financial information</li>
+      <li>Any unlawful, harmful, or offensive conduct</li>
+    </ul>
+
+    <h3>7. Platform Role and Liability Limitation</h3>
+    <p>UniSkilled provides a technology platform to facilitate connections between Tutors and Students. We do not guarantee the quality, safety, legality, or accuracy of any content posted by users, nor the ability of Tutors to teach or Students to learn.</p>
+    <p>To the fullest extent permitted by applicable law, UniSkilled's liability for damages arising from platform use is limited to the fees paid by the user to UniSkilled in the three months preceding the event giving rise to the claim. This limitation does not apply to damages arising from intentional misconduct or gross negligence, or to liability that cannot be limited under German law (including the German Civil Code §§ 305–310 on standard terms).</p>
+
+    <h3>8. Intellectual Property</h3>
+    <p>All platform content, design, code, and branding are the property of UniSkilled or its licensors. Users grant UniSkilled a non-exclusive, royalty-free licence to display content they submit (such as tutor profiles and reviews) for the purpose of operating the platform.</p>
+
+    <h3>9. Termination</h3>
+    <p>Either party may terminate the user relationship at any time. Users may delete their account by contacting <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>. We may suspend or terminate accounts for violations of these Terms. Termination does not affect any rights or obligations that arose before the termination date.</p>
+
+    <h3>10. Changes to Terms</h3>
+    <p>We may update these Terms at any time. Material changes will be communicated to registered users by email at least 14 days before taking effect. Continued use of the platform after that date constitutes acceptance of the revised Terms.</p>
+
+    <h3>11. Governing Law</h3>
+    <p>These Terms are governed by the law of the Federal Republic of Germany. The UN Convention on Contracts for the International Sale of Goods (CISG) does not apply. For consumers within the EU, mandatory consumer protection provisions of your country of residence also apply.</p>
+  </div>
+
+  <!-- ── 3. PRIVACY POLICY ── -->
+  <div class="legal-section" id="privacy">
+    <div class="section-label">GDPR — Regulation (EU) 2016/679</div>
+    <h2>Privacy Policy (Datenschutzerklärung)</h2>
+
+    <div class="callout callout-blue">
+      <strong>Your rights</strong>
+      Under GDPR you have the right to access, correct, delete, restrict, and port your personal data, and to object to its processing. Contact us at <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> to exercise any of these rights. You may also lodge a complaint with your national supervisory authority.
+    </div>
+
+    <h3>1. Controller</h3>
+    <p>The data controller responsible for your personal data is the operator identified in the Impressum above. Contact: <a href="mailto:info@uniskilled.com">info@uniskilled.com</a></p>
+
+    <h3>2. Data We Collect</h3>
+    <table class="data-table">
+      <thead><tr><th>Category</th><th>Examples</th><th>Legal Basis (GDPR Art. 6)</th></tr></thead>
+      <tbody>
+        <tr><td>Account data</td><td>Name, email address, password (hashed), role (tutor/student)</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>Profile data</td><td>University, degree, subjects, bio, photo, availability, hourly rate</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>Transaction data</td><td>Booking history, session status, payment records</td><td>Art. 6(1)(b) — contract; Art. 6(1)(c) — legal obligation</td></tr>
+        <tr><td>Communication data</td><td>Messages sent via platform, notifications</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>Technical data</td><td>IP address, browser type, session timestamps</td><td>Art. 6(1)(f) — legitimate interest (security, fraud prevention)</td></tr>
+        <tr><td>Reviews &amp; ratings</td><td>Written reviews, star ratings</td><td>Art. 6(1)(b) — contract performance</td></tr>
+      </tbody>
+    </table>
+
+    <h3>3. How We Use Your Data</h3>
+    <ul>
+      <li>To create and manage your account</li>
+      <li>To match students with tutors and facilitate bookings</li>
+      <li>To send transactional emails (booking confirmations, notifications)</li>
+      <li>To display tutor profiles publicly on the platform</li>
+      <li>To process payments and maintain financial records</li>
+      <li>To detect, prevent, and investigate fraud and abuse</li>
+      <li>To comply with legal obligations (e.g. tax, regulatory)</li>
+    </ul>
+
+    <h3>4. Third-Party Processors</h3>
+    <p>We work with the following sub-processors who may process your personal data:</p>
+    <table class="data-table">
+      <thead><tr><th>Provider</th><th>Purpose</th><th>Location</th></tr></thead>
+      <tbody>
+        <tr><td>Supabase (via AWS eu-north-1)</td><td>Database, authentication, file storage</td><td>EU (Stockholm)</td></tr>
+        <tr><td>Resend</td><td>Transactional email delivery</td><td>EU (based on sending region)</td></tr>
+        <tr><td>GitHub Pages</td><td>Static website hosting</td><td>Global CDN</td></tr>
+        <tr><td>Zoom / Google Meet</td><td>Video call sessions (link only — not controlled by UniSkilled)</td><td>Global (user's own account)</td></tr>
+        <tr><td>Google Fonts</td><td>Font delivery (Manrope typeface)</td><td>Global CDN</td></tr>
+      </tbody>
+    </table>
+    <p>All EU-based processors operate under Data Processing Agreements (DPAs) compliant with GDPR Article 28. For transfers outside the EU/EEA, Standard Contractual Clauses (SCCs) are in place.</p>
+
+    <div class="callout callout-amber">
+      <strong>Google Fonts Notice</strong>
+      Google Fonts loads from fonts.googleapis.com, which may transfer your IP address to Google's servers. To achieve full GDPR compliance in Germany, self-host the Manrope font or replace with a locally hosted alternative. This is recommended before your public launch.
+    </div>
+
+    <h3>5. Data Retention</h3>
+    <ul>
+      <li><strong>Account data:</strong> Retained for the duration of your account, plus 3 years after closure for legal purposes</li>
+      <li><strong>Financial records:</strong> 10 years (German tax law — § 147 AO)</li>
+      <li><strong>Messages:</strong> 12 months after the last message, then deleted</li>
+      <li><strong>Technical logs:</strong> 90 days</li>
+    </ul>
+
+    <h3>6. Your Rights Under GDPR</h3>
+    <ul>
+      <li><strong>Right of access (Art. 15):</strong> Request a copy of your personal data</li>
+      <li><strong>Right to rectification (Art. 16):</strong> Correct inaccurate data</li>
+      <li><strong>Right to erasure (Art. 17):</strong> Request deletion of your data ("right to be forgotten")</li>
+      <li><strong>Right to restriction (Art. 18):</strong> Limit how we process your data</li>
+      <li><strong>Right to portability (Art. 20):</strong> Receive your data in a machine-readable format</li>
+      <li><strong>Right to object (Art. 21):</strong> Object to processing based on legitimate interest</li>
+      <li><strong>Right to withdraw consent:</strong> Where processing is consent-based, withdraw at any time</li>
+    </ul>
+    <p>To exercise any right, contact <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>. We will respond within 30 days. You also have the right to lodge a complaint with your national data protection authority. In Germany: <a href="https://www.bfdi.bund.de" target="_blank">Bundesbeauftragte für den Datenschutz und die Informationsfreiheit (BfDI)</a>.</p>
+
+    <h3>7. Data Breach Notification</h3>
+    <p>In the event of a personal data breach likely to result in risk to your rights and freedoms, we will notify the competent supervisory authority within 72 hours and, where required, notify affected users without undue delay, in accordance with GDPR Article 33–34.</p>
+  </div>
+
+  <!-- ── 4. COOKIE POLICY ── -->
+  <div class="legal-section" id="cookies">
+    <div class="section-label">ePrivacy Directive &amp; GDPR</div>
+    <h2>Cookie Policy</h2>
+
+    <p>UniSkilled uses cookies and similar technologies. Under German law and the ePrivacy Directive, non-essential cookies require your prior explicit consent. Our current cookie usage is as follows:</p>
+
+    <table class="data-table">
+      <thead><tr><th>Cookie / Technology</th><th>Type</th><th>Purpose</th><th>Duration</th><th>Consent required?</th></tr></thead>
+      <tbody>
+        <tr><td>Supabase auth token</td><td>Essential</td><td>Keeps you logged in — required for the platform to function</td><td>Session / 7 days (if "Keep me signed in")</td><td>No — strictly necessary</td></tr>
+        <tr><td>localStorage (session data)</td><td>Essential</td><td>Stores authentication state in the browser</td><td>Session</td><td>No — strictly necessary</td></tr>
+        <tr><td>Google Fonts</td><td>Functional</td><td>Loads the Manrope typeface from Google's CDN</td><td>1 year</td><td>Yes — transfers IP to Google</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-green">
+      <strong>Good news</strong>
+      UniSkilled currently does not use advertising cookies, marketing trackers, or analytics tools (such as Google Analytics). This minimises your compliance burden significantly.
+    </div>
+
+    <p>You can manage or delete cookies through your browser settings at any time. Note that disabling essential cookies will prevent you from using the platform. Instructions for common browsers:</p>
+    <ul>
+      <li><a href="https://support.google.com/chrome/answer/95647" target="_blank">Google Chrome</a></li>
+      <li><a href="https://support.mozilla.org/en-US/kb/cookies-information-websites-store-on-your-computer" target="_blank">Mozilla Firefox</a></li>
+      <li><a href="https://support.apple.com/guide/safari/manage-cookies-sfri11471" target="_blank">Apple Safari</a></li>
+    </ul>
+  </div>
+
+  <!-- ── 5. REFUND & CANCELLATION ── -->
+  <div class="legal-section" id="refund">
+    <div class="section-label">Consumer Rights Directive 2011/83/EU</div>
+    <h2>Refund &amp; Cancellation Policy</h2>
+
+    <div class="callout callout-blue">
+      <strong>EU Statutory Withdrawal Right</strong>
+      EU consumers generally have a 14-day right to withdraw from distance contracts. However, for digital services that have already been fully performed with the consumer's prior express consent and acknowledgement of loss of withdrawal right, this right may not apply. By booking a session that has already taken place, you agree that the right of withdrawal is excluded in respect of that completed session.
+    </div>
+
+    <h3>Cancellation by the Student</h3>
+    <ul>
+      <li><strong>More than 24 hours before the session:</strong> 100% refund.</li>
+      <li><strong>12–24 hours before the session:</strong> 50% refund. The tutor retains 50% as compensation for reserved time.</li>
+      <li><strong>Less than 12 hours before the session, or no-show:</strong> No refund.</li>
+      <li><strong>Student did not enjoy the lesson:</strong> No refund. See "Dissatisfaction with a Session" below.</li>
+    </ul>
+
+    <h3>Cancellation by the Tutor</h3>
+    <ul>
+      <li><strong>Tutor never showed up:</strong> Student receives a 100% refund.</li>
+      <li><strong>Tutor ended the lesson significantly early without justification:</strong> Student may receive a partial or full refund at UniSkilled's discretion following investigation.</li>
+      <li>Repeated last-minute cancellations or no-shows by tutors may result in account suspension.</li>
+    </ul>
+
+    <h3>Dispute Window &amp; Tutor Payout Eligibility</h3>
+    <ul>
+      <li>Students must report any issue within <strong>24 hours</strong> of the scheduled session time.</li>
+      <li>If no dispute is raised within 24 hours, the session is considered completed and the tutor becomes eligible for payout.</li>
+      <li>If a dispute is opened within 24 hours, the payout may be temporarily delayed while UniSkilled reviews the matter.</li>
+    </ul>
+
+    <h3>Refund Process</h3>
+    <p>To request a refund, contact <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> with your booking reference. Refunds approved under this Refund Policy will be issued to the original payment method through Stripe. Depending on the payment provider and the customer's bank, refunds typically appear within 5–10 business days after being processed.</p>
+    <p>If a valid refund is approved after a tutor's payout has already been released, UniSkilled reserves the right to recover the refunded amount from the tutor's future earnings or to otherwise seek reimbursement where permitted by law.</p>
+
+    <h3>Dissatisfaction with a Session</h3>
+    <p>Tutoring outcomes are subjective and depend on many factors, including the student's preparation and participation. A refund will not be issued solely because a student was dissatisfied with the teaching style or expected a different outcome.</p>
+    <p>Refunds may only be considered where:</p>
+    <ul>
+      <li>the tutor failed to attend the session;</li>
+      <li>the tutor ended the session significantly earlier than agreed without justification;</li>
+      <li>the session could not reasonably be delivered due to technical issues caused by the tutor; or</li>
+      <li>the session was materially different from what was advertised on the tutor's profile.</li>
+    </ul>
+    <p>Students must report any issue within 24 hours of the scheduled session time by contacting <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>. UniSkilled may request supporting information before making a decision. No dispute raised after 24 hours will be considered.</p>
+
+    <h3>Payment Processing</h3>
+    <p>All payments for tutoring sessions are processed securely through Stripe. Students are charged at the time a booking is confirmed. UniSkilled securely holds the payment until the tutoring session has been completed.</p>
+    <p>Tutor earnings become available 24 hours after the scheduled session, provided no dispute has been submitted within that period. If a dispute is opened, the payout may be temporarily delayed while UniSkilled reviews the matter.</p>
+    <p>Once released, payouts are sent to the tutor's designated bank account or Stripe-supported payout method. The time required for funds to arrive depends on Stripe and the tutor's financial institution, but typically takes 3–5 business days. UniSkilled deducts any applicable platform service fees before releasing the tutor's payout. A detailed breakdown of the payment, fees, and payout amount will be available in the tutor's account.</p>
+  </div>
+
+  <!-- ── 6. PAYMENT TERMS ── -->
+  <div class="legal-section" id="payment">
+    <div class="section-label">Payment Information</div>
+    <h2>Payment Terms</h2>
+
+    <h3>Tutor Payouts</h3>
+    <p>Where UniSkilled processes payments, funds are held in escrow until the tutoring session has been completed and the dispute window has closed.</p>
+    <ul>
+      <li>Tutor earnings become available <strong>24 hours</strong> after the scheduled session end time, unless a dispute has been opened within that period.</li>
+      <li>Once available, withdrawals are processed to the tutor's chosen payout method (bank account or Stripe-supported method) within <strong>3–5 business days</strong>, depending on the payment provider and bank.</li>
+      <li>UniSkilled deducts any applicable platform service fees before releasing the payout. A full breakdown of the session fee, platform fee, and net payout will be displayed in the tutor's account.</li>
+      <li>If a valid refund is approved after a tutor's payout has already been released, UniSkilled reserves the right to recover the refunded amount from the tutor's future earnings or to otherwise seek reimbursement where permitted by law.</li>
+    </ul>
+
+    <h3>Session Fees</h3>
+    <p>UniSkilled enforces a minimum session price of <strong>€25 per hour</strong>. Tutors may not list sessions below this rate. This minimum ensures quality standards and reflects the true cost of university-level tutoring.</p>
+    <p>Tutors set their own hourly rates, displayed in their chosen currency on their profile. The rate shown is the tutor's fee for the session. UniSkilled may charge a platform service fee in addition to the tutor's rate — where applicable, this will be displayed clearly before you confirm a booking.</p>
+
+    <h3>Payment Methods</h3>
+    <p>UniSkilled currently supports payment arrangements directly between tutors and students. Supported methods include bank transfer, PayPal, and other methods agreed between the parties. Do not send cash or cryptocurrency.</p>
+
+    <h3>Invoicing &amp; VAT</h3>
+    <p>Tutors who are registered for VAT in their jurisdiction must charge VAT to students as required by applicable law. UniSkilled does not automatically collect or remit VAT on behalf of tutors. Tutors operating as businesses must issue proper invoices to students upon request.</p>
+
+    <h3>Currency</h3>
+    <p>Sessions may be priced in any currency selected by the tutor. The currency displayed on the tutor's profile is the currency in which payment is expected. Exchange rate risk lies with the party making the payment.</p>
+
+    <h3>Late Payment</h3>
+    <p>Where payment for a confirmed session is not made, the tutor may report the matter to UniSkilled. Repeated non-payment by a student may result in account suspension.</p>
+
+    <h3>Platform Fees (Future)</h3>
+    <p>UniSkilled reserves the right to introduce a platform service fee in the future. Users will be notified at least 14 days in advance of any such change, and the fee will be clearly displayed during the booking process.</p>
+  </div>
+
+  <!-- ── 7. COMMUNITY GUIDELINES ── -->
+  <div class="legal-section" id="conduct">
+    <div class="section-label">Community Standards</div>
+    <h2>Community Guidelines &amp; Acceptable Use</h2>
+
+    <h3>Zero Tolerance</h3>
+    <p>The following will result in immediate account suspension without refund:</p>
+    <ul>
+      <li>Harassment, bullying, or threats directed at any user</li>
+      <li>Discrimination based on race, gender, religion, nationality, sexual orientation, or disability</li>
+      <li>Sharing sexual, violent, or otherwise harmful content</li>
+      <li>Academic fraud — using UniSkilled to obtain work submitted as your own (contract cheating)</li>
+      <li>Attempting to move bookings off-platform to avoid fees once connected through UniSkilled</li>
+    </ul>
+
+    <h3>Reviews &amp; Ratings</h3>
+    <p>Reviews must be honest and based on your direct experience. Fake reviews, incentivised reviews, or reviews submitted by someone other than the session participant are prohibited and will be removed. UniSkilled reserves the right to remove reviews that violate these guidelines or that are subject to a valid legal complaint.</p>
+
+    <h3>Reporting</h3>
+    <p>To report a user or content that violates these guidelines, contact <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> with details of the incident. We aim to respond within 72 hours.</p>
+  </div>
+
+  <!-- ── 8. DISPUTE RESOLUTION ── -->
+  <div class="legal-section" id="dispute">
+    <div class="section-label">EU ODR Platform &amp; Consumer Rights</div>
+    <h2>Dispute Resolution</h2>
+
+    <h3>Internal Resolution</h3>
+    <p>If you have a complaint, please contact us first at <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>. We will try to resolve your issue within 14 days.</p>
+
+    <h3>EU Online Dispute Resolution</h3>
+    <p>The European Commission provides an Online Dispute Resolution (ODR) platform for resolving disputes arising from online contracts between consumers and traders. As required by EU Regulation No 524/2013, we link to this platform here:</p>
+    <p><a href="https://ec.europa.eu/consumers/odr" target="_blank">https://ec.europa.eu/consumers/odr</a></p>
+    <p>Our email address for ODR purposes: <a href="mailto:info@uniskilled.com">info@uniskilled.com</a></p>
+    <p>We are not obligated to participate in alternative dispute resolution proceedings before a consumer arbitration board and do not currently do so voluntarily.</p>
+
+    <h3>Jurisdiction</h3>
+    <p>For disputes with business customers, the courts of the operator's registered place of business in Germany have exclusive jurisdiction. For disputes with consumers, the mandatory consumer protection rules of the consumer's country of residence apply, and the consumer may bring proceedings in the courts of their domicile.</p>
+  </div>
+
+</div>
+
+<div class="legal-footer">
+  <p>© 2026 UniSkilled · <a href="legal.html">Legal</a> · <a href="mailto:info@uniskilled.com">info@uniskilled.com</a></p>
+  <p style="margin-top:.4rem;">This page was last reviewed on 11 July 2026. For legal advice specific to your situation, consult a qualified lawyer. This document does not constitute legal advice.</p>
+</div>
+
+</body>
+</html>
