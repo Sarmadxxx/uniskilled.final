@@ -440,7 +440,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="alert-bar" id="alertTeaching"></div>
       <div class="form-row">
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="25" min="1"></div>
+          <div class="form-group"><label class="form-label">Hourly rate (min. €25)</label><input type="number" class="form-input" id="inputRate" placeholder="25" min="25"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;">UniSkilled minimum session price is €25.</div></div>
           <div class="form-group"><label class="form-label">Currency</label>
             <select class="form-select" id="inputCurrency">
               <option value="GBP">£ — British Pound (GBP)</option>
@@ -844,7 +844,12 @@ async function saveAcademic() {
 }
 
 async function saveTeaching() {
-  const data = { user_id: currentUserId, hourly_rate: document.getElementById('inputRate').value ? parseFloat(document.getElementById('inputRate').value) : null, currency: document.getElementById('inputCurrency').value || 'GBP', session_length: document.getElementById('inputSessionLen').value || null, teaching_format: document.getElementById('inputFormat').value || null, preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
+  const rateVal = document.getElementById('inputRate').value ? parseFloat(document.getElementById('inputRate').value) : null;
+  if (rateVal !== null && rateVal < 25) {
+    alert('The minimum session rate on UniSkilled is €25. Please update your rate.');
+    return;
+  }
+  const data = { user_id: currentUserId, hourly_rate: rateVal, currency: document.getElementById('inputCurrency').value || 'GBP', session_length: document.getElementById('inputSessionLen').value || null, teaching_format: document.getElementById('inputFormat').value || null, preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
   const { error } = await _supabase.from('tutor_profiles').upsert(data, { onConflict: 'user_id' });
   if (error) { showAlert('alertTeaching', 'Error: ' + error.message, 'error'); return; }
   showAlert('alertTeaching', 'Saved!', 'success');
