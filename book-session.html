@@ -6,6 +6,7 @@
 <title>Book a Session — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://js.stripe.com/v3/"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1a6bff;--ink:#111827;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#fff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;}
@@ -32,6 +33,17 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 .alert.error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;display:block;}
 .alert.success{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0;display:block;}
 .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+.payment-section{margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid var(--border);}
+.payment-section h4{font-size:0.85rem;font-weight:700;color:var(--ink);margin-bottom:0.8rem;}
+.payment-box{background:#f8fafc;border:1.5px solid var(--border);border-radius:10px;padding:1rem;}
+#card-element{padding:0.7rem;background:#fff;border:1.5px solid var(--border);border-radius:8px;}
+#card-errors{color:#dc2626;font-size:0.78rem;font-weight:600;margin-top:0.5rem;min-height:18px;}
+.price-breakdown{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:0.9rem 1rem;margin-bottom:1rem;font-size:0.82rem;}
+.price-row{display:flex;justify-content:space-between;margin-bottom:0.3rem;color:#374151;}
+.price-row.total{font-weight:800;font-size:0.95rem;color:#111827;border-top:1px solid #bae6fd;padding-top:0.5rem;margin-top:0.3rem;}
+.secure-badge{display:flex;align-items:center;gap:5px;font-size:0.72rem;color:#6b7280;margin-top:0.6rem;}
+.test-cards{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:0.75rem 1rem;font-size:0.78rem;color:#92400e;margin-top:0.8rem;}
+.test-cards strong{display:block;margin-bottom:0.3rem;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .free-badge{background:var(--green-bg);color:var(--green);font-size:0.78rem;font-weight:700;padding:4px 12px;border-radius:100px;display:inline-block;margin-bottom:1rem;}
 </style>
@@ -67,7 +79,27 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
         <div style="font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:3px;" id="tutorRate"></div>
       </div>
     </div>
-    <div style="background:#ecfdf5;color:#059669;font-size:0.78rem;font-weight:700;padding:6px 14px;border-radius:100px;display:inline-block;margin-bottom:1rem;">✓ Free session booking — no payment needed</div>
+    <!-- PRICE DISPLAY -->
+    <div id="priceDisplay" style="display:none;" class="price-breakdown">
+      <div class="price-row"><span>Session fee</span><span id="priceTotal">—</span></div>
+      <div class="price-row"><span style="color:#6b7280;">Platform fee (included)</span><span id="priceFee" style="color:#6b7280;">—</span></div>
+      <div class="price-row"><span style="color:#6b7280;">Tutor receives</span><span id="priceTutor" style="color:#6b7280;">—</span></div>
+      <div class="price-row total"><span>You pay today</span><span id="priceCharge">—</span></div>
+    </div>
+
+    <!-- PAYMENT SECTION -->
+    <div class="payment-section" id="paymentSection" style="display:none;">
+      <h4>💳 Payment details</h4>
+      <div class="payment-box">
+        <div id="card-element"></div>
+        <div id="card-errors"></div>
+      </div>
+      <div class="test-cards">
+        <strong>🧪 Test mode — no real charges</strong>
+        Use card number <strong>4242 4242 4242 4242</strong>, any future date, any CVC.
+      </div>
+      <div class="secure-badge">🔒 Payments secured by Stripe. Your card details are never stored by UniSkilled.</div>
+    </div>
 
     <div id="alert" class="alert"></div>
 
@@ -108,7 +140,7 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
     </div>
 
     <button class="btn-submit" id="submitBtn" onclick="submitBooking()">
-      <span id="btnText">Request session</span>
+      <span id="btnText">Review & Pay</span>
       <div class="spinner" id="spinner"></div>
     </button>
   </div>
@@ -136,6 +168,14 @@ let tutorData=null;
 // Set min date to today
 document.getElementById('date').min=new Date().toISOString().split('T')[0];
 
+const STRIPE_PK = 'pk_test_51Tfj28AHKBfu6wG2wxfkepeQQBlrL04Te4pnq4egM2DYMuXTj7bC64ec1xgT78kMkzHBuVXZAxzpBAJi693eYBJL004IjXIPWh';
+let stripe = null;
+let cardElement = null;
+let paymentIntentClientSecret = null;
+let paymentIntentId = null;
+let sessionPayload = null; // holds the booking details while payment is confirmed
+let step = 'details'; // 'details' | 'payment' | 'done'
+
 async function init(){
   const {data:{session}}=await _sb.auth.getSession();
   if(!session){
@@ -159,11 +199,36 @@ async function init(){
   document.getElementById('tutorName').textContent=name;
   const subjects=Array.isArray(tp?.subjects)?tp.subjects:[];
   document.getElementById('tutorSubjects').textContent=subjects.join(', ')||'';
-  const sym = currSymbol(tp?.currency || 'GBP');
-  document.getElementById('tutorRate').textContent = tp?.hourly_rate ? sym+tp.hourly_rate+'/hr (free to book for now)' : 'Free to book';
+  const sym = currSymbol(tp?.currency || 'EUR');
+  const rate = tp?.hourly_rate || 0;
+  document.getElementById('tutorRate').textContent = rate ? sym + rate + '/hr' : 'Rate not set';
+
+  // Show price breakdown if rate is set
+  if (rate >= 25) {
+    const fee = parseFloat((rate * 0.18).toFixed(2));
+    const tutor = parseFloat((rate * 0.82).toFixed(2));
+    document.getElementById('priceTotal').textContent = sym + rate;
+    document.getElementById('priceFee').textContent = sym + fee + ' (18%)';
+    document.getElementById('priceTutor').textContent = sym + tutor;
+    document.getElementById('priceCharge').textContent = sym + rate;
+    document.getElementById('priceDisplay').style.display = 'block';
+  }
 
   // Pre-fill subject if only one
   if(subjects.length===1)document.getElementById('subject').value=subjects[0];
+
+  // Initialize Stripe
+  stripe = Stripe(STRIPE_PK);
+  const elements = stripe.elements();
+  cardElement = elements.create('card', {
+    style: {
+      base: { fontSize: '15px', color: '#111827', fontFamily: 'Manrope, sans-serif', '::placeholder': { color: '#9ca3af' } },
+      invalid: { color: '#dc2626' }
+    }
+  });
+  cardElement.on('change', e => {
+    document.getElementById('card-errors').textContent = e.error ? e.error.message : '';
+  });
 }
 
 async function submitBooking(){
@@ -178,108 +243,109 @@ async function submitBooking(){
   if(!date){showAlert('Please select a date.','error');return;}
   if(!time){showAlert('Please select a time.','error');return;}
 
-  // Check date is in future
   const sessionDate=new Date(date+'T'+time);
   if(sessionDate<new Date()){showAlert('Please select a future date and time.','error');return;}
 
-  setLoading(true);
+  const rate = tutorData?.hourly_rate || 0;
 
-  // Get student name
-  const {data:sp}=await _sb.from('users').select('full_name').eq('id',currentUser.id).single();
-  const studentName=sp?.full_name||'Student';
-  const tutorName=tutorData?.full_name||tutorNameParam;
-  const price = 0; // Free booking - Stripe will be added later
-
-  // Create session
-  const {data:session,error}=await _sb.from('sessions').insert({
-    tutor_id:tutorId,
-    student_id:currentUser.id,
-    tutor_name:tutorName,
-    student_name:studentName,
-    subject,
-    scheduled_date:date,
-    scheduled_time:time,
-    duration_minutes:parseInt(duration),
-    format,
-    status:'pending',
-    price,
-    notes:notes||null
-  }).select().single();
-
-  if(error){showAlert('Error: '+error.message,'error');setLoading(false);return;}
-
-  // Create notification for tutor
-  await _sb.from('notifications').insert({
-    user_id:tutorId,
-    type:'booking_request',
-    title:'New session request',
-    body:studentName+' wants to book a '+subject+' session on '+new Date(date).toLocaleDateString(),
-    link:'tutor-dashboard.html',
-    read:false
-  });
-
-  // Create/get conversation and send message
-  let convId=null;
-  const p1=currentUser.id<tutorId?currentUser.id:tutorId;
-  const p2=currentUser.id<tutorId?tutorId:currentUser.id;
-
-  const {data:existingConv}=await _sb.from('conversations')
-    .select('id').eq('participant_1',p1).eq('participant_2',p2).single();
-
-  if(existingConv){
-    convId=existingConv.id;
-  } else {
-    const {data:newConv}=await _sb.from('conversations').insert({
-      participant_1:p1,participant_2:p2,
-      participant_1_name:p1===currentUser.id?studentName:tutorName,
-      participant_2_name:p2===currentUser.id?studentName:tutorName,
-      last_message:'Session request: '+subject,
-      last_message_at:new Date().toISOString()
-    }).select().single();
-    convId=newConv?.id;
-  }
-
-  if(convId){
-    await _sb.from('messages').insert({
-      conversation_id:convId,
-      sender_id:currentUser.id,
-      receiver_id:tutorId,
-      sender_name:studentName,
-      content:'Hi! I\'d like to book a '+subject+' session on '+new Date(date).toLocaleDateString()+' at '+time+'. '+( notes?'Notes: '+notes:''),
-      read:false
-    });
-    // Update conversation last message
-    await _sb.from('conversations').update({
-      last_message:'Session request: '+subject,
-      last_message_at:new Date().toISOString()
-    }).eq('id',convId);
-  }
-
-  setLoading(false);
-  showAlert('Session request sent! Waiting for tutor confirmation.','success');
-
-  // Send confirmation email to tutor
-  try {
-    const {data:tutorUser} = await _sb.from('users').select('email').eq('id',tutorId).single();
-    if(tutorUser?.email) {
-      await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          type:'booking_request',
-          to: tutorUser.email,
-          data:{
-            tutorName, studentName, subject,
-            date: new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),
-            time, duration, format, notes:notes||''
-          }
-        })
-      });
+  // STEP 1: Show payment form
+  if (step === 'details') {
+    if (rate < 25) {
+      showAlert('This tutor has not set a valid session rate yet.','error');
+      return;
     }
-  } catch(e){ console.error('Email failed (non-critical):', e); }
+    setLoading(true);
+    const {data:sp}=await _sb.from('users').select('full_name').eq('id',currentUser.id).single();
+    const studentName=sp?.full_name||'Student';
+    const tutorName=tutorData?.full_name||tutorNameParam;
+    sessionPayload = { subject, date, time, duration, format, notes, studentName, tutorName, rate };
 
-  setTimeout(()=>window.location.href='student-dashboard.html',2000);
+    try {
+      const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/create-payment-intent', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ amount_eur:rate, currency:tutorData?.currency||'EUR', session_id:'pending', tutor_name:tutorName, student_name:studentName, subject })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.client_secret) { showAlert('Payment setup failed: '+(data.error||'Unknown error'),'error'); setLoading(false); return; }
+      paymentIntentClientSecret = data.client_secret;
+      paymentIntentId = data.payment_intent_id;
+    } catch(err) { showAlert('Network error: '+err.message,'error'); setLoading(false); return; }
+
+    document.getElementById('paymentSection').style.display='block';
+    cardElement.mount('#card-element');
+    document.getElementById('btnText').textContent='Confirm & Pay';
+    step='payment';
+    setLoading(false);
+    document.getElementById('paymentSection').scrollIntoView({behavior:'smooth',block:'center'});
+    return;
+  }
+
+  // STEP 2: Confirm payment then create session
+  if (step === 'payment') {
+    setLoading(true);
+    document.getElementById('card-errors').textContent='';
+
+    const {error:stripeError,paymentIntent}=await stripe.confirmCardPayment(paymentIntentClientSecret,{
+      payment_method:{card:cardElement}
+    });
+
+    if(stripeError){document.getElementById('card-errors').textContent=stripeError.message;setLoading(false);return;}
+    if(paymentIntent.status!=='succeeded'){showAlert('Payment was not completed. Please try again.','error');setLoading(false);return;}
+
+    const {subject,date,time,duration,format,notes,studentName,tutorName,rate}=sessionPayload;
+    const platformFee=parseFloat((rate*0.18).toFixed(2));
+    const tutorPayout=parseFloat((rate*0.82).toFixed(2));
+
+    const {data:sess,error:sessError}=await _sb.from('sessions').insert({
+      tutor_id:tutorId, student_id:currentUser.id, tutor_name:tutorName, student_name:studentName,
+      subject, scheduled_date:date, scheduled_time:time, duration_minutes:parseInt(duration),
+      format, notes:notes||null, status:'pending', price:rate,
+      payment_status:'paid', stripe_payment_intent_id:paymentIntentId
+    }).select().single();
+
+    if(sessError){showAlert('Payment succeeded but booking failed. Contact support with ref: '+paymentIntentId,'error');setLoading(false);return;}
+
+    await _sb.from('payments').insert({
+      session_id:sess.id, payer_id:currentUser.id, payee_id:tutorId,
+      type:'session', amount:rate, platform_fee:platformFee, tutor_payout:tutorPayout,
+      currency:tutorData?.currency||'EUR', stripe_payment_intent_id:paymentIntentId,
+      status:'paid', paid_at:new Date().toISOString()
+    });
+
+    // Message to tutor
+    const p1=currentUser.id<tutorId?currentUser.id:tutorId;
+    const p2=currentUser.id<tutorId?tutorId:currentUser.id;
+    const {data:existingConv}=await _sb.from('conversations').select('id').eq('participant_1',p1).eq('participant_2',p2).maybeSingle();
+    let convId=existingConv?.id;
+    if(!convId){
+      const {data:newConv}=await _sb.from('conversations').insert({
+        participant_1:p1, participant_2:p2,
+        participant_1_name:p1===currentUser.id?studentName:tutorName,
+        participant_2_name:p2===currentUser.id?studentName:tutorName,
+        last_message:'Session request: '+subject, last_message_at:new Date().toISOString()
+      }).select().single();
+      convId=newConv?.id;
+    }
+    if(convId){
+      await _sb.from('messages').insert({conversation_id:convId,sender_id:currentUser.id,receiver_id:tutorId,sender_name:studentName,content:'Hi! I\'d like to book a '+subject+' session on '+new Date(date).toLocaleDateString()+' at '+time+(notes?'. Notes: '+notes:''),read:false});
+      await _sb.from('conversations').update({last_message:'Session request: '+subject,last_message_at:new Date().toISOString()}).eq('id',convId);
+    }
+
+    await _sb.from('notifications').insert({user_id:tutorId,type:'booking_request',title:'📅 New paid booking — '+subject,body:studentName+' has paid for a '+subject+' session.',link:'tutor-dashboard.html',read:false});
+
+    try {
+      const {data:tu}=await _sb.from('users').select('email').eq('id',tutorId).single();
+      if(tu?.email) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'booking_request',to:tu.email,data:{tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time,duration,format,notes:notes||''}})});
+    } catch(e){console.error('Email failed:',e);}
+
+    step='done';
+    setLoading(false);
+    showAlert('✅ Payment confirmed! Session booked successfully.','success');
+    document.getElementById('submitBtn').style.display='none';
+    setTimeout(()=>window.location.href='student-dashboard.html',2500);
+  }
 }
+
 
 function showAlert(msg,type){
   const el=document.getElementById('alert');
