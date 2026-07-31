@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — UniSkilled</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;}
+body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;}
+nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:200;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
+.logo-icon{width:32px;height:32px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.9rem;}
+.nav-links{display:flex;align-items:center;gap:0.4rem;}
+.nav-link{font-size:0.83rem;font-weight:600;color:var(--mid);text-decoration:none;padding:0.45rem 0.8rem;border-radius:8px;}
+.nav-link:hover{background:var(--off);}
+.nav-cta{font-size:0.83rem;font-weight:700;background:var(--blue);color:#fff;text-decoration:none;padding:0.45rem 1.1rem;border-radius:8px;}
+.nav-burger{display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--ink);}
+.mobile-nav{display:none;position:fixed;top:62px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:199;padding:1rem;flex-direction:column;gap:0.5rem;}
+.mobile-nav a{display:block;padding:0.75rem 1rem;font-weight:600;color:var(--ink);text-decoration:none;border-radius:10px;background:var(--off);}
+.cover-wrap{position:relative;height:180px;background:linear-gradient(135deg,#059669,#1a6bff,#7c3aed);overflow:hidden;}
+.cover-img{width:100%;height:100%;object-fit:cover;}
+.cover-edit{position:absolute;bottom:12px;right:16px;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:'Manrope',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;}
+.cover-edit:hover{background:rgba(0,0,0,0.7);}
+.profile-header{background:#fff;border-bottom:1px solid var(--border);padding:0 5% 1.5rem;}
+.profile-header-inner{max-width:900px;margin:0 auto;position:relative;}
+.avatar-section{display:flex;align-items:flex-end;gap:1.5rem;margin-bottom:1rem;}
+.avatar-wrap{position:relative;flex-shrink:0;margin-top:-50px;}
+.avatar{width:100px;height:100px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,#059669,#1a6bff);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:800;overflow:hidden;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.15);}
+.avatar img{width:100%;height:100%;object-fit:cover;}
+.avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff;font-size:1.2rem;}
+.avatar-wrap:hover .avatar-overlay{opacity:1;}
+.profile-actions{margin-left:auto;display:flex;gap:0.7rem;padding-bottom:0.5rem;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:0.6rem 1.2rem;border-radius:9px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;border:none;text-decoration:none;transition:all .18s;}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-primary:hover{background:#1558e0;}
+.btn-outline{background:#fff;color:var(--ink2);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+.profile-name{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.25rem;}
+.profile-title{font-size:0.95rem;color:var(--ink2);margin-bottom:0.4rem;}
+.profile-meta{display:flex;flex-wrap:wrap;gap:1rem;font-size:0.83rem;color:var(--mid);margin-bottom:0.8rem;}
+.profile-meta span{display:flex;align-items:center;gap:4px;}
+.subject-tag{background:var(--green-bg);color:var(--green);font-size:0.78rem;font-weight:600;padding:4px 12px;border-radius:100px;border:1px solid #a7f3d0;}
+.verified-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-bg);color:var(--green);font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:100px;}
+.progress-wrap{margin-top:0.8rem;}
+.progress-bar{height:6px;background:var(--border);border-radius:100px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,#059669,#1a6bff);transition:width .5s;}
+.progress-label{font-size:0.75rem;color:var(--mid);margin-top:0.3rem;}
+.page-layout{max-width:900px;margin:0 auto;padding:1.5rem 5%;display:grid;grid-template-columns:1fr 260px;gap:1.5rem;align-items:start;}
+.card{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.2rem;}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid var(--border);}
+.card-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--light);}
+.edit-btn{display:inline-flex;align-items:center;gap:4px;padding:0.28rem 0.7rem;background:var(--off);border:1.5px solid var(--border);border-radius:7px;font-size:0.75rem;font-weight:700;color:var(--mid);cursor:pointer;font-family:'Manrope',sans-serif;}
+.edit-btn:hover{border-color:var(--blue);color:var(--blue);}
+.card-body{padding:1.2rem 1.4rem;}
+.info-row{display:flex;justify-content:space-between;align-items:flex-start;padding:0.5rem 0;border-bottom:1px solid var(--border);font-size:0.86rem;gap:1rem;}
+.info-row:last-child{border-bottom:none;}
+.info-label{color:var(--mid);font-weight:600;flex-shrink:0;}
+.info-value{color:var(--ink);font-weight:600;text-align:right;}
+.empty{color:var(--light);font-style:italic;font-size:0.85rem;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem;}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.4rem;border-bottom:1px solid var(--border);}
+.modal-title{font-weight:800;font-size:1rem;}
+.modal-x{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--mid);width:32px;height:32px;border-radius:8px;}
+.modal-x:hover{background:var(--off);}
+.modal-body{padding:1.4rem;}
+.modal-footer{padding:1rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:0.7rem;justify-content:flex-end;}
+.form-group{margin-bottom:1rem;}
+.form-label{display:block;font-size:0.8rem;font-weight:700;color:var(--ink2);margin-bottom:0.4rem;}
+.form-input,.form-select,.form-textarea{width:100%;padding:0.7rem 0.9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.87rem;outline:none;color:var(--ink);}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);}
+.form-textarea{min-height:90px;resize:vertical;line-height:1.6;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.5rem;border:1.5px solid var(--border);border-radius:9px;min-height:44px;cursor:text;}
+.tag-input-wrap:focus-within{border-color:var(--blue);}
+.tag-chip{display:inline-flex;align-items:center;gap:4px;background:var(--green-bg);color:var(--green);font-size:0.78rem;font-weight:700;padding:3px 10px;border-radius:100px;}
+.tag-chip button{background:none;border:none;cursor:pointer;font-size:0.9rem;color:var(--green);padding:0;line-height:1;}
+.tag-input{border:none;outline:none;font-family:'Manrope',sans-serif;font-size:0.86rem;flex:1;min-width:80px;padding:2px 4px;}
+.alert-inline{padding:0.6rem 0.9rem;border-radius:8px;font-size:0.82rem;font-weight:600;margin-bottom:0.8rem;display:none;}
+.alert-inline.success{background:var(--green-bg);color:var(--green);display:block;}
+.alert-inline.error{background:var(--red-bg);color:var(--red);display:block;}
+.day-grid{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;}
+.day-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:#fff;font-family:'Manrope',sans-serif;font-size:0.72rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.day-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+.sidebar-widget{background:#fff;border-radius:14px;border:1px solid var(--border);padding:1.2rem 1.4rem;margin-bottom:1rem;}
+.widget-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--light);margin-bottom:0.8rem;}
+.help-item{font-size:0.82rem;color:var(--ink2);display:flex;gap:0.5rem;margin-bottom:0.5rem;line-height:1.5;}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1e293b;color:#fff;padding:0.8rem 1.2rem;border-radius:10px;font-size:0.84rem;font-weight:600;z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s;max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+@media(max-width:900px){.page-layout{grid-template-columns:1fr;}.nav-links{display:none;}.nav-burger{display:block;}.form-row{grid-template-columns:1fr;}}
+@media(max-width:600px){.avatar-section{flex-direction:column;align-items:flex-start;}.profile-actions{margin-left:0;}}
+</style>
+</head>
+<body>
+<nav>
+  <a class="nav-logo" href="index.html"><div class="logo-icon">U</div>UniSkilled</a>
+  <div class="nav-links">
+    <a href="index.html" class="nav-link">🏠 Home</a>
+    <a href="student-dashboard.html" class="nav-link">📊 Dashboard</a>
+    <a href="messages.html" class="nav-link">💬 Messages</a>
+    <a href="find-tutors.html" class="nav-cta">Find Tutors</a>
+    <a href="#" class="nav-link" style="font-size:0.78rem;color:var(--mid);" onclick="event.preventDefault();profileSignOut()">Sign out</a>
+  </div>
+  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
+</nav>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">🏠 Home</a>
+  <a href="student-dashboard.html">📊 Dashboard</a>
+  <a href="messages.html">💬 Messages</a>
+  <a href="find-tutors.html">🔍 Find Tutors</a>
+  <a href="#" onclick="event.preventDefault();profileSignOut()">🚪 Sign out</a>
+</div>
+
+<div class="cover-wrap" id="coverWrap">
+  <img class="cover-img" id="coverImg" style="display:none;" alt="Cover">
+  <button class="cover-edit" onclick="document.getElementById('coverInput').click()">🖼 Change cover</button>
+  <input type="file" id="coverInput" accept="image/*" style="display:none;" onchange="uploadCover(this)">
+</div>
+
+<div class="profile-header">
+  <div class="profile-header-inner">
+    <div class="avatar-section">
+      <div class="avatar-wrap">
+        <div class="avatar" id="avatarEl">?<div class="avatar-overlay">📷</div></div>
+        <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
+      </div>
+      <div style="flex:1;">
+        <h1 class="profile-name" id="profileName">Loading...</h1>
+        <div class="profile-title" id="profileTitle"></div>
+        <div class="profile-meta" id="profileMeta"></div>
+        <div id="profileTags" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;"></div>
+        <span class="verified-badge">✓ Verified student</span>
+      </div>
+      <div class="profile-actions">
+        <button class="btn btn-outline" onclick="openModal('modalBio')">✏️ Edit profile</button>
+        <a href="student-dashboard.html" class="btn btn-primary">← Dashboard</a>
+      </div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-label" id="progressLabel">Calculating profile completeness...</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-layout">
+  <div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">About me</div><button class="edit-btn" onclick="openModal('modalBio')">✏️ Edit</button></div>
+      <div class="card-body"><p id="bioText" style="font-size:0.88rem;color:var(--ink2);line-height:1.7;" class="empty">Tell tutors about yourself — your goals, study style, and what you're looking for help with.</p></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Academic Background</div><button class="edit-btn" onclick="openModal('modalAcademic')">✏️ Edit</button></div>
+      <div class="card-body" id="academicBody"><span class="empty">Not set yet.</span></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Subjects I need help with</div><button class="edit-btn" onclick="openModal('modalSubjects')">✏️ Edit</button></div>
+      <div class="card-body"><div id="subjectsBody"><span class="empty">No subjects added yet.</span></div></div>
+    </div>
+    <div class="card">
+      <div class="card-head"><div class="card-title">Availability</div><button class="edit-btn" onclick="openModal('modalAvailability')">✏️ Edit</button></div>
+      <div class="card-body" id="availBody"><span class="empty">Not set yet.</span></div>
+    </div>
+  </div>
+  <div>
+    <div class="sidebar-widget">
+      <div class="widget-title">Personal</div>
+      <div id="personalBody"><span class="empty" style="font-size:0.82rem;">Not set yet.</span></div>
+    </div>
+    <div class="sidebar-widget">
+      <div class="widget-title">Profile tips</div>
+      <div class="help-item">📸 Add a photo — tutors accept bookings from students with photos more readily</div>
+      <div class="help-item">📚 List your subjects so tutors know what you need help with</div>
+      <div class="help-item">📅 Set your availability to make scheduling easier</div>
+      <div class="help-item">📝 A short bio helps tutors understand your learning style</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modalBio" onclick="if(event.target===this)closeModal('modalBio')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Edit Profile</div><button class="modal-x" onclick="closeModal('modalBio')">✕</button></div>
+    <div class="modal-body">
+      <div class="alert-inline" id="alertBio"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First name</label><input type="text" class="form-input" id="inputFirstName" placeholder="First name"></div>
+        <div class="form-group"><label class="form-label">Last name</label><input type="text" class="form-input" id="inputLastName" placeholder="Last name"></div>
+      </div>
+      <div class="form-group"><label class="form-label">About me</label><textarea class="form-textarea" id="inputBio" placeholder="Tell tutors about yourself..."></textarea></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Country</label>
+          <select class="form-select" id="inputCountry">
+            <option value="">Select country</option>
+            <option>Germany</option><option>United Kingdom</option><option>France</option><option>Turkey</option><option>Qatar</option><option>UAE</option><option>Saudi Arabia</option><option>Egypt</option><option>Jordan</option><option>Lebanon</option><option>Morocco</option><option>Pakistan</option><option>India</option><option>Nigeria</option><option>United States</option><option>Canada</option><option>Australia</option><option>Netherlands</option><option>Belgium</option><option>Spain</option><option>Italy</option><option>Poland</option><option>Sweden</option><option>Switzerland</option><option>Austria</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Gender (optional)</label>
+          <select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Other</option></select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Preferred language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German, Arabic"></div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button><button class="btn btn-primary" onclick="saveBio()">Save</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalAcademic" onclick="if(event.target===this)closeModal('modalAcademic')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Academic Background</div><button class="modal-x" onclick="closeModal('modalAcademic')">✕</button></div>
+    <div class="modal-body">
+      <div class="alert-inline" id="alertAcademic"></div>
+      <div class="form-group"><label class="form-label">University / College</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Degree</label><input type="text" class="form-input" id="inputDegree" placeholder="e.g. Computer Science"></div>
+        <div class="form-group"><label class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. AI & Machine Learning"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Year of study</label>
+          <select class="form-select" id="inputYear"><option value="">Select</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option><option value="graduate">Graduate</option><option value="phd">PhD</option></select>
+        </div>
+        <div class="form-group"><label class="form-label">Graduation year</label><input type="number" class="form-input" id="inputGradYear" placeholder="e.g. 2027" min="2024" max="2035"></div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAcademic')">Cancel</button><button class="btn btn-primary" onclick="saveAcademic()">Save</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalSubjects" onclick="if(event.target===this)closeModal('modalSubjects')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Subjects I need help with</div><button class="modal-x" onclick="closeModal('modalSubjects')">✕</button></div>
+    <div class="modal-body">
+      <div class="alert-inline" id="alertSubjects"></div>
+      <div class="form-group">
+        <label class="form-label">Add subjects</label>
+        <div class="tag-input-wrap" id="subjectTagWrap" onclick="document.getElementById('subjectInput').focus()">
+          <input type="text" class="tag-input" id="subjectInput" placeholder="Type a subject and press Enter...">
+        </div>
+        <div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;">Press Enter or comma to add each subject</div>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalSubjects')">Cancel</button><button class="btn btn-primary" onclick="saveSubjects()">Save</button></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalAvailability" onclick="if(event.target===this)closeModal('modalAvailability')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">My Availability</div><button class="modal-x" onclick="closeModal('modalAvailability')">✕</button></div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Available days</label>
+        <div class="day-grid" id="dayGrid">
+          <button class="day-btn" data-day="mon">Mon</button><button class="day-btn" data-day="tue">Tue</button><button class="day-btn" data-day="wed">Wed</button><button class="day-btn" data-day="thu">Thu</button><button class="day-btn" data-day="fri">Fri</button><button class="day-btn" data-day="sat">Sat</button><button class="day-btn" data-day="sun">Sun</button>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Preferred time</label>
+        <select class="form-select" id="inputPrefTime"><option value="">Flexible</option><option value="morning">Morning (before 12pm)</option><option value="afternoon">Afternoon (12–5pm)</option><option value="evening">Evening (after 5pm)</option><option value="weekend">Weekends only</option></select>
+      </div>
+    </div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAvailability')">Cancel</button><button class="btn btn-primary" onclick="saveAvailability()">Save</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const _sb = window.supabase.createClient('https://orghkbbohnabcietidiv.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8');
+let currentUserId=null,userData=null,profileData=null,subjectTags=[],availDays=[];
+
+async function init(){
+  const {data:{session}}=await _sb.auth.getSession();
+  if(!session){window.location.href='signin.html';return;}
+  currentUserId=session.user.id;
+  await loadProfile();
+}
+
+async function loadProfile(){
+  const {data:u}=await _sb.from('users').select('*').eq('id',currentUserId).single();
+  const {data:sp}=await _sb.from('student_profiles').select('*').eq('user_id',currentUserId).single();
+  userData=u||{};profileData=sp||{};
+  const fullName=u?.full_name||'Student';
+  const initials=fullName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+  const av=document.getElementById('avatarEl');
+  if(u?.avatar_url)av.innerHTML=`<img src="${u.avatar_url}" alt="${fullName}"><div class="avatar-overlay">📷</div>`;
+  else{av.innerHTML=`${initials}<div class="avatar-overlay">📷</div>`;}
+  av.onclick=()=>document.getElementById('avatarInput').click();
+  if(u?.cover_url){const img=document.getElementById('coverImg');img.src=u.cover_url;img.style.display='block';}
+  document.getElementById('profileName').textContent=fullName;
+  document.title=fullName+' — UniSkilled';
+  const titleParts=[sp?.university,sp?.year_of_study?'Year '+sp.year_of_study:'',sp?.degree].filter(Boolean);
+  document.getElementById('profileTitle').textContent=titleParts.join(' · ')||'Student at UniSkilled';
+  const meta=[];
+  if(u?.country)meta.push(`<span>🌍 ${u.country}</span>`);
+  if(sp?.graduation_year)meta.push(`<span>🎓 Graduating ${sp.graduation_year}</span>`);
+  if(u?.language)meta.push(`<span>💬 ${u.language}</span>`);
+  document.getElementById('profileMeta').innerHTML=meta.join('');
+  const subjects=Array.isArray(sp?.subjects)?sp.subjects:[];
+  document.getElementById('profileTags').innerHTML=subjects.slice(0,5).map(s=>`<span class="subject-tag">${s}</span>`).join('');
+  const bioEl=document.getElementById('bioText');
+  if(sp?.bio){bioEl.textContent=sp.bio;bioEl.classList.remove('empty');}
+  else{bioEl.textContent='Tell tutors about yourself...';bioEl.classList.add('empty');}
+  const acParts=[];
+  if(sp?.university)acParts.push(`<div class="info-row"><span class="info-label">University</span><span class="info-value">${sp.university}</span></div>`);
+  if(sp?.degree)acParts.push(`<div class="info-row"><span class="info-label">Degree</span><span class="info-value">${sp.degree}</span></div>`);
+  if(sp?.major)acParts.push(`<div class="info-row"><span class="info-label">Major</span><span class="info-value">${sp.major}</span></div>`);
+  if(sp?.year_of_study)acParts.push(`<div class="info-row"><span class="info-label">Year</span><span class="info-value">${sp.year_of_study}</span></div>`);
+  if(sp?.graduation_year)acParts.push(`<div class="info-row"><span class="info-label">Graduation</span><span class="info-value">${sp.graduation_year}</span></div>`);
+  document.getElementById('academicBody').innerHTML=acParts.length?acParts.join(''):'<span class="empty">Not set yet.</span>';
+  subjectTags=[...subjects];
+  document.getElementById('subjectsBody').innerHTML=subjects.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s=>`<span class="subject-tag">${s}</span>`).join('')}</div>`:'<span class="empty">No subjects added yet.</span>';
+  const avail=Array.isArray(sp?.availability)?sp.availability:[];
+  availDays=[...avail];
+  const dayNames={mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
+  document.getElementById('availBody').innerHTML=avail.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${avail.map(d=>`<span style="background:#eff6ff;color:var(--blue);font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:100px;">${dayNames[d]||d}</span>`).join('')}</div>${sp?.preferred_time?`<div style="font-size:0.82rem;color:var(--mid);margin-top:0.5rem;">Preferred: ${sp.preferred_time}</div>`:''}`:'<span class="empty">Not set yet.</span>';
+  const personal=[];
+  if(u?.country)personal.push(`<div class="info-row"><span class="info-label">Country</span><span class="info-value">${u.country}</span></div>`);
+  if(u?.gender)personal.push(`<div class="info-row"><span class="info-label">Gender</span><span class="info-value">${u.gender}</span></div>`);
+  if(u?.language)personal.push(`<div class="info-row"><span class="info-label">Language</span><span class="info-value">${u.language}</span></div>`);
+  document.getElementById('personalBody').innerHTML=personal.length?personal.join(''):'<span class="empty" style="font-size:0.82rem;">Not set yet.</span>';
+  const checks=[u?.full_name,u?.avatar_url,sp?.bio,sp?.university,sp?.degree,subjects.length>0,avail.length>0,u?.country];
+  const done=checks.filter(Boolean).length;
+  const pct=Math.round((done/checks.length)*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=`Profile ${pct}% complete — ${done}/${checks.length} sections filled`;
+}
+
+async function saveBio(){
+  const firstName=document.getElementById('inputFirstName').value.trim();
+  const lastName=document.getElementById('inputLastName').value.trim();
+  const bio=document.getElementById('inputBio').value.trim();
+  const country=document.getElementById('inputCountry').value;
+  const gender=document.getElementById('inputGender').value;
+  const language=document.getElementById('inputLanguage').value.trim();
+  const alertEl=document.getElementById('alertBio');
+  const fullName=[firstName,lastName].filter(Boolean).join(' ')||userData?.full_name||'Student';
+  const {error:uErr}=await _sb.from('users').upsert({id:currentUserId,email:userData?.email||'',full_name:fullName,country:country||null,gender:gender||null,language:language||null},{onConflict:'id'});
+  if(uErr){alertEl.textContent=uErr.message;alertEl.className='alert-inline error';return;}
+  const {error:spErr}=await _sb.from('student_profiles').upsert({user_id:currentUserId,bio:bio||null},{onConflict:'user_id'});
+  if(spErr){alertEl.textContent=spErr.message;alertEl.className='alert-inline error';return;}
+  closeModal('modalBio');showToast('Profile saved ✓');await loadProfile();
+}
+
+async function saveAcademic(){
+  const university=document.getElementById('inputUniversity').value.trim();
+  const degree=document.getElementById('inputDegree').value.trim();
+  const major=document.getElementById('inputMajor').value.trim();
+  const year=document.getElementById('inputYear').value;
+  const gradYear=document.getElementById('inputGradYear').value;
+  const alertEl=document.getElementById('alertAcademic');
+  const {error}=await _sb.from('student_profiles').upsert({user_id:currentUserId,university:university||null,degree:degree||null,major:major||null,year_of_study:year||null,graduation_year:gradYear?parseInt(gradYear):null},{onConflict:'user_id'});
+  if(error){alertEl.textContent=error.message;alertEl.className='alert-inline error';return;}
+  closeModal('modalAcademic');showToast('Academic info saved ✓');await loadProfile();
+}
+
+async function saveSubjects(){
+  const alertEl=document.getElementById('alertSubjects');
+  const {error}=await _sb.from('student_profiles').upsert({user_id:currentUserId,subjects:subjectTags.length>0?subjectTags:null},{onConflict:'user_id'});
+  if(error){alertEl.textContent=error.message;alertEl.className='alert-inline error';return;}
+  closeModal('modalSubjects');showToast('Subjects saved ✓');await loadProfile();
+}
+
+async function saveAvailability(){
+  const prefTime=document.getElementById('inputPrefTime').value;
+  const {error}=await _sb.from('student_profiles').upsert({user_id:currentUserId,availability:availDays.length>0?availDays:null,preferred_time:prefTime||null},{onConflict:'user_id'});
+  if(error){showToast('Error: '+error.message);return;}
+  closeModal('modalAvailability');showToast('Availability saved ✓');await loadProfile();
+}
+
+async function uploadAvatar(input){
+  const file=input.files[0];if(!file)return;
+  const ext=file.name.split('.').pop();
+  const path=currentUserId+'/student-avatar.'+ext;
+  const {error:upErr}=await _sb.storage.from('avatars').upload(path,file,{upsert:true});
+  if(upErr){showToast('Upload failed: '+upErr.message);return;}
+  const {data:urlData}=_sb.storage.from('avatars').getPublicUrl(path);
+  await _sb.from('users').update({avatar_url:urlData.publicUrl}).eq('id',currentUserId);
+  showToast('Photo updated ✓');await loadProfile();
+}
+
+async function uploadCover(input){
+  const file=input.files[0];if(!file)return;
+  const ext=file.name.split('.').pop();
+  const path=currentUserId+'/student-cover.'+ext;
+  const {error:upErr}=await _sb.storage.from('covers').upload(path,file,{upsert:true});
+  if(upErr){showToast('Upload failed: '+upErr.message);return;}
+  const {data:urlData}=_sb.storage.from('covers').getPublicUrl(path);
+  await _sb.from('users').update({cover_url:urlData.publicUrl}).eq('id',currentUserId);
+  showToast('Cover updated ✓');await loadProfile();
+}
+
+function renderSubjectTags(){
+  const wrap=document.getElementById('subjectTagWrap');
+  const input=document.getElementById('subjectInput');
+  wrap.innerHTML='';
+  subjectTags.forEach((s,i)=>{const chip=document.createElement('span');chip.className='tag-chip';chip.innerHTML=`${s} <button onclick="removeSubjectTag(${i})">×</button>`;wrap.appendChild(chip);});
+  wrap.appendChild(input);input.focus();
+}
+function removeSubjectTag(i){subjectTags.splice(i,1);renderSubjectTags();}
+function addSubjectTag(){const input=document.getElementById('subjectInput');const val=input.value.trim().replace(/,$/,'');if(val&&!subjectTags.includes(val)){subjectTags.push(val);renderSubjectTags();}input.value='';}
+
+function initDayGrid(){
+  document.querySelectorAll('.day-btn').forEach(btn=>{
+    if(availDays.includes(btn.dataset.day))btn.classList.add('active');
+    btn.onclick=()=>{const d=btn.dataset.day;if(availDays.includes(d))availDays=availDays.filter(x=>x!==d);else availDays.push(d);btn.classList.toggle('active');};
+  });
+}
+
+function openModal(id){
+  document.getElementById(id).classList.add('open');
+  if(id==='modalBio'){const name=(userData?.full_name||'').split(' ');document.getElementById('inputFirstName').value=name[0]||'';document.getElementById('inputLastName').value=name.slice(1).join(' ')||'';document.getElementById('inputBio').value=profileData?.bio||'';document.getElementById('inputCountry').value=userData?.country||'';document.getElementById('inputGender').value=userData?.gender||'';document.getElementById('inputLanguage').value=userData?.language||'';document.getElementById('alertBio').style.display='none';}
+  if(id==='modalAcademic'){document.getElementById('inputUniversity').value=profileData?.university||'';document.getElementById('inputDegree').value=profileData?.degree||'';document.getElementById('inputMajor').value=profileData?.major||'';document.getElementById('inputYear').value=profileData?.year_of_study||'';document.getElementById('inputGradYear').value=profileData?.graduation_year||'';document.getElementById('alertAcademic').style.display='none';}
+  if(id==='modalSubjects'){renderSubjectTags();document.getElementById('alertSubjects').style.display='none';}
+  if(id==='modalAvailability'){document.getElementById('inputPrefTime').value=profileData?.preferred_time||'';initDayGrid();}
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
+function toggleNav(btn){const n=document.getElementById('mobileNav');const o=n.style.display==='flex';n.style.display=o?'none':'flex';btn.textContent=o?'☰':'✕';}
+function profileSignOut(){_sb.auth.signOut().then(()=>window.location.href='index.html');}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  init();
+  document.getElementById('subjectInput').addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===','){e.preventDefault();addSubjectTag();}
+    if(e.key==='Backspace'&&e.target.value===''&&subjectTags.length>0){subjectTags.pop();renderSubjectTags();}
+  });
+});
+</script>
+</body>
+</html>
