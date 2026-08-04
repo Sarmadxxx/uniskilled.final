@@ -381,7 +381,7 @@ function showPage(id, el) {
   target.classList.add('page-transition');
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
   if (el) el.classList.add('active');
-  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  target.scrollIntoView({ behavior: 'auto', block: 'start' });
 }
 
 // ── INIT ──
