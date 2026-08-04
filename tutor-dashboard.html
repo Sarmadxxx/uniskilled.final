@@ -72,6 +72,8 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 
 /* MAIN */
 .main{display:flex;flex-direction:column;gap:1.2rem;}
+@keyframes pageFadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.page-transition{animation:pageFadeIn 0.28s ease;}
 
 /* HERO */
 .hero-card{background:linear-gradient(135deg,#0b1f4a,#7c3aed,#1a6bff);border-radius:16px;padding:2rem;color:#fff;position:relative;overflow:hidden;}
@@ -366,7 +368,11 @@ let _accessToken = null;
 // ── NAVIGATION ──
 function showPage(id, el) {
   document.querySelectorAll('.main > div[id^="page-"]').forEach(p => p.style.display = 'none');
-  document.getElementById('page-' + id).style.display = 'block';
+  const target = document.getElementById('page-' + id);
+  target.style.display = 'block';
+  target.classList.remove('page-transition');
+  void target.offsetWidth; // force reflow so the animation replays every time
+  target.classList.add('page-transition');
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
   if (el) el.classList.add('active');
   window.scrollTo({ top: 0, behavior: 'smooth' });
