@@ -212,27 +212,27 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       </div>
     </div>
     <div class="sidebar-nav">
-      <a class="nav-item active" onclick="showPage('overview',this)">
+      <a class="nav-item active" href="tutor-dashboard.html?tab=overview">
         <div class="nav-item-left"><span>🏠</span>Overview</div>
       </a>
-      <a class="nav-item" onclick="showPage('requests',this)">
+      <a class="nav-item" href="tutor-dashboard.html?tab=requests">
         <div class="nav-item-left"><span>📥</span>Booking Requests</div>
         <span class="nav-badge" id="badgeRequests" style="display:none">0</span>
       </a>
-      <a class="nav-item" onclick="showPage('subjectRequests',this)">
+      <a class="nav-item" href="tutor-dashboard.html?tab=subjectRequests">
         <div class="nav-item-left"><span>📋</span>Open Subject Requests</div>
         <span class="nav-badge green" id="badgeSubjectRequests" style="display:none">0</span>
       </a>
-      <a class="nav-item" onclick="showPage('sessions',this)">
+      <a class="nav-item" href="tutor-dashboard.html?tab=sessions">
         <div class="nav-item-left"><span>📅</span>Sessions</div>
       </a>
       <a class="nav-item" href="calendar.html">
         <div class="nav-item-left"><span>🗓️</span>Calendar</div>
       </a>
-      <a class="nav-item" onclick="showPage('reviews',this)">
+      <a class="nav-item" href="tutor-dashboard.html?tab=reviews">
         <div class="nav-item-left"><span>⭐</span>Reviews</div>
       </a>
-      <a class="nav-item" onclick="showPage('notifications',this)">
+      <a class="nav-item" href="tutor-dashboard.html?tab=notifications">
         <div class="nav-item-left"><span>🔔</span>Notifications</div>
         <span class="nav-badge" id="badgeNotifs" style="display:none">0</span>
       </a>
@@ -264,7 +264,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <div class="card" style="margin-bottom:1.2rem;">
         <div class="card-head">
           <div class="card-title">Booking Requests</div>
-          <a onclick="showPage('requests')" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
+          <a href="tutor-dashboard.html?tab=requests" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
         </div>
         <div class="card-body" id="overviewRequests">
           <div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>
@@ -275,7 +275,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <div class="card" style="margin-bottom:1.2rem;">
         <div class="card-head">
           <div class="card-title">Open Subject Requests</div>
-          <a onclick="showPage('subjectRequests')" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
+          <a href="tutor-dashboard.html?tab=subjectRequests" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
         </div>
         <div class="card-body" id="overviewSubjectRequests">
           <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
@@ -428,6 +428,13 @@ async function init() {
   document.title = firstName + "'s Dashboard — UniSkilled";
 
   await loadAll();
+
+  // Show whichever tab the URL asked for (real navigation from the sidebar
+  // now reloads the page with ?tab=X, so this runs fresh on every click —
+  // giving the same "new page" feel as Calendar/Messages on mobile).
+  const requestedTab = new URLSearchParams(window.location.search).get('tab') || 'overview';
+  const targetLink = document.querySelector(`.nav-item[href="tutor-dashboard.html?tab=${requestedTab}"]`);
+  showPage(requestedTab, targetLink);
 
   // Realtime notifications
   _sb.channel('notifs-' + userId)
