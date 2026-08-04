@@ -369,6 +369,7 @@ function showPage(id, el) {
   document.getElementById('page-' + id).style.display = 'block';
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
   if (el) el.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // ── INIT ──
