@@ -355,6 +355,12 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </div>
 
 <script>
+// Stop the browser from "helpfully" restoring the previous scroll position
+// when navigating between ?tab= variants of this same page (a known iOS
+// Safari behavior that was causing the sidebar to feel like it wasn't
+// scrolling to the new section).
+if ('scrollRestoration' in history) { history.scrollRestoration = 'manual'; }
+
 const _sb = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
@@ -375,7 +381,7 @@ function showPage(id, el) {
   target.classList.add('page-transition');
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
   if (el) el.classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ── INIT ──
