@@ -229,6 +229,9 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <a class="nav-item" href="calendar.html">
         <div class="nav-item-left"><span>🗓️</span>Calendar</div>
       </a>
+      <a class="nav-item" href="tutor-dashboard.html?tab=groupSessions">
+        <div class="nav-item-left"><span>👥</span>Group Sessions</div>
+      </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=reviews">
         <div class="nav-item-left"><span>⭐</span>Reviews</div>
       </a>
@@ -326,6 +329,22 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
           <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No sessions yet</div></div>
         </div>
       </div>
+    </div>
+
+    <!-- GROUP SESSIONS PAGE -->
+    <div id="page-groupSessions" style="display:none;">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">👥 Group Sessions</div>
+          <button class="edit-btn" onclick="openGroupSessionModal()" style="background:var(--blue);color:#fff;border:none;">+ Create Group Session</button>
+        </div>
+        <div class="card-body" id="groupSessionsList">
+          <div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">No group sessions yet</div></div>
+        </div>
+      </div>
+      <p style="font-size:0.8rem;color:var(--mid);margin-top:0.8rem;line-height:1.5;">
+        Group sessions let up to 4 students split one session and each pay a lower price — great for popular subjects where several students need the same help. You still get paid per student, same 48-hour hold applies.
+      </p>
     </div>
 
     <!-- REVIEWS PAGE -->
@@ -462,7 +481,111 @@ async function init() {
 }
 
 async function loadAll() {
-  await Promise.all([loadRequests(), loadSubjectRequests(), loadSessions(), loadReviews(), loadNotifications()]);
+  await Promise.all([loadRequests(), loadSubjectRequests(), loadSessions(), loadReviews(), loadNotifications(), loadGroupSessions()]);
+}
+
+// ── GROUP SESSIONS ──
+function openGroupSessionModal() {
+  const sel = document.getElementById('gsSubject');
+  sel.innerHTML = tutorSubjects.length > 0
+    ? tutorSubjects.map(s => `<option value="${s}">${s}</option>`).join('')
+    : '<option value="">Add a subject to your profile first</option>';
+  document.getElementById('gsError').style.display = 'none';
+  document.getElementById('groupSessionModalOverlay').style.display = 'flex';
+}
+
+function closeGroupSessionModal() {
+  document.getElementById('groupSessionModalOverlay').style.display = 'none';
+}
+
+async function submitGroupSession() {
+  const subject = document.getElementById('gsSubject').value;
+  const date = document.getElementById('gsDate').value;
+  const time = document.getElementById('gsTime').value;
+  const duration = document.getElementById('gsDuration').value;
+  const format = document.getElementById('gsFormat').value;
+  const maxStudents = document.getElementById('gsMaxStudents').value;
+  const price = document.getElementById('gsPrice').value;
+  const notes = document.getElementById('gsNotes').value.trim();
+  const errBox = document.getElementById('gsError');
+
+  if (!subject || !date || !time || !price || Number(price) <= 0) {
+    errBox.textContent = 'Please fill in subject, date, time, and a valid price.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  const sessionDateTime = new Date(date + 'T' + time);
+  if (sessionDateTime < new Date()) {
+    errBox.textContent = 'Please choose a future date and time.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('gsSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Creating...';
+
+  const { error } = await _sb.from('group_sessions').insert({
+    tutor_id: userId,
+    tutor_name: tutorName,
+    subject, scheduled_date: date, scheduled_time: time,
+    duration_minutes: parseInt(duration), format,
+    max_students: parseInt(maxStudents),
+    price_per_student: parseFloat(price),
+    notes: notes || null,
+    status: 'open'
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Create Group Session';
+
+  if (error) {
+    errBox.textContent = 'Could not create group session: ' + error.message;
+    errBox.style.display = 'block';
+    return;
+  }
+
+  closeGroupSessionModal();
+  await loadGroupSessions();
+}
+
+async function loadGroupSessions() {
+  const list = document.getElementById('groupSessionsList');
+  if (!list) return;
+
+  const { data: groupSessions } = await _sb.from('group_sessions')
+    .select('*').eq('tutor_id', userId).order('scheduled_date', { ascending: true });
+
+  if (!groupSessions || groupSessions.length === 0) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">No group sessions yet</div></div>';
+    return;
+  }
+
+  const { data: allParticipants } = await _sb.from('group_session_participants')
+    .select('*').in('group_session_id', groupSessions.map(g => g.id));
+
+  list.innerHTML = groupSessions.map(gs => {
+    const participants = (allParticipants || []).filter(p => p.group_session_id === gs.id);
+    const confirmed = participants.filter(p => p.status === 'confirmed');
+    const date = new Date(gs.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' });
+    const statusBadge = gs.status === 'cancelled'
+      ? '<span class="badge badge-expired">cancelled</span>'
+      : gs.status === 'completed'
+      ? '<span class="badge badge-completed">completed</span>'
+      : confirmed.length >= gs.max_students
+      ? '<span class="badge badge-confirmed">full</span>'
+      : '<span class="badge badge-pending">open</span>';
+
+    return `<div class="session-row">
+      <div class="session-av">👥</div>
+      <div class="session-info">
+        <div class="session-name">${gs.subject}</div>
+        <div class="session-sub">${date} · ${gs.scheduled_time.slice(0,5)} · €${gs.price_per_student}/student · ${confirmed.length}/${gs.max_students} joined</div>
+      </div>
+      ${statusBadge}
+    </div>`;
+  }).join('');
 }
 
 // ── REQUESTS ──
@@ -1069,5 +1192,76 @@ async function joinSession(sessionId, subject, otherName) {
     </div>
   </div>
 </div>
+<!-- CREATE GROUP SESSION MODAL -->
+<div id="groupSessionModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:16px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto;padding:1.6rem;font-family:'Manrope',sans-serif;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
+      <div style="font-size:1.1rem;font-weight:800;color:var(--ink);">Create Group Session</div>
+      <button onclick="closeGroupSessionModal()" style="background:none;border:none;font-size:1.3rem;color:var(--mid);cursor:pointer;line-height:1;">×</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:0.9rem;">
+      <div>
+        <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Subject</label>
+        <select id="gsSubject" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;"></select>
+      </div>
+
+      <div style="display:flex;gap:0.7rem;">
+        <div style="flex:1;">
+          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Date</label>
+          <input type="date" id="gsDate" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Time</label>
+          <input type="time" id="gsTime" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.7rem;">
+        <div style="flex:1;">
+          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Duration</label>
+          <select id="gsDuration" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="60" selected>60 min</option>
+            <option value="90">90 min</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</label>
+          <select id="gsFormat" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
+            <option value="online" selected>Online</option>
+            <option value="in-person">In-person</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:0.7rem;">
+        <div style="flex:1;">
+          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Max students</label>
+          <select id="gsMaxStudents" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Price per student (€)</label>
+          <input type="number" id="gsPrice" min="1" step="0.5" placeholder="e.g. 12" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
+        </div>
+      </div>
+
+      <div>
+        <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Notes (optional)</label>
+        <textarea id="gsNotes" rows="2" placeholder="e.g. Covers chapters 3-4, bring a calculator" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;resize:vertical;"></textarea>
+      </div>
+
+      <div id="gsError" style="display:none;font-size:0.8rem;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:0.6rem 0.8rem;"></div>
+
+      <button onclick="submitGroupSession()" id="gsSubmitBtn" style="background:var(--blue);color:#fff;border:none;padding:0.75rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:0.3rem;">Create Group Session</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
