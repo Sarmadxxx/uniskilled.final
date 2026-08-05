@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tutor Certificate — UniSkilled</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--navy:#0b1f4a;--ink:#0f172a;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--off:#f8fafc;--gold:#c9971e;}
+body{font-family:'Manrope',sans-serif;background:#eef2f7;color:var(--ink);min-height:100vh;padding:2.5rem 1.2rem;}
+.toolbar{max-width:820px;margin:0 auto 1.2rem;display:flex;justify-content:space-between;align-items:center;}
+.toolbar a{font-size:0.85rem;font-weight:600;color:var(--mid);text-decoration:none;}
+.print-btn{background:var(--blue);color:#fff;border:none;padding:0.6rem 1.3rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;}
+
+.cert{max-width:820px;margin:0 auto;background:#fff;border-radius:18px;box-shadow:0 20px 50px rgba(15,23,42,0.08);overflow:hidden;position:relative;}
+.cert-band{height:10px;background:linear-gradient(90deg,var(--navy),var(--blue));}
+.cert-inner{padding:3rem 3.2rem;}
+.cert-header{text-align:center;margin-bottom:2.2rem;}
+.cert-logo{height:40px;margin-bottom:1.4rem;}
+.cert-eyebrow{font-size:0.72rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.6rem;}
+.cert-title{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--navy);margin-bottom:0.4rem;}
+.cert-sub{font-size:0.88rem;color:var(--mid);}
+
+.cert-person{display:flex;align-items:center;gap:1.1rem;justify-content:center;margin:2rem 0;padding:1.4rem;background:var(--off);border-radius:14px;}
+.cert-avatar{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.4rem;flex-shrink:0;overflow:hidden;}
+.cert-avatar img{width:100%;height:100%;object-fit:cover;}
+.cert-name{font-size:1.25rem;font-weight:800;color:var(--ink);}
+.cert-role{font-size:0.85rem;color:var(--mid);margin-top:2px;}
+
+.cert-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:2rem 0;}
+.cert-stat{text-align:center;padding:1rem 0.5rem;border:1px solid var(--border);border-radius:12px;}
+.cert-stat-num{font-size:1.5rem;font-weight:800;color:var(--navy);}
+.cert-stat-lbl{font-size:0.68rem;color:var(--mid);text-transform:uppercase;letter-spacing:0.05em;margin-top:0.2rem;}
+
+.cert-section{margin-top:2rem;}
+.cert-section-title{font-size:0.78rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.9rem;border-bottom:1px solid var(--border);padding-bottom:0.5rem;}
+.subject-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.7rem;font-size:0.88rem;}
+.subject-bar-bg{flex:1;height:6px;background:var(--off);border-radius:100px;margin:0 1rem;overflow:hidden;}
+.subject-bar-fill{height:100%;background:var(--blue);border-radius:100px;}
+
+.cert-footer{margin-top:2.5rem;padding-top:1.5rem;border-top:1px dashed var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+.cert-verify{font-size:0.72rem;color:var(--light);}
+.cert-verify a{color:var(--blue);text-decoration:none;}
+.cert-seal{font-size:0.72rem;font-weight:700;color:var(--gold);border:1.5px solid var(--gold);border-radius:100px;padding:0.35rem 0.9rem;}
+
+.empty-msg{text-align:center;padding:4rem 1rem;color:var(--mid);}
+
+@media print {
+  body{background:#fff;padding:0;}
+  .toolbar{display:none;}
+  .cert{box-shadow:none;border-radius:0;}
+}
+@media(max-width:600px){
+  .cert-inner{padding:2rem 1.4rem;}
+  .cert-stats{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <a href="#" id="backLink">← Back to profile</a>
+  <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+</div>
+
+<div class="cert" id="certCard" style="display:none;">
+  <div class="cert-band"></div>
+  <div class="cert-inner">
+    <div class="cert-header">
+      <img src="uniskilled-logo.png" alt="UniSkilled" class="cert-logo">
+      <div class="cert-eyebrow">Verified Tutor Certificate</div>
+      <div class="cert-title">Certificate of Tutoring Achievement</div>
+      <div class="cert-sub">Issued by UniSkilled — University-Verified Tutoring</div>
+    </div>
+
+    <div class="cert-person">
+      <div class="cert-avatar" id="certAvatar">?</div>
+      <div>
+        <div class="cert-name" id="certName">—</div>
+        <div class="cert-role" id="certRole">—</div>
+      </div>
+    </div>
+
+    <div class="cert-stats">
+      <div class="cert-stat"><div class="cert-stat-num" id="certSessions">0</div><div class="cert-stat-lbl">Sessions</div></div>
+      <div class="cert-stat"><div class="cert-stat-num" id="certRating">—</div><div class="cert-stat-lbl">Rating</div></div>
+      <div class="cert-stat"><div class="cert-stat-num" id="certReviews">0</div><div class="cert-stat-lbl">Reviews</div></div>
+      <div class="cert-stat"><div class="cert-stat-num" id="certSince" style="font-size:1rem;">—</div><div class="cert-stat-lbl">Member Since</div></div>
+    </div>
+
+    <div class="cert-section">
+      <div class="cert-section-title">Subjects Taught</div>
+      <div id="certSubjects"></div>
+    </div>
+
+    <div class="cert-footer">
+      <div class="cert-verify">
+        Verify this certificate at<br><a id="verifyUrl" href="#">uniskilled.com</a>
+      </div>
+      <div class="cert-seal">✓ UniSkilled Verified</div>
+    </div>
+  </div>
+</div>
+
+<div class="empty-msg" id="emptyMsg" style="display:none;">This tutor's certificate isn't available yet.</div>
+
+<script>
+const _sb = window.supabase.createClient(
+  'https://orghkbbohnabcietidiv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
+);
+
+const params = new URLSearchParams(window.location.search);
+const tutorId = params.get('tutor');
+
+async function init() {
+  if (!tutorId) { document.getElementById('emptyMsg').style.display = 'block'; return; }
+
+  document.getElementById('backLink').href = 'tutor-profile.html?id=' + tutorId;
+  document.getElementById('verifyUrl').href = window.location.href;
+  document.getElementById('verifyUrl').textContent = window.location.href.replace('https://', '');
+
+  const { data: p } = await _sb.from('users').select('*').eq('id', tutorId).single();
+  const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', tutorId).single();
+
+  if (!p) { document.getElementById('emptyMsg').style.display = 'block'; return; }
+
+  const fullName = p.full_name || 'Tutor';
+  const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+  document.title = fullName + "'s Certificate — UniSkilled";
+  document.getElementById('certName').textContent = fullName;
+
+  const roleParts = [tp?.major || '', tp?.location || ''].filter(Boolean);
+  document.getElementById('certRole').textContent = roleParts.length ? roleParts.join(' · ') : 'UniSkilled Tutor';
+
+  const avatarUrl = tp?.avatar_url || p?.avatar_url;
+  const avEl = document.getElementById('certAvatar');
+  if (avatarUrl) avEl.innerHTML = `<img src="${avatarUrl}" alt="${fullName}">`;
+  else avEl.textContent = initials;
+
+  // Sessions + subject breakdown
+  const { data: sessions } = await _sb.from('sessions').select('subject').eq('tutor_id', tutorId).eq('status', 'completed');
+  document.getElementById('certSessions').textContent = (sessions || []).length;
+
+  const bySubject = {};
+  (sessions || []).forEach(s => {
+    const subj = s.subject || 'Other';
+    bySubject[subj] = (bySubject[subj] || 0) + 1;
+  });
+  const entries = Object.entries(bySubject).sort((a, b) => b[1] - a[1]);
+  const maxCount = entries.length ? entries[0][1] : 1;
+  document.getElementById('certSubjects').innerHTML = entries.length > 0
+    ? entries.map(([subj, count]) => `
+        <div class="subject-row">
+          <span style="font-weight:600;min-width:120px;">${subj}</span>
+          <div class="subject-bar-bg"><div class="subject-bar-fill" style="width:${(count / maxCount * 100).toFixed(0)}%;"></div></div>
+          <span style="color:var(--mid);min-width:70px;text-align:right;">${count} session${count === 1 ? '' : 's'}</span>
+        </div>`).join('')
+    : '<span style="color:var(--mid);font-size:0.85rem;">No completed sessions yet.</span>';
+
+  // Reviews + rating
+  const { data: reviews } = await _sb.from('reviews').select('rating').eq('tutor_id', tutorId);
+  document.getElementById('certReviews').textContent = (reviews || []).length;
+  if (reviews && reviews.length > 0) {
+    const avg = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
+    document.getElementById('certRating').textContent = avg;
+  }
+
+  // Member since
+  if (p.created_at) {
+    document.getElementById('certSince').textContent = new Date(p.created_at).toLocaleDateString([], { month: 'short', year: 'numeric' });
+  }
+
+  document.getElementById('certCard').style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

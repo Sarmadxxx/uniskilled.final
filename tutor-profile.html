@@ -192,6 +192,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="stat-item"><div class="stat-num" id="statSessions">0</div><div class="stat-lbl">Sessions</div></div>
       <div class="stat-item"><div class="stat-num" id="statRating">—</div><div class="stat-lbl">Rating</div></div>
       <div class="stat-item"><div class="stat-num" id="statReviews">0</div><div class="stat-lbl">Reviews</div></div>
+      <div class="stat-item"><div class="stat-num" id="statMemberSince" style="font-size:0.95rem;">—</div><div class="stat-lbl">Member Since</div></div>
     </div>
   </div>
 </div>
@@ -219,6 +220,16 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       </div>
       <div class="card-body" id="subjectsBody">
         <span class="empty">No subjects added yet.</span>
+      </div>
+    </div>
+
+    <!-- TRACK RECORD -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📊 Track Record</div>
+      </div>
+      <div class="card-body" id="trackRecordBody">
+        <span class="empty">No completed sessions yet.</span>
       </div>
     </div>
 
@@ -661,17 +672,45 @@ async function loadProfile() {
 
   // Book/Edit actions
   const bookDiv = document.getElementById('bookActions');
+  const certLink = `<a href="tutor-certificate.html?tutor=${tutorId}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.7rem;text-decoration:none;">🏆 View Certificate</a>`;
   if (isOwner) {
-    bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>`;
+    bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>` + certLink;
   } else if (currentUserId) {
-    bookDiv.innerHTML = `<a href="book-session.html?tutor=${tutorId}&name=${encodeURIComponent(fullName)}" class="book-btn">📅 Book a session</a><a href="messages.html?with=${tutorId}" class="msg-btn">💬 Send message</a>`;
+    bookDiv.innerHTML = `<a href="book-session.html?tutor=${tutorId}&name=${encodeURIComponent(fullName)}" class="book-btn">📅 Book a session</a><a href="messages.html?with=${tutorId}" class="msg-btn">💬 Send message</a>` + certLink;
   } else {
-    bookDiv.innerHTML = `<a href="signin.html" class="book-btn">Sign in to book</a>`;
+    bookDiv.innerHTML = `<a href="signin.html" class="book-btn">Sign in to book</a>` + certLink;
   }
 
   // Stats
-  const { data: sessions } = await _supabase.from('sessions').select('id').eq('tutor_id', tutorId).eq('status', 'completed');
+  const { data: sessions } = await _supabase.from('sessions').select('id, subject').eq('tutor_id', tutorId).eq('status', 'completed');
   document.getElementById('statSessions').textContent = (sessions || []).length;
+
+  // Track record: sessions completed per subject
+  const bySubject = {};
+  (sessions || []).forEach(s => {
+    const subj = s.subject || 'Other';
+    bySubject[subj] = (bySubject[subj] || 0) + 1;
+  });
+  const subjectEntries = Object.entries(bySubject).sort((a, b) => b[1] - a[1]);
+  const maxCount = subjectEntries.length ? subjectEntries[0][1] : 1;
+  document.getElementById('trackRecordBody').innerHTML = subjectEntries.length > 0
+    ? subjectEntries.map(([subj, count]) => `
+        <div style="margin-bottom:0.7rem;">
+          <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;">
+            <span style="font-weight:600;color:var(--ink);">${subj}</span>
+            <span style="color:var(--mid);">${count} session${count === 1 ? '' : 's'}</span>
+          </div>
+          <div style="background:var(--off);border-radius:100px;height:6px;overflow:hidden;">
+            <div style="background:var(--blue);height:100%;width:${(count / maxCount * 100).toFixed(0)}%;border-radius:100px;"></div>
+          </div>
+        </div>`).join('')
+    : '<span class="empty">No completed sessions yet.</span>';
+
+  // Member since
+  if (p?.created_at) {
+    const joined = new Date(p.created_at);
+    document.getElementById('statMemberSince').textContent = joined.toLocaleDateString([], { month: 'short', year: 'numeric' });
+  }
 
   // Bio
   document.getElementById('bioText').innerHTML = tp?.bio ? `<span class="about-text">${tp.bio}</span>` : '<span class="empty">No bio added yet.</span>';
