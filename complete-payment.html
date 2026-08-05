@@ -109,6 +109,8 @@ const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const params = new URLSearchParams(window.location.search);
 const sessionId = params.get('session');
+const groupParticipantId = params.get('group_participant');
+const isGroup = !!groupParticipantId;
 let countdownInterval = null;
 let currentUser = null;
 
@@ -155,27 +157,56 @@ async function init() {
   }
   currentUser = authSession.user;
 
-  if (!sessionId) { showCard('notFoundCard'); return; }
+  if (!sessionId && !groupParticipantId) { showCard('notFoundCard'); return; }
 
-  const { data: s, error } = await _sb.from('sessions').select('*').eq('id', sessionId).single();
-  if (error || !s || s.student_id !== currentUser.id) { showCard('notFoundCard'); return; }
+  let displayName, subject, date, time, price, status, paymentDueAt;
 
-  if (s.status === 'confirmed' && s.payment_status === 'paid') { showCard('doneCard'); return; }
-  if (s.status === 'payment_expired') { showCard('expiredCard'); return; }
-  if (s.status !== 'awaiting_payment') { showCard('notFoundCard'); return; }
-  if (s.payment_due_at && new Date(s.payment_due_at).getTime() < Date.now()) { showCard('expiredCard'); return; }
+  if (isGroup) {
+    const { data: p, error } = await _sb.from('group_session_participants')
+      .select('*, group_sessions(*)').eq('id', groupParticipantId).single();
+    if (error || !p || p.student_id !== currentUser.id) { showCard('notFoundCard'); return; }
 
-  const initials = (s.tutor_name || 'T').split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+    const gs = p.group_sessions;
+    if (p.status === 'confirmed') { showCard('doneCard'); return; }
+    if (p.status === 'payment_expired' || p.status === 'cancelled') { showCard('expiredCard'); return; }
+    if (p.status !== 'awaiting_payment') { showCard('notFoundCard'); return; }
+    if (p.payment_due_at && new Date(p.payment_due_at).getTime() < Date.now()) { showCard('expiredCard'); return; }
+
+    displayName = gs.tutor_name || 'Tutor';
+    subject = gs.subject || '';
+    date = gs.scheduled_date;
+    time = gs.scheduled_time;
+    price = gs.price_per_student;
+    paymentDueAt = p.payment_due_at;
+
+  } else {
+    const { data: s, error } = await _sb.from('sessions').select('*').eq('id', sessionId).single();
+    if (error || !s || s.student_id !== currentUser.id) { showCard('notFoundCard'); return; }
+
+    if (s.status === 'confirmed' && s.payment_status === 'paid') { showCard('doneCard'); return; }
+    if (s.status === 'payment_expired') { showCard('expiredCard'); return; }
+    if (s.status !== 'awaiting_payment') { showCard('notFoundCard'); return; }
+    if (s.payment_due_at && new Date(s.payment_due_at).getTime() < Date.now()) { showCard('expiredCard'); return; }
+
+    displayName = s.tutor_name || 'Tutor';
+    subject = s.subject || '';
+    date = s.scheduled_date;
+    time = s.scheduled_time;
+    price = s.price;
+    paymentDueAt = s.payment_due_at;
+  }
+
+  const initials = displayName.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
   document.getElementById('tutorAv').textContent = initials;
-  document.getElementById('tutorName').textContent = s.tutor_name || 'Tutor';
-  document.getElementById('sessionSubject').textContent = s.subject || '';
-  const dateStr = s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' }) : '';
-  document.getElementById('sessionDateTime').textContent = [dateStr, s.scheduled_time ? s.scheduled_time.slice(0,5) : ''].filter(Boolean).join(' · ');
-  document.getElementById('priceAmount').textContent = '€' + s.price;
-  document.getElementById('priceTotal').textContent = '€' + s.price;
+  document.getElementById('tutorName').textContent = displayName;
+  document.getElementById('sessionSubject').textContent = subject + (isGroup ? ' (Group Session)' : '');
+  const dateStr = date ? new Date(date).toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' }) : '';
+  document.getElementById('sessionDateTime').textContent = [dateStr, time ? time.slice(0,5) : ''].filter(Boolean).join(' · ');
+  document.getElementById('priceAmount').textContent = '€' + price;
+  document.getElementById('priceTotal').textContent = '€' + price;
 
   showCard('paymentCard');
-  startCountdown(s.payment_due_at);
+  startCountdown(paymentDueAt);
 
   await loadPayPalScript();
 
@@ -184,10 +215,11 @@ async function init() {
 
     createOrder: async () => {
       document.getElementById('errorBox').style.display = 'none';
+      const body = isGroup ? { group_participant_id: groupParticipantId } : { session_id: sessionId };
       const res = await fetch(`${SUPABASE_URL}/functions/v1/create-paypal-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ session_id: sessionId }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok || !data.order_id) {
@@ -199,10 +231,13 @@ async function init() {
     },
 
     onApprove: async (data) => {
+      const body = isGroup
+        ? { order_id: data.orderID, group_participant_id: groupParticipantId }
+        : { order_id: data.orderID, session_id: sessionId };
       const res = await fetch(`${SUPABASE_URL}/functions/v1/capture-paypal-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ order_id: data.orderID, session_id: sessionId }),
+        body: JSON.stringify(body),
       });
       const result = await res.json();
       if (!res.ok || !result.success) {
