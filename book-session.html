@@ -72,11 +72,23 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
     </div>
     <!-- PRICE DISPLAY -->
     <div id="priceDisplay" style="display:none;" class="price-breakdown">
-      <div class="price-row"><span>Session price</span><span id="priceTotal">—</span></div>
+      <div class="form-group" style="margin-bottom:0.8rem;">
+        <label class="form-label" style="display:flex;justify-content:space-between;align-items:center;">
+          <span>Your offer</span>
+          <span style="font-weight:500;color:#6b7280;font-size:0.75rem;">Listed rate: <span id="listedRateHint"></span></span>
+        </label>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+          <span id="currencySymbolLabel" style="font-size:1rem;font-weight:700;color:var(--ink);">€</span>
+          <input type="number" id="offerPrice" class="form-input" style="max-width:140px;" step="0.5">
+        </div>
+        <div class="hint" id="priceHint" style="margin-top:0.3rem;"></div>
+      </div>
       <div class="price-row"><span style="color:#6b7280;">Platform fee (included)</span><span id="priceFee" style="color:#6b7280;">—</span></div>
       <div class="price-row"><span style="color:#6b7280;">Tutor receives</span><span id="priceTutor" style="color:#6b7280;">—</span></div>
       <div class="price-row total"><span>Total if confirmed</span><span id="priceCharge">—</span></div>
     </div>
+
+    <div id="blockedWarning" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:8px;padding:0.7rem 0.9rem;font-size:0.8rem;margin-bottom:1rem;"></div>
 
     <div class="no-charge-note">
       <span>ℹ️</span>
@@ -140,7 +152,7 @@ const CURRENCY_SYMBOLS = {
   INR:'₹', CAD:'CA$', AUD:'A$', CHF:'CHF', SEK:'kr', NOK:'kr',
   DKK:'kr', PLN:'zł'
 };
-function currSymbol(code) { return CURRENCY_SYMBOLS[code] || code || '£'; }
+function currSymbol(code) { return CURRENCY_SYMBOLS[code] || code || '€'; }
 
 const _sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
@@ -155,6 +167,7 @@ document.getElementById('date').min=new Date().toISOString().split('T')[0];
 
 let sessionPayload = null; // holds the booking details while submitting
 let step = 'details'; // kept for structural clarity, always resolves in one step now
+let blockedByDate = {}; // 'YYYY-MM-DD' -> [block, ...], fetched from tutor_blocked_slots
 
 async function init(){
   const {data:{session}}=await _sb.auth.getSession();
@@ -179,23 +192,78 @@ async function init(){
   document.getElementById('tutorName').textContent=name;
   const subjects=Array.isArray(tp?.subjects)?tp.subjects:[];
   document.getElementById('tutorSubjects').textContent=subjects.join(', ')||'';
-  const sym = currSymbol(tp?.currency || 'EUR');
+
+  const currency = tp?.currency || 'EUR';
+  const sym = currSymbol(currency);
   const rate = tp?.hourly_rate || 0;
+  const minPrice = currency === 'USD' ? 27 : 25;
   document.getElementById('tutorRate').textContent = rate ? sym + rate + '/hr' : 'Rate not set';
 
-  // Show price breakdown if rate is set
-  if (rate >= 25) {
-    const fee = parseFloat((rate * 0.18).toFixed(2));
-    const tutor = parseFloat((rate * 0.82).toFixed(2));
-    document.getElementById('priceTotal').textContent = sym + rate;
-    document.getElementById('priceFee').textContent = sym + fee + ' (18%)';
-    document.getElementById('priceTutor').textContent = sym + tutor;
-    document.getElementById('priceCharge').textContent = sym + rate;
+  // Editable price / negotiation
+  if (rate >= minPrice) {
+    document.getElementById('currencySymbolLabel').textContent = sym;
+    document.getElementById('listedRateHint').textContent = sym + rate;
+    const offerInput = document.getElementById('offerPrice');
+    offerInput.value = rate;
+    offerInput.min = minPrice;
+    document.getElementById('priceHint').textContent = `Minimum ${sym}${minPrice}. Agreed on a different price in chat? Enter it here — the tutor will see your offer and can accept or decline.`;
+    updatePriceBreakdown();
+    offerInput.addEventListener('input', updatePriceBreakdown);
     document.getElementById('priceDisplay').style.display = 'block';
   }
 
   // Pre-fill subject if only one
   if(subjects.length===1)document.getElementById('subject').value=subjects[0];
+
+  // Load the tutor's blocked availability so students can't pick a blocked slot
+  const { data: blocks } = await _sb.from('tutor_blocked_slots').select('*').eq('tutor_id', tutorId);
+  blockedByDate = {};
+  (blocks || []).forEach(b => {
+    if (!blockedByDate[b.blocked_date]) blockedByDate[b.blocked_date] = [];
+    blockedByDate[b.blocked_date].push(b);
+  });
+
+  document.getElementById('date').addEventListener('change', checkBlockedSlot);
+  document.getElementById('time').addEventListener('change', checkBlockedSlot);
+}
+
+function updatePriceBreakdown() {
+  const currency = tutorData?.currency || 'EUR';
+  const sym = currSymbol(currency);
+  const offer = parseFloat(document.getElementById('offerPrice').value) || 0;
+  const fee = parseFloat((offer * 0.18).toFixed(2));
+  const tutorReceives = parseFloat((offer * 0.82).toFixed(2));
+  document.getElementById('priceFee').textContent = sym + fee + ' (18%)';
+  document.getElementById('priceTutor').textContent = sym + tutorReceives;
+  document.getElementById('priceCharge').textContent = sym + offer;
+}
+
+function checkBlockedSlot() {
+  const date = document.getElementById('date').value;
+  const time = document.getElementById('time').value;
+  const warningBox = document.getElementById('blockedWarning');
+  if (!date) { warningBox.style.display = 'none'; return; }
+
+  const blocks = blockedByDate[date] || [];
+  const fullBlock = blocks.find(b => b.all_day);
+
+  if (fullBlock) {
+    warningBox.textContent = '⚠️ This tutor is fully unavailable on this date. Please pick a different day.';
+    warningBox.style.display = 'block';
+    return true;
+  }
+
+  if (time) {
+    const partialBlock = blocks.find(b => !b.all_day && time >= b.start_time && time < b.end_time);
+    if (partialBlock) {
+      warningBox.textContent = `⚠️ This tutor is unavailable between ${partialBlock.start_time.slice(0,5)}–${partialBlock.end_time.slice(0,5)} on this date. Please pick a different time.`;
+      warningBox.style.display = 'block';
+      return true;
+    }
+  }
+
+  warningBox.style.display = 'none';
+  return false;
 }
 
 async function submitBooking(){
@@ -213,9 +281,16 @@ async function submitBooking(){
   const sessionDate=new Date(date+'T'+time);
   if(sessionDate<new Date()){showAlert('Please select a future date and time.','error');return;}
 
-  const rate = tutorData?.hourly_rate || 0;
-  if (rate < 25) {
-    showAlert('This tutor has not set a valid session rate yet.','error');
+  if (checkBlockedSlot()) {
+    showAlert('This tutor is not available at the selected date/time. Please choose a different slot.','error');
+    return;
+  }
+
+  const currency = tutorData?.currency || 'EUR';
+  const minPrice = currency === 'USD' ? 27 : 25;
+  const offerPrice = parseFloat(document.getElementById('offerPrice').value);
+  if (!offerPrice || offerPrice < minPrice) {
+    showAlert(`The minimum session price is ${currSymbol(currency)}${minPrice}.`,'error');
     return;
   }
 
@@ -228,7 +303,7 @@ async function submitBooking(){
   const {data:sess,error:sessError}=await _sb.from('sessions').insert({
     tutor_id:tutorId, student_id:currentUser.id, tutor_name:tutorName, student_name:studentName,
     subject, scheduled_date:date, scheduled_time:time, duration_minutes:parseInt(duration),
-    format, notes:notes||null, status:'pending', price:rate,
+    format, notes:notes||null, status:'pending', price:offerPrice, currency,
     payment_status:'unpaid'
   }).select().single();
 
