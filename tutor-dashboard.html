@@ -388,6 +388,7 @@ const _sb = window.supabase.createClient(
 let userId = null;
 let tutorName = 'Tutor';
 let tutorSubjects = [];
+let tutorCurrency = 'EUR';
 let _accessToken = null;
 
 // ── NAVIGATION ──
@@ -435,6 +436,7 @@ async function init() {
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
   tutorName = fullName;
   tutorSubjects = Array.isArray(tp?.subjects) ? tp.subjects : [];
+  tutorCurrency = tp?.currency || 'EUR';
 
   // Sidebar profile
   const av = document.getElementById('sideAv');
@@ -490,6 +492,8 @@ function openGroupSessionModal() {
   sel.innerHTML = tutorSubjects.length > 0
     ? tutorSubjects.map(s => `<option value="${s}">${s}</option>`).join('')
     : '<option value="">Add a subject to your profile first</option>';
+  const sym = tutorCurrency === 'USD' ? '$' : '€';
+  document.getElementById('gsPriceLabel').textContent = `Price per student (${sym})`;
   document.getElementById('gsError').style.display = 'none';
   document.getElementById('groupSessionModalOverlay').style.display = 'flex';
 }
@@ -533,6 +537,7 @@ async function submitGroupSession() {
     duration_minutes: parseInt(duration), format,
     max_students: parseInt(maxStudents),
     price_per_student: parseFloat(price),
+    currency: tutorCurrency,
     notes: notes || null,
     status: 'open'
   });
@@ -581,7 +586,7 @@ async function loadGroupSessions() {
       <div class="session-av">👥</div>
       <div class="session-info">
         <div class="session-name">${gs.subject}</div>
-        <div class="session-sub">${date} · ${gs.scheduled_time.slice(0,5)} · €${gs.price_per_student}/student · ${confirmed.length}/${gs.max_students} joined</div>
+        <div class="session-sub">${date} · ${gs.scheduled_time.slice(0,5)} · ${gs.currency === 'USD' ? '$' : '€'}${gs.price_per_student}/student · ${confirmed.length}/${gs.max_students} joined</div>
       </div>
       ${statusBadge}
     </div>`;
@@ -1246,7 +1251,7 @@ async function joinSession(sessionId, subject, otherName) {
           </select>
         </div>
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Price per student (€)</label>
+          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;" id="gsPriceLabel">Price per student (€)</label>
           <input type="number" id="gsPrice" min="1" step="0.5" placeholder="e.g. 12" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
       </div>

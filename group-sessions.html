@@ -108,7 +108,7 @@ async function loadGroupSessions() {
     } else if (isFull) {
       btnHtml = `<button class="join-btn" disabled>Full</button>`;
     } else {
-      btnHtml = `<button class="join-btn" onclick="joinGroupSession('${gs.id}')">Join · €${gs.price_per_student}</button>`;
+      btnHtml = `<button class="join-btn" onclick="joinGroupSession('${gs.id}')">Join · ${gs.currency === 'USD' ? '$' : '€'}${gs.price_per_student}</button>`;
     }
 
     return `<div class="gs-card">

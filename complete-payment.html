@@ -120,11 +120,11 @@ function showCard(id) {
   });
 }
 
-function loadPayPalScript() {
+function loadPayPalScript(currency) {
   return new Promise((resolve, reject) => {
     if (window.paypal) { resolve(); return; }
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=EUR`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=${currency || 'EUR'}`;
     script.onload = resolve;
     script.onerror = reject;
     document.head.appendChild(script);
@@ -159,7 +159,7 @@ async function init() {
 
   if (!sessionId && !groupParticipantId) { showCard('notFoundCard'); return; }
 
-  let displayName, subject, date, time, price, status, paymentDueAt;
+  let displayName, subject, date, time, price, status, paymentDueAt, currency;
 
   if (isGroup) {
     const { data: p, error } = await _sb.from('group_session_participants')
@@ -177,6 +177,7 @@ async function init() {
     date = gs.scheduled_date;
     time = gs.scheduled_time;
     price = gs.price_per_student;
+    currency = gs.currency || 'EUR';
     paymentDueAt = p.payment_due_at;
 
   } else {
@@ -193,22 +194,24 @@ async function init() {
     date = s.scheduled_date;
     time = s.scheduled_time;
     price = s.price;
+    currency = s.currency || 'EUR';
     paymentDueAt = s.payment_due_at;
   }
 
+  const currSym = currency === 'USD' ? '$' : '€';
   const initials = displayName.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
   document.getElementById('tutorAv').textContent = initials;
   document.getElementById('tutorName').textContent = displayName;
   document.getElementById('sessionSubject').textContent = subject + (isGroup ? ' (Group Session)' : '');
   const dateStr = date ? new Date(date).toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' }) : '';
   document.getElementById('sessionDateTime').textContent = [dateStr, time ? time.slice(0,5) : ''].filter(Boolean).join(' · ');
-  document.getElementById('priceAmount').textContent = '€' + price;
-  document.getElementById('priceTotal').textContent = '€' + price;
+  document.getElementById('priceAmount').textContent = currSym + price;
+  document.getElementById('priceTotal').textContent = currSym + price;
 
   showCard('paymentCard');
   startCountdown(paymentDueAt);
 
-  await loadPayPalScript();
+  await loadPayPalScript(currency);
 
   window.paypal.Buttons({
     style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
