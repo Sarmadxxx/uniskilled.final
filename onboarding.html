@@ -54,6 +54,10 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 .avail-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0.4rem;margin-bottom:0.9rem;}
 .avail-day label{display:block;font-size:0.62rem;font-weight:700;color:var(--mid);margin-bottom:0.25rem;text-align:center;text-transform:uppercase;}
 .avail-toggle{width:100%;aspect-ratio:1;border-radius:7px;border:1.5px solid var(--border);background:var(--off);cursor:pointer;font-size:0.65rem;font-weight:700;color:var(--light);transition:all .18s;}
+.pref-time-chip{display:flex;align-items:center;gap:0.6rem;padding:0.7rem 0.8rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600;color:var(--ink);transition:all .15s;}
+.pref-time-chip:has(input:checked){border-color:var(--blue);background:rgba(26,107,255,0.06);}
+.pref-time-chip input{width:16px;height:16px;accent-color:var(--blue);flex-shrink:0;}
+.pref-time-chip small{font-weight:500;color:var(--light);font-size:0.72rem;}
 .avail-toggle.active{background:var(--blue);border-color:var(--blue);color:#fff;}
 .cert-list{display:flex;flex-direction:column;gap:0.5rem;margin-bottom:0.8rem;}
 .cert-item{display:flex;align-items:center;gap:0.5rem;background:var(--off);border:1px solid var(--border);border-radius:9px;padding:0.6rem 0.8rem;}
@@ -164,7 +168,16 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
       <div id="tutorExtra" style="display:none;">
         <div class="section-title">Pricing & Teaching</div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Hourly rate (£) *</label><input type="number" id="hourlyRate" class="form-input" placeholder="25" min="5" max="200"><div class="hint">Set your rate in GBP per hour</div></div>
+          <div class="form-group"><label class="form-label">Hourly rate *</label>
+            <div style="display:flex;gap:0.6rem;">
+              <select id="rateCurrency" class="form-select" style="max-width:110px;flex-shrink:0;">
+                <option value="EUR" selected>€ EUR</option>
+                <option value="USD">$ USD</option>
+              </select>
+              <input type="number" id="hourlyRate" class="form-input" placeholder="25" min="25" max="200">
+            </div>
+            <div class="hint" id="rateHint">Minimum €25 per hour</div>
+          </div>
           <div class="form-group"><label class="form-label">Teaching format</label><select id="teachingFormat" class="form-select"><option value="online">Online only</option><option value="inperson">In-person only</option><option value="both">Both</option></select></div>
         </div>
         <div class="form-group"><label class="form-label">Bio — tell students about yourself</label><textarea id="bio" class="form-textarea" placeholder="Describe your teaching style, experience, and qualifications..."></textarea></div>
@@ -195,7 +208,16 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
         <div class="avail-day"><label>Sat</label><button class="avail-toggle" data-day="sat">S</button></div>
         <div class="avail-day"><label>Sun</label><button class="avail-toggle" data-day="sun">S</button></div>
       </div>
-      <div class="form-group"><label class="form-label">Preferred time</label><select id="preferredTime" class="form-select"><option value="">Any time</option><option value="morning">Morning (8am–12pm)</option><option value="afternoon">Afternoon (12pm–5pm)</option><option value="evening">Evening (5pm–10pm)</option><option value="flexible">Flexible</option></select></div>
+      <div class="form-group">
+        <label class="form-label">When are you usually available?</label>
+        <div class="hint" style="margin-bottom:0.6rem;">Select as many as apply. You'll be able to block off specific days or hours anytime from your dashboard after signing up.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;">
+          <label class="pref-time-chip"><input type="checkbox" value="morning" class="pref-time-cb"><span>🌅 Morning<br><small>8am–12pm</small></span></label>
+          <label class="pref-time-chip"><input type="checkbox" value="afternoon" class="pref-time-cb"><span>☀️ Afternoon<br><small>12pm–5pm</small></span></label>
+          <label class="pref-time-chip"><input type="checkbox" value="evening" class="pref-time-cb"><span>🌙 Evening<br><small>5pm–10pm</small></span></label>
+          <label class="pref-time-chip"><input type="checkbox" value="flexible" class="pref-time-cb"><span>🔄 Flexible<br><small>Anytime works</small></span></label>
+        </div>
+      </div>
 
       <button class="btn-primary" id="nextBtn3">Continue →</button>
       <button class="btn-secondary" id="backBtn2">← Back</button>
@@ -392,11 +414,24 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('nextBtn3').addEventListener('click', function() {
     hideAlert();
     if (selectedRole === 'tutor') {
-      const rate = document.getElementById('hourlyRate').value;
+      const rate = parseFloat(document.getElementById('hourlyRate').value);
+      const currency = document.getElementById('rateCurrency').value;
+      const minRate = currency === 'USD' ? 27 : 25;
       if (!rate) { showAlert('Please enter your hourly rate.', 'error'); return; }
+      if (rate < minRate) { showAlert(`The minimum rate is ${currency === 'USD' ? '$27' : '€25'} per hour.`, 'error'); return; }
     }
     setStep(4);
   });
+
+  // Keep the minimum-rate hint accurate as the tutor switches currency
+  const rateCurrencyEl = document.getElementById('rateCurrency');
+  if (rateCurrencyEl) {
+    rateCurrencyEl.addEventListener('change', function() {
+      const isUsd = this.value === 'USD';
+      document.getElementById('hourlyRate').min = isUsd ? 27 : 25;
+      document.getElementById('rateHint').textContent = isUsd ? 'Minimum $27 per hour' : 'Minimum €25 per hour';
+    });
+  }
 
   document.getElementById('backBtn1').addEventListener('click', function() { hideAlert(); setStep(1); });
   document.getElementById('backBtn2').addEventListener('click', function() { hideAlert(); setStep(2); });
@@ -427,8 +462,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const university = document.getElementById('university').value.trim();
     const degree = document.getElementById('degree').value.trim();
     const yearOfStudy = document.getElementById('yearOfStudy').value;
-    const preferredTime = document.getElementById('preferredTime').value;
+    const preferredTimes = Array.from(document.querySelectorAll('.pref-time-cb:checked')).map(cb => cb.value);
     const hourlyRate = selectedRole === 'tutor' ? document.getElementById('hourlyRate').value : null;
+    const hourlyCurrency = selectedRole === 'tutor' ? document.getElementById('rateCurrency').value : null;
     const teachingFormat = selectedRole === 'tutor' ? document.getElementById('teachingFormat').value : null;
     const bio = selectedRole === 'tutor' ? document.getElementById('bio').value.trim() : null;
 
@@ -461,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
           gender: gender || null, country: country || null, language: language || null,
           subjects: subjects.length > 0 ? subjects : null,
           availability: availability.length > 0 ? availability : null,
-          preferred_time: preferredTime || null
+          preferred_time: preferredTimes[0] || null
         });
       } else if (selectedRole === 'tutor') {
         // Upload certificate files to Supabase Storage
@@ -487,11 +523,13 @@ document.addEventListener('DOMContentLoaded', function() {
           gender: gender || null, country: country || null, language: language || null,
           subjects: subjects.length > 0 ? subjects : null,
           hourly_rate: hourlyRate ? parseFloat(hourlyRate) : null,
+          currency: hourlyCurrency || 'EUR',
           teaching_format: teachingFormat || null,
           bio: bio || null,
           certificates: certsToSave.length > 0 ? certsToSave : null,
           availability: availability.length > 0 ? availability : null,
-          preferred_time: preferredTime || null
+          preferred_time: preferredTimes[0] || null,
+          preferred_times: preferredTimes.length > 0 ? preferredTimes : null
         });
       }
     }

@@ -673,8 +673,9 @@ async function loadProfile() {
   // Book/Edit actions
   const bookDiv = document.getElementById('bookActions');
   const certLink = `<a href="tutor-certificate.html?tutor=${tutorId}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.7rem;text-decoration:none;">🏆 View Certificate</a>`;
+  const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.7rem;text-decoration:none;">🚫 Manage Availability</a>`;
   if (isOwner) {
-    bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>` + certLink;
+    bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>` + availabilityLink + certLink;
   } else if (currentUserId) {
     bookDiv.innerHTML = `<a href="book-session.html?tutor=${tutorId}&name=${encodeURIComponent(fullName)}" class="book-btn">📅 Book a session</a><a href="messages.html?with=${tutorId}" class="msg-btn">💬 Send message</a>` + certLink;
   } else {

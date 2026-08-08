@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Availability — UniSkilled</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;}
+body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:100;flex-shrink:0;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
+.logo-icon{width:32px;height:32px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;}
+.nav-link{font-size:0.83rem;font-weight:600;color:var(--mid);text-decoration:none;padding:0.45rem 0.8rem;border-radius:8px;}
+.nav-link:hover{background:var(--off);color:var(--ink);}
+
+.page{max-width:1000px;margin:0 auto;width:100%;padding:1.8rem 5% 3rem;}
+.page-head{margin-bottom:0.4rem;}
+.page-title{font-size:1.5rem;font-weight:800;}
+.page-sub{font-size:0.86rem;color:var(--mid);margin-top:0.3rem;margin-bottom:1.5rem;line-height:1.5;}
+
+.layout{display:grid;grid-template-columns:1fr 340px;gap:1.5rem;align-items:start;}
+
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.cal-title{font-size:1.1rem;font-weight:800;}
+.cal-nav{display:flex;align-items:center;gap:0.5rem;}
+.cal-nav-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:#fff;font-size:0.95rem;cursor:pointer;color:var(--ink2);}
+.cal-nav-btn:hover{background:var(--off);}
+
+.cal-grid{background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);}
+.cal-weekday{padding:0.6rem 0;text-align:center;font-size:0.68rem;font-weight:700;color:var(--light);text-transform:uppercase;}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);}
+.cal-day{min-height:74px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:0.4rem;cursor:pointer;transition:background .12s;}
+.cal-day:nth-child(7n){border-right:none;}
+.cal-day:hover{background:var(--off);}
+.cal-day.other-month{background:#fafbfc;color:var(--light);cursor:default;}
+.cal-day.other-month:hover{background:#fafbfc;}
+.cal-day.past{color:var(--light);cursor:default;background:#fafbfc;}
+.cal-day.past:hover{background:#fafbfc;}
+.cal-day.today .day-num{background:var(--blue);color:#fff;}
+.cal-day.blocked-full{background:var(--red-bg);}
+.cal-day.blocked-partial{background:#fffbeb;}
+.day-num{font-size:0.78rem;font-weight:700;width:22px;height:22px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:0.25rem;}
+.day-tag{font-size:0.6rem;font-weight:700;padding:1px 5px;border-radius:100px;display:inline-block;}
+.day-tag.full{background:#fee2e2;color:#b91c1c;}
+.day-tag.partial{background:#fef3c7;color:#92400e;}
+
+.legend{display:flex;gap:1rem;margin-top:0.9rem;font-size:0.74rem;color:var(--mid);flex-wrap:wrap;}
+.legend-item{display:flex;align-items:center;gap:0.4rem;}
+.legend-dot{width:10px;height:10px;border-radius:3px;}
+
+.side-panel{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.2rem;}
+.side-title{font-size:0.95rem;font-weight:800;margin-bottom:0.9rem;}
+.side-empty{font-size:0.82rem;color:var(--mid);text-align:center;padding:1.5rem 0.5rem;}
+
+.block-form{display:none;flex-direction:column;gap:0.7rem;margin-bottom:1rem;padding-bottom:1rem;border-bottom:1px solid var(--border);}
+.block-form.active{display:flex;}
+.selected-date-label{font-size:0.88rem;font-weight:700;color:var(--ink);}
+.radio-row{display:flex;gap:0.6rem;}
+.radio-chip{flex:1;text-align:center;padding:0.5rem;border:1.5px solid var(--border);border-radius:8px;font-size:0.78rem;font-weight:600;cursor:pointer;color:var(--mid);}
+.radio-chip input{display:none;}
+.radio-chip:has(input:checked){border-color:var(--blue);background:rgba(26,107,255,0.06);color:var(--blue);}
+.time-row{display:none;gap:0.5rem;}
+.time-row.active{display:flex;}
+.time-row input{flex:1;padding:0.5rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.82rem;}
+.reason-input{padding:0.5rem 0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.8rem;}
+.block-save-btn{background:var(--blue);color:#fff;border:none;padding:0.6rem;border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;}
+.block-cancel-btn{background:none;border:none;color:var(--mid);font-size:0.78rem;cursor:pointer;text-decoration:underline;}
+
+.blocked-list-title{font-size:0.78rem;font-weight:700;color:var(--mid);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.6rem;}
+.blocked-item{display:flex;justify-content:space-between;align-items:flex-start;padding:0.6rem 0;border-bottom:1px solid var(--off);gap:0.6rem;}
+.blocked-item:last-child{border-bottom:none;}
+.blocked-item-date{font-size:0.8rem;font-weight:700;}
+.blocked-item-detail{font-size:0.74rem;color:var(--mid);margin-top:1px;}
+.blocked-remove{background:none;border:none;color:var(--red);font-size:0.75rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr;}
+  .cal-day{min-height:52px;}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="uniskilled-logo.png" alt="UniSkilled" style="height:34px;width:auto;display:block;">
+  </a>
+  <a href="tutor-dashboard.html" class="nav-link">← Back to Dashboard</a>
+</nav>
+
+<div class="page">
+  <div class="page-head">
+    <div class="page-title">🗓️ Manage Availability</div>
+    <div class="page-sub">Block off days or specific hours you're not available. Students won't be able to book you during blocked times — everything else stays open.</div>
+  </div>
+
+  <div class="layout">
+    <div>
+      <div class="cal-header">
+        <div class="cal-title" id="monthTitle">—</div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+          <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+        </div>
+      </div>
+      <div id="calGrid" class="cal-grid"></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#fee2e2;"></span>Fully blocked</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#fef3c7;"></span>Partially blocked</div>
+      </div>
+    </div>
+
+    <div class="side-panel">
+      <div class="side-title" id="sidePanelTitle">Select a day to manage</div>
+
+      <div class="block-form" id="blockForm">
+        <div class="selected-date-label" id="selectedDateLabel"></div>
+
+        <div class="radio-row">
+          <label class="radio-chip"><input type="radio" name="blockType" value="full" checked>Whole day</label>
+          <label class="radio-chip"><input type="radio" name="blockType" value="partial">Specific hours</label>
+        </div>
+
+        <div class="time-row" id="timeRow">
+          <input type="time" id="blockStart" value="09:00">
+          <input type="time" id="blockEnd" value="12:00">
+        </div>
+
+        <input type="text" class="reason-input" id="blockReason" placeholder="Reason (optional, e.g. exams)">
+
+        <button class="block-save-btn" onclick="saveBlock()">Block this day</button>
+        <button class="block-cancel-btn" onclick="closeForm()">Cancel</button>
+      </div>
+
+      <div class="blocked-list-title">Upcoming blocked times</div>
+      <div id="blockedList"><div class="side-empty">Nothing blocked yet.</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const _sb = window.supabase.createClient(
+  'https://orghkbbohnabcietidiv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
+);
+
+let currentUser = null;
+let viewYear, viewMonth;
+let blockedByDate = {}; // 'YYYY-MM-DD' -> [block, ...]
+let selectedDateKey = null;
+
+function dateKey(y, m, d) { return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`; }
+
+async function init() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.href = 'signin.html?redirect=' + encodeURIComponent(window.location.href); return; }
+  currentUser = session.user;
+
+  const today = new Date();
+  viewYear = today.getFullYear();
+  viewMonth = today.getMonth();
+
+  document.querySelectorAll('input[name="blockType"]').forEach(r => {
+    r.addEventListener('change', () => {
+      document.getElementById('timeRow').classList.toggle('active', document.querySelector('input[name="blockType"]:checked').value === 'partial');
+    });
+  });
+
+  await loadBlocks();
+  render();
+  renderBlockedList();
+}
+
+async function loadBlocks() {
+  const { data } = await _sb.from('tutor_blocked_slots').select('*').eq('tutor_id', currentUser.id).order('blocked_date', { ascending: true });
+  blockedByDate = {};
+  (data || []).forEach(b => {
+    if (!blockedByDate[b.blocked_date]) blockedByDate[b.blocked_date] = [];
+    blockedByDate[b.blocked_date].push(b);
+  });
+}
+
+function changeMonth(delta) {
+  viewMonth += delta;
+  if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+  render();
+}
+
+function render() {
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('monthTitle').textContent = `${monthNames[viewMonth]} ${viewYear}`;
+
+  const firstDay = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const daysInPrevMonth = new Date(viewYear, viewMonth, 0).getDate();
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  let cells = '';
+  for (let i = firstDay - 1; i >= 0; i--) {
+    cells += `<div class="cal-day other-month"><div class="day-num">${daysInPrevMonth - i}</div></div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = dateKey(viewYear, viewMonth, d);
+    const isToday = key === todayStr;
+    const isPast = key < todayStr;
+    const blocks = blockedByDate[key] || [];
+    const hasFullBlock = blocks.some(b => b.all_day);
+    const hasPartialBlock = blocks.some(b => !b.all_day);
+    let cls = 'cal-day';
+    if (isPast) cls += ' past';
+    if (isToday) cls += ' today';
+    if (hasFullBlock) cls += ' blocked-full';
+    else if (hasPartialBlock) cls += ' blocked-partial';
+
+    const tag = hasFullBlock ? '<span class="day-tag full">Blocked</span>' : hasPartialBlock ? '<span class="day-tag partial">Partial</span>' : '';
+    const onclick = isPast ? '' : `onclick="selectDay('${key}')"`;
+    cells += `<div class="${cls}" ${onclick}><div class="day-num">${d}</div>${tag}</div>`;
+  }
+  const totalCells = firstDay + daysInMonth;
+  const trailing = (7 - (totalCells % 7)) % 7;
+  for (let d = 1; d <= trailing; d++) {
+    cells += `<div class="cal-day other-month"><div class="day-num">${d}</div></div>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = `
+    <div class="cal-weekdays">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w => `<div class="cal-weekday">${w}</div>`).join('')}</div>
+    <div class="cal-days">${cells}</div>
+  `;
+}
+
+function selectDay(key) {
+  selectedDateKey = key;
+  const dateObj = new Date(key + 'T00:00:00');
+  document.getElementById('selectedDateLabel').textContent = dateObj.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('sidePanelTitle').textContent = 'Manage this day';
+  document.getElementById('blockForm').classList.add('active');
+  document.querySelector('input[name="blockType"][value="full"]').checked = true;
+  document.getElementById('timeRow').classList.remove('active');
+  document.getElementById('blockReason').value = '';
+}
+
+function closeForm() {
+  document.getElementById('blockForm').classList.remove('active');
+  document.getElementById('sidePanelTitle').textContent = 'Select a day to manage';
+  selectedDateKey = null;
+}
+
+async function saveBlock() {
+  if (!selectedDateKey) return;
+  const type = document.querySelector('input[name="blockType"]:checked').value;
+  const reason = document.getElementById('blockReason').value.trim();
+
+  const payload = {
+    tutor_id: currentUser.id,
+    blocked_date: selectedDateKey,
+    all_day: type === 'full',
+    start_time: type === 'partial' ? document.getElementById('blockStart').value : null,
+    end_time: type === 'partial' ? document.getElementById('blockEnd').value : null,
+    reason: reason || null,
+  };
+
+  if (type === 'partial' && payload.start_time >= payload.end_time) {
+    alert('End time must be after start time.');
+    return;
+  }
+
+  const { error } = await _sb.from('tutor_blocked_slots').insert(payload);
+  if (error) { alert('Could not save: ' + error.message); return; }
+
+  closeForm();
+  await loadBlocks();
+  render();
+  renderBlockedList();
+}
+
+async function removeBlock(id) {
+  await _sb.from('tutor_blocked_slots').delete().eq('id', id);
+  await loadBlocks();
+  render();
+  renderBlockedList();
+}
+
+function renderBlockedList() {
+  const container = document.getElementById('blockedList');
+  const allBlocks = Object.values(blockedByDate).flat()
+    .filter(b => b.blocked_date >= new Date().toISOString().slice(0, 10))
+    .sort((a, b) => a.blocked_date.localeCompare(b.blocked_date));
+
+  if (allBlocks.length === 0) {
+    container.innerHTML = '<div class="side-empty">Nothing blocked yet.</div>';
+    return;
+  }
+
+  container.innerHTML = allBlocks.map(b => {
+    const dateStr = new Date(b.blocked_date + 'T00:00:00').toLocaleDateString([], { month: 'short', day: 'numeric' });
+    const detail = b.all_day ? 'Whole day' : `${b.start_time.slice(0,5)} – ${b.end_time.slice(0,5)}`;
+    return `<div class="blocked-item">
+      <div>
+        <div class="blocked-item-date">${dateStr}</div>
+        <div class="blocked-item-detail">${detail}${b.reason ? ' · ' + b.reason : ''}</div>
+      </div>
+      <button class="blocked-remove" onclick="removeBlock('${b.id}')">Remove</button>
+    </div>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
