@@ -813,12 +813,16 @@ async function loadSessions() {
       : s.status === 'completed' ? 'badge-completed'
       : s.status === 'awaiting_payment' ? 'badge-awaiting-payment'
       : s.status === 'payment_expired' ? 'badge-expired'
+      : s.status === 'cancelled' ? 'badge-expired'
       : 'badge-pending';
     const badgeLabel = s.status === 'awaiting_payment' ? 'awaiting payment'
       : s.status === 'payment_expired' ? 'payment expired'
       : s.status;
     const joinBtn = s.status === 'confirmed'
       ? `<button class="btn-join" onclick="joinSession('${s.id}','${(s.subject||'Session').replace(/'/g,"\'")}','${(s.student_name||'Student').replace(/'/g,"\'")}')">🎥 Join Session</button>`
+      : '';
+    const cancelBtn = s.status === 'confirmed'
+      ? `<button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>`
       : '';
     return `<div class="session-row">
       <div class="session-av">${ini}</div>
@@ -827,7 +831,7 @@ async function loadSessions() {
         <div class="session-sub">${s.subject || '—'} ${date ? '· ' + date : ''} ${s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) : ''}</div>
       </div>
       <span class="badge ${badgeClass}">${badgeLabel}</span>
-      ${joinBtn}
+      ${joinBtn}${cancelBtn}
     </div>`;
   };
 
@@ -1108,6 +1112,49 @@ async function setupPayouts() {
 
 document.addEventListener('DOMContentLoaded', init);
 
+let cancelTargetSessionId = null;
+
+function openCancelModal(sessionId) {
+  cancelTargetSessionId = sessionId;
+  document.getElementById('cancelModalBody').innerHTML = 'As the tutor, cancelling this session will always issue the student a full refund, regardless of timing.';
+  document.getElementById('cancelModalActions').innerHTML = `
+    <button onclick="confirmCancel(false)" style="background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Yes, cancel and refund</button>
+    <button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Never mind</button>
+  `;
+  document.getElementById('cancelModalOverlay').style.display = 'flex';
+}
+
+function closeCancelModal() {
+  document.getElementById('cancelModalOverlay').style.display = 'none';
+  cancelTargetSessionId = null;
+}
+
+async function confirmCancel(confirmNoRefund) {
+  const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/cancel-session', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: cancelTargetSessionId, requester_id: userId, confirm_no_refund: confirmNoRefund }),
+  });
+  const data = await res.json();
+
+  if (data.requires_confirmation) {
+    document.getElementById('cancelModalBody').innerHTML = data.message;
+    document.getElementById('cancelModalActions').innerHTML = `
+      <button onclick="confirmCancel(true)" style="background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Cancel anyway (no refund)</button>
+      <button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Keep the session</button>
+    `;
+    return;
+  }
+
+  if (data.error) {
+    document.getElementById('cancelModalBody').innerHTML = `<span style="color:#dc2626;">${data.error}</span>`;
+    document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Close</button>`;
+    return;
+  }
+
+  closeCancelModal();
+  await loadAll();
+}
+
 async function joinSession(sessionId, subject, otherName) {
   const btn = event.target;
   btn.disabled = true;
@@ -1265,6 +1312,18 @@ async function joinSession(sessionId, subject, otherName) {
 
       <button onclick="submitGroupSession()" id="gsSubmitBtn" style="background:var(--blue);color:#fff;border:none;padding:0.75rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:0.3rem;">Create Group Session</button>
     </div>
+  </div>
+</div>
+
+<!-- CANCEL SESSION MODAL -->
+<div id="cancelModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:1.6rem;font-family:'Manrope',sans-serif;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <div style="font-size:1.05rem;font-weight:800;color:var(--ink);">Cancel this session?</div>
+      <button onclick="closeCancelModal()" style="background:none;border:none;font-size:1.3rem;color:var(--mid);cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div id="cancelModalBody" style="font-size:0.86rem;color:var(--ink2);line-height:1.5;"></div>
+    <div id="cancelModalActions" style="display:flex;flex-direction:column;gap:0.6rem;margin-top:1.2rem;"></div>
   </div>
 </div>
 

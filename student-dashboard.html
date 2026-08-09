@@ -368,7 +368,8 @@ async function init() {
 
       let actionBtn = '';
       if (s.status === 'confirmed') {
-        actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${(s.subject||'Session').replace(/'/g,"\'")}','${(s.tutor_name||'Tutor').replace(/'/g,"\'")}')">🎥 Join Session</button>`;
+        actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${(s.subject||'Session').replace(/'/g,"\'")}','${(s.tutor_name||'Tutor').replace(/'/g,"\'")}')">🎥 Join Session</button>
+        <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>`;
       } else if (s.status === 'awaiting_payment') {
         const remaining = s.payment_due_at ? Math.max(0, new Date(s.payment_due_at).getTime() - Date.now()) : 0;
         const hoursLeft = Math.floor(remaining / 3600000);
@@ -495,6 +496,85 @@ async function loadMyRequests() {
           : 'Waiting for a tutor to respond'}
       </div>
     </div>`).join('');
+}
+
+let cancelTargetSessionId = null;
+
+function openCancelModal(sessionId) {
+  cancelTargetSessionId = sessionId;
+  document.getElementById('cancelModalBody').innerHTML = 'Checking your cancellation options…';
+  document.getElementById('rescheduleForm').style.display = 'none';
+  document.getElementById('cancelModalActions').innerHTML = '';
+  document.getElementById('cancelModalOverlay').style.display = 'flex';
+  confirmCancel(false);
+}
+
+function closeCancelModal() {
+  document.getElementById('cancelModalOverlay').style.display = 'none';
+  document.getElementById('rescheduleForm').style.display = 'none';
+  cancelTargetSessionId = null;
+}
+
+async function confirmCancel(confirmNoRefund) {
+  const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/cancel-session', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: cancelTargetSessionId, requester_id: currentUserId, confirm_no_refund: confirmNoRefund }),
+  });
+  const data = await res.json();
+
+  if (data.requires_confirmation) {
+    document.getElementById('cancelModalBody').innerHTML = data.message;
+    document.getElementById('rescheduleForm').style.display = 'none';
+    document.getElementById('cancelModalActions').innerHTML = `
+      <button onclick="showRescheduleForm()" style="background:#1a6bff;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Reschedule instead</button>
+      <button onclick="confirmCancel(true)" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Cancel anyway (no refund)</button>
+      <button onclick="closeCancelModal()" style="background:none;border:none;color:var(--mid);padding:0.4rem;font-family:'Manrope',sans-serif;font-size:0.82rem;cursor:pointer;text-decoration:underline;">Keep the session</button>
+    `;
+    return;
+  }
+
+  if (data.error) {
+    document.getElementById('cancelModalBody').innerHTML = `<span style="color:#dc2626;">${data.error}</span>`;
+    document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Close</button>`;
+    return;
+  }
+
+  if (data.success) {
+    document.getElementById('cancelModalBody').innerHTML = data.refunded
+      ? '✅ Cancelled. A full refund has been issued to your PayPal account.'
+      : 'Session cancelled.';
+    document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal(); location.reload();" style="background:#1a6bff;color:#fff;border:none;padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Done</button>`;
+  }
+}
+
+function showRescheduleForm() {
+  document.getElementById('cancelModalBody').innerHTML = 'Pick a new date and time for this session — no new payment needed.';
+  document.getElementById('rescheduleForm').style.display = 'flex';
+  document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal()" style="background:none;border:none;color:var(--mid);padding:0.2rem;font-family:'Manrope',sans-serif;font-size:0.82rem;cursor:pointer;text-decoration:underline;">Cancel</button>`;
+}
+
+async function submitReschedule() {
+  const newDate = document.getElementById('rescheduleDate').value;
+  const newTime = document.getElementById('rescheduleTime').value;
+  const errBox = document.getElementById('rescheduleError');
+  if (!newDate || !newTime) {
+    errBox.textContent = 'Please choose both a date and a time.';
+    errBox.style.display = 'block';
+    return;
+  }
+  const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/reschedule-session', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: cancelTargetSessionId, requester_id: currentUserId, new_date: newDate, new_time: newTime }),
+  });
+  const data = await res.json();
+  if (data.error) {
+    errBox.textContent = data.error;
+    errBox.style.display = 'block';
+    return;
+  }
+  document.getElementById('rescheduleForm').style.display = 'none';
+  document.getElementById('cancelModalBody').innerHTML = '✅ Session rescheduled successfully.';
+  document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal(); location.reload();" style="background:#1a6bff;color:#fff;border:none;padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Done</button>`;
 }
 
 async function joinSession(sessionId, subject, otherName) {
@@ -661,5 +741,26 @@ document.addEventListener('DOMContentLoaded', init);
   <a href="mailto:info@uniskilled.com" style="color:var(--light);text-decoration:none;margin:0 0.7rem;">Contact</a>
   <div style="margin-top:0.4rem;">© 2026 UniSkilled</div>
 </div>
+
+<!-- CANCEL / RESCHEDULE SESSION MODAL -->
+<div id="cancelModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:1.6rem;font-family:'Manrope',sans-serif;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+      <div style="font-size:1.05rem;font-weight:800;color:var(--ink);">Cancel this session?</div>
+      <button onclick="closeCancelModal()" style="background:none;border:none;font-size:1.3rem;color:var(--mid);cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div id="cancelModalBody" style="font-size:0.86rem;color:var(--ink2);line-height:1.5;"></div>
+    <div id="rescheduleForm" style="display:none;margin-top:1rem;flex-direction:column;gap:0.6rem;">
+      <div style="display:flex;gap:0.5rem;">
+        <input type="date" id="rescheduleDate" style="flex:1;padding:0.55rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.85rem;">
+        <input type="time" id="rescheduleTime" style="flex:1;padding:0.55rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.85rem;">
+      </div>
+      <div id="rescheduleError" style="display:none;font-size:0.78rem;color:#dc2626;"></div>
+      <button onclick="submitReschedule()" style="background:#1a6bff;color:#fff;border:none;padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">Confirm new time</button>
+    </div>
+    <div id="cancelModalActions" style="display:flex;flex-direction:column;gap:0.6rem;margin-top:1.2rem;"></div>
+  </div>
+</div>
+
 </body>
 </html>
