@@ -102,6 +102,9 @@ nav{height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);bor
         <div style="font-size:0.75rem;color:var(--mid);" id="activeChatSub"></div>
       </div>
     </div>
+    <div id="trustBanner" style="display:none;background:#fffbeb;border-bottom:1px solid #fcd34d;padding:0.6rem 1.5rem;font-size:0.76rem;color:#92400e;line-height:1.5;flex-shrink:0;">
+      🛡️ <strong>Payments through UniSkilled are protected</strong> — held safely and refundable. Payments made outside UniSkilled aren't covered by this guarantee — no refund protection, no dispute support.
+    </div>
     <div class="chat-messages" id="chatMessages" style="display:none;"></div>
     <div class="chat-input-area" id="chatInputArea" style="display:none;">
       <input class="chat-input" id="msgInput" placeholder="Type a message..." maxlength="1000">
@@ -201,6 +204,7 @@ async function openConv(convId, otherId, otherName){
 
   document.getElementById('noChatSelected').style.display='none';
   document.getElementById('activeChatHeader').style.display='flex';
+  document.getElementById('trustBanner').style.display='block';
   document.getElementById('chatMessages').style.display='flex';
   document.getElementById('chatInputArea').style.display='flex';
   document.getElementById('activeChatName').textContent=otherName;

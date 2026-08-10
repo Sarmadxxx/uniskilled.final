@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Disputes — UniSkilled Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#0f172a;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--amber:#92400e;--amber-bg:#fffbeb;}
+body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;}
+nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:100;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
+.page{max-width:1000px;margin:0 auto;padding:2rem 5% 3rem;}
+.page-title{font-size:1.5rem;font-weight:800;margin-bottom:1.5rem;}
+.tabs{display:flex;gap:0.5rem;margin-bottom:1.2rem;}
+.tab{padding:0.5rem 1rem;border-radius:8px;font-size:0.85rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--mid);}
+.tab.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+
+.dispute-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.3rem 1.5rem;margin-bottom:1rem;}
+.dispute-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.8rem;flex-wrap:wrap;gap:0.5rem;}
+.dispute-id{font-size:0.75rem;color:var(--light);font-weight:700;}
+.dispute-subject{font-size:1.05rem;font-weight:800;margin-top:2px;}
+.badge{font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:100px;}
+.badge-open{background:var(--amber-bg);color:var(--amber);}
+.badge-resolved{background:var(--green-bg);color:var(--green);}
+.dispute-meta{font-size:0.82rem;color:var(--mid);margin-bottom:0.7rem;line-height:1.6;}
+.dispute-reason{background:var(--off);border-radius:10px;padding:0.9rem 1rem;font-size:0.85rem;color:var(--ink);margin-bottom:1rem;}
+.resolve-row{display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;}
+.resolve-btn{padding:0.55rem 1rem;border-radius:8px;font-size:0.8rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:#fff;}
+.resolve-btn.release{color:var(--green);border-color:#86efac;}
+.resolve-btn.refund{color:var(--red);border-color:#fecaca;}
+.resolve-btn.partial{color:var(--amber);border-color:#fcd34d;}
+.notes-input{flex:1;min-width:200px;padding:0.55rem 0.7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.82rem;}
+.partial-amount-input{width:90px;padding:0.55rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.82rem;display:none;}
+.resolution-summary{font-size:0.82rem;color:var(--mid);font-style:italic;}
+.empty-state{text-align:center;padding:4rem 1rem;color:var(--mid);}
+.spinner{width:28px;height:28px;border:3px solid rgba(26,107,255,0.2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:3rem auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.access-denied{text-align:center;padding:5rem 1rem;color:var(--mid);}
+</style>
+</head>
+<body>
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="uniskilled-logo.png" alt="UniSkilled" style="height:34px;width:auto;display:block;">
+  </a>
+</nav>
+
+<div class="page">
+  <div class="page-title">🚨 Disputes</div>
+  <div class="tabs">
+    <div class="tab active" onclick="setFilter('open', this)">Open</div>
+    <div class="tab" onclick="setFilter('resolved', this)">Resolved</div>
+  </div>
+  <div id="disputesList"><div class="spinner"></div></div>
+</div>
+
+<script>
+const _sb = window.supabase.createClient(
+  'https://orghkbbohnabcietidiv.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
+);
+
+let currentUser = null;
+let currentFilter = 'open';
+
+async function init() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.href = 'signin.html?redirect=' + encodeURIComponent(window.location.href); return; }
+  currentUser = session.user;
+
+  const { data: u } = await _sb.from('users').select('roles').eq('id', currentUser.id).single();
+  if (!u?.roles?.includes('admin')) {
+    document.querySelector('.page').innerHTML = '<div class="access-denied">🔒 This page is for admins only.</div>';
+    return;
+  }
+
+  await loadDisputes();
+}
+
+function setFilter(filter, el) {
+  currentFilter = filter;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  loadDisputes();
+}
+
+async function loadDisputes() {
+  const list = document.getElementById('disputesList');
+  list.innerHTML = '<div class="spinner"></div>';
+
+  const { data: disputes } = await _sb.from('disputes')
+    .select('*, sessions(*)')
+    .eq('status', currentFilter)
+    .order('created_at', { ascending: false });
+
+  if (!disputes || disputes.length === 0) {
+    list.innerHTML = `<div class="empty-state">No ${currentFilter} disputes.</div>`;
+    return;
+  }
+
+  list.innerHTML = disputes.map(d => {
+    const s = d.sessions;
+    const openedByStudent = d.opened_by === s?.student_id;
+
+    if (d.status === 'resolved') {
+      return `<div class="dispute-card">
+        <div class="dispute-head">
+          <div>
+            <div class="dispute-id">#${d.id.slice(0,8)}</div>
+            <div class="dispute-subject">${s?.subject || 'Session'}</div>
+          </div>
+          <span class="badge badge-resolved">${d.resolution}</span>
+        </div>
+        <div class="dispute-meta">Between ${s?.student_name || '?'} and ${s?.tutor_name || '?'} · Resolved ${new Date(d.resolved_at).toLocaleDateString()}</div>
+        <div class="resolution-summary">${d.resolution_notes || 'No notes added.'}</div>
+      </div>`;
+    }
+
+    return `<div class="dispute-card">
+      <div class="dispute-head">
+        <div>
+          <div class="dispute-id">#${d.id.slice(0,8)}</div>
+          <div class="dispute-subject">${s?.subject || 'Session'}</div>
+        </div>
+        <span class="badge badge-open">open</span>
+      </div>
+      <div class="dispute-meta">
+        Between <strong>${s?.student_name || '?'}</strong> and <strong>${s?.tutor_name || '?'}</strong> ·
+        Reported by ${openedByStudent ? s?.student_name : s?.tutor_name} · ${new Date(d.created_at).toLocaleDateString()}
+      </div>
+      <div class="dispute-reason">"${d.reason}"</div>
+      <div class="resolve-row">
+        <button class="resolve-btn release" onclick="resolve('${d.id}', 'released', this)">✅ Release to tutor</button>
+        <button class="resolve-btn refund" onclick="resolve('${d.id}', 'refunded', this)">↩️ Full refund</button>
+        <button class="resolve-btn partial" onclick="togglePartial('${d.id}', this)">➗ Partial refund</button>
+        <input type="number" class="partial-amount-input" id="partial-${d.id}" placeholder="Amount" step="0.5">
+        <input type="text" class="notes-input" id="notes-${d.id}" placeholder="Resolution notes (optional)">
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function togglePartial(disputeId, btn) {
+  const input = document.getElementById('partial-' + disputeId);
+  const isVisible = input.style.display === 'inline-block';
+  input.style.display = isVisible ? 'none' : 'inline-block';
+  if (!isVisible) {
+    input.focus();
+    btn.onclick = () => resolve(disputeId, 'partial', btn);
+  }
+}
+
+async function resolve(disputeId, resolution, btn) {
+  const notes = document.getElementById('notes-' + disputeId)?.value || '';
+  const partialInput = document.getElementById('partial-' + disputeId);
+  const refundAmount = resolution === 'partial' ? parseFloat(partialInput?.value) : undefined;
+
+  if (resolution === 'partial' && (!refundAmount || refundAmount <= 0)) {
+    alert('Please enter a valid partial refund amount.');
+    return;
+  }
+
+  const confirmMsg = resolution === 'released' ? 'Release payment to the tutor as normal?'
+    : resolution === 'refunded' ? 'Issue a full refund to the student?'
+    : `Issue a partial refund of ${refundAmount} to the student?`;
+  if (!confirm(confirmMsg)) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+
+  const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/resolve-dispute', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dispute_id: disputeId, admin_id: currentUser.id, resolution, resolution_notes: notes, refund_amount: refundAmount }),
+  });
+  const data = await res.json();
+
+  if (data.error) {
+    alert('Error: ' + data.error);
+    btn.disabled = false;
+    return;
+  }
+
+  await loadDisputes();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>

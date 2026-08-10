@@ -369,7 +369,10 @@ async function init() {
       let actionBtn = '';
       if (s.status === 'confirmed') {
         actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${(s.subject||'Session').replace(/'/g,"\'")}','${(s.tutor_name||'Tutor').replace(/'/g,"\'")}')">🎥 Join Session</button>
-        <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>`;
+        <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>
+        <button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`;
+      } else if (s.status === 'completed') {
+        actionBtn = `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`;
       } else if (s.status === 'awaiting_payment') {
         const remaining = s.payment_due_at ? Math.max(0, new Date(s.payment_due_at).getTime() - Date.now()) : 0;
         const hoursLeft = Math.floor(remaining / 3600000);
@@ -499,6 +502,53 @@ async function loadMyRequests() {
 }
 
 let cancelTargetSessionId = null;
+
+let reportTargetSessionId = null;
+
+function openReportModal(sessionId) {
+  reportTargetSessionId = sessionId;
+  document.getElementById('reportReasonInput').value = '';
+  document.getElementById('reportModalError').style.display = 'none';
+  document.getElementById('reportModalOverlay').style.display = 'flex';
+}
+
+function closeReportModal() {
+  document.getElementById('reportModalOverlay').style.display = 'none';
+  reportTargetSessionId = null;
+}
+
+async function submitReport() {
+  const reason = document.getElementById('reportReasonInput').value.trim();
+  const errBox = document.getElementById('reportModalError');
+  if (!reason) {
+    errBox.textContent = 'Please describe the issue.';
+    errBox.style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('reportSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/open-dispute', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ session_id: reportTargetSessionId, opener_id: currentUserId, reason }),
+  });
+  const data = await res.json();
+
+  btn.disabled = false;
+  btn.textContent = 'Submit Report';
+
+  if (data.error) {
+    errBox.textContent = data.error;
+    errBox.style.display = 'block';
+    return;
+  }
+
+  closeReportModal();
+  alert('Your report has been submitted. Our team will review it shortly.');
+  location.reload();
+}
 
 function openCancelModal(sessionId) {
   cancelTargetSessionId = sessionId;
@@ -759,6 +809,20 @@ document.addEventListener('DOMContentLoaded', init);
       <button onclick="submitReschedule()" style="background:#1a6bff;color:#fff;border:none;padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">Confirm new time</button>
     </div>
     <div id="cancelModalActions" style="display:flex;flex-direction:column;gap:0.6rem;margin-top:1.2rem;"></div>
+  </div>
+</div>
+
+<!-- REPORT ISSUE MODAL -->
+<div id="reportModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
+  <div style="background:#fff;border-radius:16px;max-width:440px;width:100%;padding:1.6rem;font-family:'Manrope',sans-serif;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.8rem;">
+      <div style="font-size:1.05rem;font-weight:800;color:var(--ink);">⚠️ Report an Issue</div>
+      <button onclick="closeReportModal()" style="background:none;border:none;font-size:1.3rem;color:var(--mid);cursor:pointer;line-height:1;">×</button>
+    </div>
+    <div style="font-size:0.82rem;color:var(--mid);margin-bottom:0.9rem;line-height:1.5;">Tell us what went wrong. This will pause the payout for this session while our team reviews it — usually resolved within a few days.</div>
+    <textarea id="reportReasonInput" rows="4" placeholder="Describe the issue..." style="width:100%;padding:0.7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.85rem;resize:vertical;margin-bottom:0.6rem;"></textarea>
+    <div id="reportModalError" style="display:none;font-size:0.78rem;color:#dc2626;margin-bottom:0.6rem;"></div>
+    <button onclick="submitReport()" id="reportSubmitBtn" style="width:100%;background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Submit Report</button>
   </div>
 </div>
 

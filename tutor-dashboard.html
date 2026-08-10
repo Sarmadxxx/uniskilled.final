@@ -877,8 +877,14 @@ async function loadNotifications() {
 
   if (notifs.length === 0) return;
 
-  // Mark all as read when notifications page is shown
-  await _sb.from('notifications').update({ read: true }).eq('user_id', userId);
+  // Only mark as read when the person is actually viewing the Notifications
+  // tab — this used to fire on every single page load (including full
+  // reloads triggered by clicking any other sidebar item), which cleared
+  // the badge before anyone had a real chance to see it.
+  const viewingNotifsTab = new URLSearchParams(window.location.search).get('tab') === 'notifications';
+  if (viewingNotifsTab) {
+    await _sb.from('notifications').update({ read: true }).eq('user_id', userId);
+  }
 
   const typeIcons = { booking_request: '📥', booking_confirmed: '✅', booking_declined: '❌', new_message: '💬', new_review: '⭐' };
 
