@@ -3,805 +3,620 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — UniSkilled</title>
+<title>Admin Console — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;--yellow-bg:#fffbeb;}
-body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--navy:#0b1f4a;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--off:#f8fafc;--white:#fff;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--amber:#92400e;--amber-bg:#fffbeb;}
+body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;}
 
-/* NAV */
-nav{background:#0b1f4a;padding:0 2rem;height:58px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.nav-brand{display:flex;align-items:center;gap:10px;color:#fff;font-weight:800;font-size:1rem;}
-.nav-logo{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;}
-.nav-badge{background:#dc2626;color:#fff;font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:8px;}
-.nav-right{display:flex;align-items:center;gap:1rem;color:rgba(255,255,255,0.7);font-size:0.82rem;}
-.signout-btn{background:rgba(255,255,255,0.1);border:none;color:#fff;padding:0.4rem 0.9rem;border-radius:7px;font-family:'Manrope',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;}
-.signout-btn:hover{background:rgba(255,255,255,0.2);}
+/* ── AUTH SCREEN ── */
+#authScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem;background:linear-gradient(135deg,var(--navy),var(--blue));}
+.auth-box{background:#fff;border-radius:16px;padding:2.2rem;max-width:380px;width:100%;text-align:center;}
+.auth-logo{height:38px;margin-bottom:1.2rem;}
+.auth-title{font-size:1.2rem;font-weight:800;margin-bottom:0.3rem;}
+.auth-sub{font-size:0.82rem;color:var(--mid);margin-bottom:1.4rem;}
+.auth-input{width:100%;padding:0.7rem 0.9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.88rem;margin-bottom:0.8rem;}
+.auth-btn{width:100%;background:var(--blue);color:#fff;border:none;padding:0.75rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;}
+.auth-error{color:var(--red);font-size:0.8rem;margin-top:0.8rem;display:none;}
+.access-denied{text-align:center;padding:5rem 1rem;color:var(--mid);}
 
-/* LAYOUT */
-.layout{display:flex;flex:1;overflow:hidden;}
-.sidebar{width:220px;background:#fff;border-right:1px solid var(--border);flex-shrink:0;padding:1.2rem 0;overflow-y:auto;}
-.sidebar-title{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--light);padding:0.5rem 1.2rem 0.3rem;}
-.nav-item{display:flex;align-items:center;gap:0.7rem;padding:0.65rem 1.2rem;font-size:0.84rem;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;border-left:3px solid transparent;}
-.nav-item:hover{background:var(--off);color:var(--ink);}
+/* ── SHELL ── */
+#adminShell{display:none;}
+.topbar{height:60px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.2rem;position:sticky;top:0;z-index:200;}
+.topbar-logo{display:flex;align-items:center;gap:8px;}
+.topbar-logo img{height:30px;}
+.topbar-title{font-size:0.85rem;font-weight:700;color:var(--mid);}
+.topbar-right{display:flex;align-items:center;gap:0.8rem;}
+.notif-bell{position:relative;background:none;border:none;font-size:1.2rem;cursor:pointer;padding:0.3rem;}
+.notif-badge{position:absolute;top:0;right:0;background:var(--red);color:#fff;font-size:0.6rem;font-weight:800;padding:1px 5px;border-radius:100px;min-width:15px;text-align:center;}
+.signout-btn{font-size:0.78rem;color:var(--mid);background:none;border:1px solid var(--border);padding:0.4rem 0.8rem;border-radius:7px;cursor:pointer;}
+.mobile-menu-btn{display:none;background:none;border:none;font-size:1.3rem;cursor:pointer;}
+
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 60px);}
+.sidebar{background:#fff;border-right:1px solid var(--border);padding:1rem 0;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:0.7rem 1.2rem;font-size:0.85rem;font-weight:600;color:var(--ink2);cursor:pointer;border-left:3px solid transparent;}
+.nav-item:hover{background:var(--off);}
 .nav-item.active{background:#eff6ff;color:var(--blue);border-left-color:var(--blue);}
-.nav-item .ico{font-size:1rem;width:20px;text-align:center;}
-.nb{background:var(--red);color:#fff;font-size:0.62rem;font-weight:700;padding:1px 5px;border-radius:100px;margin-left:auto;}
+.nav-item .count{margin-left:auto;background:var(--red);color:#fff;font-size:0.65rem;font-weight:800;padding:1px 6px;border-radius:100px;}
 
-/* MAIN */
-.main{flex:1;overflow-y:auto;padding:1.5rem 2rem;}
-.page{display:none;}
-.page.active{display:block;}
-.page-title{font-size:1.3rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.3rem;}
-.page-sub{font-size:0.82rem;color:var(--mid);margin-bottom:1.5rem;}
+.main{padding:1.5rem;overflow-x:hidden;}
+.page-title{font-size:1.3rem;font-weight:800;margin-bottom:1.2rem;}
 
-/* STAT CARDS */
-.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem;}
-.stat-card{background:#fff;border-radius:12px;border:1px solid var(--border);padding:1.2rem 1.4rem;}
-.stat-card-n{font-size:1.8rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.2rem;}
-.stat-card-l{font-size:0.75rem;color:var(--mid);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;}
-.stat-card.blue .stat-card-n{color:var(--blue);}
-.stat-card.green .stat-card-n{color:var(--green);}
-.stat-card.red .stat-card-n{color:var(--red);}
-.stat-card.yellow .stat-card-n{color:var(--yellow);}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.9rem;margin-bottom:1.5rem;}
+.stat-card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:1.1rem;}
+.stat-num{font-size:1.5rem;font-weight:800;color:var(--ink);}
+.stat-lbl{font-size:0.72rem;color:var(--mid);text-transform:uppercase;letter-spacing:0.04em;margin-top:2px;}
 
-/* TABLES */
-.card{background:#fff;border-radius:12px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.2rem;}
-.card-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid var(--border);}
-.card-title{font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--light);}
-.search-row{display:flex;gap:0.7rem;align-items:center;}
-.search-input{padding:0.45rem 0.85rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.82rem;outline:none;min-width:200px;}
-.search-input:focus{border-color:var(--blue);}
-.filter-sel{padding:0.45rem 0.7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.82rem;outline:none;cursor:pointer;}
-table{width:100%;border-collapse:collapse;}
-th{text-align:left;padding:0.75rem 1rem;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--light);border-bottom:1px solid var(--border);background:var(--off);}
-td{padding:0.8rem 1rem;font-size:0.83rem;border-bottom:1px solid var(--border);vertical-align:middle;}
+.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:1.2rem;}
+.card-title{font-size:0.95rem;font-weight:800;margin-bottom:0.9rem;}
+
+table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+th{text-align:left;padding:0.5rem 0.6rem;color:var(--light);font-size:0.68rem;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--border);white-space:nowrap;}
+td{padding:0.6rem;border-bottom:1px solid var(--off);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-tr:hover td{background:#fafbfc;}
-.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:100px;font-size:0.7rem;font-weight:700;}
-.badge-tutor{background:#eff6ff;color:var(--blue);}
-.badge-student{background:var(--green-bg);color:var(--green);}
-.badge-admin{background:#fef3c7;color:#92400e;}
-.badge-confirmed{background:var(--green-bg);color:var(--green);}
-.badge-pending{background:#fffbeb;color:var(--yellow);}
-.badge-completed{background:#f0fdf4;color:#15803d;}
-.badge-open{background:#eff6ff;color:var(--blue);}
-.badge-accepted{background:var(--green-bg);color:var(--green);}
-.badge-suspended{background:var(--red-bg);color:var(--red);}
+.table-scroll{overflow-x:auto;}
 
-/* ACTION BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:4px;padding:0.32rem 0.75rem;border-radius:7px;font-family:'Manrope',sans-serif;font-size:0.76rem;font-weight:700;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;}
-.btn-sm-blue{background:#eff6ff;color:var(--blue);}
-.btn-sm-blue:hover{background:#dbeafe;}
-.btn-sm-red{background:var(--red-bg);color:var(--red);}
-.btn-sm-red:hover{background:#fecaca;}
-.btn-sm-green{background:var(--green-bg);color:var(--green);}
-.btn-sm-green:hover{background:#a7f3d0;}
-.btn-sm-yellow{background:var(--yellow-bg);color:var(--yellow);}
-.btn-sm-yellow:hover{background:#fde68a;}
-.btn-sm-gray{background:var(--off);color:var(--mid);}
-.btn-sm-gray:hover{background:var(--border);}
-.btn-primary{background:var(--blue);color:#fff;padding:0.55rem 1.2rem;font-size:0.84rem;}
-.btn-primary:hover{background:#1558e0;}
-.btn-danger{background:var(--red);color:#fff;padding:0.55rem 1.2rem;font-size:0.84rem;}
-.btn-group{display:flex;gap:0.4rem;flex-wrap:wrap;}
+.badge{font-size:0.68rem;font-weight:700;padding:2px 9px;border-radius:100px;white-space:nowrap;}
+.badge-green{background:var(--green-bg);color:var(--green);}
+.badge-red{background:var(--red-bg);color:var(--red);}
+.badge-amber{background:var(--amber-bg);color:var(--amber);}
+.badge-gray{background:var(--off);color:var(--mid);}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:600;display:none;align-items:center;justify-content:center;padding:1rem;}
-.modal-overlay.open{display:flex;}
-.modal{background:#fff;border-radius:14px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
-.modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);}
-.modal-title{font-weight:800;font-size:0.95rem;}
-.modal-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--mid);width:30px;height:30px;border-radius:7px;}
-.modal-close:hover{background:var(--off);}
-.modal-body{padding:1.4rem;}
-.modal-footer{padding:1rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:0.7rem;justify-content:flex-end;}
-.form-group{margin-bottom:0.9rem;}
-.form-label{display:block;font-size:0.78rem;font-weight:700;color:var(--ink2);margin-bottom:0.35rem;}
-.form-input,.form-select,.form-textarea{width:100%;padding:0.65rem 0.85rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;outline:none;}
-.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);}
-.form-textarea{min-height:90px;resize:vertical;line-height:1.6;}
+.filter-row{display:flex;gap:0.6rem;margin-bottom:1rem;flex-wrap:wrap;}
+.filter-btn{padding:0.4rem 0.9rem;border-radius:100px;font-size:0.78rem;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--mid);cursor:pointer;}
+.filter-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);}
+.search-input{padding:0.5rem 0.8rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;flex:1;min-width:180px;}
 
-/* ALERT */
-.alert{padding:0.75rem 1rem;border-radius:9px;font-size:0.82rem;font-weight:600;margin-bottom:1rem;display:none;}
-.alert.success{background:var(--green-bg);color:var(--green);display:block;}
-.alert.error{background:var(--red-bg);color:var(--red);display:block;}
-.alert.info{background:#eff6ff;color:var(--blue);display:block;}
+.dispute-card{border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:0.9rem;}
+.dispute-reason{background:var(--off);border-radius:8px;padding:0.8rem 0.9rem;font-size:0.83rem;margin:0.7rem 0;}
+.resolve-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
+.resolve-btn{padding:0.5rem 0.9rem;border-radius:8px;font-size:0.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:#fff;}
+.resolve-btn.release{color:var(--green);border-color:#86efac;}
+.resolve-btn.refund{color:var(--red);border-color:#fecaca;}
+.resolve-btn.partial{color:var(--amber);border-color:#fcd34d;}
+.notes-input{flex:1;min-width:160px;padding:0.5rem 0.7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.8rem;}
+.partial-amount-input{width:85px;padding:0.5rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.8rem;display:none;}
 
-/* TOAST */
-.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1e293b;color:#fff;padding:0.8rem 1.2rem;border-radius:10px;font-size:0.84rem;font-weight:600;z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s;max-width:320px;}
-.toast.show{transform:translateY(0);opacity:1;}
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--mid);font-size:0.85rem;}
+.spinner{width:26px;height:26px;border:3px solid rgba(26,107,255,0.2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:2.5rem auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-/* EMPTY */
-.empty-row td{text-align:center;padding:2.5rem;color:var(--light);font-style:italic;}
+.suspend-btn{font-size:0.72rem;color:var(--red);background:none;border:1px solid #fecaca;padding:3px 8px;border-radius:6px;cursor:pointer;}
+.unsuspend-btn{font-size:0.72rem;color:var(--green);background:none;border:1px solid #86efac;padding:3px 8px;border-radius:6px;cursor:pointer;}
 
-/* ANNOUNCEMENT */
-.announce-wrap{background:linear-gradient(135deg,#0b1f4a,#1a6bff);border-radius:12px;padding:1.5rem;color:#fff;margin-bottom:1.2rem;}
-.announce-wrap h3{font-size:1rem;font-weight:700;margin-bottom:0.4rem;}
-.announce-wrap p{font-size:0.82rem;opacity:0.75;margin-bottom:1rem;line-height:1.5;}
+.notif-panel{position:fixed;top:60px;right:0;width:340px;max-width:90vw;height:calc(100vh - 60px);background:#fff;border-left:1px solid var(--border);z-index:300;display:none;flex-direction:column;box-shadow:-8px 0 24px rgba(0,0,0,0.08);}
+.notif-panel.open{display:flex;}
+.notif-panel-head{padding:1rem 1.2rem;border-bottom:1px solid var(--border);font-weight:800;display:flex;justify-content:space-between;align-items:center;}
+.notif-panel-body{flex:1;overflow-y:auto;}
+.notif-row{padding:0.9rem 1.2rem;border-bottom:1px solid var(--off);font-size:0.8rem;cursor:pointer;}
+.notif-row.unread{background:#eff6ff;}
+.notif-row-title{font-weight:700;margin-bottom:2px;}
+.notif-row-body{color:var(--mid);}
+.notif-row-time{color:var(--light);font-size:0.7rem;margin-top:4px;}
 
-@media(max-width:900px){
-  .sidebar{display:none;}
-  .stat-grid{grid-template-columns:1fr 1fr;}
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{display:none;position:fixed;top:60px;left:0;right:0;bottom:0;z-index:250;overflow-y:auto;}
+  .sidebar.open{display:block;}
+  .mobile-menu-btn{display:block;}
+  .main{padding:1rem;}
+  .topbar-title{display:none;}
 }
 </style>
 </head>
 <body>
 
-<nav>
-  <div class="nav-brand">
-    <div class="nav-logo">U</div>
-    UniSkilled <span class="nav-badge">ADMIN</span>
-  </div>
-  <div class="nav-right">
-    <span id="adminName">Loading...</span>
-    <button class="signout-btn" onclick="adminSignOut()">Sign out</button>
-  </div>
-</nav>
-
-<div class="layout">
-  <!-- SIDEBAR -->
-  <div class="sidebar">
-    <div class="sidebar-title">Overview</div>
-    <div class="nav-item active" onclick="showPage('overview',this)"><span class="ico">📊</span>Dashboard</div>
-    <div class="sidebar-title" style="margin-top:0.8rem;">Users</div>
-    <div class="nav-item" onclick="showPage('users',this)"><span class="ico">👥</span>All Users <span class="nb" id="nbUsers">0</span></div>
-    <div class="nav-item" onclick="showPage('tutors',this)"><span class="ico">📚</span>Tutors</div>
-    <div class="nav-item" onclick="showPage('students',this)"><span class="ico">🎓</span>Students</div>
-    <div class="sidebar-title" style="margin-top:0.8rem;">Platform</div>
-    <div class="nav-item" onclick="showPage('sessions',this)"><span class="ico">📅</span>Sessions</div>
-    <div class="nav-item" onclick="showPage('requests',this)"><span class="ico">📋</span>Subject Requests</div>
-    <div class="nav-item" onclick="showPage('reviews',this)"><span class="ico">⭐</span>Reviews</div>
-    <div class="nav-item" onclick="showPage('messages',this)"><span class="ico">💬</span>Messages</div>
-    <div class="sidebar-title" style="margin-top:0.8rem;">Tools</div>
-    <div class="nav-item" onclick="showPage('announce',this)"><span class="ico">📣</span>Announcements</div>
-  </div>
-
-  <!-- MAIN CONTENT -->
-  <div class="main">
-
-    <!-- OVERVIEW -->
-    <div class="page active" id="page-overview">
-      <div class="page-title">Dashboard</div>
-      <div class="page-sub" id="overviewSub">Loading platform stats...</div>
-      <div class="stat-grid">
-        <div class="stat-card blue"><div class="stat-card-n" id="statTotalUsers">—</div><div class="stat-card-l">Total Users</div></div>
-        <div class="stat-card green"><div class="stat-card-n" id="statTotalTutors">—</div><div class="stat-card-l">Tutors</div></div>
-        <div class="stat-card"><div class="stat-card-n" id="statTotalStudents">—</div><div class="stat-card-l">Students</div></div>
-        <div class="stat-card yellow"><div class="stat-card-n" id="statTotalSessions">—</div><div class="stat-card-l">Sessions</div></div>
-        <div class="stat-card green"><div class="stat-card-n" id="statConfirmed">—</div><div class="stat-card-l">Confirmed</div></div>
-        <div class="stat-card"><div class="stat-card-n" id="statCompleted">—</div><div class="stat-card-l">Completed</div></div>
-        <div class="stat-card"><div class="stat-card-n" id="statMessages">—</div><div class="stat-card-l">Messages</div></div>
-        <div class="stat-card red"><div class="stat-card-n" id="statOpenRequests">—</div><div class="stat-card-l">Open Requests</div></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">Recent signups</div></div>
-        <table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr></thead>
-        <tbody id="recentUsersTable"><tr class="empty-row"><td colspan="5">Loading...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- USERS -->
-    <div class="page" id="page-users">
-      <div class="page-title">All Users</div>
-      <div class="page-sub">Manage all platform accounts</div>
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Users</div>
-          <div class="search-row">
-            <input type="text" class="search-input" id="userSearch" placeholder="Search name or email..." oninput="filterUsers()">
-            <select class="filter-sel" id="userRoleFilter" onchange="filterUsers()">
-              <option value="">All roles</option>
-              <option value="tutor">Tutors</option>
-              <option value="student">Students</option>
-            </select>
-          </div>
-        </div>
-        <table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Country</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
-        <tbody id="usersTable"><tr class="empty-row"><td colspan="7">Loading...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- TUTORS -->
-    <div class="page" id="page-tutors">
-      <div class="page-title">Tutors</div>
-      <div class="page-sub">View and manage tutor accounts and profiles</div>
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Tutor Profiles</div>
-          <input type="text" class="search-input" id="tutorSearch" placeholder="Search tutor..." oninput="filterTutors()">
-        </div>
-        <table><thead><tr><th>Name</th><th>Email</th><th>University</th><th>Subjects</th><th>Rate</th><th>Country</th><th>Actions</th></tr></thead>
-        <tbody id="tutorsTable"><tr class="empty-row"><td colspan="7">Loading...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- STUDENTS -->
-    <div class="page" id="page-students">
-      <div class="page-title">Students</div>
-      <div class="page-sub">View and manage student accounts</div>
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Student Accounts</div>
-          <input type="text" class="search-input" id="studentSearch" placeholder="Search student..." oninput="filterStudents()">
-        </div>
-        <table><thead><tr><th>Name</th><th>Email</th><th>University</th><th>Degree</th><th>Country</th><th>Sessions</th><th>Actions</th></tr></thead>
-        <tbody id="studentsTable"><tr class="empty-row"><td colspan="7">Loading...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- SESSIONS -->
-    <div class="page" id="page-sessions">
-      <div class="page-title">Sessions</div>
-      <div class="page-sub">All tutoring sessions on the platform</div>
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">All Sessions</div>
-          <select class="filter-sel" id="sessionStatusFilter" onchange="filterSessions()">
-            <option value="">All statuses</option>
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="completed">Completed</option>
-            <option value="declined">Declined</option>
-          </select>
-        </div>
-        <table><thead><tr><th>Tutor</th><th>Student</th><th>Subject</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody id="sessionsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- SUBJECT REQUESTS -->
-    <div class="page" id="page-requests">
-      <div class="page-title">Subject Requests</div>
-      <div class="page-sub">Student-posted subject requests and their status</div>
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Requests</div>
-          <select class="filter-sel" id="reqStatusFilter" onchange="filterRequests()">
-            <option value="">All</option>
-            <option value="open">Open</option>
-            <option value="accepted">Accepted</option>
-          </select>
-        </div>
-        <table><thead><tr><th>Student</th><th>Subject</th><th>Level</th><th>Language</th><th>Status</th><th>Posted</th><th>Actions</th></tr></thead>
-        <tbody id="requestsTable"><tr class="empty-row"><td colspan="7">Loading...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- REVIEWS -->
-    <div class="page" id="page-reviews">
-      <div class="page-title">Reviews</div>
-      <div class="page-sub">All tutor reviews — remove any that violate community guidelines</div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">All Reviews</div></div>
-        <table><thead><tr><th>Student</th><th>Tutor</th><th>Rating</th><th>Comment</th><th>Date</th><th>Actions</th></tr></thead>
-        <tbody id="reviewsTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- MESSAGES -->
-    <div class="page" id="page-messages">
-      <div class="page-title">Conversations</div>
-      <div class="page-sub">Conversation metadata — message content is not shown to protect user privacy</div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">All Conversations</div></div>
-        <table><thead><tr><th>Participant 1</th><th>Participant 2</th><th>Last Message</th><th>Messages</th><th>Last Active</th><th>Actions</th></tr></thead>
-        <tbody id="messagesTable"><tr class="empty-row"><td colspan="6">Loading...</td></tr></tbody></table>
-      </div>
-    </div>
-
-    <!-- ANNOUNCEMENTS -->
-    <div class="page" id="page-announce">
-      <div class="page-title">Announcements</div>
-      <div class="page-sub">Send notifications to all users or specific groups</div>
-      <div class="announce-wrap">
-        <h3>📣 Platform Announcement</h3>
-        <p>Send a notification to all users — tutors, students, or everyone. They'll see it in their notifications panel.</p>
-      </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">New Announcement</div></div>
-        <div style="padding:1.4rem;">
-          <div class="alert" id="announceAlert"></div>
-          <div class="form-group">
-            <label class="form-label">Send to</label>
-            <select class="form-select" id="announceTarget">
-              <option value="all">Everyone</option>
-              <option value="tutor">Tutors only</option>
-              <option value="student">Students only</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Title</label>
-            <input type="text" class="form-input" id="announceTitle" placeholder="e.g. New feature available">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Message</label>
-            <textarea class="form-textarea" id="announceBody" placeholder="Write your announcement here..."></textarea>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Link (optional)</label>
-            <input type="text" class="form-input" id="announceLink" placeholder="e.g. find-tutors.html">
-          </div>
-          <button class="btn btn-primary" onclick="sendAnnouncement()">📣 Send Announcement</button>
-        </div>
-      </div>
-    </div>
-
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-box">
+    <img src="uniskilled-logo.png" alt="UniSkilled" class="auth-logo">
+    <div class="auth-title">Admin Console</div>
+    <div class="auth-sub">Sign in with your admin account</div>
+    <input type="email" id="authEmail" class="auth-input" placeholder="Email">
+    <input type="password" id="authPassword" class="auth-input" placeholder="Password">
+    <button class="auth-btn" onclick="doSignIn()" id="signInBtn">Sign In</button>
+    <div class="auth-error" id="authError"></div>
   </div>
 </div>
 
-<!-- MODALS -->
-<!-- Suspend User -->
-<div class="modal-overlay" id="modalSuspend" onclick="if(event.target===this)closeModal('modalSuspend')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Suspend User</div><button class="modal-close" onclick="closeModal('modalSuspend')">✕</button></div>
-    <div class="modal-body">
-      <p style="font-size:0.85rem;color:var(--mid);margin-bottom:1rem;">This will prevent the user from accessing the platform. You can unsuspend them at any time.</p>
-      <div class="form-group"><label class="form-label">Reason for suspension</label><textarea class="form-textarea" id="suspendReason" placeholder="e.g. Violated community guidelines..."></textarea></div>
+<!-- ACCESS DENIED (signed in but not admin) -->
+<div id="deniedScreen" style="display:none;" class="access-denied">🔒 This account doesn't have admin access.</div>
+
+<!-- ADMIN SHELL -->
+<div id="adminShell">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:0.8rem;">
+      <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+      <div class="topbar-logo"><img src="uniskilled-logo.png" alt="UniSkilled"></div>
+      <span class="topbar-title">Admin Console</span>
     </div>
-    <div class="modal-footer">
-      <button class="btn btn-sm-gray" onclick="closeModal('modalSuspend')">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmSuspend()">Suspend User</button>
+    <div class="topbar-right">
+      <button class="notif-bell" onclick="toggleNotifPanel()">
+        🔔<span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+      </button>
+      <button class="signout-btn" onclick="signOut()">Sign out</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar" id="sidebar">
+      <div class="nav-item active" onclick="showPage('overview',this)">📊 Overview</div>
+      <div class="nav-item" onclick="showPage('disputes',this)">🚨 Disputes<span class="count" id="disputeCount" style="display:none;">0</span></div>
+      <div class="nav-item" onclick="showPage('transactions',this)">💰 Transactions</div>
+      <div class="nav-item" onclick="showPage('sessions',this)">📅 Sessions</div>
+      <div class="nav-item" onclick="showPage('groupsessions',this)">👥 Group Sessions</div>
+      <div class="nav-item" onclick="showPage('users',this)">👤 Users</div>
+    </div>
+
+    <div class="main">
+      <!-- OVERVIEW -->
+      <div id="page-overview">
+        <div class="page-title">📊 Overview</div>
+        <div class="stat-grid" id="statsGrid"><div class="spinner"></div></div>
+        <div class="card">
+          <div class="card-title">Recent Activity</div>
+          <div id="recentActivity"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- DISPUTES -->
+      <div id="page-disputes" style="display:none;">
+        <div class="page-title">🚨 Disputes</div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setDisputeFilter('open',this)">Open</button>
+          <button class="filter-btn" onclick="setDisputeFilter('resolved',this)">Resolved</button>
+        </div>
+        <div id="disputesList"><div class="spinner"></div></div>
+      </div>
+
+      <!-- TRANSACTIONS -->
+      <div id="page-transactions" style="display:none;">
+        <div class="page-title">💰 Transactions</div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setTxnFilter('all',this)">All</button>
+          <button class="filter-btn" onclick="setTxnFilter('paid',this)">Paid</button>
+          <button class="filter-btn" onclick="setTxnFilter('released',this)">Released</button>
+          <button class="filter-btn" onclick="setTxnFilter('refunded',this)">Refunded</button>
+        </div>
+        <div class="card">
+          <div class="table-scroll" id="transactionsTable"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- SESSIONS -->
+      <div id="page-sessions" style="display:none;">
+        <div class="page-title">📅 Sessions</div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setSessionFilter('all',this)">All</button>
+          <button class="filter-btn" onclick="setSessionFilter('pending',this)">Pending</button>
+          <button class="filter-btn" onclick="setSessionFilter('awaiting_payment',this)">Awaiting Payment</button>
+          <button class="filter-btn" onclick="setSessionFilter('confirmed',this)">Confirmed</button>
+          <button class="filter-btn" onclick="setSessionFilter('completed',this)">Completed</button>
+          <button class="filter-btn" onclick="setSessionFilter('cancelled',this)">Cancelled</button>
+        </div>
+        <div class="card">
+          <div class="table-scroll" id="sessionsTable"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- GROUP SESSIONS -->
+      <div id="page-groupsessions" style="display:none;">
+        <div class="page-title">👥 Group Sessions</div>
+        <div class="card">
+          <div class="table-scroll" id="groupSessionsTable"><div class="spinner"></div></div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div id="page-users" style="display:none;">
+        <div class="page-title">👤 Users</div>
+        <div class="filter-row">
+          <input type="text" class="search-input" id="userSearch" placeholder="Search by name or email..." oninput="renderUsers()">
+          <button class="filter-btn active" onclick="setUserFilter('all',this)">All</button>
+          <button class="filter-btn" onclick="setUserFilter('tutor',this)">Tutors</button>
+          <button class="filter-btn" onclick="setUserFilter('student',this)">Students</button>
+          <button class="filter-btn" onclick="setUserFilter('suspended',this)">Suspended</button>
+        </div>
+        <div class="card">
+          <div class="table-scroll" id="usersTable"><div class="spinner"></div></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- Change Role -->
-<div class="modal-overlay" id="modalRole" onclick="if(event.target===this)closeModal('modalRole')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Change Role</div><button class="modal-close" onclick="closeModal('modalRole')">✕</button></div>
-    <div class="modal-body">
-      <div class="form-group"><label class="form-label">New role</label>
-        <select class="form-select" id="newRole">
-          <option value="student">Student</option>
-          <option value="tutor">Tutor</option>
-          <option value="admin">Admin</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-sm-gray" onclick="closeModal('modalRole')">Cancel</button>
-      <button class="btn btn-primary" onclick="confirmRoleChange()">Save</button>
-    </div>
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-panel-head">
+    <span>Notifications</span>
+    <button onclick="toggleNotifPanel()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;">×</button>
   </div>
+  <div class="notif-panel-body" id="notifPanelBody"><div class="spinner"></div></div>
 </div>
-
-<!-- Delete confirm -->
-<div class="modal-overlay" id="modalDelete" onclick="if(event.target===this)closeModal('modalDelete')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Confirm Delete</div><button class="modal-close" onclick="closeModal('modalDelete')">✕</button></div>
-    <div class="modal-body">
-      <p style="font-size:0.88rem;color:var(--ink2);" id="deleteConfirmText">Are you sure? This cannot be undone.</p>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-sm-gray" onclick="closeModal('modalDelete')">Cancel</button>
-      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script>
+const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
 const _sb = window.supabase.createClient(
-  'https://orghkbbohnabcietidiv.supabase.co',
+  SUPABASE_URL,
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
 );
 
-let allUsers = [], allSessions = [], allRequests = [], allReviews = [], allConvs = [];
-let pendingAction = null; // { type, id, extra }
+let adminUser = null;
+let allUsers = [], allSessions = [], allGroupSessions = [], allPayments = [], allDisputes = [];
+let disputeFilter = 'open', txnFilter = 'all', sessionFilter = 'all', userFilter = 'all';
 
-// ── INIT ──
-async function init() {
-  const { data: { session } } = await _sb.auth.getSession();
-  if (!session) { window.location.href = 'signin.html'; return; }
+async function doSignIn() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const errBox = document.getElementById('authError');
+  errBox.style.display = 'none';
 
-  const meta = session.user.user_metadata || {};
-  // Check admin role from both public.users and user_metadata
-  const { data: u } = await _sb.from('users').select('role, full_name').eq('id', session.user.id).single();
-  if (!u || u.role !== 'admin') {
-    window.location.href = 'index.html';
+  if (!email || !password) {
+    errBox.textContent = 'Please enter both email and password.';
+    errBox.style.display = 'block';
     return;
   }
 
-  document.getElementById('adminName').textContent = u.full_name || session.user.email;
-  await loadAll();
+  const btn = document.getElementById('signInBtn');
+  btn.disabled = true;
+  btn.textContent = 'Signing in...';
+
+  const { data, error } = await _sb.auth.signInWithPassword({ email, password });
+
+  btn.disabled = false;
+  btn.textContent = 'Sign In';
+
+  if (error) {
+    errBox.textContent = error.message;
+    errBox.style.display = 'block';
+    return;
+  }
+
+  await checkAdminAccess();
 }
 
-async function loadAll() {
-  await Promise.all([loadStats(), loadUsers(), loadSessions(), loadRequests(), loadReviews(), loadConversations()]);
+async function checkAdminAccess() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) return; // stay on auth screen
+
+  const { data: u } = await _sb.from('users').select('*').eq('id', session.user.id).single();
+  if (!u?.roles?.includes('admin')) {
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('deniedScreen').style.display = 'block';
+    return;
+  }
+
+  adminUser = { id: session.user.id, email: u.email };
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('deniedScreen').style.display = 'none';
+  document.getElementById('adminShell').style.display = 'block';
+
+  await loadEverything();
+  setupRealtime();
 }
 
-// ── STATS ──
-async function loadStats() {
-  const [
-    { count: totalUsers },
-    { count: tutors },
-    { count: students },
-    { count: sessions },
-    { count: confirmed },
-    { count: completed },
-    { count: messages },
-    { count: openReqs }
-  ] = await Promise.all([
-    _sb.from('users').select('*', { count: 'exact', head: true }),
-    _sb.from('users').select('*', { count: 'exact', head: true }).eq('role', 'tutor'),
-    _sb.from('users').select('*', { count: 'exact', head: true }).eq('role', 'student'),
-    _sb.from('sessions').select('*', { count: 'exact', head: true }),
-    _sb.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'confirmed'),
-    _sb.from('sessions').select('*', { count: 'exact', head: true }).eq('status', 'completed'),
-    _sb.from('messages').select('*', { count: 'exact', head: true }),
-    _sb.from('subject_requests').select('*', { count: 'exact', head: true }).eq('status', 'open'),
+async function signOut() {
+  await _sb.auth.signOut();
+  location.reload();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+function showPage(id, el) {
+  document.querySelectorAll('[id^="page-"]').forEach(p => p.style.display = 'none');
+  document.getElementById('page-' + id).style.display = 'block';
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('sidebar').classList.remove('open');
+}
+
+// ── DATA LOADING ──
+async function loadEverything() {
+  const [usersRes, sessionsRes, groupSessionsRes, paymentsRes, disputesRes] = await Promise.all([
+    _sb.from('users').select('*').order('created_at', { ascending: false }),
+    _sb.from('sessions').select('*').order('created_at', { ascending: false }).limit(200),
+    _sb.from('group_sessions').select('*, group_session_participants(*)').order('created_at', { ascending: false }),
+    _sb.from('payments').select('*').order('paid_at', { ascending: false }).limit(200),
+    _sb.from('disputes').select('*, sessions(*)').order('created_at', { ascending: false }),
   ]);
 
-  document.getElementById('statTotalUsers').textContent = totalUsers ?? 0;
-  document.getElementById('statTotalTutors').textContent = tutors ?? 0;
-  document.getElementById('statTotalStudents').textContent = students ?? 0;
-  document.getElementById('statTotalSessions').textContent = sessions ?? 0;
-  document.getElementById('statConfirmed').textContent = confirmed ?? 0;
-  document.getElementById('statCompleted').textContent = completed ?? 0;
-  document.getElementById('statMessages').textContent = messages ?? 0;
-  document.getElementById('statOpenRequests').textContent = openReqs ?? 0;
-  document.getElementById('nbUsers').textContent = totalUsers ?? 0;
-  document.getElementById('overviewSub').textContent = `Platform live · ${totalUsers} users · ${sessions} sessions · Last updated ${new Date().toLocaleTimeString()}`;
+  allUsers = usersRes.data || [];
+  allSessions = sessionsRes.data || [];
+  allGroupSessions = groupSessionsRes.data || [];
+  allPayments = paymentsRes.data || [];
+  allDisputes = disputesRes.data || [];
+
+  renderOverview();
+  renderDisputes();
+  renderTransactions();
+  renderSessions();
+  renderGroupSessions();
+  renderUsers();
+  await loadNotifications();
+
+  const openCount = allDisputes.filter(d => d.status === 'open').length;
+  const dc = document.getElementById('disputeCount');
+  if (openCount > 0) { dc.textContent = openCount; dc.style.display = 'inline-block'; }
+  else dc.style.display = 'none';
 }
 
-// ── USERS ──
-async function loadUsers() {
-  const { data } = await _sb.from('users').select('*').order('created_at', { ascending: false });
-  allUsers = data || [];
-  renderUsers(allUsers);
-  renderRecentUsers(allUsers.slice(0, 8));
-  renderTutors(allUsers.filter(u => u.role === 'tutor'));
-  renderStudents(allUsers.filter(u => u.role === 'student'));
+function setupRealtime() {
+  _sb.channel('admin-notifs')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${adminUser.id}` },
+      async () => await loadEverything())
+    .subscribe();
+  _sb.channel('admin-disputes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'disputes' },
+      async () => await loadEverything())
+    .subscribe();
+  _sb.channel('admin-payments')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'payments' },
+      async () => await loadEverything())
+    .subscribe();
 }
 
-function renderRecentUsers(users) {
-  document.getElementById('recentUsersTable').innerHTML = users.length === 0
-    ? '<tr class="empty-row"><td colspan="5">No users yet</td></tr>'
-    : users.map(u => `<tr>
-        <td><strong>${u.full_name || '—'}</strong></td>
-        <td style="color:var(--mid)">${u.email}</td>
-        <td><span class="badge badge-${u.role || 'student'}">${u.role || 'student'}</span></td>
-        <td style="color:var(--mid)">${new Date(u.created_at).toLocaleDateString()}</td>
-        <td><div class="btn-group">
-          ${u.suspended_at ? `<button class="btn btn-sm-green" onclick="unsuspendUser('${u.id}')">✓ Unsuspend</button>` : `<button class="btn btn-sm-yellow" onclick="openSuspendModal('${u.id}')">⚠ Suspend</button>`}
-        </div></td>
-      </tr>`).join('');
+// ── OVERVIEW ──
+function renderOverview() {
+  const totalStudents = allUsers.filter(u => u.roles?.includes('student')).length;
+  const totalTutors = allUsers.filter(u => u.roles?.includes('tutor')).length;
+  const totalRevenue = allPayments.filter(p => p.status === 'paid' || p.status === 'released').reduce((sum, p) => sum + Number(p.platform_fee || 0), 0);
+  const openDisputes = allDisputes.filter(d => d.status === 'open').length;
+  const confirmedSessions = allSessions.filter(s => s.status === 'confirmed' || s.status === 'completed').length;
+  const pendingPayouts = allPayments.filter(p => p.status === 'paid' && !p.released_at).length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${totalStudents}</div><div class="stat-lbl">Students</div></div>
+    <div class="stat-card"><div class="stat-num">${totalTutors}</div><div class="stat-lbl">Tutors</div></div>
+    <div class="stat-card"><div class="stat-num">${confirmedSessions}</div><div class="stat-lbl">Sessions Booked</div></div>
+    <div class="stat-card"><div class="stat-num">€${totalRevenue.toFixed(2)}</div><div class="stat-lbl">Platform Revenue</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:${openDisputes > 0 ? 'var(--red)' : 'var(--ink)'};">${openDisputes}</div><div class="stat-lbl">Open Disputes</div></div>
+    <div class="stat-card"><div class="stat-num">${pendingPayouts}</div><div class="stat-lbl">Pending Payouts</div></div>
+  `;
+
+  const recent = [...allPayments].slice(0, 8).map(p => {
+    const s = allSessions.find(s => s.id === p.session_id);
+    return `<div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid var(--off);font-size:0.82rem;">
+      <span>${s?.subject || p.type || 'Payment'}</span>
+      <span style="font-weight:700;">${p.currency === 'USD' ? '$' : '€'}${p.amount} <span class="badge ${p.status === 'refunded' ? 'badge-red' : p.status === 'released' ? 'badge-green' : 'badge-gray'}">${p.status}</span></span>
+    </div>`;
+  }).join('');
+  document.getElementById('recentActivity').innerHTML = recent || '<div class="empty-state">No activity yet.</div>';
 }
 
-function renderUsers(users) {
-  document.getElementById('usersTable').innerHTML = users.length === 0
-    ? '<tr class="empty-row"><td colspan="7">No users found</td></tr>'
-    : users.map(u => `<tr>
-        <td><strong>${u.full_name || '—'}</strong></td>
-        <td style="color:var(--mid);font-size:0.78rem;">${u.email}</td>
-        <td><span class="badge badge-${u.role || 'student'}">${u.role || 'student'}</span></td>
-        <td style="color:var(--mid)">${u.country || '—'}</td>
-        <td>${u.suspended_at ? '<span class="badge badge-suspended">Suspended</span>' : '<span style="color:var(--green);font-size:0.78rem;font-weight:600;">Active</span>'}</td>
-        <td style="color:var(--mid)">${new Date(u.created_at).toLocaleDateString()}</td>
-        <td><div class="btn-group">
-          <button class="btn btn-sm-blue" onclick="openRoleModal('${u.id}','${u.role || 'student'}')">Role</button>
-          ${u.suspended_at
-            ? `<button class="btn btn-sm-green" onclick="unsuspendUser('${u.id}')">Unsuspend</button>`
-            : `<button class="btn btn-sm-yellow" onclick="openSuspendModal('${u.id}')">Suspend</button>`}
-          <button class="btn btn-sm-red" onclick="openDeleteModal('user','${u.id}','Delete user ${(u.full_name||u.email).replace(/'/g,"\\'")}?')">Delete</button>
-        </div></td>
-      </tr>`).join('');
+// ── DISPUTES ──
+function setDisputeFilter(f, el) {
+  disputeFilter = f;
+  document.querySelectorAll('#page-disputes .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderDisputes();
 }
 
-function filterUsers() {
-  const q = document.getElementById('userSearch').value.toLowerCase();
-  const role = document.getElementById('userRoleFilter').value;
-  renderUsers(allUsers.filter(u =>
-    (!q || (u.full_name||'').toLowerCase().includes(q) || u.email.toLowerCase().includes(q)) &&
-    (!role || u.role === role)
-  ));
+function renderDisputes() {
+  const filtered = allDisputes.filter(d => d.status === disputeFilter);
+  const list = document.getElementById('disputesList');
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state">No ${disputeFilter} disputes.</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(d => {
+    const s = d.sessions;
+    if (d.status === 'resolved') {
+      return `<div class="dispute-card">
+        <div style="display:flex;justify-content:space-between;"><strong>${s?.subject || 'Session'}</strong><span class="badge badge-green">${d.resolution}</span></div>
+        <div style="font-size:0.78rem;color:var(--mid);margin-top:4px;">${s?.student_name || '?'} & ${s?.tutor_name || '?'} · Resolved ${new Date(d.resolved_at).toLocaleDateString()}</div>
+        <div style="font-size:0.8rem;color:var(--mid);font-style:italic;margin-top:6px;">${d.resolution_notes || 'No notes.'}</div>
+      </div>`;
+    }
+    return `<div class="dispute-card">
+      <div style="display:flex;justify-content:space-between;"><strong>${s?.subject || 'Session'}</strong><span class="badge badge-amber">open</span></div>
+      <div style="font-size:0.78rem;color:var(--mid);margin-top:4px;">Between ${s?.student_name || '?'} and ${s?.tutor_name || '?'} · ${new Date(d.created_at).toLocaleDateString()}</div>
+      <div class="dispute-reason">"${d.reason}"</div>
+      <div class="resolve-row">
+        <button class="resolve-btn release" onclick="resolveDispute('${d.id}','released',this)">✅ Release to tutor</button>
+        <button class="resolve-btn refund" onclick="resolveDispute('${d.id}','refunded',this)">↩️ Full refund</button>
+        <button class="resolve-btn partial" onclick="togglePartial('${d.id}',this)">➗ Partial</button>
+        <input type="number" class="partial-amount-input" id="partial-${d.id}" placeholder="Amount" step="0.5">
+        <input type="text" class="notes-input" id="notes-${d.id}" placeholder="Notes (optional)">
+      </div>
+    </div>`;
+  }).join('');
 }
 
-// ── TUTORS ──
-async function loadTutorDetails() {
-  const { data: profiles } = await _sb.from('tutor_profiles').select('*');
-  return profiles || [];
+function togglePartial(id, btn) {
+  const input = document.getElementById('partial-' + id);
+  const show = input.style.display !== 'inline-block';
+  input.style.display = show ? 'inline-block' : 'none';
+  if (show) { input.focus(); btn.onclick = () => resolveDispute(id, 'partial', btn); }
 }
 
-async function renderTutors(tutors) {
-  const profiles = await loadTutorDetails();
-  const profileMap = {};
-  profiles.forEach(p => profileMap[p.user_id] = p);
-  document.getElementById('tutorsTable').innerHTML = tutors.length === 0
-    ? '<tr class="empty-row"><td colspan="7">No tutors found</td></tr>'
-    : tutors.map(u => {
-        const tp = profileMap[u.id] || {};
-        const subjects = Array.isArray(tp.subjects) ? tp.subjects.join(', ') : '—';
-        const rate = tp.hourly_rate ? `${tp.currency || '£'}${tp.hourly_rate}/hr` : '—';
-        return `<tr>
-          <td><strong>${u.full_name || '—'}</strong></td>
-          <td style="color:var(--mid);font-size:0.78rem;">${u.email}</td>
-          <td style="color:var(--mid)">${tp.location || '—'}</td>
-          <td style="font-size:0.78rem;">${subjects}</td>
-          <td style="font-weight:700;color:var(--blue)">${rate}</td>
-          <td style="color:var(--mid)">${u.country || '—'}</td>
-          <td><div class="btn-group">
-            <a href="tutor-profile.html?id=${u.id}" target="_blank" class="btn btn-sm-blue">View</a>
-            <button class="btn btn-sm-yellow" onclick="openSuspendModal('${u.id}')">Suspend</button>
-            <button class="btn btn-sm-red" onclick="openDeleteModal('user','${u.id}','Delete tutor ${(u.full_name||u.email).replace(/'/g,"\\'")}?')">Delete</button>
-          </div></td>
-        </tr>`;
-      }).join('');
+async function resolveDispute(disputeId, resolution, btn) {
+  const notes = document.getElementById('notes-' + disputeId)?.value || '';
+  const refundAmount = resolution === 'partial' ? parseFloat(document.getElementById('partial-' + disputeId)?.value) : undefined;
+
+  if (resolution === 'partial' && (!refundAmount || refundAmount <= 0)) { alert('Enter a valid partial refund amount.'); return; }
+
+  const msg = resolution === 'released' ? 'Release payment to the tutor?' : resolution === 'refunded' ? 'Issue a full refund?' : `Refund ${refundAmount} to the student?`;
+  if (!confirm(msg)) return;
+
+  btn.disabled = true; btn.textContent = 'Processing...';
+
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/resolve-dispute`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ dispute_id: disputeId, admin_id: adminUser.id, resolution, resolution_notes: notes, refund_amount: refundAmount }),
+  });
+  const data = await res.json();
+  if (data.error) { alert('Error: ' + data.error); btn.disabled = false; return; }
+  await loadEverything();
 }
 
-function filterTutors() {
-  const q = document.getElementById('tutorSearch').value.toLowerCase();
-  renderTutors(allUsers.filter(u => u.role === 'tutor' &&
-    (!q || (u.full_name||'').toLowerCase().includes(q) || u.email.toLowerCase().includes(q))
-  ));
+// ── TRANSACTIONS ──
+function setTxnFilter(f, el) {
+  txnFilter = f;
+  document.querySelectorAll('#page-transactions .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderTransactions();
 }
 
-// ── STUDENTS ──
-async function renderStudents(students) {
-  const { data: profiles } = await _sb.from('student_profiles').select('*');
-  const profileMap = {};
-  (profiles||[]).forEach(p => profileMap[p.user_id] = p);
-  const { data: sessionCounts } = await _sb.from('sessions').select('student_id');
-  const sessionMap = {};
-  (sessionCounts||[]).forEach(s => sessionMap[s.student_id] = (sessionMap[s.student_id]||0)+1);
+function renderTransactions() {
+  let filtered = allPayments;
+  if (txnFilter !== 'all') filtered = allPayments.filter(p => p.status === txnFilter);
 
-  document.getElementById('studentsTable').innerHTML = students.length === 0
-    ? '<tr class="empty-row"><td colspan="7">No students found</td></tr>'
-    : students.map(u => {
-        const sp = profileMap[u.id] || {};
-        return `<tr>
-          <td><strong>${u.full_name || '—'}</strong></td>
-          <td style="color:var(--mid);font-size:0.78rem;">${u.email}</td>
-          <td style="color:var(--mid)">${sp.university || '—'}</td>
-          <td style="color:var(--mid)">${sp.degree || '—'}</td>
-          <td style="color:var(--mid)">${u.country || '—'}</td>
-          <td style="text-align:center;font-weight:700">${sessionMap[u.id] || 0}</td>
-          <td><div class="btn-group">
-            <button class="btn btn-sm-yellow" onclick="openSuspendModal('${u.id}')">Suspend</button>
-            <button class="btn btn-sm-red" onclick="openDeleteModal('user','${u.id}','Delete student ${(u.full_name||u.email).replace(/'/g,"\\'")}?')">Delete</button>
-          </div></td>
-        </tr>`;
-      }).join('');
-}
+  const rows = filtered.map(p => {
+    const s = allSessions.find(s => s.id === p.session_id);
+    const sym = p.currency === 'USD' ? '$' : '€';
+    const badgeClass = p.status === 'refunded' || p.status === 'partially_refunded' ? 'badge-red' : p.status === 'released' ? 'badge-green' : 'badge-gray';
+    return `<tr>
+      <td>${new Date(p.paid_at || p.created_at || Date.now()).toLocaleDateString()}</td>
+      <td>${s?.subject || p.type || '—'}</td>
+      <td>${sym}${p.amount}</td>
+      <td>${sym}${p.platform_fee || 0}</td>
+      <td>${sym}${p.tutor_payout || 0}</td>
+      <td><span class="badge ${badgeClass}">${p.status}</span></td>
+    </tr>`;
+  }).join('');
 
-function filterStudents() {
-  const q = document.getElementById('studentSearch').value.toLowerCase();
-  renderStudents(allUsers.filter(u => u.role === 'student' &&
-    (!q || (u.full_name||'').toLowerCase().includes(q) || u.email.toLowerCase().includes(q))
-  ));
+  document.getElementById('transactionsTable').innerHTML = filtered.length === 0
+    ? '<div class="empty-state">No transactions found.</div>'
+    : `<table><thead><tr><th>Date</th><th>Session</th><th>Amount</th><th>Fee</th><th>Payout</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 // ── SESSIONS ──
-async function loadSessions() {
-  const { data } = await _sb.from('sessions').select('*').order('created_at', { ascending: false });
-  allSessions = data || [];
-  renderSessions(allSessions);
+function setSessionFilter(f, el) {
+  sessionFilter = f;
+  document.querySelectorAll('#page-sessions .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderSessions();
 }
 
-function renderSessions(sessions) {
-  document.getElementById('sessionsTable').innerHTML = sessions.length === 0
-    ? '<tr class="empty-row"><td colspan="6">No sessions found</td></tr>'
-    : sessions.map(s => `<tr>
-        <td>${s.tutor_name || '—'}</td>
-        <td>${s.student_name || '—'}</td>
-        <td>${s.subject || '—'}</td>
-        <td style="color:var(--mid)">${s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString() : '—'} ${s.scheduled_time ? s.scheduled_time.slice(0,5) : ''}</td>
-        <td><span class="badge badge-${s.status}">${s.status}</span></td>
-        <td><div class="btn-group">
-          ${s.status !== 'completed' ? `<button class="btn btn-sm-green" onclick="markSessionComplete('${s.id}')">Complete</button>` : ''}
-          <button class="btn btn-sm-red" onclick="openDeleteModal('session','${s.id}','Cancel this session?')">Cancel</button>
-        </div></td>
-      </tr>`).join('');
+function renderSessions() {
+  let filtered = allSessions;
+  if (sessionFilter !== 'all') filtered = allSessions.filter(s => s.status === sessionFilter);
+
+  const rows = filtered.slice(0, 100).map(s => {
+    const badgeMap = { confirmed: 'badge-green', completed: 'badge-gray', cancelled: 'badge-red', payment_expired: 'badge-red', awaiting_payment: 'badge-amber', pending: 'badge-amber' };
+    return `<tr>
+      <td>${s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString() : '—'}</td>
+      <td>${s.subject || '—'}</td>
+      <td>${s.student_name || '—'}</td>
+      <td>${s.tutor_name || '—'}</td>
+      <td>${s.currency === 'USD' ? '$' : '€'}${s.price || 0}</td>
+      <td><span class="badge ${badgeMap[s.status] || 'badge-gray'}">${s.status}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('sessionsTable').innerHTML = filtered.length === 0
+    ? '<div class="empty-state">No sessions found.</div>'
+    : `<table><thead><tr><th>Date</th><th>Subject</th><th>Student</th><th>Tutor</th><th>Price</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-function filterSessions() {
-  const status = document.getElementById('sessionStatusFilter').value;
-  renderSessions(status ? allSessions.filter(s => s.status === status) : allSessions);
-}
-
-async function markSessionComplete(id) {
-  await _sb.from('sessions').update({ status: 'completed' }).eq('id', id);
-  showToast('Session marked as completed');
-  await loadSessions();
-}
-
-// ── SUBJECT REQUESTS ──
-async function loadRequests() {
-  const { data } = await _sb.from('subject_requests').select('*').order('created_at', { ascending: false });
-  allRequests = data || [];
-  renderRequests(allRequests);
-}
-
-function renderRequests(reqs) {
-  document.getElementById('requestsTable').innerHTML = reqs.length === 0
-    ? '<tr class="empty-row"><td colspan="7">No requests</td></tr>'
-    : reqs.map(r => `<tr>
-        <td>${r.student_name || '—'}</td>
-        <td><strong>${r.subject || '—'}</strong></td>
-        <td style="color:var(--mid)">${r.level || '—'}</td>
-        <td style="color:var(--mid)">${r.language || '—'}</td>
-        <td><span class="badge badge-${r.status}">${r.status}</span>${r.status === 'accepted' && r.accepted_tutor_name ? `<div style="font-size:0.7rem;color:var(--mid);margin-top:2px;">by ${r.accepted_tutor_name}</div>` : ''}</td>
-        <td style="color:var(--mid)">${new Date(r.created_at).toLocaleDateString()}</td>
-        <td><button class="btn btn-sm-red" onclick="openDeleteModal('request','${r.id}','Delete this subject request?')">Delete</button></td>
-      </tr>`).join('');
-}
-
-function filterRequests() {
-  const status = document.getElementById('reqStatusFilter').value;
-  renderRequests(status ? allRequests.filter(r => r.status === status) : allRequests);
-}
-
-// ── REVIEWS ──
-async function loadReviews() {
-  const { data } = await _sb.from('reviews').select('*').order('created_at', { ascending: false });
-  allReviews = data || [];
-  renderReviews(allReviews);
-}
-
-function renderReviews(reviews) {
-  document.getElementById('reviewsTable').innerHTML = reviews.length === 0
-    ? '<tr class="empty-row"><td colspan="6">No reviews yet</td></tr>'
-    : reviews.map(r => `<tr>
-        <td>${r.student_name || '—'}</td>
-        <td>${r.tutor_name || '—'}</td>
-        <td><strong>${'★'.repeat(r.rating || 0)}${'☆'.repeat(5-(r.rating||0))}</strong> ${r.rating}/5</td>
-        <td style="font-size:0.78rem;max-width:220px;color:var(--ink2);">${r.comment ? r.comment.slice(0,100)+(r.comment.length>100?'…':'') : '—'}</td>
-        <td style="color:var(--mid)">${new Date(r.created_at).toLocaleDateString()}</td>
-        <td><button class="btn btn-sm-red" onclick="openDeleteModal('review','${r.id}','Delete this review?')">Delete</button></td>
-      </tr>`).join('');
-}
-
-// ── CONVERSATIONS ──
-async function loadConversations() {
-  const { data } = await _sb.from('conversations').select('*').order('last_message_at', { ascending: false });
-  allConvs = data || [];
-  const convIds = allConvs.map(c => c.id);
-  let msgCounts = {};
-  if (convIds.length) {
-    const { data: msgs } = await _sb.from('messages').select('conversation_id');
-    (msgs||[]).forEach(m => msgCounts[m.conversation_id] = (msgCounts[m.conversation_id]||0)+1);
+// ── GROUP SESSIONS ──
+function renderGroupSessions() {
+  if (allGroupSessions.length === 0) {
+    document.getElementById('groupSessionsTable').innerHTML = '<div class="empty-state">No group sessions yet.</div>';
+    return;
   }
-  document.getElementById('messagesTable').innerHTML = allConvs.length === 0
-    ? '<tr class="empty-row"><td colspan="6">No conversations</td></tr>'
-    : allConvs.map(c => `<tr>
-        <td>${c.participant_1_name || '—'}</td>
-        <td>${c.participant_2_name || '—'}</td>
-        <td style="font-size:0.78rem;color:var(--mid);max-width:200px;">${c.last_message ? c.last_message.slice(0,60)+(c.last_message.length>60?'…':'') : '—'}</td>
-        <td style="text-align:center;font-weight:700">${msgCounts[c.id]||0}</td>
-        <td style="color:var(--mid)">${c.last_message_at ? new Date(c.last_message_at).toLocaleDateString() : '—'}</td>
-        <td><button class="btn btn-sm-red" onclick="openDeleteModal('conversation','${c.id}','Delete this entire conversation and all its messages?')">Delete</button></td>
-      </tr>`).join('');
+  const rows = allGroupSessions.map(gs => {
+    const confirmed = (gs.group_session_participants || []).filter(p => p.status === 'confirmed').length;
+    const badgeMap = { open: 'badge-amber', completed: 'badge-gray', cancelled: 'badge-red' };
+    return `<tr>
+      <td>${new Date(gs.scheduled_date).toLocaleDateString()}</td>
+      <td>${gs.subject}</td>
+      <td>${gs.tutor_name || '—'}</td>
+      <td>${confirmed}/${gs.max_students}</td>
+      <td>${gs.currency === 'USD' ? '$' : '€'}${gs.price_per_student}</td>
+      <td><span class="badge ${badgeMap[gs.status] || 'badge-gray'}">${gs.status}</span></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('groupSessionsTable').innerHTML = `<table><thead><tr><th>Date</th><th>Subject</th><th>Tutor</th><th>Joined</th><th>Price</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
-// ── SUSPEND / UNSUSPEND ──
-let suspendTargetId = null;
-function openSuspendModal(userId) {
-  suspendTargetId = userId;
-  document.getElementById('suspendReason').value = '';
-  openModal('modalSuspend');
+// ── USERS ──
+function setUserFilter(f, el) {
+  userFilter = f;
+  document.querySelectorAll('#page-users .filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderUsers();
 }
-async function confirmSuspend() {
-  const reason = document.getElementById('suspendReason').value.trim() || 'Suspended by admin';
-  await _sb.from('users').update({ suspended_at: new Date().toISOString(), suspended_reason: reason }).eq('id', suspendTargetId);
-  closeModal('modalSuspend');
-  showToast('User suspended');
-  await loadUsers();
+
+function renderUsers() {
+  const search = (document.getElementById('userSearch')?.value || '').toLowerCase();
+  let filtered = allUsers;
+
+  if (userFilter === 'tutor') filtered = filtered.filter(u => u.roles?.includes('tutor'));
+  else if (userFilter === 'student') filtered = filtered.filter(u => u.roles?.includes('student'));
+  else if (userFilter === 'suspended') filtered = filtered.filter(u => u.suspended_at);
+
+  if (search) filtered = filtered.filter(u => (u.full_name || '').toLowerCase().includes(search) || (u.email || '').toLowerCase().includes(search));
+
+  const rows = filtered.slice(0, 150).map(u => {
+    const roleLabel = (u.roles || []).join(', ') || u.role || '—';
+    return `<tr>
+      <td>${u.full_name || '—'}</td>
+      <td>${u.email || '—'}</td>
+      <td>${roleLabel}</td>
+      <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+      <td>${u.suspended_at ? '<span class="badge badge-red">suspended</span>' : '<span class="badge badge-green">active</span>'}</td>
+      <td>${u.suspended_at
+        ? `<button class="unsuspend-btn" onclick="unsuspendUser('${u.id}')">Unsuspend</button>`
+        : `<button class="suspend-btn" onclick="suspendUser('${u.id}')">Suspend</button>`}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('usersTable').innerHTML = filtered.length === 0
+    ? '<div class="empty-state">No users found.</div>'
+    : `<table><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Joined</th><th>Status</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
 }
+
+async function suspendUser(userId) {
+  const reason = prompt('Reason for suspension (visible in admin records):');
+  if (reason === null) return;
+  await _sb.from('users').update({ suspended_at: new Date().toISOString(), suspended_reason: reason || null, suspended_by: adminUser.id }).eq('id', userId);
+  await loadEverything();
+}
+
 async function unsuspendUser(userId) {
-  await _sb.from('users').update({ suspended_at: null, suspended_reason: null }).eq('id', userId);
-  showToast('User unsuspended');
-  await loadUsers();
+  if (!confirm('Lift this suspension?')) return;
+  await _sb.from('users').update({ suspended_at: null, suspended_reason: null, suspended_by: null }).eq('id', userId);
+  await loadEverything();
 }
 
-// ── ROLE CHANGE ──
-let roleTargetId = null;
-function openRoleModal(userId, currentRole) {
-  roleTargetId = userId;
-  document.getElementById('newRole').value = currentRole;
-  openModal('modalRole');
-}
-async function confirmRoleChange() {
-  const newRole = document.getElementById('newRole').value;
-  await _sb.from('users').update({ role: newRole }).eq('id', roleTargetId);
-  closeModal('modalRole');
-  showToast('Role updated');
-  await loadUsers();
-}
+// ── NOTIFICATIONS ──
+async function loadNotifications() {
+  const { data } = await _sb.from('notifications').select('*').eq('user_id', adminUser.id).order('created_at', { ascending: false }).limit(30);
+  const notifs = data || [];
+  const unread = notifs.filter(n => !n.read).length;
 
-// ── DELETE ──
-let deleteTarget = null;
-function openDeleteModal(type, id, confirmText) {
-  deleteTarget = { type, id };
-  document.getElementById('deleteConfirmText').textContent = confirmText;
-  openModal('modalDelete');
-}
-async function confirmDelete() {
-  if (!deleteTarget) return;
-  const { type, id } = deleteTarget;
-  if (type === 'user') await _sb.from('users').delete().eq('id', id);
-  else if (type === 'session') await _sb.from('sessions').delete().eq('id', id);
-  else if (type === 'request') await _sb.from('subject_requests').delete().eq('id', id);
-  else if (type === 'review') await _sb.from('reviews').delete().eq('id', id);
-  else if (type === 'conversation') {
-    await _sb.from('messages').delete().eq('conversation_id', id);
-    await _sb.from('conversations').delete().eq('id', id);
-  }
-  closeModal('modalDelete');
-  showToast('Deleted successfully');
-  await loadAll();
+  const badge = document.getElementById('notifBadge');
+  if (unread > 0) { badge.textContent = unread; badge.style.display = 'inline-block'; }
+  else badge.style.display = 'none';
+
+  document.getElementById('notifPanelBody').innerHTML = notifs.length === 0
+    ? '<div class="empty-state">No notifications yet.</div>'
+    : notifs.map(n => `
+      <div class="notif-row ${n.read ? '' : 'unread'}" onclick="markNotifRead('${n.id}')">
+        <div class="notif-row-title">${n.title || 'Notification'}</div>
+        <div class="notif-row-body">${n.body || ''}</div>
+        <div class="notif-row-time">${new Date(n.created_at).toLocaleString()}</div>
+      </div>`).join('');
 }
 
-// ── ANNOUNCEMENT ──
-async function sendAnnouncement() {
-  const target = document.getElementById('announceTarget').value;
-  const title = document.getElementById('announceTitle').value.trim();
-  const body = document.getElementById('announceBody').value.trim();
-  const link = document.getElementById('announceLink').value.trim();
-  const alertEl = document.getElementById('announceAlert');
-
-  if (!title || !body) {
-    alertEl.textContent = 'Please fill in the title and message.';
-    alertEl.className = 'alert error';
-    return;
-  }
-
-  let userIds = [];
-  if (target === 'all') {
-    userIds = allUsers.filter(u => u.role !== 'admin').map(u => u.id);
-  } else {
-    userIds = allUsers.filter(u => u.role === target).map(u => u.id);
-  }
-
-  if (userIds.length === 0) {
-    alertEl.textContent = 'No users found for the selected target.';
-    alertEl.className = 'alert error';
-    return;
-  }
-
-  const notifications = userIds.map(uid => ({
-    user_id: uid, type: 'announcement',
-    title: '📣 ' + title, body, link: link || null, read: false
-  }));
-
-  const { error } = await _sb.from('notifications').insert(notifications);
-  if (error) {
-    alertEl.textContent = 'Error: ' + error.message;
-    alertEl.className = 'alert error';
-    return;
-  }
-
-  alertEl.textContent = `Sent to ${userIds.length} user${userIds.length !== 1 ? 's' : ''} successfully!`;
-  alertEl.className = 'alert success';
-  document.getElementById('announceTitle').value = '';
-  document.getElementById('announceBody').value = '';
-  document.getElementById('announceLink').value = '';
-  showToast(`📣 Announcement sent to ${userIds.length} users`);
+async function markNotifRead(id) {
+  await _sb.from('notifications').update({ read: true }).eq('id', id);
+  await loadNotifications();
 }
 
-// ── HELPERS ──
-function showPage(id, el) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  if (el) el.classList.add('active');
-}
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
-}
-function adminSignOut() {
-  _sb.auth.signOut().then(() => window.location.href = 'signin.html');
+function toggleNotifPanel() {
+  document.getElementById('notifPanel').classList.toggle('open');
 }
 
-document.addEventListener('DOMContentLoaded', init);
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', checkAdminAccess);
 </script>
 </body>
 </html>
