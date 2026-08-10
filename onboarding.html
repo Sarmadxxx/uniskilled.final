@@ -245,6 +245,7 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
         <p>We've sent a confirmation link to:</p>
         <div class="email-highlight" id="confirmedEmail"></div>
         <p>Click the link to verify your account. Check spam if you don't see it.</p>
+        <p id="certWarning" style="display:none;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:0.7rem 0.9rem;font-size:0.82rem;margin-top:0.8rem;"></p>
         <button class="btn-primary" id="goSignin" style="max-width:240px;margin:1rem auto 0;">Go to Sign in →</button>
       </div>
     </div>
@@ -500,22 +501,34 @@ document.addEventListener('DOMContentLoaded', function() {
           preferred_time: preferredTimes[0] || null
         });
       } else if (selectedRole === 'tutor') {
-        // Upload certificate files to Supabase Storage
+        let certUploadFailures = 0;
+        // Upload certificate files via a server-side function — the browser has
+        // no active session yet at this point (email confirmation is pending),
+        // so a direct client-side storage upload would silently fail every time.
         const certsToSave = [];
         for (const cert of certificates) {
           let fileUrl = null;
           if (cert.file) {
-            const ext = cert.file.name.split('.').pop();
-            const filePath = data.user.id + '/' + Date.now() + '_' + cert.subject.replace(/\s+/g,'_') + '.' + ext;
-            const { data: uploadData, error: uploadError } = await _sb.storage
-              .from('certificates')
-              .upload(filePath, cert.file, { upsert: true });
-            if (!uploadError) {
-              const { data: urlData } = _sb.storage.from('certificates').getPublicUrl(filePath);
-              fileUrl = urlData.publicUrl;
+            const fd = new FormData();
+            fd.append('user_id', data.user.id);
+            fd.append('file', cert.file);
+            fd.append('subject_label', cert.subject || 'certificate');
+            try {
+              const uploadRes = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', {
+                method: 'POST', body: fd,
+              });
+              const uploadResult = await uploadRes.json();
+              if (uploadRes.ok && uploadResult.fileUrl) {
+                fileUrl = uploadResult.fileUrl;
+              } else {
+                console.error('Certificate upload failed:', uploadResult.error);
+              }
+            } catch (e) {
+              console.error('Certificate upload request failed:', e);
             }
           }
           certsToSave.push({ subject: cert.subject, grade: cert.grade, fileUrl: fileUrl, fileName: cert.fileName });
+          if (cert.file && !fileUrl) certUploadFailures++;
         }
 
         await _sb.from('tutor_profiles').upsert({
@@ -531,6 +544,14 @@ document.addEventListener('DOMContentLoaded', function() {
           preferred_time: preferredTimes[0] || null,
           preferred_times: preferredTimes.length > 0 ? preferredTimes : null
         });
+
+        if (certUploadFailures > 0) {
+          const warn = document.getElementById('certWarning');
+          warn.textContent = certUploadFailures === 1
+            ? '⚠️ One certificate file couldn\'t be uploaded. You can add it again later from your profile.'
+            : `⚠️ ${certUploadFailures} certificate files couldn't be uploaded. You can add them again later from your profile.`;
+          warn.style.display = 'block';
+        }
       }
     }
 
