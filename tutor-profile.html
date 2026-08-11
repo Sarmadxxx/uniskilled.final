@@ -30,29 +30,33 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 .cover-edit:hover{background:rgba(0,0,0,0.7);}
 
 /* PROFILE HEADER */
-.profile-header{background:#fff;border-bottom:1px solid var(--border);padding:0 5% 1.5rem;}
-.profile-header-inner{max-width:900px;margin:0 auto;position:relative;}
-.avatar-section{display:flex;align-items:flex-end;gap:1.5rem;margin-bottom:1rem;}
-.avatar-wrap{position:relative;flex-shrink:0;margin-top:-50px;}
-.avatar{width:100px;height:100px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:800;overflow:hidden;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.15);}
+.profile-header{background:#fff;border-bottom:1px solid var(--border);padding:0 5% 0;}
+.profile-header-inner{max-width:900px;margin:0 auto;position:relative;padding-bottom:1.4rem;}
+.identity-row{display:flex;align-items:flex-start;gap:1.4rem;padding-top:1.2rem;flex-wrap:wrap;}
+.avatar-wrap{position:relative;flex-shrink:0;margin-top:-64px;}
+.avatar{width:110px;height:110px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.1rem;font-weight:800;overflow:hidden;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.15);}
 .avatar img{width:100%;height:100%;object-fit:cover;}
 .avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff;font-size:1.2rem;}
 .avatar-wrap:hover .avatar-overlay{opacity:1;}
-.profile-actions{margin-left:auto;display:flex;gap:0.7rem;padding-bottom:0.5rem;}
+.identity-info{flex:1;min-width:220px;padding-top:0.3rem;}
+.identity-name-row{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.3rem;}
+.profile-actions{display:flex;gap:0.7rem;flex-shrink:0;padding-top:0.3rem;margin-left:auto;}
+.profile-actions .btn{white-space:nowrap;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:0.6rem 1.2rem;border-radius:9px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;border:none;text-decoration:none;transition:all .18s;}
 .btn-primary{background:var(--blue);color:#fff;}
 .btn-primary:hover{background:#1558e0;box-shadow:0 4px 14px rgba(26,107,255,0.3);}
 .btn-outline{background:#fff;color:var(--ink2);border:1.5px solid var(--border);}
 .btn-outline:hover{border-color:var(--blue);color:var(--blue);}
-.profile-name{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.25rem;}
+.profile-name{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;}
 .profile-title{font-size:0.95rem;color:var(--ink2);margin-bottom:0.4rem;}
 .profile-meta{display:flex;flex-wrap:wrap;gap:1rem;font-size:0.83rem;color:var(--mid);margin-bottom:0.8rem;}
 .profile-meta span{display:flex;align-items:center;gap:4px;}
-.profile-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.8rem;}
+.profile-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.9rem;}
 .subject-tag{background:#eff6ff;color:var(--blue);font-size:0.78rem;font-weight:600;padding:4px 12px;border-radius:100px;border:1px solid #dbeafe;}
-.verified-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-bg);color:var(--green);font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:100px;}
-.profile-stats{display:flex;gap:2rem;padding-top:0.8rem;border-top:1px solid var(--border);}
-.stat-item{text-align:center;}
+.verified-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-bg);color:var(--green);font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:100px;flex-shrink:0;}
+.profile-stats{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);margin-top:0.4rem;}
+.stat-item{text-align:center;padding:1rem 0.5rem;border-right:1px solid var(--border);}
+.stat-item:last-child{border-right:none;}
 .stat-num{font-size:1.3rem;font-weight:800;color:var(--ink);}
 .stat-lbl{font-size:0.68rem;color:var(--mid);text-transform:uppercase;letter-spacing:0.06em;}
 
@@ -73,11 +77,15 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 .info-row:last-child{border-bottom:none;}
 .info-label{font-size:0.82rem;color:var(--mid);}
 .info-value{font-size:0.82rem;font-weight:700;text-align:right;}
-.cert-row{display:flex;align-items:center;gap:0.9rem;padding:0.75rem 0;border-bottom:1px solid var(--border);}
+.cert-row{display:flex;align-items:center;gap:0.9rem;padding:0.85rem 0;border-bottom:1px solid var(--border);}
 .cert-row:last-child{border-bottom:none;}
-.cert-icon{width:40px;height:40px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;}
-.cert-name{font-weight:700;font-size:0.85rem;}
-.cert-grade{font-size:0.75rem;color:var(--green);font-weight:600;margin-top:1px;}
+.cert-icon{width:44px;height:44px;background:linear-gradient(135deg,#fef3c7,#fde68a);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.cert-icon.pdf{background:linear-gradient(135deg,#fee2e2,#fecaca);}
+.cert-name{font-weight:700;font-size:0.86rem;}
+.cert-grade{font-size:0.75rem;color:var(--green);font-weight:600;margin-top:2px;}
+.cert-missing{font-size:0.73rem;color:var(--mid);margin-top:2px;font-style:italic;}
+.cert-view-btn{display:inline-flex;align-items:center;gap:5px;font-size:0.78rem;color:var(--blue);font-weight:700;text-decoration:none;background:#eff6ff;padding:6px 12px;border-radius:100px;flex-shrink:0;white-space:nowrap;}
+.cert-view-btn:hover{background:#dbeafe;}
 .avail-grid{display:flex;gap:0.4rem;flex-wrap:wrap;}
 .avail-chip{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.68rem;font-weight:700;}
 .avail-chip.on{background:var(--blue);color:#fff;}
@@ -133,12 +141,15 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
   .nav-links{display:none;}.nav-burger{display:block;}
   .page-layout{grid-template-columns:1fr;}
   .side-col{position:static;order:-1;}
-  .avatar-section{flex-direction:column;align-items:flex-start;}
-  .avatar-wrap{margin-top:-40px;}
-  .profile-actions{margin-left:0;}
-  .avatar{width:80px;height:80px;font-size:1.5rem;}
+  .identity-row{flex-direction:column;}
+  .avatar-wrap{margin-top:-48px;}
+  .avatar{width:88px;height:88px;font-size:1.7rem;}
   .profile-name{font-size:1.3rem;}
-  .profile-stats{gap:1rem;}
+  .profile-actions{width:100%;flex-direction:column;padding-top:0.7rem;}
+  .profile-actions .btn{width:100%;justify-content:center;}
+  .profile-stats{grid-template-columns:repeat(2,1fr);row-gap:0.4rem;}
+  .stat-item:nth-child(2){border-right:none;}
+  .stat-item:nth-child(1),.stat-item:nth-child(2){border-bottom:1px solid var(--border);padding-bottom:0.9rem;}
   .form-row{grid-template-columns:1fr;}
 }
 </style>
@@ -173,18 +184,20 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 <!-- PROFILE HEADER -->
 <div class="profile-header">
   <div class="profile-header-inner">
-    <div class="avatar-section">
+    <div class="identity-row">
       <div class="avatar-wrap" id="avatarWrap">
         <div class="avatar" id="avatarEl">?</div>
         <div class="avatar-overlay">📷</div>
         <input type="file" id="avatarInput" accept="image/*" style="display:none;">
       </div>
-      <div style="flex:1;padding-bottom:0.5rem;">
-        <div class="profile-name" id="profileName">Loading...</div>
+      <div class="identity-info">
+        <div class="identity-name-row">
+          <div class="profile-name" id="profileName">Loading...</div>
+          <div class="verified-badge">✓ Verified Tutor</div>
+        </div>
         <div class="profile-title" id="profileTitle"></div>
         <div class="profile-meta" id="profileMeta"></div>
         <div class="profile-tags" id="profileTags"></div>
-        <div class="verified-badge">✓ Verified Tutor</div>
       </div>
       <div class="profile-actions" id="profileActions"></div>
     </div>
@@ -749,7 +762,22 @@ async function loadProfile() {
 
   // Certs
   document.getElementById('certsBody').innerHTML = certificates.length > 0
-    ? certificates.map(c => `<div class="cert-row"><div class="cert-icon">🏅</div><div style="flex:1;"><div class="cert-name">${c.subject}</div><div class="cert-grade">${c.grade ? 'Grade: ' + c.grade : 'No grade specified'}</div></div>${c.fileUrl ? `<a href="${c.fileUrl}" target="_blank" style="font-size:0.75rem;color:var(--blue);font-weight:600;">📎 View</a>` : ''}</div>`).join('')
+    ? certificates.map(c => {
+        const isPdf = (c.fileName || '').toLowerCase().endsWith('.pdf');
+        const icon = c.fileUrl ? (isPdf ? '📄' : '🖼️') : '🏅';
+        const iconClass = c.fileUrl && isPdf ? 'cert-icon pdf' : 'cert-icon';
+        const rightSide = c.fileUrl
+          ? `<a href="${c.fileUrl}" target="_blank" class="cert-view-btn">${isPdf ? '📄' : '🖼️'} View ${isPdf ? 'PDF' : 'Image'}</a>`
+          : (c.fileName ? '<span class="cert-missing">File pending</span>' : '');
+        return `<div class="cert-row">
+          <div class="${iconClass}">${icon}</div>
+          <div style="flex:1;">
+            <div class="cert-name">${c.subject}</div>
+            <div class="cert-grade">${c.grade ? 'Grade: ' + c.grade : 'No grade specified'}</div>
+          </div>
+          ${rightSide}
+        </div>`;
+      }).join('')
     : '<span class="empty">No certificates added yet.</span>';
 
   // Availability
@@ -952,10 +980,23 @@ function renderCertsModal() {
 async function saveCerts() {
   for (let c of certificates) {
     if (c.file && !c.fileUrl) {
-      const ext = c.file.name.split('.').pop();
-      const path = currentUserId + '/' + Date.now() + '_' + c.subject.replace(/\s+/g, '_') + '.' + ext;
-      const { error } = await _supabase.storage.from('certificates').upload(path, c.file, { upsert: true });
-      if (!error) { const { data: u } = _supabase.storage.from('certificates').getPublicUrl(path); c.fileUrl = u.publicUrl; }
+      const fd = new FormData();
+      fd.append('user_id', currentUserId);
+      fd.append('file', c.file);
+      fd.append('subject_label', c.subject || 'certificate');
+      try {
+        const uploadRes = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', {
+          method: 'POST', body: fd,
+        });
+        const uploadResult = await uploadRes.json();
+        if (uploadRes.ok && uploadResult.fileUrl) {
+          c.fileUrl = uploadResult.fileUrl;
+        } else {
+          console.error('Certificate upload failed:', uploadResult.error);
+        }
+      } catch (e) {
+        console.error('Certificate upload request failed:', e);
+      }
       delete c.file;
     }
   }
