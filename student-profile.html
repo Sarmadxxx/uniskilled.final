@@ -24,30 +24,33 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 .cover-img{width:100%;height:100%;object-fit:cover;}
 .cover-edit{position:absolute;bottom:12px;right:16px;background:rgba(0,0,0,0.5);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-family:'Manrope',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;}
 .cover-edit:hover{background:rgba(0,0,0,0.7);}
-.profile-header{background:#fff;border-bottom:1px solid var(--border);padding:0 5% 1.5rem;}
-.profile-header-inner{max-width:900px;margin:0 auto;position:relative;}
-.avatar-section{display:flex;align-items:flex-end;gap:1.5rem;margin-bottom:1rem;}
-.avatar-wrap{position:relative;flex-shrink:0;margin-top:-50px;}
-.avatar{width:100px;height:100px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,#059669,#1a6bff);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2rem;font-weight:800;overflow:hidden;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.15);}
+.profile-header{background:#fff;border-bottom:1px solid var(--border);padding:0 5% 0;}
+.profile-header-inner{max-width:900px;margin:0 auto;position:relative;padding-bottom:1.4rem;}
+.identity-row{display:flex;align-items:flex-start;gap:1.4rem;padding-top:1.2rem;flex-wrap:wrap;}
+.avatar-wrap{position:relative;flex-shrink:0;margin-top:-64px;}
+.avatar{width:110px;height:110px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,#059669,#1a6bff);display:flex;align-items:center;justify-content:center;color:#fff;font-size:2.1rem;font-weight:800;overflow:hidden;cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,0.15);}
 .avatar img{width:100%;height:100%;object-fit:cover;}
 .avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,0.45);border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff;font-size:1.2rem;}
 .avatar-wrap:hover .avatar-overlay{opacity:1;}
-.profile-actions{margin-left:auto;display:flex;gap:0.7rem;padding-bottom:0.5rem;}
+.identity-info{flex:1;min-width:220px;padding-top:0.3rem;}
+.identity-name-row{display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.3rem;}
+.profile-actions{display:flex;gap:0.7rem;flex-shrink:0;padding-top:0.3rem;margin-left:auto;}
+.profile-actions .btn{white-space:nowrap;}
 .btn{display:inline-flex;align-items:center;gap:6px;padding:0.6rem 1.2rem;border-radius:9px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;border:none;text-decoration:none;transition:all .18s;}
 .btn-primary{background:var(--blue);color:#fff;}
 .btn-primary:hover{background:#1558e0;}
 .btn-outline{background:#fff;color:var(--ink2);border:1.5px solid var(--border);}
 .btn-outline:hover{border-color:var(--blue);color:var(--blue);}
-.profile-name{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.25rem;}
+.profile-name{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;}
 .profile-title{font-size:0.95rem;color:var(--ink2);margin-bottom:0.4rem;}
 .profile-meta{display:flex;flex-wrap:wrap;gap:1rem;font-size:0.83rem;color:var(--mid);margin-bottom:0.8rem;}
 .profile-meta span{display:flex;align-items:center;gap:4px;}
 .subject-tag{background:var(--green-bg);color:var(--green);font-size:0.78rem;font-weight:600;padding:4px 12px;border-radius:100px;border:1px solid #a7f3d0;}
-.verified-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-bg);color:var(--green);font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:100px;}
-.progress-wrap{margin-top:0.8rem;}
+.verified-badge{display:inline-flex;align-items:center;gap:5px;background:var(--green-bg);color:var(--green);font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:100px;flex-shrink:0;}
+.progress-wrap{border-top:1px solid var(--border);margin-top:0.4rem;padding-top:1rem;}
 .progress-bar{height:6px;background:var(--border);border-radius:100px;overflow:hidden;}
 .progress-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,#059669,#1a6bff);transition:width .5s;}
-.progress-label{font-size:0.75rem;color:var(--mid);margin-top:0.3rem;}
+.progress-label{font-size:0.75rem;color:var(--mid);margin-top:0.4rem;}
 .page-layout{max-width:900px;margin:0 auto;padding:1.5rem 5%;display:grid;grid-template-columns:1fr 260px;gap:1.5rem;align-items:start;}
 .card{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;margin-bottom:1.2rem;}
 .card-head{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.4rem;border-bottom:1px solid var(--border);}
@@ -92,7 +95,14 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 .toast{position:fixed;bottom:1.5rem;right:1.5rem;background:#1e293b;color:#fff;padding:0.8rem 1.2rem;border-radius:10px;font-size:0.84rem;font-weight:600;z-index:1000;transform:translateY(100px);opacity:0;transition:all .3s;max-width:320px;}
 .toast.show{transform:translateY(0);opacity:1;}
 @media(max-width:900px){.page-layout{grid-template-columns:1fr;}.nav-links{display:none;}.nav-burger{display:block;}.form-row{grid-template-columns:1fr;}}
-@media(max-width:600px){.avatar-section{flex-direction:column;align-items:flex-start;}.profile-actions{margin-left:0;}}
+@media(max-width:600px){
+  .identity-row{flex-direction:column;}
+  .avatar-wrap{margin-top:-48px;}
+  .avatar{width:88px;height:88px;font-size:1.7rem;}
+  .profile-name{font-size:1.3rem;}
+  .profile-actions{width:100%;flex-direction:column;padding-top:0.7rem;}
+  .profile-actions .btn{width:100%;justify-content:center;}
+}
 </style>
 </head>
 <body>
@@ -123,17 +133,19 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 
 <div class="profile-header">
   <div class="profile-header-inner">
-    <div class="avatar-section">
+    <div class="identity-row">
       <div class="avatar-wrap">
         <div class="avatar" id="avatarEl">?<div class="avatar-overlay">📷</div></div>
         <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
       </div>
-      <div style="flex:1;">
-        <h1 class="profile-name" id="profileName">Loading...</h1>
+      <div class="identity-info">
+        <div class="identity-name-row">
+          <h1 class="profile-name" id="profileName">Loading...</h1>
+          <span class="verified-badge">✓ Verified student</span>
+        </div>
         <div class="profile-title" id="profileTitle"></div>
         <div class="profile-meta" id="profileMeta"></div>
-        <div id="profileTags" style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.6rem;"></div>
-        <span class="verified-badge">✓ Verified student</span>
+        <div id="profileTags" style="display:flex;flex-wrap:wrap;gap:0.4rem;"></div>
       </div>
       <div class="profile-actions">
         <button class="btn btn-outline" onclick="openModal('modalBio')">✏️ Edit profile</button>
