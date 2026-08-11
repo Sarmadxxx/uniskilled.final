@@ -518,6 +518,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
         </div>
         <div class="form-group"><label class="form-label">Upload proof (optional)</label><input type="file" id="certFileInput" accept="image/jpeg,image/png,application/pdf" class="form-input" style="padding:0.4rem;"></div>
         <button class="btn btn-outline" onclick="addCert()" style="width:100%;">+ Add certificate</button>
+        <div style="font-size:0.72rem;color:var(--mid);margin-top:0.5rem;">After adding, don't forget to click <strong>Save</strong> below to actually store it on your profile.</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -920,10 +921,17 @@ async function saveLevels() {
 }
 
 function addCert() {
-  const sub = document.getElementById('certSubjectInput').value.trim();
+  let sub = document.getElementById('certSubjectInput').value.trim();
   const grade = document.getElementById('certGradeInput').value.trim();
-  if (!sub) { showAlert('alertCerts', 'Please enter a certificate name or subject.', 'error'); return; }
   const file = document.getElementById('certFileInput').files[0] || null;
+
+  if (!sub && file) {
+    // Don't block on a missing subject when a file was clearly chosen —
+    // just use the filename (without extension) as a sensible default.
+    sub = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ');
+  }
+  if (!sub) { showAlert('alertCerts', 'Please enter a certificate name or subject, or choose a file.', 'error'); return; }
+
   certificates.push({ subject: sub, grade: grade || null, file, fileName: file ? file.name : null, fileUrl: null });
   renderCertsModal();
   document.getElementById('certSubjectInput').value = '';
