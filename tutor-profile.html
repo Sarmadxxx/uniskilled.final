@@ -978,6 +978,23 @@ function renderCertsModal() {
 }
 
 async function saveCerts() {
+  // If a file (and/or subject) is sitting in the mini-form but the person
+  // went straight to "Save" without clicking "+ Add certificate" first —
+  // a completely natural thing to do — catch it here instead of silently
+  // discarding it.
+  const pendingSub = document.getElementById('certSubjectInput').value.trim();
+  const pendingGrade = document.getElementById('certGradeInput').value.trim();
+  const pendingFile = document.getElementById('certFileInput').files[0] || null;
+  if (pendingFile || pendingSub) {
+    let sub = pendingSub;
+    if (!sub && pendingFile) sub = pendingFile.name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ');
+    certificates.push({ subject: sub, grade: pendingGrade || null, file: pendingFile, fileName: pendingFile ? pendingFile.name : null, fileUrl: null });
+    document.getElementById('certSubjectInput').value = '';
+    document.getElementById('certGradeInput').value = '';
+    document.getElementById('certFileInput').value = '';
+  }
+
+  let uploadFailures = 0;
   for (let c of certificates) {
     if (c.file && !c.fileUrl) {
       const fd = new FormData();
@@ -993,9 +1010,11 @@ async function saveCerts() {
           c.fileUrl = uploadResult.fileUrl;
         } else {
           console.error('Certificate upload failed:', uploadResult.error);
+          uploadFailures++;
         }
       } catch (e) {
         console.error('Certificate upload request failed:', e);
+        uploadFailures++;
       }
       delete c.file;
     }
@@ -1004,6 +1023,11 @@ async function saveCerts() {
   const { error } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, certificates: clean }, { onConflict: 'user_id' });
   if (error) { showAlert('alertCerts', 'Error: ' + error.message, 'error'); return; }
   certificates = clean;
+  renderCertsModal();
+  if (uploadFailures > 0) {
+    showAlert('alertCerts', `Saved, but ${uploadFailures} file${uploadFailures > 1 ? 's' : ''} couldn't upload. Please try that file again.`, 'error');
+    return;
+  }
   showAlert('alertCerts', 'Saved!', 'success');
   setTimeout(async () => { closeModal('modalCerts'); await loadProfile(); }, 700);
 }
