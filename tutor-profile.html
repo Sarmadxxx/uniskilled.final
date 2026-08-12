@@ -862,22 +862,42 @@ async function submitReview() {
 async function uploadAvatar() {
   const file = this.files[0]; if (!file) return;
   const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${e.target.result}">`; }; r.readAsDataURL(file);
-  const ext = file.name.split('.').pop();
-  const { error } = await _supabase.storage.from('certificates').upload(currentUserId + '/avatar.' + ext, file, { upsert: true });
-  if (!error) {
-    const { data: u } = _supabase.storage.from('certificates').getPublicUrl(currentUserId + '/avatar.' + ext);
-    await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, avatar_url: u.publicUrl }, { onConflict: 'user_id' });
+
+  const fd = new FormData();
+  fd.append('user_id', currentUserId);
+  fd.append('file', file);
+  fd.append('fixed_filename', 'avatar');
+  try {
+    const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', { method: 'POST', body: fd });
+    const result = await res.json();
+    if (res.ok && result.fileUrl) {
+      await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, avatar_url: result.fileUrl }, { onConflict: 'user_id' });
+    } else {
+      alert('Photo upload failed: ' + (result.error || 'unknown error') + '. Please try again.');
+    }
+  } catch (e) {
+    alert('Photo upload failed — check your connection and try again.');
   }
 }
 
 async function uploadCover() {
   const file = this.files[0]; if (!file) return;
   const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
-  const ext = file.name.split('.').pop();
-  const { error } = await _supabase.storage.from('certificates').upload(currentUserId + '/cover.' + ext, file, { upsert: true });
-  if (!error) {
-    const { data: u } = _supabase.storage.from('certificates').getPublicUrl(currentUserId + '/cover.' + ext);
-    await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, cover_url: u.publicUrl }, { onConflict: 'user_id' });
+
+  const fd = new FormData();
+  fd.append('user_id', currentUserId);
+  fd.append('file', file);
+  fd.append('fixed_filename', 'cover');
+  try {
+    const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', { method: 'POST', body: fd });
+    const result = await res.json();
+    if (res.ok && result.fileUrl) {
+      await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, cover_url: result.fileUrl }, { onConflict: 'user_id' });
+    } else {
+      alert('Cover photo upload failed: ' + (result.error || 'unknown error') + '. Please try again.');
+    }
+  } catch (e) {
+    alert('Cover photo upload failed — check your connection and try again.');
   }
 }
 
