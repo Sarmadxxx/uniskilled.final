@@ -389,6 +389,7 @@ let userId = null;
 let tutorName = 'Tutor';
 let tutorSubjects = [];
 let tutorCurrency = 'EUR';
+let tutorRate = 0;
 let _accessToken = null;
 
 // ── NAVIGATION ──
@@ -437,6 +438,7 @@ async function init() {
   tutorName = fullName;
   tutorSubjects = Array.isArray(tp?.subjects) ? tp.subjects : [];
   tutorCurrency = tp?.currency || 'EUR';
+  tutorRate = Number(tp?.hourly_rate) || 0;
 
   // Sidebar profile
   const av = document.getElementById('sideAv');
@@ -605,12 +607,27 @@ async function loadRequests() {
 
   const html = requests.length === 0
     ? '<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>'
-    : requests.map(r => `
+    : requests.map(r => {
+        const sym = (r.currency || tutorCurrency) === 'USD' ? '$' : '€';
+        const offeredPrice = Number(r.price) || 0;
+        // What the tutor's own rate would work out to for this exact duration,
+        // so "negotiated" reflects a genuinely different price, not just a
+        // longer/shorter session at the same rate.
+        const expectedAtListedRate = tutorRate * ((r.duration_minutes || 60) / 60);
+        const isNegotiated = tutorRate > 0 && Math.abs(offeredPrice - expectedAtListedRate) >= 0.5;
+        const priceHtml = `<div style="margin-top:0.4rem;">
+          <span style="font-weight:800;font-size:0.95rem;color:var(--ink);">${sym}${offeredPrice.toFixed(2)}</span>
+          ${isNegotiated
+            ? `<span style="margin-left:0.4rem;font-size:0.7rem;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:100px;">🏷️ Negotiated — your rate: ${sym}${expectedAtListedRate.toFixed(2)}</span>`
+            : `<span style="margin-left:0.4rem;font-size:0.72rem;color:var(--mid);">at your listed rate</span>`}
+        </div>`;
+        return `
       <div class="request-row">
         <div class="request-header">
           <div>
             <div class="request-name">${r.student_name || 'Student'}</div>
             <div class="request-subject">Subject: <strong>${r.subject || '—'}</strong></div>
+            ${priceHtml}
           </div>
           <span style="font-size:0.75rem;color:var(--mid);">${r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : ''} ${r.scheduled_time ? r.scheduled_time.slice(0,5) : ''}</span>
         </div>
@@ -623,7 +640,8 @@ async function loadRequests() {
           <button class="btn-decline" onclick="respond('${r.id}','declined','${r.student_id}','${(r.student_name||'').replace(/'/g,"\\'")}','${(r.subject||'').replace(/'/g,"\\'")}')">✗ Decline</button>
           <button class="btn-msg" onclick="window.location.href='messages.html?with=${r.student_id}'">💬</button>
         </div>
-      </div>`).join('');
+      </div>`;
+      }).join('');
 
   document.getElementById('requestsList').innerHTML = html;
   document.getElementById('overviewRequests').innerHTML = requests.length === 0

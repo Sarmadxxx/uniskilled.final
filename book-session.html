@@ -207,13 +207,14 @@ async function init(){
   // Editable price / negotiation
   if (rate >= minPrice) {
     document.getElementById('currencySymbolLabel').textContent = sym;
-    document.getElementById('listedRateHint').textContent = sym + rate;
+    document.getElementById('listedRateHint').textContent = sym + rate + '/hr';
     const offerInput = document.getElementById('offerPrice');
-    offerInput.value = rate;
     offerInput.min = minPrice;
     document.getElementById('priceHint').textContent = `Minimum ${sym}${minPrice}. Agreed on a different price in chat? Enter it here — the tutor will see your offer and can accept or decline.`;
+    applyDurationScaledPrice(); // sets the initial price based on the default 60-min duration
     updatePriceBreakdown();
     offerInput.addEventListener('input', updatePriceBreakdown);
+    document.getElementById('duration').addEventListener('change', () => { applyDurationScaledPrice(); updatePriceBreakdown(); });
     document.getElementById('priceDisplay').style.display = 'block';
   }
 
@@ -230,6 +231,13 @@ async function init(){
 
   document.getElementById('date').addEventListener('change', checkBlockedSlot);
   document.getElementById('time').addEventListener('change', checkBlockedSlot);
+}
+
+function applyDurationScaledPrice() {
+  const rate = Number(tutorData?.hourly_rate) || 0;
+  const durationMinutes = parseInt(document.getElementById('duration').value) || 60;
+  const scaled = (rate * durationMinutes / 60);
+  document.getElementById('offerPrice').value = scaled % 1 === 0 ? scaled.toFixed(0) : scaled.toFixed(2);
 }
 
 function updatePriceBreakdown() {
@@ -329,15 +337,16 @@ async function submitBooking(){
     convId=newConv?.id;
   }
   if(convId){
-    await _sb.from('messages').insert({conversation_id:convId,sender_id:currentUser.id,receiver_id:tutorId,sender_name:studentName,content:'Hi! I\'d like to book a '+subject+' session on '+new Date(date).toLocaleDateString()+' at '+time+(notes?'. Notes: '+notes:''),read:false});
-    await _sb.from('conversations').update({last_message:'Session request: '+subject,last_message_at:new Date().toISOString()}).eq('id',convId);
+    const sym = currency === 'USD' ? '$' : '€';
+    await _sb.from('messages').insert({conversation_id:convId,sender_id:currentUser.id,receiver_id:tutorId,sender_name:studentName,content:'Hi! I\'d like to book a '+subject+' session on '+new Date(date).toLocaleDateString()+' at '+time+' for '+sym+offerPrice.toFixed(2)+(notes?'. Notes: '+notes:''),read:false});
+    await _sb.from('conversations').update({last_message:'Session request: '+subject+' — '+sym+offerPrice.toFixed(2),last_message_at:new Date().toISOString()}).eq('id',convId);
   }
 
-  await _sb.from('notifications').insert({user_id:tutorId,type:'booking_request',title:'📅 New session request — '+subject,body:studentName+' would like to book a '+subject+' session. No payment has been taken yet.',link:'tutor-dashboard.html',read:false});
+  await _sb.from('notifications').insert({user_id:tutorId,type:'booking_request',title:'📅 New session request — '+subject,body:studentName+' would like to book a '+subject+' session for '+(currency === 'USD' ? '$' : '€')+offerPrice.toFixed(2)+'. No payment has been taken yet.',link:'tutor-dashboard.html',read:false});
 
   try {
     const {data:tu}=await _sb.from('users').select('email').eq('id',tutorId).single();
-    if(tu?.email) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'booking_request',to:tu.email,data:{tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time,duration,format,notes:notes||''}})});
+    if(tu?.email) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'booking_request',to:tu.email,data:{tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time,duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);
