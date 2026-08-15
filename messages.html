@@ -106,6 +106,7 @@ nav{height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);bor
       🛡️ <strong>Payments through UniSkilled are protected</strong> — held safely and refundable. Payments made outside UniSkilled aren't covered by this guarantee — no refund protection, no dispute support.
     </div>
     <div class="chat-messages" id="chatMessages" style="display:none;"></div>
+    <div id="contactWarning" style="display:none;background:#fef2f2;border-top:1px solid #fecaca;padding:0.6rem 1.5rem;font-size:0.78rem;color:#b91c1c;line-height:1.4;flex-shrink:0;"></div>
     <div class="chat-input-area" id="chatInputArea" style="display:none;">
       <input class="chat-input" id="msgInput" placeholder="Type a message..." maxlength="1000">
       <button class="send-btn" id="sendBtn">➤</button>
@@ -289,10 +290,37 @@ function appendMessage(msg,scroll=true){
   if(scroll)container.scrollTop=container.scrollHeight;
 }
 
+// ── OFF-PLATFORM CONTACT DETECTION ──
+// Not airtight (nothing is — Airbnb/Upwork/Fiverr all have the same limits),
+// but raises real friction for the common case: someone dropping a phone
+// number, email, or social handle to move the conversation off-platform.
+function detectContactInfo(text) {
+  const patterns = [
+    { re: /[\w.+-]+@[\w-]+\.[a-z]{2,}/i, label: 'an email address' },
+    { re: /(?:\+?\d[\s.-]?){7,}/, label: 'a phone number' },
+    { re: /\b(?:wa\.me|t\.me|instagram\.com|snapchat\.com|discord\.gg)\/\S+/i, label: 'a social media link' },
+    { re: /\b(?:whatsapp|whats app|telegram|snap(?:chat)?|insta(?:gram)?|discord|tiktok|imessage|line id|wechat)\b.{0,15}[@#]?[\w.]{3,}/i, label: 'a social media handle' },
+  ];
+  for (const p of patterns) {
+    if (p.re.test(text)) return p.label;
+  }
+  return null;
+}
+
 async function sendMessage(){
   const input=document.getElementById('msgInput');
   const content=input.value.trim();
   if(!content||!currentConvId)return;
+
+  const warningEl = document.getElementById('contactWarning');
+  const detected = detectContactInfo(content);
+  if (detected) {
+    warningEl.textContent = `⚠️ It looks like your message may contain ${detected}. For your safety and to keep your booking protections active, contact details can't be shared in chat — you'll be able to exchange them once your session is confirmed. Please edit your message to send it.`;
+    warningEl.style.display = 'block';
+    return;
+  }
+  warningEl.style.display = 'none';
+
   input.value='';
 
   // Use the session's own metadata as the source of truth for the sender's name.
