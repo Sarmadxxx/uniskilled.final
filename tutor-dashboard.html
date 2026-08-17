@@ -314,6 +314,12 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
           Students post subjects they need help with here. If you can teach one, click "I can offer this" — the student will be notified right away and you can confirm details by message.
         </div>
       </div>
+      <div id="clusteredDemandSection" style="display:none;margin-bottom:1rem;">
+        <div class="card">
+          <div class="card-head"><div class="card-title">🔥 Multiple Students Want the Same Thing</div></div>
+          <div class="card-body" id="clusteredDemandList"></div>
+        </div>
+      </div>
       <div class="card">
         <div class="card-body" id="subjectRequestsList">
           <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
@@ -489,11 +495,28 @@ async function loadAll() {
 }
 
 // ── GROUP SESSIONS ──
-function openGroupSessionModal() {
+let pendingGroupNotifyIds = [];
+
+function openGroupSessionModal(prefillSubject, studentIdsCsv) {
   const sel = document.getElementById('gsSubject');
-  sel.innerHTML = tutorSubjects.length > 0
-    ? tutorSubjects.map(s => `<option value="${s}">${s}</option>`).join('')
+  let options = tutorSubjects.length > 0 ? [...tutorSubjects] : [];
+  if (prefillSubject && !options.some(s => s.toLowerCase() === prefillSubject.toLowerCase())) {
+    options.unshift(prefillSubject);
+  }
+  sel.innerHTML = options.length > 0
+    ? options.map(s => `<option value="${s}">${s}</option>`).join('')
     : '<option value="">Add a subject to your profile first</option>';
+  if (prefillSubject) sel.value = prefillSubject;
+
+  pendingGroupNotifyIds = studentIdsCsv ? studentIdsCsv.split(',').filter(Boolean) : [];
+  const hint = document.getElementById('gsNotifyHint');
+  if (pendingGroupNotifyIds.length > 0) {
+    hint.textContent = `✓ The ${pendingGroupNotifyIds.length} student${pendingGroupNotifyIds.length > 1 ? 's' : ''} who requested this will be notified as soon as you create it.`;
+    hint.style.display = 'block';
+  } else {
+    hint.style.display = 'none';
+  }
+
   const sym = tutorCurrency === 'USD' ? '$' : '€';
   document.getElementById('gsPriceLabel').textContent = `Price per student (${sym})`;
   document.getElementById('gsError').style.display = 'none';
@@ -532,7 +555,7 @@ async function submitGroupSession() {
   btn.disabled = true;
   btn.textContent = 'Creating...';
 
-  const { error } = await _sb.from('group_sessions').insert({
+  const { data: newSession, error } = await _sb.from('group_sessions').insert({
     tutor_id: userId,
     tutor_name: tutorName,
     subject, scheduled_date: date, scheduled_time: time,
@@ -542,7 +565,7 @@ async function submitGroupSession() {
     currency: tutorCurrency,
     notes: notes || null,
     status: 'open'
-  });
+  }).select().single();
 
   btn.disabled = false;
   btn.textContent = 'Create Group Session';
@@ -551,6 +574,18 @@ async function submitGroupSession() {
     errBox.textContent = 'Could not create group session: ' + error.message;
     errBox.style.display = 'block';
     return;
+  }
+
+  if (pendingGroupNotifyIds.length > 0) {
+    const dateStr = new Date(date).toLocaleDateString([], { month: 'short', day: 'numeric' });
+    const notifs = pendingGroupNotifyIds.map(sid => ({
+      user_id: sid, type: 'group_session_created',
+      title: '🚀 A group session was just created for you!',
+      body: `${tutorName} created a ${subject} group session on ${dateStr} at ${time.slice(0,5)} — the exact thing you requested. Join now before spots fill up.`,
+      link: 'group-sessions.html', read: false,
+    }));
+    await _sb.from('notifications').insert(notifs);
+    pendingGroupNotifyIds = [];
   }
 
   closeGroupSessionModal();
@@ -739,6 +774,39 @@ async function loadSubjectRequests() {
   document.getElementById('overviewSubjectRequests').innerHTML = reqs.length === 0
     ? emptyHtml
     : reqs.slice(0, 3).map(renderSubjectRequestRow).join('');
+
+  renderClusteredDemand(reqs);
+}
+
+function renderClusteredDemand(reqs) {
+  const clusters = {};
+  reqs.forEach(r => {
+    const key = (r.subject || '').trim().toLowerCase();
+    if (!key) return;
+    if (!clusters[key]) clusters[key] = { subject: r.subject, requests: [] };
+    clusters[key].requests.push(r);
+  });
+
+  const grouped = Object.values(clusters).filter(c => c.requests.length >= 2).sort((a, b) => b.requests.length - a.requests.length);
+
+  const section = document.getElementById('clusteredDemandSection');
+  if (grouped.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  document.getElementById('clusteredDemandList').innerHTML = grouped.map(c => {
+    const names = c.requests.map(r => r.student_name || 'A student').join(', ');
+    const ids = c.requests.map(r => r.student_id).join(',');
+    const safeSubject = c.subject.replace(/'/g, "\\'");
+    return `<div style="border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:0.8rem;background:#fffbeb;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.6rem;">
+        <div>
+          <div style="font-weight:800;font-size:0.92rem;">${c.subject}</div>
+          <div style="font-size:0.8rem;color:var(--mid);margin-top:2px;">${c.requests.length} students want this · ${names}</div>
+        </div>
+        <button class="btn-accept" onclick="openGroupSessionModal('${safeSubject}','${ids}')" style="white-space:nowrap;">🚀 Create Group Session</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 window.acceptSubjectRequest = async function(requestId, studentId, studentName, subject) {
@@ -1280,6 +1348,7 @@ async function joinSession(sessionId, subject, otherName) {
       <div>
         <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Subject</label>
         <select id="gsSubject" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;"></select>
+        <div id="gsNotifyHint" style="display:none;font-size:0.76rem;color:var(--green);font-weight:600;margin-top:0.4rem;"></div>
       </div>
 
       <div style="display:flex;gap:0.7rem;">
