@@ -236,6 +236,18 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       </div>
     </div>
 
+    <!-- COURSES -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">🎯 Specific Courses</div>
+        <button class="edit-btn owner-only" onclick="openModal('modalCourses')" style="display:none;">✏️ Edit</button>
+      </div>
+      <div class="card-body" id="coursesBody">
+        <span class="empty">No specific courses added yet.</span>
+      </div>
+      <p style="font-size:0.75rem;color:var(--mid);margin-top:0.7rem;">Add exact course codes so students searching for their specific class — not just the general subject — can find you.</p>
+    </div>
+
     <!-- TRACK RECORD -->
     <div class="card">
       <div class="card-head">
@@ -394,6 +406,29 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalSubjects')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSubjects()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Courses -->
+<div class="modal-overlay" id="modalCourses">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Specific Courses</div><button class="modal-close" onclick="closeModal('modalCourses')">✕</button></div>
+    <div class="modal-body">
+      <div class="alert-bar" id="alertCourses"></div>
+      <div id="coursesModalList" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;"></div>
+      <div style="display:flex;flex-direction:column;gap:0.6rem;padding-top:0.8rem;border-top:1px solid var(--border);">
+        <div style="display:flex;gap:0.5rem;">
+          <input type="text" class="form-input" id="courseCodeInput" placeholder="Course code — e.g. MATH 201" style="flex:1;">
+          <input type="text" class="form-input" id="courseNameInput" placeholder="Course name (optional)" style="flex:1;">
+        </div>
+        <input type="text" class="form-input" id="courseProfInput" placeholder="Professor's name (optional)">
+        <button class="btn btn-outline" onclick="addCourse()" style="width:100%;">+ Add course</button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalCourses')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCourses()">Save</button>
     </div>
   </div>
 </div>
@@ -560,6 +595,7 @@ let isOwner = false;
 let tutorId = null;
 let currentUserId = null;
 let subjects = [];
+let courses = [];
 let availability = [];
 let certificates = [];
 let teachingLevels = [];
@@ -652,6 +688,9 @@ async function loadProfile() {
   teachingLevels = Array.isArray(tp?.teaching_levels) ? tp.teaching_levels : [];
   teachLanguages = Array.isArray(tp?.languages) ? tp.languages : [];
 
+  const { data: tc } = await _supabase.from('tutor_courses').select('*').eq('tutor_id', tutorId).order('created_at', { ascending: true });
+  courses = tc || [];
+
   document.title = fullName + ' — UniSkilled';
 
   // Avatar
@@ -734,6 +773,18 @@ async function loadProfile() {
   document.getElementById('subjectsBody').innerHTML = subjects.length > 0
     ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${s}</span>`).join('')}</div>`
     : '<span class="empty">No subjects added yet.</span>';
+
+  // Courses
+  document.getElementById('coursesBody').innerHTML = courses.length > 0
+    ? `<div style="display:flex;flex-direction:column;gap:0.6rem;">${courses.map(c => `
+        <div style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--border);">
+          <div style="width:36px;height:36px;background:var(--blue-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🎯</div>
+          <div>
+            <div style="font-weight:700;font-size:0.85rem;">${c.course_code}${c.course_name ? ' — ' + c.course_name : ''}</div>
+            ${c.professor_name ? `<div style="font-size:0.75rem;color:var(--mid);">Prof. ${c.professor_name}</div>` : ''}
+          </div>
+        </div>`).join('')}</div>`
+    : '<span class="empty">No specific courses added yet.</span>';
 
   // Academic
   const acadItems = [
@@ -924,6 +975,44 @@ async function saveSubjects() {
   setTimeout(async () => { closeModal('modalSubjects'); await loadProfile(); }, 700);
 }
 
+// Courses modal
+function renderCoursesModal() {
+  document.getElementById('coursesModalList').innerHTML = courses.length > 0
+    ? courses.map((c, i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:var(--off);border-radius:8px;">
+        <div>
+          <div style="font-weight:700;font-size:0.83rem;">${c.course_code}${c.course_name ? ' — ' + c.course_name : ''}</div>
+          ${c.professor_name ? `<div style="font-size:0.73rem;color:var(--mid);">Prof. ${c.professor_name}</div>` : ''}
+        </div>
+        <button onclick="courses.splice(${i},1);renderCoursesModal()" style="background:none;border:none;color:var(--mid);font-size:1.1rem;cursor:pointer;">×</button>
+      </div>`).join('')
+    : '<span class="empty">No courses added yet.</span>';
+}
+window.addCourse = function() {
+  const code = document.getElementById('courseCodeInput').value.trim();
+  const name = document.getElementById('courseNameInput').value.trim();
+  const prof = document.getElementById('courseProfInput').value.trim();
+  if (!code) { showAlert('alertCourses', 'Please enter at least a course code.', 'error'); return; }
+  courses.push({ course_code: code, course_name: name || null, professor_name: prof || null });
+  renderCoursesModal();
+  document.getElementById('courseCodeInput').value = '';
+  document.getElementById('courseNameInput').value = '';
+  document.getElementById('courseProfInput').value = '';
+  document.getElementById('alertCourses').style.display = 'none';
+};
+async function saveCourses() {
+  // Full-replace sync: clear this tutor's existing rows, then insert the current list
+  await _supabase.from('tutor_courses').delete().eq('tutor_id', currentUserId);
+  if (courses.length > 0) {
+    const { error } = await _supabase.from('tutor_courses').insert(
+      courses.map(c => ({ tutor_id: currentUserId, course_code: c.course_code, course_name: c.course_name, professor_name: c.professor_name }))
+    );
+    if (error) { showAlert('alertCourses', 'Error: ' + error.message, 'error'); return; }
+  }
+  showAlert('alertCourses', 'Saved!', 'success');
+  setTimeout(async () => { closeModal('modalCourses'); await loadProfile(); }, 700);
+}
+
 async function saveAcademic() {
   const data = { user_id: currentUserId, location: document.getElementById('inputUniversity').value.trim() || null, degree_level: document.getElementById('inputDegree').value || null, major: document.getElementById('inputMajor').value.trim() || null, study_year: document.getElementById('inputYear').value || null, overall_grade: document.getElementById('inputGrade').value.trim() || null };
   const { error } = await _supabase.from('tutor_profiles').upsert(data, { onConflict: 'user_id' });
@@ -1067,6 +1156,9 @@ function openModal(id) {
   if (id === 'modalSubjects') {
     renderSubjectsModal();
   }
+  if (id === 'modalCourses') {
+    renderCoursesModal();
+  }
   if (id === 'modalAcademic') {
     document.getElementById('inputUniversity').value = tutorData?.location || '';
     document.getElementById('inputDegree').value = tutorData?.degree_level || '';
@@ -1113,6 +1205,7 @@ window.addSubject = function() {
 document.addEventListener('DOMContentLoaded', () => {
   init();
   document.getElementById('subjectInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addSubject(); });
+  document.getElementById('courseCodeInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addCourse(); });
   document.getElementById('languageInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addLanguage(); });
 });
 

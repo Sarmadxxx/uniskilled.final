@@ -195,6 +195,15 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
           <input type="file" id="certFile" accept="image/jpeg,image/png,image/jpg,application/pdf" class="form-input" style="padding:0.5rem;cursor:pointer;">
           <div class="hint">Max 5MB. PDF, JPG or PNG. Will appear on your public tutor profile.</div>
         </div>
+
+        <div class="section-title">Specific Courses (optional)</div>
+        <p style="font-size:0.8rem;color:var(--mid);margin-bottom:0.8rem;">Add exact course codes you can help with, so students searching for their specific class — not just the general subject — can find you.</p>
+        <div class="cert-list" id="courseList"></div>
+        <div class="cert-add-row">
+          <div class="form-group" style="margin:0;"><label class="form-label">Course code</label><input type="text" class="form-input" id="courseCode" placeholder="e.g. MATH 201"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label">Course name / Professor</label><input type="text" class="form-input" id="courseNameProf" placeholder="e.g. Calculus II — Prof. Chen"></div>
+          <button class="tag-btn" id="addCourseBtn" style="align-self:flex-end;margin-bottom:0;">+ Add</button>
+        </div>
       </div>
 
       <!-- Availability -->
@@ -261,6 +270,7 @@ let selectedRole = null;
 let subjects = [];
 let availability = [];
 let certificates = [];
+let courses = [];
 
 const TOTAL_STEPS = 5;
 
@@ -300,6 +310,13 @@ function renderCerts() {
   ).join('');
 }
 window.removeCert = function(i) { certificates.splice(i, 1); renderCerts(); };
+
+function renderCourses() {
+  document.getElementById('courseList').innerHTML = courses.map((c, i) =>
+    `<div class="cert-item"><span class="cert-icon">🎯</span><div class="cert-info"><div class="cert-name">${c.course_code}</div><div class="cert-grade">${c.course_name || 'No details added'}</div></div><button class="cert-remove" onclick="removeCourse(${i})">×</button></div>`
+  ).join('');
+}
+window.removeCourse = function(i) { courses.splice(i, 1); renderCourses(); };
 
 function setLoading(loading) {
   const btn = document.getElementById('submitBtn');
@@ -373,6 +390,20 @@ document.addEventListener('DOMContentLoaded', function() {
       fileInput.value = '';
     } else {
       showAlert('Please enter both subject and grade.', 'error');
+    }
+  });
+
+  // Course add
+  document.getElementById('addCourseBtn').addEventListener('click', function() {
+    const code = document.getElementById('courseCode').value.trim();
+    const nameProf = document.getElementById('courseNameProf').value.trim();
+    if (code) {
+      courses.push({ course_code: code, course_name: nameProf || null });
+      renderCourses();
+      document.getElementById('courseCode').value = '';
+      document.getElementById('courseNameProf').value = '';
+    } else {
+      showAlert('Please enter at least a course code.', 'error');
     }
   });
 
@@ -544,6 +575,12 @@ document.addEventListener('DOMContentLoaded', function() {
           preferred_time: preferredTimes[0] || null,
           preferred_times: preferredTimes.length > 0 ? preferredTimes : null
         });
+
+        if (courses.length > 0) {
+          await _sb.from('tutor_courses').insert(
+            courses.map(c => ({ tutor_id: data.user.id, course_code: c.course_code, course_name: c.course_name }))
+          );
+        }
 
         if (certUploadFailures > 0) {
           const warn = document.getElementById('certWarning');

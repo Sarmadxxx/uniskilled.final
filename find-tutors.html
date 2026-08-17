@@ -90,7 +90,7 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
   <h1>Find your perfect tutor</h1>
   <p>University-verified tutors matched to your subjects</p>
   <div class="search-bar">
-    <input type="text" class="search-input" id="searchInput" placeholder="Search by subject, name...">
+    <input type="text" class="search-input" id="searchInput" placeholder="Search by subject, course code, professor, name...">
     <button class="search-btn" onclick="filterTutors()">Search</button>
   </div>
   <div id="postRequestBanner" style="display:none;margin-top:1.1rem;">
@@ -203,6 +203,7 @@ async function loadTutors() {
     const userIds = profiles.map(p => p.user_id).filter(Boolean);
     const { data: users } = await _sb.from('users').select('id,full_name,avatar_url,country').in('id', userIds);
     const { data: reviews } = await _sb.from('reviews').select('tutor_id,rating');
+    const { data: courseRows } = await _sb.from('tutor_courses').select('*').in('tutor_id', userIds);
 
     const userMap = {};
     (users || []).forEach(u => userMap[u.id] = u);
@@ -212,11 +213,16 @@ async function loadTutors() {
       reviewMap[r.tutor_id].total += r.rating;
       reviewMap[r.tutor_id].count++;
     });
+    const courseMap = {};
+    (courseRows || []).forEach(c => {
+      if (!courseMap[c.tutor_id]) courseMap[c.tutor_id] = [];
+      courseMap[c.tutor_id].push(c);
+    });
 
     allTutors = profiles.map(tp => {
       const u = userMap[tp.user_id] || {};
       const rv = reviewMap[tp.user_id] || { total: 0, count: 0 };
-      return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || '', currency: tp.currency || 'GBP', avgRating: rv.count > 0 ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count };
+      return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || '', currency: tp.currency || 'GBP', avgRating: rv.count > 0 ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count, courses: courseMap[tp.user_id] || [] };
     });
 
     renderTutors(allTutors);
@@ -261,6 +267,7 @@ function renderTutors(tutors) {
         </div>
       </div>
       ${t.bio?`<p style="font-size:0.82rem;color:var(--mid);line-height:1.5;margin-bottom:0.9rem;">${t.bio.slice(0,120)}${t.bio.length>120?'...':''}</p>`:''}
+      ${(t.courses||[]).length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;">${t.courses.slice(0,3).map(c=>`<span style="background:var(--blue-pale);color:var(--blue);font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:100px;">🎯 ${c.course_code}</span>`).join('')}</div>` : ''}
       <div class="subjects">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${s}</span>`).join('')}</div>
       <div class="card-footer">
         <div class="tutor-rate">${rate} <span>per hour</span></div>
@@ -281,7 +288,13 @@ function filterTutors() {
   renderTutors(allTutors.filter(t => {
     const subjects = Array.isArray(t.subjects)?t.subjects:[];
     const avail = Array.isArray(t.availability)?t.availability:[];
-    if(q && !subjects.some(s=>s.toLowerCase().includes(q)) && !(t.fullName||'').toLowerCase().includes(q) && !(t.location||'').toLowerCase().includes(q)) return false;
+    const courses = Array.isArray(t.courses)?t.courses:[];
+    const matchesCourse = courses.some(c =>
+      (c.course_code||'').toLowerCase().includes(q) ||
+      (c.course_name||'').toLowerCase().includes(q) ||
+      (c.professor_name||'').toLowerCase().includes(q)
+    );
+    if(q && !subjects.some(s=>s.toLowerCase().includes(q)) && !matchesCourse && !(t.fullName||'').toLowerCase().includes(q) && !(t.location||'').toLowerCase().includes(q)) return false;
     if(fmt && t.teaching_format!==fmt && t.teaching_format!=='both') return false;
     if(day && !avail.includes(day)) return false;
     if(price){const r=t.hourly_rate||0;if(price==='0-20'&&r>20)return false;if(price==='20-40'&&(r<20||r>40))return false;if(price==='40-60'&&(r<40||r>60))return false;if(price==='60+'&&r<60)return false;}
