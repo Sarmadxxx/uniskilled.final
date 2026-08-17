@@ -487,7 +487,27 @@ async function loadMyRequests() {
     body.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📋</div><div class="empty-state-text">No subject requests yet</div><a href="find-tutors.html#request" class="btn-sm">Request a subject →</a></div>';
     return;
   }
-  body.innerHTML = reqs.map(r => `
+
+  // For any still-open requests, check whether other students want the same
+  // subject too — this is the same signal a tutor sees clustered on their
+  // side, just made visible back to the student who's actually waiting.
+  const openSubjects = [...new Set(reqs.filter(r => r.status === 'open').map(r => r.subject))];
+  let demandCounts = {};
+  if (openSubjects.length > 0) {
+    const { data: allOpen } = await _sb.from('subject_requests').select('subject,student_id').eq('status', 'open').in('subject', openSubjects);
+    (allOpen || []).forEach(r => {
+      demandCounts[r.subject] = (demandCounts[r.subject] || 0) + 1;
+    });
+  }
+
+  body.innerHTML = reqs.map(r => {
+    const othersCount = (demandCounts[r.subject] || 1) - 1; // exclude the student's own request
+    const demandHtml = (r.status === 'open' && othersCount > 0)
+      ? `<div style="margin-top:0.5rem;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:0.5rem 0.7rem;font-size:0.78rem;color:#92400e;">
+          👥 ${othersCount} other student${othersCount > 1 ? 's are' : ' is'} also looking for <strong>${r.subject}</strong> help. Group sessions often form once a tutor notices — check <a href="group-sessions.html" style="color:#92400e;text-decoration:underline;">Group Sessions</a> or ask around your class to speed it up.
+        </div>`
+      : '';
+    return `
     <div class="myreq-row">
       <div class="myreq-top">
         <div class="myreq-subject">${r.subject}</div>
@@ -498,7 +518,9 @@ async function loadMyRequests() {
           ? `${r.accepted_tutor_name} can help with this — <a href="messages.html?with=${r.accepted_tutor_id}" style="color:var(--blue);font-weight:600;">message them →</a>`
           : 'Waiting for a tutor to respond'}
       </div>
-    </div>`).join('');
+      ${demandHtml}
+    </div>`;
+  }).join('');
 }
 
 let cancelTargetSessionId = null;
