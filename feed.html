@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Pulse — UniSkilled</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Manrope',sans-serif;}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--yellow:#f59e0b;--yellow-bg:#fffbeb;}
+body{background:var(--off);color:var(--ink);min-height:100vh;}
+
+/* NAV */
+nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:200;}
+.nav-logo{display:flex;align-items:center;gap:8px;}
+.nav-logo img{height:32px;}
+.nav-title{font-size:0.9rem;font-weight:700;color:var(--mid);display:flex;align-items:center;gap:6px;}
+.nav-right a{font-size:0.83rem;font-weight:600;color:var(--mid);text-decoration:none;padding:0.5rem 0.9rem;border-radius:8px;}
+.nav-right a:hover{background:var(--off);color:var(--ink);}
+
+/* LAYOUT */
+.page{max-width:640px;margin:0 auto;padding:1.5rem 5% 4rem;}
+.hero-title{font-size:1.4rem;font-weight:800;margin-bottom:0.2rem;}
+.hero-sub{font-size:0.85rem;color:var(--mid);margin-bottom:1.4rem;}
+
+/* COMPOSE CARD */
+.compose{background:#fff;border-radius:16px;border:1px solid var(--border);padding:1.1rem 1.2rem;margin-bottom:1.4rem;transition:box-shadow .2s;}
+.compose:focus-within{box-shadow:0 4px 20px rgba(26,107,255,0.08);border-color:#c7d9ff;}
+.compose-top{display:flex;gap:0.8rem;}
+.avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blue),#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;flex-shrink:0;}
+.compose textarea{flex:1;border:none;outline:none;resize:none;font-size:0.92rem;line-height:1.5;min-height:44px;background:transparent;color:var(--ink);}
+.compose textarea::placeholder{color:var(--light);}
+.compose-tags{display:flex;gap:0.6rem;margin-top:0.7rem;padding-top:0.7rem;border-top:1px solid var(--off);flex-wrap:wrap;}
+.compose-tags input{border:1px solid var(--border);border-radius:100px;padding:0.4rem 0.9rem;font-size:0.78rem;background:var(--off);width:140px;}
+.compose-tags input:focus{outline:none;border-color:var(--blue);background:#fff;}
+.compose-footer{display:flex;justify-content:flex-end;margin-top:0.8rem;}
+.post-btn{background:var(--blue);color:#fff;border:none;padding:0.6rem 1.4rem;border-radius:100px;font-weight:700;font-size:0.85rem;cursor:pointer;transition:all .15s;}
+.post-btn:hover{background:#1558e0;}
+.post-btn:disabled{background:var(--light);cursor:not-allowed;}
+
+/* POST CARD */
+.post{background:#fff;border-radius:16px;border:1px solid var(--border);padding:1.2rem;margin-bottom:1rem;animation:fadein .3s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.post-head{display:flex;gap:0.7rem;align-items:flex-start;}
+.post-head-info{flex:1;min-width:0;}
+.post-name-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.post-name{font-weight:700;font-size:0.9rem;}
+.post-time{font-size:0.76rem;color:var(--light);}
+.tag-pill{display:inline-flex;align-items:center;font-size:0.7rem;font-weight:700;background:#eff6ff;color:var(--blue);padding:2px 10px;border-radius:100px;}
+.post-content{font-size:0.9rem;line-height:1.55;color:var(--ink2);margin:0.6rem 0 0.9rem;white-space:pre-wrap;}
+
+.group-nudge{display:flex;align-items:center;justify-content:space-between;gap:0.6rem;background:var(--yellow-bg);border:1px solid #fde68a;border-radius:10px;padding:0.6rem 0.9rem;margin-bottom:0.8rem;flex-wrap:wrap;}
+.group-nudge-text{font-size:0.78rem;color:#92400e;font-weight:600;}
+.group-nudge-btn{background:var(--yellow);color:#fff;border:none;padding:0.4rem 0.9rem;border-radius:100px;font-size:0.76rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+
+.post-actions{display:flex;gap:1.4rem;padding-top:0.7rem;border-top:1px solid var(--off);}
+.action-btn{display:flex;align-items:center;gap:6px;background:none;border:none;font-size:0.8rem;font-weight:600;color:var(--mid);cursor:pointer;padding:0.3rem 0.2rem;transition:color .15s;}
+.action-btn:hover{color:var(--blue);}
+.action-btn.liked{color:#e11d48;}
+.action-btn.answer-btn{color:var(--green);}
+.action-btn svg{width:17px;height:17px;stroke-width:2;}
+
+/* REPLIES */
+.replies{margin-top:0.9rem;padding-top:0.9rem;border-top:1px solid var(--off);display:none;}
+.replies.open{display:block;}
+.reply-row{display:flex;gap:0.6rem;margin-bottom:0.8rem;}
+.reply-avatar{width:30px;height:30px;border-radius:50%;background:var(--off);color:var(--ink2);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.68rem;flex-shrink:0;}
+.reply-bubble{background:var(--off);border-radius:12px;padding:0.6rem 0.9rem;flex:1;}
+.reply-bubble.answer{background:var(--green-bg);border:1px solid #a7f3d0;}
+.reply-name-row{display:flex;align-items:center;gap:5px;margin-bottom:2px;}
+.reply-name{font-size:0.78rem;font-weight:700;}
+.verified-badge{display:inline-flex;align-items:center;gap:3px;font-size:0.66rem;font-weight:700;color:var(--green);}
+.reply-text{font-size:0.83rem;color:var(--ink2);line-height:1.4;}
+
+.reply-compose{display:flex;gap:0.6rem;align-items:center;margin-top:0.5rem;}
+.reply-compose input[type=text]{flex:1;border:1px solid var(--border);border-radius:100px;padding:0.5rem 1rem;font-size:0.82rem;background:var(--off);}
+.reply-compose input[type=text]:focus{outline:none;border-color:var(--blue);background:#fff;}
+.tutor-toggle{display:flex;align-items:center;gap:5px;font-size:0.73rem;color:var(--green);font-weight:700;white-space:nowrap;cursor:pointer;user-select:none;}
+.reply-send{background:var(--blue);color:#fff;border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--mid);}
+.load-more{display:block;margin:1rem auto 0;background:#fff;border:1px solid var(--border);padding:0.6rem 1.6rem;border-radius:100px;font-size:0.83rem;font-weight:700;color:var(--ink2);cursor:pointer;}
+.skeleton{background:#fff;border-radius:16px;border:1px solid var(--border);padding:1.2rem;margin-bottom:1rem;}
+.skeleton-line{height:12px;background:var(--off);border-radius:6px;margin-bottom:8px;animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+@media(max-width:640px){
+  .page{padding:1rem 1rem 4rem;}
+  .compose-tags input{width:calc(50% - 0.3rem);}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><img src="uniskilled-logo.png" alt="UniSkilled"></a>
+  <span class="nav-title">✨ Study Pulse</span>
+  <div class="nav-right" id="navRight"><a href="student-dashboard.html">← Dashboard</a></div>
+</nav>
+
+<div class="page">
+  <div class="hero-title">Study Pulse</div>
+  <div class="hero-sub">Ask what you're stuck on. Get real answers from verified tutors — join in with your own comments too.</div>
+
+  <div class="compose">
+    <div class="compose-top">
+      <div class="avatar" id="composeAvatar">?</div>
+      <textarea id="postInput" placeholder="What are you stuck on right now?" rows="2" oninput="autoGrow(this)"></textarea>
+    </div>
+    <div class="compose-tags">
+      <input type="text" id="postCourse" placeholder="🎯 Course code">
+      <input type="text" id="postSubject" placeholder="📚 Subject">
+    </div>
+    <div class="compose-footer">
+      <button class="post-btn" id="postBtn" onclick="submitPost()">Post</button>
+    </div>
+  </div>
+
+  <div id="feedList"></div>
+  <button class="load-more" id="loadMoreBtn" onclick="loadPosts(false)" style="display:none;">Load more</button>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
+const _sb = window.supabase.createClient(
+  SUPABASE_URL,
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
+);
+
+let currentUser = null;
+let currentUserName = 'You';
+let isTutor = false;
+let posts = [];
+let offset = 0;
+const PAGE_SIZE = 15;
+
+function autoGrow(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+
+function initials(name) {
+  return (name || '?').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+}
+
+function timeAgo(dateStr) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString();
+}
+
+async function init() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { window.location.href = 'signin.html?redirect=' + encodeURIComponent(window.location.href); return; }
+  currentUser = session.user;
+
+  const { data: u } = await _sb.from('users').select('full_name, roles').eq('id', currentUser.id).single();
+  currentUserName = u?.full_name || 'You';
+  isTutor = Array.isArray(u?.roles) && u.roles.includes('tutor');
+  document.getElementById('composeAvatar').textContent = initials(currentUserName);
+  document.getElementById('navRight').innerHTML = `<a href="${isTutor ? 'tutor-dashboard.html' : 'student-dashboard.html'}">← Dashboard</a>`;
+
+  await loadPosts(true);
+  setupRealtime();
+}
+
+async function submitPost() {
+  const content = document.getElementById('postInput').value.trim();
+  if (!content) return;
+  const course = document.getElementById('postCourse').value.trim();
+  const subject = document.getElementById('postSubject').value.trim();
+  const btn = document.getElementById('postBtn');
+  btn.disabled = true; btn.textContent = 'Posting...';
+
+  const { error } = await _sb.from('feed_posts').insert({
+    author_id: currentUser.id, author_name: currentUserName,
+    author_role: isTutor ? 'tutor' : 'student',
+    content, course_code: course || null, subject: subject || null,
+  });
+
+  btn.disabled = false; btn.textContent = 'Post';
+  if (error) { alert('Could not post: ' + error.message); return; }
+
+  document.getElementById('postInput').value = '';
+  document.getElementById('postInput').style.height = 'auto';
+  document.getElementById('postCourse').value = '';
+  document.getElementById('postSubject').value = '';
+  offset = 0;
+  await loadPosts(true);
+}
+
+async function loadPosts(reset) {
+  if (reset) { offset = 0; document.getElementById('feedList').innerHTML = skeletons(); }
+  const { data } = await _sb.from('feed_posts').select('*').order('created_at', { ascending: false }).range(offset, offset + PAGE_SIZE - 1);
+
+  if (reset) posts = data || [];
+  else posts = posts.concat(data || []);
+  offset += PAGE_SIZE;
+
+  renderFeed();
+  document.getElementById('loadMoreBtn').style.display = (data && data.length === PAGE_SIZE) ? 'block' : 'none';
+}
+
+function skeletons() {
+  return Array(3).fill('<div class="skeleton"><div class="skeleton-line" style="width:40%"></div><div class="skeleton-line" style="width:90%"></div><div class="skeleton-line" style="width:60%"></div></div>').join('');
+}
+
+async function renderFeed() {
+  const list = document.getElementById('feedList');
+  if (posts.length === 0) { list.innerHTML = '<div class="empty-state">No posts yet — be the first to ask something.</div>'; return; }
+
+  // Course-demand clustering: how many distinct students posted/tagged this
+  // same course_code, to power the group-session nudge — reuses the exact
+  // signal already driving the dashboard's demand-clustering feature.
+  const courseCounts = {};
+  posts.forEach(p => {
+    if (!p.course_code) return;
+    const key = p.course_code.toLowerCase();
+    if (!courseCounts[key]) courseCounts[key] = new Set();
+    courseCounts[key].add(p.author_id);
+  });
+
+  list.innerHTML = posts.map(p => {
+    const demandCount = p.course_code ? (courseCounts[p.course_code.toLowerCase()]?.size || 0) : 0;
+    const showNudge = isTutor && demandCount >= 3;
+
+    return `<div class="post" data-post-id="${p.id}">
+      <div class="post-head">
+        <div class="avatar" style="background:${p.author_role === 'tutor' ? 'linear-gradient(135deg,#059669,#0ea5e9)' : 'linear-gradient(135deg,var(--blue),#7c3aed)'};">${initials(p.author_name)}</div>
+        <div class="post-head-info">
+          <div class="post-name-row">
+            <span class="post-name">${escapeHtml(p.author_name)}</span>
+            <span class="post-time">· ${timeAgo(p.created_at)}</span>
+            ${p.course_code ? `<span class="tag-pill">🎯 ${escapeHtml(p.course_code)}</span>` : ''}
+          </div>
+          <div class="post-content">${escapeHtml(p.content)}</div>
+          ${showNudge ? `<div class="group-nudge">
+            <span class="group-nudge-text">👥 ${demandCount} students interested in ${escapeHtml(p.course_code)} — enough for a group session</span>
+            <button class="group-nudge-btn" onclick="window.location.href='tutor-dashboard.html?tab=groupSessions'">Start it →</button>
+          </div>` : ''}
+          <div class="post-actions">
+            <button class="action-btn like-btn" onclick="toggleLike('${p.id}', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> <span class="like-count">${p.like_count || 0}</span></button>
+            <button class="action-btn" onclick="toggleReplies('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> ${p.reply_count || 0} ${p.reply_count === 1 ? 'reply' : 'replies'}</button>
+            ${p.has_tutor_answer ? `<span class="action-btn answer-btn" style="cursor:default;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg> Answered</span>` : ''}
+          </div>
+          <div class="replies" id="replies-${p.id}">
+            <div class="reply-list" id="replyList-${p.id}"></div>
+            <div class="reply-compose">
+              <input type="text" id="replyInput-${p.id}" placeholder="${isTutor ? 'Write a reply...' : 'Add a comment...'}" onkeydown="if(event.key==='Enter')submitReply('${p.id}')">
+              ${isTutor ? `<label class="tutor-toggle"><input type="checkbox" id="asAnswer-${p.id}" checked style="accent-color:var(--green);"> Answer</label>` : ''}
+              <button class="reply-send" onclick="submitReply('${p.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML;
+}
+
+async function toggleLike(postId, btn) {
+  const { data: existing } = await _sb.from('feed_likes').select('*').eq('post_id', postId).eq('user_id', currentUser.id).maybeSingle();
+  const countEl = btn.querySelector('.like-count');
+  let count = parseInt(countEl.textContent);
+
+  if (existing) {
+    await _sb.from('feed_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+    btn.classList.remove('liked');
+    count = Math.max(0, count - 1);
+  } else {
+    await _sb.from('feed_likes').insert({ post_id: postId, user_id: currentUser.id });
+    btn.classList.add('liked');
+    count += 1;
+  }
+  countEl.textContent = count;
+  await _sb.from('feed_posts').update({ like_count: count }).eq('id', postId);
+}
+
+let openReplies = new Set();
+
+async function toggleReplies(postId) {
+  const el = document.getElementById('replies-' + postId);
+  const isOpen = el.classList.contains('open');
+  if (isOpen) { el.classList.remove('open'); openReplies.delete(postId); return; }
+  el.classList.add('open');
+  openReplies.add(postId);
+  await loadReplies(postId);
+}
+
+async function loadReplies(postId) {
+  const { data } = await _sb.from('feed_replies').select('*').eq('post_id', postId).order('created_at', { ascending: true });
+  const list = document.getElementById('replyList-' + postId);
+  list.innerHTML = (data || []).map(r => `
+    <div class="reply-row">
+      <div class="reply-avatar">${initials(r.author_name)}</div>
+      <div class="reply-bubble ${r.is_tutor_answer ? 'answer' : ''}">
+        <div class="reply-name-row">
+          <span class="reply-name">${escapeHtml(r.author_name)}</span>
+          ${r.is_tutor_answer ? '<span class="verified-badge">✓ Verified tutor</span>' : ''}
+        </div>
+        <div class="reply-text">${escapeHtml(r.content)}</div>
+      </div>
+    </div>`).join('');
+}
+
+async function submitReply(postId) {
+  const input = document.getElementById('replyInput-' + postId);
+  const content = input.value.trim();
+  if (!content) return;
+  const asAnswerEl = document.getElementById('asAnswer-' + postId);
+  const asAnswer = asAnswerEl ? asAnswerEl.checked : false;
+
+  input.value = '';
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/post-feed-reply`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ post_id: postId, author_id: currentUser.id, content, as_tutor_answer: asAnswer }),
+  });
+  const data = await res.json();
+  if (data.error) { alert('Could not post reply: ' + data.error); return; }
+
+  await loadReplies(postId);
+  const post = posts.find(p => p.id === postId);
+  if (post) {
+    post.reply_count = (post.reply_count || 0) + 1;
+    if (data.is_tutor_answer) post.has_tutor_answer = true;
+  }
+  renderFeed();
+  document.getElementById('replies-' + postId).classList.add('open');
+}
+
+function setupRealtime() {
+  _sb.channel('feed-live')
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'feed_posts' }, payload => {
+      if (payload.new.author_id === currentUser.id) return; // already shown optimistically
+      posts.unshift(payload.new);
+      renderFeed();
+    })
+    .subscribe();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
