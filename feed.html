@@ -103,7 +103,7 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
   <div class="hero-title">Feeds</div>
   <div class="hero-sub">Ask what you're stuck on. Get real answers from verified tutors — join in with your own comments too.</div>
 
-  <div class="compose">
+  <div class="compose" id="studentCompose">
     <div class="compose-top">
       <div class="avatar" id="composeAvatar">?</div>
       <textarea id="postInput" placeholder="What are you stuck on right now?" rows="2" oninput="autoGrow(this)"></textarea>
@@ -114,6 +114,28 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
     </div>
     <div class="compose-footer">
       <button class="post-btn" id="postBtn" onclick="submitPost()">Post</button>
+    </div>
+  </div>
+
+  <div class="compose" id="tutorCompose" style="display:none;">
+    <div class="compose-top">
+      <div class="avatar" id="composeAvatarTutor">?</div>
+      <textarea id="shareInput" placeholder="Share a study tip, resource, or something useful for your students..." rows="2" oninput="autoGrow(this)"></textarea>
+    </div>
+    <div class="compose-tags">
+      <input type="text" id="shareCourse" placeholder="🎯 Course code">
+      <input type="text" id="shareSubject" placeholder="📚 Subject">
+    </div>
+    <div id="attachmentPreview" style="display:none;align-items:center;gap:8px;background:var(--off);border-radius:10px;padding:0.5rem 0.8rem;margin-top:0.6rem;font-size:0.8rem;color:var(--ink2);">
+      <span id="attachmentPreviewName"></span>
+      <button onclick="clearAttachment()" style="margin-left:auto;background:none;border:none;color:var(--mid);cursor:pointer;font-size:1rem;">×</button>
+    </div>
+    <div class="compose-footer" style="justify-content:space-between;">
+      <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--mid);cursor:pointer;">
+        <input type="file" id="shareFileInput" accept="image/jpeg,image/png,application/pdf" style="display:none;" onchange="handleAttachmentSelect(this)">
+        📎 Attach a file
+      </label>
+      <button class="post-btn" id="shareBtn" onclick="submitSharePost()">Share</button>
     </div>
   </div>
 
@@ -164,8 +186,17 @@ async function init() {
   const { data: u } = await _sb.from('users').select('full_name, roles').eq('id', currentUser.id).single();
   currentUserName = u?.full_name || 'You';
   isTutor = Array.isArray(u?.roles) && u.roles.includes('tutor');
-  document.getElementById('composeAvatar').textContent = initials(currentUserName);
   document.getElementById('navRight').innerHTML = `<a href="${isTutor ? 'tutor-dashboard.html' : 'student-dashboard.html'}">← Dashboard</a>`;
+
+  // Students ask questions; tutors share resources/tips with an optional
+  // attachment — two genuinely different actions, not one generic box.
+  if (isTutor) {
+    document.getElementById('studentCompose').style.display = 'none';
+    document.getElementById('tutorCompose').style.display = 'block';
+    document.getElementById('composeAvatarTutor').textContent = initials(currentUserName);
+  } else {
+    document.getElementById('composeAvatar').textContent = initials(currentUserName);
+  }
 
   await loadPosts(true);
   setupRealtime();
@@ -196,6 +227,69 @@ async function submitPost() {
   await loadPosts(true);
 }
 
+let pendingAttachment = null; // { file, name }
+
+function handleAttachmentSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  pendingAttachment = { file, name: file.name };
+  document.getElementById('attachmentPreviewName').textContent = '📎 ' + file.name;
+  document.getElementById('attachmentPreview').style.display = 'flex';
+}
+
+function clearAttachment() {
+  pendingAttachment = null;
+  document.getElementById('shareFileInput').value = '';
+  document.getElementById('attachmentPreview').style.display = 'none';
+}
+
+async function submitSharePost() {
+  const content = document.getElementById('shareInput').value.trim();
+  if (!content) return;
+  const course = document.getElementById('shareCourse').value.trim();
+  const subject = document.getElementById('shareSubject').value.trim();
+  const btn = document.getElementById('shareBtn');
+  btn.disabled = true; btn.textContent = 'Sharing...';
+
+  let attachmentUrl = null, attachmentName = null;
+  if (pendingAttachment) {
+    const fd = new FormData();
+    fd.append('user_id', currentUser.id);
+    fd.append('file', pendingAttachment.file);
+    fd.append('subject_label', 'feed_share');
+    try {
+      const uploadRes = await fetch(`${SUPABASE_URL}/functions/v1/upload-certificate`, { method: 'POST', body: fd });
+      const uploadResult = await uploadRes.json();
+      if (uploadRes.ok && uploadResult.fileUrl) {
+        attachmentUrl = uploadResult.fileUrl;
+        attachmentName = pendingAttachment.name;
+      } else {
+        alert('Could not attach the file: ' + (uploadResult.error || 'unknown error') + '. Posting without it.');
+      }
+    } catch (e) {
+      alert('Could not attach the file — check your connection. Posting without it.');
+    }
+  }
+
+  const { error } = await _sb.from('feed_posts').insert({
+    author_id: currentUser.id, author_name: currentUserName,
+    author_role: 'tutor', post_type: 'share',
+    content, course_code: course || null, subject: subject || null,
+    attachment_url: attachmentUrl, attachment_name: attachmentName,
+  });
+
+  btn.disabled = false; btn.textContent = 'Share';
+  if (error) { alert('Could not post: ' + error.message); return; }
+
+  document.getElementById('shareInput').value = '';
+  document.getElementById('shareInput').style.height = 'auto';
+  document.getElementById('shareCourse').value = '';
+  document.getElementById('shareSubject').value = '';
+  clearAttachment();
+  offset = 0;
+  await loadPosts(true);
+}
+
 async function loadPosts(reset) {
   if (reset) { offset = 0; document.getElementById('feedList').innerHTML = skeletons(); }
   const { data } = await _sb.from('feed_posts').select('*').order('created_at', { ascending: false }).range(offset, offset + PAGE_SIZE - 1);
@@ -219,42 +313,55 @@ async function renderFeed() {
   // Course-demand clustering: how many distinct students posted/tagged this
   // same course_code, to power the group-session nudge — reuses the exact
   // signal already driving the dashboard's demand-clustering feature.
+  // Course-demand clustering only makes sense for student questions, not
+  // tutor resource shares — a tutor posting a PDF about MATH 201 shouldn't
+  // count toward "3 students need a group session for MATH 201."
   const courseCounts = {};
   posts.forEach(p => {
-    if (!p.course_code) return;
+    if (!p.course_code || p.post_type === 'share') return;
     const key = p.course_code.toLowerCase();
     if (!courseCounts[key]) courseCounts[key] = new Set();
     courseCounts[key].add(p.author_id);
   });
 
   list.innerHTML = posts.map(p => {
-    const demandCount = p.course_code ? (courseCounts[p.course_code.toLowerCase()]?.size || 0) : 0;
+    const isShare = p.post_type === 'share';
+    const demandCount = (!isShare && p.course_code) ? (courseCounts[p.course_code.toLowerCase()]?.size || 0) : 0;
     const showNudge = isTutor && demandCount >= 3;
 
-    return `<div class="post" data-post-id="${p.id}">
+    const attachmentHtml = p.attachment_url ? `
+      <a href="${p.attachment_url}" target="_blank" style="display:flex;align-items:center;gap:8px;background:var(--off);border-radius:10px;padding:0.6rem 0.9rem;margin:0.6rem 0 0.9rem;font-size:0.82rem;color:var(--ink2);text-decoration:none;">
+        📎 <span style="font-weight:600;">${escapeHtml(p.attachment_name || 'Attachment')}</span>
+        <span style="margin-left:auto;color:var(--blue);font-weight:700;font-size:0.78rem;">View →</span>
+      </a>` : '';
+
+    return `<div class="post" data-post-id="${p.id}" style="${isShare ? 'border-left:3px solid var(--green);' : ''}">
       <div class="post-head">
         <div class="avatar" style="background:${p.author_role === 'tutor' ? 'linear-gradient(135deg,#059669,#0ea5e9)' : 'linear-gradient(135deg,var(--blue),#7c3aed)'};">${initials(p.author_name)}</div>
         <div class="post-head-info">
           <div class="post-name-row">
             <span class="post-name">${escapeHtml(p.author_name)}</span>
+            ${isShare ? '<span class="verified-badge">✓ Verified tutor</span>' : ''}
             <span class="post-time">· ${timeAgo(p.created_at)}</span>
+            ${isShare ? '<span class="tag-pill" style="background:var(--green-bg);color:var(--green);">📎 Shared resource</span>' : ''}
             ${p.course_code ? `<span class="tag-pill">🎯 ${escapeHtml(p.course_code)}</span>` : ''}
           </div>
           <div class="post-content">${escapeHtml(p.content)}</div>
+          ${attachmentHtml}
           ${showNudge ? `<div class="group-nudge">
             <span class="group-nudge-text">👥 ${demandCount} students interested in ${escapeHtml(p.course_code)} — enough for a group session</span>
             <button class="group-nudge-btn" onclick="window.location.href='tutor-dashboard.html?tab=groupSessions'">Start it →</button>
           </div>` : ''}
           <div class="post-actions">
             <button class="action-btn like-btn" onclick="toggleLike('${p.id}', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> <span class="like-count">${p.like_count || 0}</span></button>
-            <button class="action-btn" onclick="toggleReplies('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> ${p.reply_count || 0} ${p.reply_count === 1 ? 'reply' : 'replies'}</button>
-            ${p.has_tutor_answer ? `<span class="action-btn answer-btn" style="cursor:default;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg> Answered</span>` : ''}
+            <button class="action-btn" onclick="toggleReplies('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> ${p.reply_count || 0} ${p.reply_count === 1 ? 'reply' : (isShare ? 'comments' : 'replies')}</button>
+            ${(!isShare && p.has_tutor_answer) ? `<span class="action-btn answer-btn" style="cursor:default;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg> Answered</span>` : ''}
           </div>
           <div class="replies" id="replies-${p.id}">
             <div class="reply-list" id="replyList-${p.id}"></div>
             <div class="reply-compose">
-              <input type="text" id="replyInput-${p.id}" placeholder="${isTutor ? 'Write a reply...' : 'Add a comment...'}" onkeydown="if(event.key==='Enter')submitReply('${p.id}')">
-              ${isTutor ? `<label class="tutor-toggle"><input type="checkbox" id="asAnswer-${p.id}" checked style="accent-color:var(--green);"> Answer</label>` : ''}
+              <input type="text" id="replyInput-${p.id}" placeholder="${isShare ? 'Add a comment...' : (isTutor ? 'Write a reply...' : 'Add a comment...')}" onkeydown="if(event.key==='Enter')submitReply('${p.id}')">
+              ${(!isShare && isTutor) ? `<label class="tutor-toggle"><input type="checkbox" id="asAnswer-${p.id}" checked style="accent-color:var(--green);"> Answer</label>` : ''}
               <button class="reply-send" onclick="submitReply('${p.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button>
             </div>
           </div>
