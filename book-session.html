@@ -224,7 +224,9 @@ async function init(){
   }
 
   // Pre-fill subject if only one
-  if(subjects.length===1)document.getElementById('subject').value=subjects[0];
+  const prefilledSubject = params.get('subject');
+  if (prefilledSubject) document.getElementById('subject').value = decodeURIComponent(prefilledSubject);
+  else if(subjects.length===1)document.getElementById('subject').value=subjects[0];
 
   // Load the tutor's blocked availability so students can't pick a blocked slot
   const { data: blocks } = await _sb.from('tutor_blocked_slots').select('*').eq('tutor_id', tutorId);

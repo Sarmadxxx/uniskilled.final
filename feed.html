@@ -335,6 +335,11 @@ async function renderFeed() {
         <span style="margin-left:auto;color:var(--blue);font-weight:700;font-size:0.78rem;">View →</span>
       </a>` : '';
 
+    // Only makes sense on a tutor's own share, viewed by someone else — not
+    // on question posts, and not shown to the tutor on their own content.
+    const showBookBtn = isShare && p.author_id !== currentUser.id;
+    const bookUrl = `book-session.html?tutor=${p.author_id}&name=${encodeURIComponent(p.author_name)}${p.course_code || p.subject ? '&subject=' + encodeURIComponent(p.course_code || p.subject) : ''}`;
+
     return `<div class="post" data-post-id="${p.id}" style="${isShare ? 'border-left:3px solid var(--green);' : ''}">
       <div class="post-head">
         <div class="avatar" style="background:${p.author_role === 'tutor' ? 'linear-gradient(135deg,#059669,#0ea5e9)' : 'linear-gradient(135deg,var(--blue),#7c3aed)'};">${initials(p.author_name)}</div>
@@ -348,6 +353,7 @@ async function renderFeed() {
           </div>
           <div class="post-content">${escapeHtml(p.content)}</div>
           ${attachmentHtml}
+          ${showBookBtn ? `<a href="${bookUrl}" style="display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;font-size:0.82rem;font-weight:700;padding:8px 16px;border-radius:100px;text-decoration:none;margin-bottom:0.7rem;">📅 Book a session with ${escapeHtml(p.author_name.split(' ')[0])} →</a>` : ''}
           ${showNudge ? `<div class="group-nudge">
             <span class="group-nudge-text">👥 ${demandCount} students interested in ${escapeHtml(p.course_code)} — enough for a group session</span>
             <button class="group-nudge-btn" onclick="window.location.href='tutor-dashboard.html?tab=groupSessions'">Start it →</button>
