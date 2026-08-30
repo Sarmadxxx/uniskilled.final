@@ -365,5 +365,26 @@ function handleSignOut() {
 const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.style.opacity="1";x.target.style.transform="translateY(0)"}})},{threshold:0.08});
 document.querySelectorAll(".wcard,.hstep,.fc,.qc,.stat").forEach((el,i)=>{el.style.opacity="0";el.style.transform="translateY(18px)";el.style.transition=`opacity .55s ${i*0.07}s ease,transform .55s ${i*0.07}s ease`;io.observe(el);});
 </script>
+<script>
+// Referral links land here (e.g. uniskilled.com?ref=AB12CD3) — persist the code so it
+// survives browsing, and forward it onto every "Get started"/"Start tutoring" link so
+// it reaches onboarding.html regardless of which CTA on this page the visitor clicks.
+(function() {
+  const refParam = new URLSearchParams(window.location.search).get('ref');
+  if (refParam) sessionStorage.setItem('uniskilled_ref_code', refParam.trim().toUpperCase());
+
+  const storedRef = sessionStorage.getItem('uniskilled_ref_code');
+  if (!storedRef) return;
+
+  document.querySelectorAll('a[href^="onboarding.html"]').forEach(function(a) {
+    const url = new URL(a.getAttribute('href'), window.location.origin);
+    url.searchParams.set('ref', storedRef);
+    a.setAttribute('href', url.pathname + url.search);
+  });
+  document.querySelectorAll('button[onclick*="onboarding.html"]').forEach(function(btn) {
+    btn.setAttribute('onclick', `window.location.href='onboarding.html?ref=${storedRef}'`);
+  });
+})();
+</script>
 </body>
 </html>

@@ -365,6 +365,11 @@ document.addEventListener('DOMContentLoaded', function() {
     if (targetCard) targetCard.click();
   }
 
+  // Capture a referral code from the URL (e.g. onboarding.html?ref=AB12CD3) and persist it
+  // across steps — a referral is only actually recorded once signup succeeds, below.
+  const urlRef = new URLSearchParams(window.location.search).get('ref');
+  if (urlRef) sessionStorage.setItem('uniskilled_ref_code', urlRef.trim().toUpperCase());
+
   // Subject add
   document.getElementById('addSubjectBtn').addEventListener('click', function() {
     const inp = document.getElementById('subjectInput');
@@ -521,6 +526,22 @@ document.addEventListener('DOMContentLoaded', function() {
         university_email: email,
         gender: gender || null, country: country || null, language: language || null
       });
+
+      // Link this signup to whoever referred them, if a code was carried in via the URL.
+      // Best-effort: an invalid code, a self-referral, or any failure here should never
+      // block or interrupt account creation.
+      const refCode = sessionStorage.getItem('uniskilled_ref_code');
+      if (refCode) {
+        try {
+          await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/capture-referral', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ referral_code: refCode, invitee_id: data.user.id }),
+          });
+        } catch (e) {
+          console.error('Referral capture failed (non-critical):', e);
+        }
+        sessionStorage.removeItem('uniskilled_ref_code');
+      }
 
       if (selectedRole === 'student') {
         await _sb.from('student_profiles').upsert({

@@ -65,6 +65,7 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 
     <div class="price-breakdown">
       <div class="price-row"><span>Session price</span><span id="priceAmount">—</span></div>
+      <div class="price-row" id="discountRow" style="display:none;color:#059669;"><span id="discountLabel">Discount</span><span id="discountAmount">—</span></div>
       <div class="price-row total"><span>Total due now</span><span id="priceTotal">—</span></div>
     </div>
 
@@ -213,6 +214,37 @@ async function init() {
   document.getElementById('priceAmount').textContent = currSym + price;
   document.getElementById('priceTotal').textContent = currSym + price;
 
+  // Preview an applicable discount before the student even clicks Pay — the real
+  // decision is always made server-side in create-paypal-order, this is just so
+  // they see the incentive up front rather than as a surprise mid-checkout.
+  if (!isGroup) {
+    try {
+      const { data: referral } = await _sb.from('referrals')
+        .select('invitee_discount_amount').eq('invitee_id', currentUser.id).eq('invitee_discount_applied', false).maybeSingle();
+      let previewDiscount = 0, previewLabel = '';
+      if (referral) {
+        previewDiscount = Math.min(Number(referral.invitee_discount_amount), price - 1);
+        previewLabel = '🎉 Welcome discount';
+      } else {
+        const { data: userRow } = await _sb.from('users').select('credit_balance').eq('id', currentUser.id).maybeSingle();
+        const balance = Number(userRow?.credit_balance || 0);
+        if (balance > 0) {
+          previewDiscount = Math.min(balance, price - 1);
+          previewLabel = '💳 Account credit applied';
+        }
+      }
+      if (previewDiscount > 0) {
+        previewDiscount = Math.round(previewDiscount * 100) / 100;
+        document.getElementById('discountLabel').textContent = previewLabel;
+        document.getElementById('discountAmount').textContent = '−' + currSym + previewDiscount.toFixed(2);
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('priceTotal').textContent = currSym + (price - previewDiscount).toFixed(2);
+      }
+    } catch (e) {
+      console.error('Discount preview failed (non-critical):', e);
+    }
+  }
+
   showCard('paymentCard');
   startCountdown(paymentDueAt);
 
@@ -234,6 +266,18 @@ async function init() {
         document.getElementById('errorBox').textContent = data.error || 'Could not start payment. Please try again.';
         document.getElementById('errorBox').style.display = 'block';
         throw new Error(data.error || 'Order creation failed');
+      }
+      // Reconcile the displayed price with what was actually charged server-side —
+      // this is the authoritative number, the preview above was only an estimate.
+      if (typeof data.discount_applied === 'number' && data.discount_applied > 0) {
+        const label = data.discount_source === 'referral_welcome' ? '🎉 Welcome discount' : '💳 Account credit applied';
+        document.getElementById('discountLabel').textContent = label;
+        document.getElementById('discountAmount').textContent = '−' + currSym + data.discount_applied.toFixed(2);
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('priceTotal').textContent = currSym + Number(data.charge_amount).toFixed(2);
+      } else {
+        document.getElementById('discountRow').style.display = 'none';
+        document.getElementById('priceTotal').textContent = currSym + price;
       }
       return data.order_id;
     },

@@ -194,6 +194,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <a href="group-sessions.html" class="nav-item"><span class="ico">👥</span>Group Sessions</a>
       <a href="feed.html" class="nav-item"><span class="ico">✨</span>Feeds</a>
       <a href="calendar.html" class="nav-item"><span class="ico">🗓️</span>Calendar</a>
+      <a href="#referralCard" class="nav-item" onclick="document.getElementById('referralCard').scrollIntoView({behavior:'smooth'})"><span class="ico">🎁</span>Refer & Earn</a>
       <a href="#notifsCard" class="nav-item" onclick="document.getElementById('notifsCard').scrollIntoView({behavior:'smooth'})"><span class="ico">🔔</span>Notifications
         <span class="badge-count" id="badgeNotifs" style="display:none;margin-left:auto;">0</span>
       </a>
@@ -225,6 +226,26 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <a href="find-tutors.html#request" class="qa"><div class="qa-ico">📋</div><div class="qa-lbl">Request a Subject</div></a>
       <a href="messages.html" class="qa"><div class="qa-ico">💬</div><div class="qa-lbl">Messages</div></a>
       <a href="student-profile.html" class="qa"><div class="qa-ico">👤</div><div class="qa-lbl">My Profile</div></a>
+    </div>
+
+    <!-- REFER & EARN -->
+    <div class="card" id="referralCard" style="padding:1.4rem 1.6rem;margin-top:1.2rem;background:linear-gradient(135deg,#f5f3ff,#eff6ff);border-color:#ddd6fe;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.9rem;">
+        <div>
+          <div style="font-weight:800;font-size:1.05rem;color:var(--ink);">🎁 Refer & earn</div>
+          <div style="font-size:0.8rem;color:var(--ink2);margin-top:0.15rem;">Give €10, get €10 — for every friend who completes their first session.</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.7rem;color:var(--mid);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">Your credit balance</div>
+          <div id="creditBalanceDisplay" style="font-size:1.3rem;font-weight:800;color:#7c3aed;">—</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
+        <input id="referralLinkInput" readonly style="flex:1;min-width:200px;padding:0.65rem 0.9rem;border:1.5px solid #ddd6fe;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;color:var(--ink2);background:#fff;" value="Loading your link...">
+        <button id="copyReferralBtn" onclick="copyReferralLink()" style="padding:0.65rem 1.1rem;background:#7c3aed;color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copy link</button>
+        <button id="shareReferralBtn" onclick="shareReferralLink()" style="padding:0.65rem 1.1rem;background:#fff;color:#7c3aed;border:1.5px solid #7c3aed;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">↗ Share</button>
+      </div>
+      <div id="referralStats" style="font-size:0.76rem;color:var(--mid);margin-top:0.7rem;"></div>
     </div>
 
     <!-- SESSIONS -->
@@ -397,6 +418,7 @@ async function init() {
   await loadMessageCount();
   await loadNotifications();
   await loadMyRequests();
+  await loadReferralCard();
 
   // Realtime: new notifications for this student
   _sb.channel('notifs-' + user.id)
@@ -757,6 +779,58 @@ function dashSignOut() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// ── REFER & EARN ──
+let myReferralLink = '';
+
+async function loadReferralCard() {
+  const { data: me } = await _sb.from('users').select('referral_code, credit_balance').eq('id', currentUserId).maybeSingle();
+  if (!me) return;
+
+  myReferralLink = `https://uniskilled.com/?ref=${me.referral_code}`;
+  document.getElementById('referralLinkInput').value = myReferralLink;
+
+  const balance = Number(me.credit_balance || 0);
+  document.getElementById('creditBalanceDisplay').textContent = '€' + balance.toFixed(2);
+
+  const { data: referrals } = await _sb.from('referrals').select('status').eq('referrer_id', currentUserId);
+  const total = (referrals || []).length;
+  const qualified = (referrals || []).filter(r => r.status === 'qualified').length;
+
+  const statsEl = document.getElementById('referralStats');
+  if (total === 0) {
+    statsEl.textContent = 'Share your link — you\'ll both get €10 once they complete their first session.';
+  } else {
+    statsEl.textContent = `${total} friend${total === 1 ? '' : 's'} referred · ${qualified} qualified for your €10 credit`;
+  }
+}
+
+function copyReferralLink() {
+  if (!myReferralLink) return;
+  navigator.clipboard.writeText(myReferralLink).then(() => {
+    const btn = document.getElementById('copyReferralBtn');
+    const original = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    setTimeout(() => { btn.textContent = original; }, 1800);
+  }).catch(() => {
+    document.getElementById('referralLinkInput').select();
+  });
+}
+
+function shareReferralLink() {
+  if (!myReferralLink) return;
+  const text = `I've been using UniSkilled for university-verified tutoring — use my link and we both get €10: ${myReferralLink}`;
+  if (navigator.share) {
+    navigator.share({ title: 'Join me on UniSkilled', text, url: myReferralLink }).catch(() => {});
+  } else {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('shareReferralBtn');
+      const original = btn.textContent;
+      btn.textContent = '✅ Copied to share!';
+      setTimeout(() => { btn.textContent = original; }, 1800);
+    });
+  }
+}
 </script>
 <!-- VIDEO CALL OVERLAY -->
 <!-- BECOME A TUTOR MODAL -->
