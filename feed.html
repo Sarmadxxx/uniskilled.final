@@ -342,7 +342,7 @@ async function submitSharePost() {
 async function loadPosts(reset) {
   if (reset) { offset = 0; document.getElementById('feedList').innerHTML = skeletons(); }
   let query = _sb.from('feed_posts').select('*').order('created_at', { ascending: false }).range(offset, offset + PAGE_SIZE - 1);
-  if (activeCourseFilter) query = query.ilike('course_code', activeCourseFilter);
+  if (activeCourseFilter) query = query.or(`course_code.ilike.${activeCourseFilter},subject.ilike.${activeCourseFilter}`);
   const { data } = await query;
 
   if (reset) posts = data || [];
@@ -366,8 +366,10 @@ async function renderFeed() {
   // group, so this never buries something genuinely brand new.
   if (!activeCourseFilter && followedCourses.size > 0) {
     posts = [...posts].sort((a, b) => {
-      const aFollowed = a.course_code && followedCourses.has(a.course_code.toLowerCase()) ? 1 : 0;
-      const bFollowed = b.course_code && followedCourses.has(b.course_code.toLowerCase()) ? 1 : 0;
+      const aKey = (a.course_code || a.subject || '').toLowerCase();
+      const bKey = (b.course_code || b.subject || '').toLowerCase();
+      const aFollowed = aKey && followedCourses.has(aKey) ? 1 : 0;
+      const bFollowed = bKey && followedCourses.has(bKey) ? 1 : 0;
       if (aFollowed !== bFollowed) return bFollowed - aFollowed;
       return new Date(b.created_at) - new Date(a.created_at);
     });
@@ -412,7 +414,9 @@ async function renderFeed() {
             ${isShare ? '<span class="verified-badge">✓ Verified tutor</span>' : ''}
             <span class="post-time">· ${timeAgo(p.created_at)}</span>
             ${isShare ? '<span class="tag-pill" style="background:var(--green-bg);color:var(--green);">📎 Shared resource</span>' : ''}
-            ${p.course_code ? `<a href="feed.html?course=${encodeURIComponent(p.course_code)}" class="tag-pill" style="text-decoration:none;cursor:pointer;">🎯 ${escapeHtml(p.course_code)}${followedCourses.has(p.course_code.toLowerCase()) ? ' ✓' : ''}</a>` : ''}
+            ${p.course_code
+              ? `<a href="feed.html?course=${encodeURIComponent(p.course_code)}" class="tag-pill" style="text-decoration:none;cursor:pointer;">🎯 ${escapeHtml(p.course_code)}${followedCourses.has(p.course_code.toLowerCase()) ? ' ✓' : ''}</a>`
+              : (p.subject ? `<a href="feed.html?course=${encodeURIComponent(p.subject)}" class="tag-pill" style="text-decoration:none;cursor:pointer;">📚 ${escapeHtml(p.subject)}${followedCourses.has(p.subject.toLowerCase()) ? ' ✓' : ''}</a>` : '')}
           </div>
           <div class="post-content">${escapeHtml(p.content)}</div>
           ${attachmentHtml}
