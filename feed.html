@@ -156,6 +156,9 @@ let isTutor = false;
 let posts = [];
 let offset = 0;
 const PAGE_SIZE = 15;
+const urlParams = new URLSearchParams(window.location.search);
+const activeCourseFilter = urlParams.get('course');
+let followedCourses = new Set();
 
 function autoGrow(el) {
   el.style.height = 'auto';
@@ -198,8 +201,54 @@ async function init() {
     document.getElementById('composeAvatar').textContent = initials(currentUserName);
   }
 
+  const { data: follows } = await _sb.from('course_follows').select('course_code').eq('user_id', currentUser.id);
+  followedCourses = new Set((follows || []).map(f => f.course_code.toLowerCase()));
+
+  if (activeCourseFilter) {
+    renderCourseHubHeader();
+    // A course hub is a focused space — hide the general compose boxes,
+    // people post from the main feed and it flows into the right hub.
+    document.getElementById('studentCompose').style.display = 'none';
+    document.getElementById('tutorCompose').style.display = 'none';
+  }
+
   await loadPosts(true);
   setupRealtime();
+}
+
+function renderCourseHubHeader() {
+  const isFollowing = followedCourses.has(activeCourseFilter.toLowerCase());
+  const header = document.createElement('div');
+  header.className = 'compose';
+  header.style.display = 'flex';
+  header.style.alignItems = 'center';
+  header.style.justifyContent = 'space-between';
+  header.innerHTML = `
+    <div>
+      <a href="feed.html" style="font-size:0.78rem;color:var(--mid);text-decoration:none;">← All feeds</a>
+      <div style="font-size:1.1rem;font-weight:800;margin-top:4px;">🎯 ${escapeHtml(activeCourseFilter)}</div>
+    </div>
+    <button id="followBtn" onclick="toggleFollowCourse()" style="padding:0.5rem 1.1rem;border-radius:100px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;${isFollowing ? 'background:var(--green-bg);color:var(--green);border:1.5px solid #a7f3d0;' : 'background:var(--blue);color:#fff;border:none;'}">${isFollowing ? '✓ Following' : '+ Follow'}</button>
+  `;
+  document.querySelector('.page').insertBefore(header, document.getElementById('studentCompose'));
+}
+
+async function toggleFollowCourse() {
+  const code = activeCourseFilter;
+  const isFollowing = followedCourses.has(code.toLowerCase());
+  const btn = document.getElementById('followBtn');
+
+  if (isFollowing) {
+    await _sb.from('course_follows').delete().eq('user_id', currentUser.id).eq('course_code', code);
+    followedCourses.delete(code.toLowerCase());
+    btn.textContent = '+ Follow';
+    btn.style.cssText = btn.style.cssText.replace(/background:[^;]+;color:[^;]+;border:[^;]+;/, 'background:var(--blue);color:#fff;border:none;');
+  } else {
+    await _sb.from('course_follows').insert({ user_id: currentUser.id, course_code: code });
+    followedCourses.add(code.toLowerCase());
+    btn.textContent = '✓ Following';
+    btn.style.cssText = btn.style.cssText.replace(/background:[^;]+;color:[^;]+;border:[^;]+;/, 'background:var(--green-bg);color:var(--green);border:1.5px solid #a7f3d0;');
+  }
 }
 
 async function submitPost() {
@@ -292,7 +341,9 @@ async function submitSharePost() {
 
 async function loadPosts(reset) {
   if (reset) { offset = 0; document.getElementById('feedList').innerHTML = skeletons(); }
-  const { data } = await _sb.from('feed_posts').select('*').order('created_at', { ascending: false }).range(offset, offset + PAGE_SIZE - 1);
+  let query = _sb.from('feed_posts').select('*').order('created_at', { ascending: false }).range(offset, offset + PAGE_SIZE - 1);
+  if (activeCourseFilter) query = query.ilike('course_code', activeCourseFilter);
+  const { data } = await query;
 
   if (reset) posts = data || [];
   else posts = posts.concat(data || []);
@@ -309,6 +360,18 @@ function skeletons() {
 async function renderFeed() {
   const list = document.getElementById('feedList');
   if (posts.length === 0) { list.innerHTML = '<div class="empty-state">No posts yet — be the first to ask something.</div>'; return; }
+
+  // On the main feed (not inside a specific course hub), bring posts from
+  // followed courses to the top — recency still governs order within each
+  // group, so this never buries something genuinely brand new.
+  if (!activeCourseFilter && followedCourses.size > 0) {
+    posts = [...posts].sort((a, b) => {
+      const aFollowed = a.course_code && followedCourses.has(a.course_code.toLowerCase()) ? 1 : 0;
+      const bFollowed = b.course_code && followedCourses.has(b.course_code.toLowerCase()) ? 1 : 0;
+      if (aFollowed !== bFollowed) return bFollowed - aFollowed;
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+  }
 
   // Course-demand clustering: how many distinct students posted/tagged this
   // same course_code, to power the group-session nudge — reuses the exact
@@ -349,7 +412,7 @@ async function renderFeed() {
             ${isShare ? '<span class="verified-badge">✓ Verified tutor</span>' : ''}
             <span class="post-time">· ${timeAgo(p.created_at)}</span>
             ${isShare ? '<span class="tag-pill" style="background:var(--green-bg);color:var(--green);">📎 Shared resource</span>' : ''}
-            ${p.course_code ? `<span class="tag-pill">🎯 ${escapeHtml(p.course_code)}</span>` : ''}
+            ${p.course_code ? `<a href="feed.html?course=${encodeURIComponent(p.course_code)}" class="tag-pill" style="text-decoration:none;cursor:pointer;">🎯 ${escapeHtml(p.course_code)}${followedCourses.has(p.course_code.toLowerCase()) ? ' ✓' : ''}</a>` : ''}
           </div>
           <div class="post-content">${escapeHtml(p.content)}</div>
           ${attachmentHtml}
@@ -396,6 +459,16 @@ async function toggleLike(postId, btn) {
     await _sb.from('feed_likes').insert({ post_id: postId, user_id: currentUser.id });
     btn.classList.add('liked');
     count += 1;
+
+    const post = posts.find(p => p.id === postId);
+    if (post && post.author_id !== currentUser.id) {
+      await _sb.from('notifications').insert({
+        user_id: post.author_id, type: 'feed_like',
+        title: '❤️ Someone liked your post',
+        body: `${currentUserName} found your post helpful.`,
+        link: 'feed.html', read: false,
+      });
+    }
   }
   countEl.textContent = count;
   await _sb.from('feed_posts').update({ like_count: count }).eq('id', postId);
