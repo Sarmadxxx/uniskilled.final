@@ -20,7 +20,16 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
 .nav-right a:hover{background:var(--off);color:var(--ink);}
 
 /* LAYOUT */
-.page{max-width:640px;margin:0 auto;padding:1.5rem 5% 4rem;}
+.page-wrap{max-width:960px;margin:0 auto;padding:1.5rem 5% 4rem;display:grid;grid-template-columns:1fr 280px;gap:2rem;align-items:start;}
+.page{max-width:640px;}
+.sidebar{position:sticky;top:1.5rem;display:flex;flex-direction:column;gap:1rem;}
+.side-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.2rem;}
+.side-card-title{font-size:0.82rem;font-weight:800;color:var(--ink);margin-bottom:0.8rem;}
+.side-empty{font-size:0.78rem;color:var(--mid);line-height:1.5;}
+.side-item{display:flex;align-items:center;justify-content:space-between;padding:0.4rem 0;font-size:0.82rem;}
+.side-item a{color:var(--ink);text-decoration:none;font-weight:600;}
+.side-item a:hover{color:var(--blue);}
+.side-count{color:var(--mid);font-size:0.74rem;}
 .hero-title{font-size:1.4rem;font-weight:800;margin-bottom:0.2rem;}
 .hero-sub{font-size:0.85rem;color:var(--mid);margin-bottom:1.4rem;}
 
@@ -86,8 +95,14 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 
 @media(max-width:640px){
-  .page{padding:1rem 1rem 4rem;}
+  .page-wrap{grid-template-columns:1fr;padding:1rem 1rem 4rem;}
+  .page{max-width:100%;padding:0;}
+  .sidebar{display:none;}
   .compose-tags input{width:calc(50% - 0.3rem);}
+}
+@media(min-width:641px) and (max-width:900px){
+  .sidebar{display:none;}
+  .page-wrap{grid-template-columns:1fr;max-width:640px;}
 }
 </style>
 </head>
@@ -99,6 +114,7 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
   <div class="nav-right" id="navRight"><a href="student-dashboard.html">← Dashboard</a></div>
 </nav>
 
+<div class="page-wrap">
 <div class="page">
   <div class="hero-title">Feeds</div>
   <div class="hero-sub">Ask what you're stuck on. Get real answers from verified tutors — join in with your own comments too.</div>
@@ -141,6 +157,18 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
 
   <div id="feedList"></div>
   <button class="load-more" id="loadMoreBtn" onclick="loadPosts(false)" style="display:none;">Load more</button>
+</div>
+
+<div class="sidebar">
+  <div class="side-card">
+    <div class="side-card-title">📚 Courses you follow</div>
+    <div id="sidebarFollowed"><div class="side-empty">Click any course tag on a post to follow it — it'll show up here.</div></div>
+  </div>
+  <div class="side-card">
+    <div class="side-card-title">🔥 Trending this week</div>
+    <div id="sidebarTrending"><div class="side-empty">Loading...</div></div>
+  </div>
+</div>
 </div>
 
 <script>
@@ -203,6 +231,8 @@ async function init() {
 
   const { data: follows } = await _sb.from('course_follows').select('course_code').eq('user_id', currentUser.id);
   followedCourses = new Set((follows || []).map(f => f.course_code.toLowerCase()));
+  renderSidebarFollowed(follows || []);
+  loadSidebarTrending();
 
   if (activeCourseFilter) {
     renderCourseHubHeader();
@@ -214,6 +244,33 @@ async function init() {
 
   await loadPosts(true);
   setupRealtime();
+}
+
+function renderSidebarFollowed(follows) {
+  const el = document.getElementById('sidebarFollowed');
+  if (!el) return;
+  el.innerHTML = follows.length > 0
+    ? follows.map(f => `<div class="side-item"><a href="feed.html?course=${encodeURIComponent(f.course_code)}">🎯 ${escapeHtml(f.course_code)}</a></div>`).join('')
+    : '<div class="side-empty">Click any course tag on a post to follow it — it\'ll show up here.</div>';
+}
+
+async function loadSidebarTrending() {
+  const el = document.getElementById('sidebarTrending');
+  if (!el) return;
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await _sb.from('feed_posts').select('course_code, subject').gte('created_at', weekAgo);
+
+  const counts = {};
+  (data || []).forEach(p => {
+    const key = p.course_code || p.subject;
+    if (!key) return;
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  el.innerHTML = top.length > 0
+    ? top.map(([topic, count]) => `<div class="side-item"><a href="feed.html?course=${encodeURIComponent(topic)}">${escapeHtml(topic)}</a><span class="side-count">${count} post${count > 1 ? 's' : ''}</span></div>`).join('')
+    : '<div class="side-empty">Nothing trending yet this week.</div>';
 }
 
 function renderCourseHubHeader() {
@@ -249,6 +306,9 @@ async function toggleFollowCourse() {
     btn.textContent = '✓ Following';
     btn.style.cssText = btn.style.cssText.replace(/background:[^;]+;color:[^;]+;border:[^;]+;/, 'background:var(--green-bg);color:var(--green);border:1.5px solid #a7f3d0;');
   }
+
+  const { data: follows } = await _sb.from('course_follows').select('course_code').eq('user_id', currentUser.id);
+  renderSidebarFollowed(follows || []);
 }
 
 async function submitPost() {
