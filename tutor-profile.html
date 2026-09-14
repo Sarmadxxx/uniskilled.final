@@ -499,29 +499,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="alert-bar" id="alertTeaching"></div>
       <div class="form-row">
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Hourly rate (min. €25)</label><input type="number" class="form-input" id="inputRate" placeholder="25" min="25"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;">UniSkilled minimum session price is €25.</div></div>
+          <div class="form-group"><label class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="25" min="25"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum session price is €25.</div></div>
           <div class="form-group"><label class="form-label">Currency</label>
             <select class="form-select" id="inputCurrency">
-              <option value="GBP">£ — British Pound (GBP)</option>
-          <option value="EUR">€ — Euro (EUR)</option>
+              <option value="EUR">€ — Euro (EUR)</option>
           <option value="USD">$ — US Dollar (USD)</option>
-          <option value="TRY">₺ — Turkish Lira (TRY)</option>
-          <option value="AED">AED — UAE Dirham (AED)</option>
-          <option value="SAR">SAR — Saudi Riyal (SAR)</option>
-          <option value="QAR">QAR — Qatari Riyal (QAR)</option>
-          <option value="KWD">KWD — Kuwaiti Dinar (KWD)</option>
-          <option value="EGP">EGP — Egyptian Pound (EGP)</option>
-          <option value="MAD">MAD — Moroccan Dirham (MAD)</option>
-          <option value="NGN">₦ — Nigerian Naira (NGN)</option>
-          <option value="KES">KSh — Kenyan Shilling (KES)</option>
-          <option value="INR">₹ — Indian Rupee (INR)</option>
-          <option value="CAD">CA$ — Canadian Dollar (CAD)</option>
-          <option value="AUD">A$ — Australian Dollar (AUD)</option>
-          <option value="CHF">CHF — Swiss Franc (CHF)</option>
-          <option value="SEK">kr — Swedish Krona (SEK)</option>
-          <option value="NOK">kr — Norwegian Krone (NOK)</option>
-          <option value="DKK">kr — Danish Krone (DKK)</option>
-          <option value="PLN">zł — Polish Zloty (PLN)</option>
             </select>
           </div>
         </div>
@@ -584,7 +566,7 @@ const CURRENCY_SYMBOLS = {
   INR:'₹', CAD:'CA$', AUD:'A$', CHF:'CHF', SEK:'kr', NOK:'kr',
   DKK:'kr', PLN:'zł'
 };
-function currSymbol(code) { return CURRENCY_SYMBOLS[code] || code || '£'; }
+function currSymbol(code) { return CURRENCY_SYMBOLS[code] || code || '€'; }
 
 const _supabase = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
@@ -718,7 +700,7 @@ async function loadProfile() {
   document.getElementById('profileTags').innerHTML = subjects.map(s => `<span class="subject-tag">${s}</span>`).join('');
 
   // Rate
-  const currency = tp?.currency || 'GBP';
+  const currency = tp?.currency || 'EUR';
   const sym = currSymbol(currency);
   const rate = tp?.hourly_rate ? sym + tp.hourly_rate : '—';
   document.getElementById('rateDisplay').textContent = rate;
@@ -1021,13 +1003,22 @@ async function saveAcademic() {
   setTimeout(async () => { closeModal('modalAcademic'); await loadProfile(); }, 700);
 }
 
+function updateRateMinHint() {
+  const isUsd = document.getElementById('inputCurrency').value === 'USD';
+  document.getElementById('inputRate').min = isUsd ? 27 : 25;
+  document.getElementById('rateMinHint').textContent = `UniSkilled minimum session price is ${isUsd ? '$27' : '€25'}.`;
+}
+document.getElementById('inputCurrency')?.addEventListener('change', updateRateMinHint);
+
 async function saveTeaching() {
   const rateVal = document.getElementById('inputRate').value ? parseFloat(document.getElementById('inputRate').value) : null;
-  if (rateVal !== null && rateVal < 25) {
-    alert('The minimum session rate on UniSkilled is €25. Please update your rate.');
+  const selectedCurrency = document.getElementById('inputCurrency').value || 'EUR';
+  const minRate = selectedCurrency === 'USD' ? 27 : 25;
+  if (rateVal !== null && rateVal < minRate) {
+    alert(`The minimum session rate on UniSkilled is ${selectedCurrency === 'USD' ? '$27' : '€25'}. Please update your rate.`);
     return;
   }
-  const data = { user_id: currentUserId, hourly_rate: rateVal, currency: document.getElementById('inputCurrency').value || 'GBP', session_length: document.getElementById('inputSessionLen').value || null, teaching_format: document.getElementById('inputFormat').value || null, preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
+  const data = { user_id: currentUserId, hourly_rate: rateVal, currency: selectedCurrency, session_length: document.getElementById('inputSessionLen').value || null, teaching_format: document.getElementById('inputFormat').value || null, preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
   const { error } = await _supabase.from('tutor_profiles').upsert(data, { onConflict: 'user_id' });
   if (error) { showAlert('alertTeaching', 'Error: ' + error.message, 'error'); return; }
   showAlert('alertTeaching', 'Saved!', 'success');
@@ -1168,7 +1159,8 @@ function openModal(id) {
   }
   if (id === 'modalTeaching') {
     document.getElementById('inputRate').value = tutorData?.hourly_rate || '';
-    document.getElementById('inputCurrency').value = tutorData?.currency || 'GBP';
+    document.getElementById('inputCurrency').value = tutorData?.currency || 'EUR';
+    updateRateMinHint();
     document.getElementById('inputSessionLen').value = tutorData?.session_length || '60';
     document.getElementById('inputFormat').value = tutorData?.teaching_format || 'online';
     document.getElementById('inputPrefTime').value = tutorData?.preferred_time || '';

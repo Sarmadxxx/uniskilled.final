@@ -229,6 +229,9 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <a class="nav-item" href="calendar.html">
         <div class="nav-item-left"><span>🗓️</span>Calendar</div>
       </a>
+      <a class="nav-item" href="manage-availability.html">
+        <div class="nav-item-left"><span>🚫</span>Manage Availability</div>
+      </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=referrals">
         <div class="nav-item-left"><span>🎁</span>Refer & Earn</div>
       </a>
@@ -263,7 +266,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
         <div class="hero-sub" id="heroSub">Complete your profile to attract students.</div>
         <div class="hero-stats">
           <div><div class="hero-stat-n" id="statSessions">—</div><div class="hero-stat-l">Sessions</div></div>
-          <div><div class="hero-stat-n" id="statEarnings">£0</div><div class="hero-stat-l">Earned</div></div>
+          <div><div class="hero-stat-n" id="statEarnings">—</div><div class="hero-stat-l">Earned</div></div>
           <div><div class="hero-stat-n" id="statRating">—</div><div class="hero-stat-l">Rating</div></div>
           <div><div class="hero-stat-n" id="statReviews">—</div><div class="hero-stat-l">Reviews</div></div>
         </div>
@@ -485,7 +488,7 @@ async function init() {
   else av.textContent = initials;
   document.getElementById('sideName').textContent = fullName;
   const subjects = Array.isArray(tp?.subjects) ? tp.subjects : [];
-  const rate = tp?.hourly_rate ? '£' + tp.hourly_rate + '/hr' : '';
+  const rate = tp?.hourly_rate ? (tutorCurrency === 'USD' ? '$' : '€') + tp.hourly_rate + '/hr' : '';
   document.getElementById('sideSub').textContent = [subjects.slice(0, 2).join(', '), rate].filter(Boolean).join(' · ') || 'Complete your profile';
 
   // Hero
@@ -924,7 +927,7 @@ async function loadSessions() {
 
   document.getElementById('statSessions').textContent = sessions.length || '—';
   const earnings = sessions.filter(s => s.status === 'completed').reduce((a, s) => a + (s.price || 0), 0);
-  document.getElementById('statEarnings').textContent = '£' + earnings;
+  document.getElementById('statEarnings').textContent = (tutorCurrency === 'USD' ? '$' : '€') + earnings;
 
   const sessionHtml = s => {
     const ini = (s.student_name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();

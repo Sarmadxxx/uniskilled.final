@@ -107,10 +107,10 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
   </select>
   <select class="filter-select" id="filterPrice" onchange="filterTutors()">
     <option value="">Any price</option>
-    <option value="0-20">Up to £20/hr</option>
-    <option value="20-40">£20–£40/hr</option>
-    <option value="40-60">£40–£60/hr</option>
-    <option value="60+">£60+/hr</option>
+    <option value="0-20">Up to €20/hr</option>
+    <option value="20-40">€20–€40/hr</option>
+    <option value="40-60">€40–€60/hr</option>
+    <option value="60+">€60+/hr</option>
   </select>
   <select class="filter-select" id="filterDay" onchange="filterTutors()">
     <option value="">Any day</option>
@@ -180,7 +180,7 @@ const CURRENCY_SYMBOLS = {
   INR:'₹', CAD:'CA$', AUD:'A$', CHF:'CHF', SEK:'kr', NOK:'kr',
   DKK:'kr', PLN:'zł'
 };
-function currSymbol(code) { return CURRENCY_SYMBOLS[code] || code || '£'; }
+function currSymbol(code) { return CURRENCY_SYMBOLS[code] || code || '€'; }
 
 const _sb = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',

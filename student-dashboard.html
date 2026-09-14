@@ -730,6 +730,10 @@ function closeDualModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 
+document.getElementById('btCurrency')?.addEventListener('change', function() {
+  document.getElementById('btRate').min = this.value === 'USD' ? 27 : 25;
+});
+
 async function submitBecomeTutor() {
   const subject = document.getElementById('btSubject').value.trim();
   const alertEl = document.getElementById('becomeTutorAlert');
@@ -740,7 +744,13 @@ async function submitBecomeTutor() {
   }
   const subjects = subject.split(',').map(s => s.trim()).filter(Boolean);
   const rate = document.getElementById('btRate').value;
-  const currency = document.getElementById('btCurrency').value;
+  const currency = document.getElementById('btCurrency').value || 'EUR';
+  const minRate = currency === 'USD' ? 27 : 25;
+  if (rate && parseFloat(rate) < minRate) {
+    alertEl.textContent = `The minimum session rate on UniSkilled is ${currency === 'USD' ? '$27' : '€25'}.`;
+    alertEl.className = 'dm-alert error';
+    return;
+  }
   const format = document.getElementById('btFormat').value;
   const bio = document.getElementById('btBio').value.trim();
 
@@ -751,7 +761,7 @@ async function submitBecomeTutor() {
     user_id: session.user.id,
     subjects,
     hourly_rate: rate ? parseFloat(rate) : null,
-    currency: currency || 'GBP',
+    currency: currency || 'EUR',
     teaching_format: format,
     bio: bio || null
   }, { onConflict: 'user_id' });
@@ -850,15 +860,12 @@ function shareReferralLink() {
       <div class="dm-row">
         <div class="dm-form-group">
           <label class="dm-label">Hourly rate</label>
-          <input type="number" class="dm-input" id="btRate" placeholder="e.g. 25" min="1">
+          <input type="number" class="dm-input" id="btRate" placeholder="e.g. 25" min="25">
         </div>
         <div class="dm-form-group">
           <label class="dm-label">Currency</label>
           <select class="dm-select" id="btCurrency">
-            <option value="GBP">£ GBP</option><option value="EUR">€ EUR</option><option value="USD">$ USD</option>
-            <option value="TRY">₺ TRY</option><option value="AED">AED</option><option value="SAR">SAR</option>
-            <option value="QAR">QAR</option><option value="KWD">KWD</option><option value="EGP">EGP</option>
-            <option value="NGN">₦ NGN</option><option value="INR">₹ INR</option>
+            <option value="EUR">€ EUR</option><option value="USD">$ USD</option>
           </select>
         </div>
       </div>
