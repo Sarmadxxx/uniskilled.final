@@ -365,6 +365,10 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 
     <!-- SESSIONS PAGE -->
     <div id="page-sessions" style="display:none;">
+      <div class="card" id="awaitingPaymentCard" style="display:none;margin-bottom:1rem;background:#fffbeb;border:1.5px solid #fcd34d;">
+        <div class="card-head"><div class="card-title">⏳ Waiting for Student Payment</div></div>
+        <div class="card-body" id="awaitingPaymentList"></div>
+      </div>
       <div class="card">
         <div class="card-head"><div class="card-title">All Sessions</div></div>
         <div class="card-body" id="sessionsList">
@@ -924,10 +928,32 @@ async function loadSessions() {
   const { data } = await _sb.from('sessions').select('*').eq('tutor_id', userId).order('created_at', { ascending: false });
   const sessions = (data || []).filter(s => s.status !== 'pending');
   const upcoming = sessions.filter(s => s.status === 'confirmed');
+  const awaitingPayment = sessions.filter(s => s.status === 'awaiting_payment');
 
   document.getElementById('statSessions').textContent = sessions.length || '—';
   const earnings = sessions.filter(s => s.status === 'completed').reduce((a, s) => a + (s.price || 0), 0);
   document.getElementById('statEarnings').textContent = (tutorCurrency === 'USD' ? '$' : '€') + earnings;
+
+  const awaitingCard = document.getElementById('awaitingPaymentCard');
+  if (awaitingPayment.length > 0) {
+    awaitingCard.style.display = 'block';
+    document.getElementById('awaitingPaymentList').innerHTML = awaitingPayment.map(s => {
+      const ini = (s.student_name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+      const dueAt = s.payment_due_at ? new Date(s.payment_due_at) : null;
+      const hoursLeft = dueAt ? Math.max(0, Math.round((dueAt.getTime() - Date.now()) / 3600000)) : null;
+      const timeLeftText = hoursLeft !== null ? `${hoursLeft}h left to pay before this expires` : 'Waiting on payment';
+      return `<div class="session-row">
+        <div class="session-av">${ini}</div>
+        <div class="session-info">
+          <div class="session-name">${s.student_name || 'Student'}</div>
+          <div class="session-sub">${s.subject || '—'} — you accepted this, now waiting on the student to pay</div>
+        </div>
+        <span class="badge badge-awaiting-payment" style="white-space:nowrap;">${timeLeftText}</span>
+      </div>`;
+    }).join('');
+  } else {
+    awaitingCard.style.display = 'none';
+  }
 
   const sessionHtml = s => {
     const ini = (s.student_name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
