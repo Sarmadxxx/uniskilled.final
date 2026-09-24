@@ -76,7 +76,22 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 
     <div class="error-box" id="errorBox"></div>
 
+    <div id="methodToggle" style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+      <button id="btnUsePaypal" onclick="setPaymentMethod('paypal')" style="flex:1;padding:0.7rem;border-radius:9px;border:2px solid var(--blue);background:#eff6ff;color:var(--blue);font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">PayPal</button>
+      <button id="btnUseCard" onclick="setPaymentMethod('card')" style="flex:1;padding:0.7rem;border-radius:9px;border:2px solid var(--border);background:#fff;color:var(--ink2,#374151);font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">💳 Card</button>
+    </div>
+
     <div id="paypal-button-container"></div>
+
+    <div id="cardPayContainer" style="display:none;">
+      <button id="btnPayWithCard" onclick="payWithCard()" style="width:100%;background:#0b1f4a;color:#fff;border:none;padding:0.85rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;">💳 Pay with Card</button>
+      <div style="font-size:0.72rem;color:var(--mid);text-align:center;margin-top:0.6rem;">You'll be taken to a secure Stripe checkout page.</div>
+    </div>
+
+    <div id="cardProcessing" style="display:none;text-align:center;padding:1.5rem 0;">
+      <div class="spinner-lg"></div>
+      <p style="font-size:0.85rem;color:var(--mid);">Confirming your payment...</p>
+    </div>
   </div>
 
   <div class="card" id="expiredCard" style="display:none;">
@@ -155,6 +170,79 @@ function startCountdown(dueAtISO) {
   countdownInterval = setInterval(tick, 1000);
 }
 
+function setPaymentMethod(method) {
+  const paypalBtn = document.getElementById('btnUsePaypal');
+  const cardBtn = document.getElementById('btnUseCard');
+  const paypalContainer = document.getElementById('paypal-button-container');
+  const cardContainer = document.getElementById('cardPayContainer');
+
+  if (method === 'paypal') {
+    paypalBtn.style.background = '#eff6ff'; paypalBtn.style.color = '#1a6bff'; paypalBtn.style.borderColor = '#1a6bff';
+    cardBtn.style.background = '#fff'; cardBtn.style.color = '#374151'; cardBtn.style.borderColor = '#e5e7eb';
+    paypalContainer.style.display = 'block';
+    cardContainer.style.display = 'none';
+  } else {
+    cardBtn.style.background = '#eff6ff'; cardBtn.style.color = '#1a6bff'; cardBtn.style.borderColor = '#1a6bff';
+    paypalBtn.style.background = '#fff'; paypalBtn.style.color = '#374151'; paypalBtn.style.borderColor = '#e5e7eb';
+    cardContainer.style.display = 'block';
+    paypalContainer.style.display = 'none';
+  }
+}
+
+async function payWithCard() {
+  const errBox = document.getElementById('errorBox');
+  errBox.style.display = 'none';
+  const btn = document.getElementById('btnPayWithCard');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to checkout...';
+
+  const body = isGroup ? { group_participant_id: groupParticipantId } : { session_id: sessionId };
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/create-stripe-checkout`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.checkout_url) {
+      errBox.textContent = data.error || 'Could not start card checkout. Please try again.';
+      errBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '💳 Pay with Card';
+      return;
+    }
+    window.location.href = data.checkout_url;
+  } catch (e) {
+    errBox.textContent = 'Something went wrong starting checkout. Please try again.';
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '💳 Pay with Card';
+  }
+}
+
+// After a card payment, Stripe redirects back here before the webhook may
+// have finished confirming it — poll briefly rather than assume it's done.
+async function pollForCardConfirmation() {
+  showCard('paymentCard');
+  document.getElementById('methodToggle').style.display = 'none';
+  document.getElementById('paypal-button-container').style.display = 'none';
+  document.getElementById('cardPayContainer').style.display = 'none';
+  document.getElementById('cardProcessing').style.display = 'block';
+
+  const table = isGroup ? 'group_session_participants' : 'sessions';
+  const id = isGroup ? groupParticipantId : sessionId;
+  const statusField = isGroup ? 'status' : 'payment_status';
+  const confirmedValue = isGroup ? 'confirmed' : 'paid';
+
+  for (let i = 0; i < 10; i++) {
+    const { data } = await _sb.from(table).select(statusField).eq('id', id).single();
+    if (data && data[statusField] === confirmedValue) {
+      showCard('doneCard');
+      return;
+    }
+    await new Promise(r => setTimeout(r, 2000));
+  }
+  document.getElementById('cardProcessing').innerHTML = '<p style="font-size:0.85rem;color:var(--mid);">This is taking longer than expected. If your card was charged, this will confirm shortly — refresh this page in a minute, or check your dashboard.</p>';
+}
+
 async function init() {
   const { data: { session: authSession } } = await _sb.auth.getSession();
   if (!authSession) {
@@ -162,6 +250,11 @@ async function init() {
     return;
   }
   currentUser = authSession.user;
+
+  if (params.get('stripe_success') === '1') {
+    await pollForCardConfirmation();
+    return;
+  }
 
   if (!sessionId && !groupParticipantId) { showCard('notFoundCard'); return; }
 
