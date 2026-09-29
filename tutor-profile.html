@@ -499,7 +499,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="alert-bar" id="alertTeaching"></div>
       <div class="form-row">
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="25" min="25"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum session price is €25.</div></div>
+          <div class="form-group"><label class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="10" min="10"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum booking value is €10.</div></div>
           <div class="form-group"><label class="form-label">Currency</label>
             <select class="form-select" id="inputCurrency">
               <option value="EUR">€ — Euro (EUR)</option>
@@ -1005,17 +1005,17 @@ async function saveAcademic() {
 
 function updateRateMinHint() {
   const isUsd = document.getElementById('inputCurrency').value === 'USD';
-  document.getElementById('inputRate').min = isUsd ? 27 : 25;
-  document.getElementById('rateMinHint').textContent = `UniSkilled minimum session price is ${isUsd ? '$27' : '€25'}.`;
+  document.getElementById('inputRate').min = isUsd ? 11 : 10;
+  document.getElementById('rateMinHint').textContent = `UniSkilled minimum booking value is ${isUsd ? '$11' : '€10'}.`;
 }
 document.getElementById('inputCurrency')?.addEventListener('change', updateRateMinHint);
 
 async function saveTeaching() {
   const rateVal = document.getElementById('inputRate').value ? parseFloat(document.getElementById('inputRate').value) : null;
   const selectedCurrency = document.getElementById('inputCurrency').value || 'EUR';
-  const minRate = selectedCurrency === 'USD' ? 27 : 25;
+  const minRate = selectedCurrency === 'USD' ? 11 : 10;
   if (rateVal !== null && rateVal < minRate) {
-    alert(`The minimum session rate on UniSkilled is ${selectedCurrency === 'USD' ? '$27' : '€25'}. Please update your rate.`);
+    alert(`The minimum hourly rate on UniSkilled is ${selectedCurrency === 'USD' ? '$11' : '€10'} (so a 60-minute session meets the ${selectedCurrency === 'USD' ? '$11' : '€10'} minimum booking value). Please update your rate.`);
     return;
   }
   const data = { user_id: currentUserId, hourly_rate: rateVal, currency: selectedCurrency, session_length: document.getElementById('inputSessionLen').value || null, teaching_format: document.getElementById('inputFormat').value || null, preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };

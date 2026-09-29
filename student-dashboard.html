@@ -731,7 +731,7 @@ function closeDualModal(id) {
 }
 
 document.getElementById('btCurrency')?.addEventListener('change', function() {
-  document.getElementById('btRate').min = this.value === 'USD' ? 27 : 25;
+  document.getElementById('btRate').min = this.value === 'USD' ? 11 : 10;
 });
 
 async function submitBecomeTutor() {
@@ -745,9 +745,9 @@ async function submitBecomeTutor() {
   const subjects = subject.split(',').map(s => s.trim()).filter(Boolean);
   const rate = document.getElementById('btRate').value;
   const currency = document.getElementById('btCurrency').value || 'EUR';
-  const minRate = currency === 'USD' ? 27 : 25;
+  const minRate = currency === 'USD' ? 11 : 10;
   if (rate && parseFloat(rate) < minRate) {
-    alertEl.textContent = `The minimum session rate on UniSkilled is ${currency === 'USD' ? '$27' : '€25'}.`;
+    alertEl.textContent = `The minimum hourly rate on UniSkilled is ${currency === 'USD' ? '$11' : '€10'}.`;
     alertEl.className = 'dm-alert error';
     return;
   }
@@ -860,7 +860,7 @@ function shareReferralLink() {
       <div class="dm-row">
         <div class="dm-form-group">
           <label class="dm-label">Hourly rate</label>
-          <input type="number" class="dm-input" id="btRate" placeholder="e.g. 25" min="25">
+          <input type="number" class="dm-input" id="btRate" placeholder="e.g. 10" min="10">
         </div>
         <div class="dm-form-group">
           <label class="dm-label">Currency</label>

@@ -206,7 +206,7 @@ async function init(){
   const currency = tp?.currency || 'EUR';
   const sym = currSymbol(currency);
   const rate = tp?.hourly_rate || 0;
-  const minPrice = currency === 'USD' ? 27 : 25;
+  const minPrice = currency === 'USD' ? 11 : 10;
   document.getElementById('tutorRate').textContent = rate ? sym + rate + '/hr' : 'Rate not set';
 
   // Editable price / negotiation
@@ -251,9 +251,9 @@ function updatePriceBreakdown() {
   const currency = tutorData?.currency || 'EUR';
   const sym = currSymbol(currency);
   const offer = parseFloat(document.getElementById('offerPrice').value) || 0;
-  const fee = parseFloat((offer * 0.18).toFixed(2));
-  const tutorReceives = parseFloat((offer * 0.82).toFixed(2));
-  document.getElementById('priceFee').textContent = sym + fee + ' (18%)';
+  const fee = parseFloat((offer * 0.20).toFixed(2));
+  const tutorReceives = parseFloat((offer * 0.80).toFixed(2));
+  document.getElementById('priceFee').textContent = sym + fee + ' (20%)';
   document.getElementById('priceTutor').textContent = sym + tutorReceives;
   document.getElementById('priceCharge').textContent = sym + offer;
 }
@@ -307,7 +307,7 @@ async function submitBooking(){
   }
 
   const currency = tutorData?.currency || 'EUR';
-  const minPrice = currency === 'USD' ? 27 : 25;
+  const minPrice = currency === 'USD' ? 11 : 10;
   const offerPrice = parseFloat(document.getElementById('offerPrice').value);
   if (!offerPrice || offerPrice < minPrice) {
     showAlert(`The minimum session price is ${currSymbol(currency)}${minPrice}.`,'error');

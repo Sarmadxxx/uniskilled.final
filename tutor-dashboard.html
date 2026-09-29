@@ -560,6 +560,7 @@ function openGroupSessionModal(prefillSubject, studentIdsCsv) {
 
   const sym = tutorCurrency === 'USD' ? '$' : '€';
   document.getElementById('gsPriceLabel').textContent = `Price per student (${sym})`;
+  document.getElementById('gsPrice').min = tutorCurrency === 'USD' ? 11 : 10;
   document.getElementById('gsError').style.display = 'none';
   document.getElementById('groupSessionModalOverlay').style.display = 'flex';
 }
@@ -579,8 +580,9 @@ async function submitGroupSession() {
   const notes = document.getElementById('gsNotes').value.trim();
   const errBox = document.getElementById('gsError');
 
-  if (!subject || !date || !time || !price || Number(price) <= 0) {
-    errBox.textContent = 'Please fill in subject, date, time, and a valid price.';
+  const gsMinPrice = tutorCurrency === 'USD' ? 11 : 10;
+  if (!subject || !date || !time || !price || Number(price) < gsMinPrice) {
+    errBox.textContent = `Please fill in subject, date, time, and a price of at least ${tutorCurrency === 'USD' ? '$11' : '€10'} per student.`;
     errBox.style.display = 'block';
     return;
   }
