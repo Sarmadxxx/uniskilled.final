@@ -659,7 +659,7 @@ async function init() {
 }
 
 async function loadProfile() {
-  const { data: p } = await _supabase.from('users').select('*').eq('id', tutorId).single();
+  const { data: p } = await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).single();
   const { data: tp } = await _supabase.from('tutor_profiles').select('*').eq('user_id', tutorId).single();
   profileData = p; tutorData = tp;
 
@@ -944,7 +944,7 @@ async function saveBio() {
   const gender = document.getElementById('inputGender').value;
   const country = document.getElementById('inputCountry').value.trim();
   const language = document.getElementById('inputLanguage').value.trim();
-  const { error: e1 } = await _supabase.from('users').upsert({ id: currentUserId, email: profileData?.email || '', full_name: fullName || profileData?.full_name, gender: gender || null, country: country || null, language: language || null }, { onConflict: 'id' });
+  const { error: e1 } = await _supabase.from('users').update({ full_name: fullName || profileData?.full_name, gender: gender || null, country: country || null, language: language || null }).eq('id', currentUserId);
   const { error: e2 } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, bio: bio || null }, { onConflict: 'user_id' });
   if (e1 || e2) { showAlert('alertBio', 'Error saving.', 'error'); return; }
   showAlert('alertBio', 'Saved!', 'success');

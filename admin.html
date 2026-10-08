@@ -289,14 +289,14 @@ async function checkAdminAccess() {
   const { data: { session } } = await _sb.auth.getSession();
   if (!session) return; // stay on auth screen
 
-  const { data: u } = await _sb.from('users').select('*').eq('id', session.user.id).single();
+  const { data: u } = await _sb.from('users').select('id,roles').eq('id', session.user.id).single();
   if (!u?.roles?.includes('admin')) {
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('deniedScreen').style.display = 'block';
     return;
   }
 
-  adminUser = { id: session.user.id, email: u.email };
+  adminUser = { id: session.user.id, email: session.user.email };
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('deniedScreen').style.display = 'none';
   document.getElementById('adminShell').style.display = 'block';
@@ -325,7 +325,7 @@ function showPage(id, el) {
 // ── DATA LOADING ──
 async function loadEverything() {
   const [usersRes, sessionsRes, groupSessionsRes, paymentsRes, disputesRes] = await Promise.all([
-    _sb.from('users').select('*').order('created_at', { ascending: false }),
+    _sb.rpc('admin_list_users'),
     _sb.from('sessions').select('*').order('created_at', { ascending: false }).limit(200),
     _sb.from('group_sessions').select('*, group_session_participants(*)').order('created_at', { ascending: false }),
     _sb.from('payments').select('*').order('paid_at', { ascending: false }).limit(200),

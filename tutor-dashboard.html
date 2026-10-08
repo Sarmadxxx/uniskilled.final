@@ -484,7 +484,7 @@ async function init() {
     if (bb) bb.style.display = 'block';
   }
 
-  const { data: p } = await _sb.from('users').select('*').eq('id', userId).single();
+  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', userId).single();
   const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', userId).single();
 
   const fullName = (p && p.full_name) || (meta.full_name) || 'Tutor';
@@ -761,15 +761,14 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
     const { data: sessionData } = await _sb.from('sessions')
       .select('scheduled_date, scheduled_time, duration_minutes, student_id, price')
       .eq('id', sessionId).single();
-    const { data: studentUser } = await _sb.from('users').select('email').eq('id', studentId).single();
-    if (studentUser?.email && sessionData) {
+    if (studentId && sessionData) {
       const dateStr = sessionData.scheduled_date ? new Date(sessionData.scheduled_date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) : 'TBD';
       await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: newStatus === 'awaiting_payment' ? 'awaiting_payment' : 'booking_declined',
-          to: studentUser.email,
+          to_user_id: studentId,
           data: {
             studentName, tutorName, subject,
             date: dateStr,
@@ -1297,7 +1296,7 @@ document.addEventListener('DOMContentLoaded', init);
 let myReferralLink = '';
 
 async function loadReferralCard() {
-  const { data: me } = await _sb.from('users').select('referral_code, credit_balance').eq('id', userId).maybeSingle();
+  const { data: me } = await _sb.rpc('get_my_account').maybeSingle();
   if (!me) return;
 
   myReferralLink = `https://uniskilled.com/?ref=${me.referral_code}`;

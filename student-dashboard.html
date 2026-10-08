@@ -347,7 +347,7 @@ async function init() {
   }
 
   // Load profile
-  const { data: p } = await _sb.from('users').select('*').eq('id', user.id).single();
+  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', user.id).single();
   const { data: sp } = await _sb.from('student_profiles').select('*').eq('user_id', user.id).single();
 
   const fullName = (p && p.full_name) || (meta.full_name) || 'Student';
@@ -802,7 +802,7 @@ document.addEventListener('DOMContentLoaded', init);
 let myReferralLink = '';
 
 async function loadReferralCard() {
-  const { data: me } = await _sb.from('users').select('referral_code, credit_balance').eq('id', currentUserId).maybeSingle();
+  const { data: me } = await _sb.rpc('get_my_account').maybeSingle();
   if (!me) return;
 
   myReferralLink = `https://uniskilled.com/?ref=${me.referral_code}`;

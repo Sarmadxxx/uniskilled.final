@@ -122,7 +122,7 @@ async function init() {
   document.getElementById('verifyUrl').href = window.location.href;
   document.getElementById('verifyUrl').textContent = window.location.href.replace('https://', '');
 
-  const { data: p } = await _sb.from('users').select('*').eq('id', tutorId).single();
+  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).single();
   const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', tutorId).single();
 
   if (!p) { document.getElementById('emptyMsg').style.display = 'block'; return; }

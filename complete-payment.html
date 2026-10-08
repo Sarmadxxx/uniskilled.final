@@ -319,7 +319,7 @@ async function init() {
         previewDiscount = Math.min(Number(referral.invitee_discount_amount), price - 1);
         previewLabel = '🎉 Welcome discount';
       } else {
-        const { data: userRow } = await _sb.from('users').select('credit_balance').eq('id', currentUser.id).maybeSingle();
+        const { data: userRow } = await _sb.rpc('get_my_account').maybeSingle();
         const balance = Number(userRow?.credit_balance || 0);
         if (balance > 0) {
           previewDiscount = Math.min(balance, price - 1);

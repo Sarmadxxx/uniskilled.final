@@ -291,7 +291,7 @@ async function init(){
 }
 
 async function loadProfile(){
-  const {data:u}=await _sb.from('users').select('*').eq('id',currentUserId).single();
+  const {data:u}=await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id',currentUserId).single();
   const {data:sp}=await _sb.from('student_profiles').select('*').eq('user_id',currentUserId).single();
   userData=u||{};profileData=sp||{};
   const fullName=u?.full_name||'Student';
@@ -349,7 +349,7 @@ async function saveBio(){
   const language=document.getElementById('inputLanguage').value.trim();
   const alertEl=document.getElementById('alertBio');
   const fullName=[firstName,lastName].filter(Boolean).join(' ')||userData?.full_name||'Student';
-  const {error:uErr}=await _sb.from('users').upsert({id:currentUserId,email:userData?.email||'',full_name:fullName,country:country||null,gender:gender||null,language:language||null},{onConflict:'id'});
+  const {error:uErr}=await _sb.from('users').update({full_name:fullName,country:country||null,gender:gender||null,language:language||null}).eq('id',currentUserId);
   if(uErr){alertEl.textContent=uErr.message;alertEl.className='alert-inline error';return;}
   const {error:spErr}=await _sb.from('student_profiles').upsert({user_id:currentUserId,bio:bio||null},{onConflict:'user_id'});
   if(spErr){alertEl.textContent=spErr.message;alertEl.className='alert-inline error';return;}

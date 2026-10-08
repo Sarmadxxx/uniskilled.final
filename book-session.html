@@ -352,8 +352,7 @@ async function submitBooking(){
   await _sb.from('notifications').insert({user_id:tutorId,type:'booking_request',title:'📅 New session request — '+subject,body:studentName+' would like to book a '+subject+' session for '+(currency === 'USD' ? '$' : '€')+offerPrice.toFixed(2)+'. No payment has been taken yet.',link:'tutor-dashboard.html',read:false});
 
   try {
-    const {data:tu}=await _sb.from('users').select('email').eq('id',tutorId).single();
-    if(tu?.email) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'booking_request',to:tu.email,data:{tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time,duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
+    if(tutorId) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time,duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);
