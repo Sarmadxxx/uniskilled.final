@@ -367,7 +367,7 @@ async function submitSharePost() {
     fd.append('file', pendingAttachment.file);
     fd.append('subject_label', 'feed_share');
     try {
-      const uploadRes = await fetch(`${SUPABASE_URL}/functions/v1/upload-certificate`, { method: 'POST', body: fd });
+      const uploadRes = await fetch(`${SUPABASE_URL}/functions/v1/upload-certificate`, { method: 'POST', headers: await _authBearer(_sb), body: fd });
       const uploadResult = await uploadRes.json();
       if (uploadRes.ok && uploadResult.fileUrl) {
         attachmentUrl = uploadResult.fileUrl;
@@ -565,6 +565,8 @@ async function loadReplies(postId) {
     </div>`).join('');
 }
 
+async function _authBearer(client){ try{ const {data:{session}} = await client.auth.getSession(); return session?.access_token ? {'Authorization':'Bearer '+session.access_token} : {}; }catch(e){ return {}; } }
+
 async function submitReply(postId) {
   const input = document.getElementById('replyInput-' + postId);
   const content = input.value.trim();
@@ -574,7 +576,7 @@ async function submitReply(postId) {
 
   input.value = '';
   const res = await fetch(`${SUPABASE_URL}/functions/v1/post-feed-reply`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: { 'Content-Type': 'application/json', ...(await _authBearer(_sb)) },
     body: JSON.stringify({ post_id: postId, author_id: currentUser.id, content, as_tutor_answer: asAnswer }),
   });
   const data = await res.json();
