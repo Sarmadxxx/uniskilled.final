@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /admin-disputes.html
+Disallow: /student-dashboard.html
+Disallow: /tutor-dashboard.html
+Disallow: /complete-payment.html
+Disallow: /messages.html
+Disallow: /reset-password.html
+
+Sitemap: https://uniskilled.com/sitemap.xml
