@@ -568,6 +568,7 @@ const CURRENCY_SYMBOLS = {
 };
 function currSymbol(code) { return CURRENCY_SYMBOLS[code] || code || '€'; }
 
+async function _authBearer(client){ try{ const {data:{session}} = await client.auth.getSession(); return session?.access_token ? {'Authorization':'Bearer '+session.access_token} : {}; }catch(e){ return {}; } }
 const _supabase = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
@@ -901,7 +902,7 @@ async function uploadAvatar() {
   fd.append('file', file);
   fd.append('fixed_filename', 'avatar');
   try {
-    const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', { method: 'POST', body: fd });
+    const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', { method: 'POST', headers: await _authBearer(_supabase), body: fd });
     const result = await res.json();
     if (res.ok && result.fileUrl) {
       await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, avatar_url: result.fileUrl }, { onConflict: 'user_id' });
@@ -922,7 +923,7 @@ async function uploadCover() {
   fd.append('file', file);
   fd.append('fixed_filename', 'cover');
   try {
-    const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', { method: 'POST', body: fd });
+    const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', { method: 'POST', headers: await _authBearer(_supabase), body: fd });
     const result = await res.json();
     if (res.ok && result.fileUrl) {
       await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, cover_url: result.fileUrl }, { onConflict: 'user_id' });
@@ -1103,7 +1104,7 @@ async function saveCerts() {
       fd.append('subject_label', c.subject || 'certificate');
       try {
         const uploadRes = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', {
-          method: 'POST', body: fd,
+          method: 'POST', headers: await _authBearer(_supabase), body: fd,
         });
         const uploadResult = await uploadRes.json();
         if (uploadRes.ok && uploadResult.fileUrl) {
