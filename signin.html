@@ -151,6 +151,17 @@ function setLoading(loading) {
   spinner.style.display = loading ? 'block' : 'none';
 }
 
+function safeRedirect(r) {
+  if (!r) return null;
+  try {
+    const u = new URL(r, location.href);
+    if (u.origin !== location.origin) return null;
+    const page = u.pathname.split('/').pop();
+    if (!/^[\w-]+\.html$/.test(page) || /^(signin|onboarding|reset-password)\.html$/.test(page)) return null;
+    return page + u.search + u.hash;
+  } catch (e) { return null; }
+}
+
 document.getElementById('signinForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const email = document.getElementById('email').value.trim();
@@ -176,6 +187,10 @@ document.getElementById('signinForm').addEventListener('submit', async (e) => {
     setLoading(false);
     return;
   }
+
+  // Return people to the page that sent them here (booking, payment link, ...), same site only
+  const back = safeRedirect(new URLSearchParams(location.search).get('redirect'));
+  if (back) { window.location.href = back; return; }
 
   // Get role from auth metadata - no DB query needed
   const meta = data.user.user_metadata || {};

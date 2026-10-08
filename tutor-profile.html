@@ -174,31 +174,9 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
-<script>try{if(localStorage.getItem("sb-orghkbbohnabcietidiv-auth-token"))document.body.classList.add("signed-in")}catch(e){}</script>
 
-<nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;"></a>
-  <div class="nav-links" id="navLinks">
-    <a href="index.html" class="nav-link">🏠 Home</a>
-    <a href="find-tutors.html" class="nav-link guest-only">Find tutors</a>
-    <a href="#" class="nav-link auth-only" id="dashLink">📊 Dashboard</a>
-    <a href="messages.html" class="nav-link auth-only">💬 Messages</a>
-    <a href="signin.html" class="nav-link guest-only">Sign in</a>
-    <a href="onboarding.html" class="nav-cta guest-only">Get started</a>
-    <a href="#" class="nav-cta auth-only" id="navCta">Edit Profile</a>
-    <a href="#" class="nav-link" id="navSignOut" style="display:none;font-size:0.8rem;" onclick="event.preventDefault();profileSignOut()">Sign out</a>
-  </div>
-  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
-</nav>
-<div class="mobile-nav" id="mobileNav">
-  <a href="index.html">🏠 Home</a>
-  <a href="find-tutors.html" class="guest-only">🔍 Find tutors</a>
-  <a href="#" id="dashLinkMobile" class="auth-only">📊 Dashboard</a>
-  <a href="messages.html" class="auth-only">💬 Messages</a>
-  <a href="signin.html" class="guest-only">Sign in</a>
-  <a href="onboarding.html" class="guest-only">Get started →</a>
-  <a href="#" id="mobileSignOut" style="display:none;" onclick="event.preventDefault();profileSignOut()">🚪 Sign out</a>
-</div>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
 
 <!-- COVER -->
 <div class="cover-wrap" id="coverWrap">
@@ -636,13 +614,6 @@ async function init() {
     isOwner = (tutorId === currentUserId && role === 'tutor');
 
     // Nav
-    document.getElementById('dashLink').href = role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
-    document.getElementById('dashLinkMobile').href = role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
-    document.getElementById('navSignOut').style.display = '';
-    document.getElementById('mobileSignOut').style.display = '';
-    document.getElementById('navCta').href = isOwner ? '#' : 'find-tutors.html';
-    document.getElementById('navCta').textContent = isOwner ? 'Edit Profile' : 'Find Tutors';
-    if (isOwner) document.getElementById('navCta').onclick = e => { e.preventDefault(); openModal('modalBio'); };
 
     if (isOwner) {
       document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
@@ -660,9 +631,6 @@ async function init() {
     document.body.classList.remove('signed-in');
     tutorId = urlId;
     if (!tutorId) { window.location.href = 'find-tutors.html'; return; }
-    document.getElementById('navCta').href = 'signin.html';
-    document.getElementById('navCta').textContent = 'Sign in';
-    document.getElementById('dashLink').href = 'signin.html';
   }
 
   await loadProfile();
@@ -1274,18 +1242,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('languageInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addLanguage(); });
 });
 
-function toggleNav(btn, force) {
-  btn = btn || document.querySelector('.nav-burger');
-  const n = document.getElementById('mobileNav');
-  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
-  n.style.display = open ? 'flex' : 'none';
-  btn.textContent = open ? '✕' : '☰';
-  btn.setAttribute('aria-expanded', open);
-  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-}
-document.getElementById('mobileNav').addEventListener('click', e => { if (e.target.closest('a')) toggleNav(null, false); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleNav(null, false); });
-document.addEventListener('click', e => { if (!e.target.closest('#mobileNav,.nav-burger')) toggleNav(null, false); });
+
 
 function profileSignOut() {
   _supabase.auth.signOut().then(function() {

@@ -95,30 +95,9 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
 <link rel="stylesheet" href="site.css">
 </head>
 <body>
-<script>try{if(localStorage.getItem("sb-orghkbbohnabcietidiv-auth-token"))document.body.classList.add("signed-in")}catch(e){}</script>
 <a class="skip-link" href="#main">Skip to results</a>
-<nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;"></a>
-  <div class="nav-links">
-    <a href="index.html" class="nav-link">🏠 Home</a>
-    <a href="group-sessions.html" class="nav-link guest-only">Group sessions</a>
-    <a href="student-dashboard.html" class="nav-link auth-only" data-dash>📊 Dashboard</a>
-    <a href="messages.html" class="nav-link auth-only">💬 Messages</a>
-    <a href="signin.html" class="nav-link guest-only">Sign in</a>
-    <a href="onboarding.html" class="nav-cta guest-only">Get started</a>
-    <a href="student-profile.html" class="nav-cta auth-only" id="navCta">My Profile</a>
-  </div>
-  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
-</nav>
-<div class="mobile-nav" id="mobileNav">
-  <a href="index.html">🏠 Home</a>
-  <a href="group-sessions.html" class="guest-only">Group sessions</a>
-  <a href="student-dashboard.html" class="auth-only" data-dash>📊 Dashboard</a>
-  <a href="messages.html" class="auth-only">💬 Messages</a>
-  <a href="student-profile.html" class="auth-only" id="navCtaMobile">👤 My Profile</a>
-  <a href="signin.html" class="guest-only">Sign in</a>
-  <a href="onboarding.html" class="guest-only" style="background:var(--blue);color:#fff;">Get started →</a>
-</div>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
 
 <div class="hero-search">
   <h1>Find your perfect tutor</h1>
@@ -349,18 +328,7 @@ function filterTutors() {
   }));
 }
 
-function toggleNav(btn, force){
-  btn = btn || document.querySelector('.nav-burger');
-  const n = document.getElementById('mobileNav');
-  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
-  n.style.display = open ? 'flex' : 'none';
-  btn.textContent = open ? '✕' : '☰';
-  btn.setAttribute('aria-expanded', open);
-  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-}
-document.getElementById('mobileNav').addEventListener('click', e => { if (e.target.closest('a')) toggleNav(null, false); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleNav(null, false); });
-document.addEventListener('click', e => { if (!e.target.closest('#mobileNav,.nav-burger')) toggleNav(null, false); });
+
 document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')filterTutors();});
 
 let currentUserId = null;
@@ -379,11 +347,7 @@ async function setNav(){
       currentUserRole = role;
       currentUserName = meta.full_name || 'Student';
       document.body.classList.add('signed-in');
-      if(role==='tutor'){
-        document.getElementById('navCta').href='tutor-profile.html';
-        document.getElementById('navCtaMobile').href='tutor-profile.html';
-        document.querySelectorAll('[data-dash]').forEach(a => a.href='tutor-dashboard.html');
-      } else {
+      if(role!=='tutor'){
         // Only students can post subject requests
         document.getElementById('postRequestBanner').style.display = 'block';
         // Load student's university for "Same as mine" filter
