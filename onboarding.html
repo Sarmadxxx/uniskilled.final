@@ -546,7 +546,7 @@ document.addEventListener('DOMContentLoaded', function() {
             fd.append('subject_label', cert.subject || 'certificate');
             try {
               const uploadRes = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', {
-                method: 'POST', body: fd,
+                method: 'POST', headers: (data.session?.access_token ? { 'Authorization': 'Bearer ' + data.session.access_token } : {}), body: fd,
               });
               const uploadResult = await uploadRes.json();
               if (uploadRes.ok && uploadResult.fileUrl) {
