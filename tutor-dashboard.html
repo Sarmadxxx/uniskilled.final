@@ -1134,6 +1134,18 @@ async function checkPayoutStatus() {
     .select('stripe_account_id, stripe_account_status, payout_method, paypal_email')
     .eq('user_id', userId).single();
 
+  // If Stripe setup was started but the tutor isn't marked active yet, ask Stripe (through our
+  // server) whether setup is finished, so the status updates by itself after onboarding.
+  if (tp && tp.stripe_account_id && tp.stripe_account_status !== 'active' && (tp.payout_method || 'stripe') === 'stripe') {
+    try {
+      const syncRes = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/check-stripe-account-status', {
+        method: 'POST', headers: await authedHeaders(), body: '{}'
+      });
+      const syncData = await syncRes.json();
+      if (syncRes.ok && syncData.status) tp.stripe_account_status = syncData.status;
+    } catch (e) { console.error('Stripe status sync failed (non-critical):', e); }
+  }
+
   const stripeBtn = document.getElementById('payoutSetupBtn');
   const paypalBox = document.getElementById('paypalPayoutBox');
   const methodToggle = document.getElementById('payoutMethodToggle');
@@ -1255,7 +1267,7 @@ async function setupPayouts() {
   try {
     const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/create-connect-account', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: await authedHeaders(),
       body: JSON.stringify({
         user_id: userId,
         return_url: 'https://uniskilled.com/tutor-dashboard.html?payout=success',
