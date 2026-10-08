@@ -333,7 +333,8 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       </div>
     </div>
 
-
+    <!-- BOOKING REQUESTS PAGE -->
+    <div id="page-requests" style="display:none;">
       <div class="card">
         <div class="card-head"><div class="card-title">Booking Requests</div></div>
         <div class="card-body" id="requestsList">
@@ -456,7 +457,7 @@ function showPage(id, el) {
   target.classList.add('page-transition');
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
   if (el) el.classList.add('active');
-  target.scrollIntoView({ behavior: 'auto', block: 'start' });
+  window.scrollTo(0, 0);
 }
 
 // ── INIT ──
