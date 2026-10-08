@@ -425,6 +425,9 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+function __viewerTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Berlin';}catch(e){return 'Europe/Berlin';}}
+function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').pop().replace(/_/g,' ')+' time)':'';}
+function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
 
 // Stop the browser from "helpfully" restoring the previous scroll position
 // when navigating between ?tab= variants of this same page (a known iOS
@@ -621,7 +624,8 @@ async function submitGroupSession() {
     price_per_student: parseFloat(price),
     currency: tutorCurrency,
     notes: notes || null,
-    status: 'open'
+    status: 'open',
+    timezone: __viewerTz()
   }).select().single();
 
   btn.disabled = false;
@@ -680,7 +684,7 @@ async function loadGroupSessions() {
       <div class="session-av">👥</div>
       <div class="session-info">
         <div class="session-name">${__esc(gs.subject)}</div>
-        <div class="session-sub">${__esc(date)} · ${__esc(gs.scheduled_time.slice(0,5))} · ${__esc(gs.currency === 'USD' ? '$' : '€')}${__esc(gs.price_per_student)}/student · ${__esc(confirmed.length)}/${__esc(gs.max_students)} joined</div>
+        <div class="session-sub">${__esc(date)} · ${__esc(gs.scheduled_time.slice(0,5) + __tzNote(gs.timezone))} · ${__esc(gs.currency === 'USD' ? '$' : '€')}${__esc(gs.price_per_student)}/student · ${__esc(confirmed.length)}/${__esc(gs.max_students)} joined</div>
       </div>
       ${statusBadge}
     </div>`;
@@ -721,7 +725,7 @@ async function loadRequests() {
             <div class="request-subject">Subject: <strong>${__esc(r.subject || '—')}</strong></div>
             ${priceHtml}
           </div>
-          <span style="font-size:0.75rem;color:var(--mid);">${__esc(r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : '')} ${__esc(r.scheduled_time ? r.scheduled_time.slice(0,5) : '')}</span>
+          <span style="font-size:0.75rem;color:var(--mid);">${__esc(r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : '')} ${__esc(r.scheduled_time ? r.scheduled_time.slice(0,5) + __tzNote(r.timezone) : '')}</span>
         </div>
         <div class="request-meta">
           📋 ${__esc(r.duration_minutes || 60)} min · ${__esc(r.format || 'Online')} 
@@ -748,7 +752,12 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
   const updatePayload = { status: newStatus };
   if (paymentDueAt) updatePayload.payment_due_at = paymentDueAt;
 
-  await _sb.from('sessions').update(updatePayload).eq('id', sessionId);
+  const { error: respondErr } = await _sb.from('sessions').update(updatePayload).eq('id', sessionId);
+  if (respondErr) {
+    alert(__friendlyDbError(respondErr, 'Could not update this request. Please refresh and try again.'));
+    await loadAll();
+    return;
+  }
 
   await _sb.from('notifications').insert({
     user_id: studentId,
@@ -764,7 +773,7 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
   // Send email to student
   try {
     const { data: sessionData } = await _sb.from('sessions')
-      .select('scheduled_date, scheduled_time, duration_minutes, student_id, price')
+      .select('scheduled_date, scheduled_time, duration_minutes, student_id, price, currency, timezone')
       .eq('id', sessionId).single();
     if (studentId && sessionData) {
       const dateStr = sessionData.scheduled_date ? new Date(sessionData.scheduled_date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) : 'TBD';
@@ -778,9 +787,10 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
           data: {
             studentName, tutorName, subject,
             date: dateStr,
-            time: sessionData.scheduled_time || '',
+            time: sessionData.scheduled_time ? sessionData.scheduled_time.slice(0,5) + ' (' + String(sessionData.timezone || 'Europe/Berlin').split('/').pop().replace(/_/g,' ') + ' time)' : '',
             duration: sessionData.duration_minutes || 60,
             amount: sessionData.price,
+            currencySymbol: sessionData.currency === 'USD' ? '$' : '€',
             sessionId
           }
         })
@@ -996,7 +1006,7 @@ async function loadSessions() {
       <div class="session-av">${__esc(ini)}</div>
       <div class="session-info">
         <div class="session-name">${__esc(s.student_name || 'Student')}</div>
-        <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) : '')}</div>
+        <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')}</div>
       </div>
       <span class="badge ${__esc(badgeClass)}">${__esc(badgeLabel)}</span>
       ${joinBtn}${cancelBtn}${reportBtn}

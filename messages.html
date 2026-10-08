@@ -119,6 +119,9 @@ nav{height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);bor
 function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+function __viewerTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Berlin';}catch(e){return 'Europe/Berlin';}}
+function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').pop().replace(/_/g,' ')+' time)':'';}
+function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
 
 const SUPABASE_URL='https://orghkbbohnabcietidiv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
@@ -337,13 +340,19 @@ async function sendMessage(){
   const {data:conv}=await _sb.from('conversations').select('*').eq('id',currentConvId).single();
   const receiverId=conv.participant_1===currentUser.id?conv.participant_2:conv.participant_1;
 
-  await _sb.from('messages').insert({
+  const { error: sendErr } = await _sb.from('messages').insert({
     conversation_id:currentConvId,
     sender_id:currentUser.id,
     receiver_id:receiverId,
     sender_name:myName,
     content,read:false
   });
+  if (sendErr) {
+    input.value = content;
+    warningEl.textContent = '⚠️ ' + __friendlyDbError(sendErr, 'Your message could not be sent. Please try again.');
+    warningEl.style.display = 'block';
+    return;
+  }
 
   // Update conversation
   await _sb.from('conversations').update({
