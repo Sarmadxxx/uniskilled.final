@@ -175,7 +175,7 @@ document.getElementById('forgotLink').addEventListener('click', async (e) => {
     return;
   }
   const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://uniskilled.com/signin.html'
+    redirectTo: 'https://uniskilled.com/reset-password.html'
   });
   if (error) {
     showAlert(error.message, 'error');
