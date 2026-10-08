@@ -280,6 +280,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 <div class="toast" id="toast"></div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const _sb = window.supabase.createClient('https://orghkbbohnabcietidiv.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8');
 let currentUserId=null,userData=null,profileData=null,subjectTags=[],availDays=[];
 
@@ -297,8 +302,8 @@ async function loadProfile(){
   const fullName=u?.full_name||'Student';
   const initials=fullName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
   const av=document.getElementById('avatarEl');
-  if(u?.avatar_url)av.innerHTML=`<img src="${u.avatar_url}" alt="${fullName}"><div class="avatar-overlay">📷</div>`;
-  else{av.innerHTML=`${initials}<div class="avatar-overlay">📷</div>`;}
+  if(u?.avatar_url)av.innerHTML=`<img src="${__safeUrl(u.avatar_url)}" alt="${__esc(fullName)}"><div class="avatar-overlay">📷</div>`;
+  else{av.innerHTML=`${__esc(initials)}<div class="avatar-overlay">📷</div>`;}
   av.onclick=()=>document.getElementById('avatarInput').click();
   if(u?.cover_url){const img=document.getElementById('coverImg');img.src=u.cover_url;img.style.display='block';}
   document.getElementById('profileName').textContent=fullName;
@@ -306,32 +311,32 @@ async function loadProfile(){
   const titleParts=[sp?.university,sp?.year_of_study?'Year '+sp.year_of_study:'',sp?.degree].filter(Boolean);
   document.getElementById('profileTitle').textContent=titleParts.join(' · ')||'Student at UniSkilled';
   const meta=[];
-  if(u?.country)meta.push(`<span>🌍 ${u.country}</span>`);
-  if(sp?.graduation_year)meta.push(`<span>🎓 Graduating ${sp.graduation_year}</span>`);
-  if(u?.language)meta.push(`<span>💬 ${u.language}</span>`);
+  if(u?.country)meta.push(`<span>🌍 ${__esc(u.country)}</span>`);
+  if(sp?.graduation_year)meta.push(`<span>🎓 Graduating ${__esc(sp.graduation_year)}</span>`);
+  if(u?.language)meta.push(`<span>💬 ${__esc(u.language)}</span>`);
   document.getElementById('profileMeta').innerHTML=meta.join('');
   const subjects=Array.isArray(sp?.subjects)?sp.subjects:[];
-  document.getElementById('profileTags').innerHTML=subjects.slice(0,5).map(s=>`<span class="subject-tag">${s}</span>`).join('');
+  document.getElementById('profileTags').innerHTML=subjects.slice(0,5).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('');
   const bioEl=document.getElementById('bioText');
   if(sp?.bio){bioEl.textContent=sp.bio;bioEl.classList.remove('empty');}
   else{bioEl.textContent='Tell tutors about yourself...';bioEl.classList.add('empty');}
   const acParts=[];
-  if(sp?.university)acParts.push(`<div class="info-row"><span class="info-label">University</span><span class="info-value">${sp.university}</span></div>`);
-  if(sp?.degree)acParts.push(`<div class="info-row"><span class="info-label">Degree</span><span class="info-value">${sp.degree}</span></div>`);
-  if(sp?.major)acParts.push(`<div class="info-row"><span class="info-label">Major</span><span class="info-value">${sp.major}</span></div>`);
-  if(sp?.year_of_study)acParts.push(`<div class="info-row"><span class="info-label">Year</span><span class="info-value">${sp.year_of_study}</span></div>`);
-  if(sp?.graduation_year)acParts.push(`<div class="info-row"><span class="info-label">Graduation</span><span class="info-value">${sp.graduation_year}</span></div>`);
+  if(sp?.university)acParts.push(`<div class="info-row"><span class="info-label">University</span><span class="info-value">${__esc(sp.university)}</span></div>`);
+  if(sp?.degree)acParts.push(`<div class="info-row"><span class="info-label">Degree</span><span class="info-value">${__esc(sp.degree)}</span></div>`);
+  if(sp?.major)acParts.push(`<div class="info-row"><span class="info-label">Major</span><span class="info-value">${__esc(sp.major)}</span></div>`);
+  if(sp?.year_of_study)acParts.push(`<div class="info-row"><span class="info-label">Year</span><span class="info-value">${__esc(sp.year_of_study)}</span></div>`);
+  if(sp?.graduation_year)acParts.push(`<div class="info-row"><span class="info-label">Graduation</span><span class="info-value">${__esc(sp.graduation_year)}</span></div>`);
   document.getElementById('academicBody').innerHTML=acParts.length?acParts.join(''):'<span class="empty">Not set yet.</span>';
   subjectTags=[...subjects];
-  document.getElementById('subjectsBody').innerHTML=subjects.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s=>`<span class="subject-tag">${s}</span>`).join('')}</div>`:'<span class="empty">No subjects added yet.</span>';
+  document.getElementById('subjectsBody').innerHTML=subjects.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>`:'<span class="empty">No subjects added yet.</span>';
   const avail=Array.isArray(sp?.availability)?sp.availability:[];
   availDays=[...avail];
   const dayNames={mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
-  document.getElementById('availBody').innerHTML=avail.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${avail.map(d=>`<span style="background:#eff6ff;color:var(--blue);font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:100px;">${dayNames[d]||d}</span>`).join('')}</div>${sp?.preferred_time?`<div style="font-size:0.82rem;color:var(--mid);margin-top:0.5rem;">Preferred: ${sp.preferred_time}</div>`:''}`:'<span class="empty">Not set yet.</span>';
+  document.getElementById('availBody').innerHTML=avail.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${avail.map(d=>`<span style="background:#eff6ff;color:var(--blue);font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:100px;">${__esc(dayNames[d]||d)}</span>`).join('')}</div>${sp?.preferred_time?`<div style="font-size:0.82rem;color:var(--mid);margin-top:0.5rem;">Preferred: ${__esc(sp.preferred_time)}</div>`:''}`:'<span class="empty">Not set yet.</span>';
   const personal=[];
-  if(u?.country)personal.push(`<div class="info-row"><span class="info-label">Country</span><span class="info-value">${u.country}</span></div>`);
-  if(u?.gender)personal.push(`<div class="info-row"><span class="info-label">Gender</span><span class="info-value">${u.gender}</span></div>`);
-  if(u?.language)personal.push(`<div class="info-row"><span class="info-label">Language</span><span class="info-value">${u.language}</span></div>`);
+  if(u?.country)personal.push(`<div class="info-row"><span class="info-label">Country</span><span class="info-value">${__esc(u.country)}</span></div>`);
+  if(u?.gender)personal.push(`<div class="info-row"><span class="info-label">Gender</span><span class="info-value">${__esc(u.gender)}</span></div>`);
+  if(u?.language)personal.push(`<div class="info-row"><span class="info-label">Language</span><span class="info-value">${__esc(u.language)}</span></div>`);
   document.getElementById('personalBody').innerHTML=personal.length?personal.join(''):'<span class="empty" style="font-size:0.82rem;">Not set yet.</span>';
   const checks=[u?.full_name,u?.avatar_url,sp?.bio,sp?.university,sp?.degree,subjects.length>0,avail.length>0,u?.country];
   const done=checks.filter(Boolean).length;
@@ -408,7 +413,7 @@ function renderSubjectTags(){
   const wrap=document.getElementById('subjectTagWrap');
   const input=document.getElementById('subjectInput');
   wrap.innerHTML='';
-  subjectTags.forEach((s,i)=>{const chip=document.createElement('span');chip.className='tag-chip';chip.innerHTML=`${s} <button onclick="removeSubjectTag(${i})">×</button>`;wrap.appendChild(chip);});
+  subjectTags.forEach((s,i)=>{const chip=document.createElement('span');chip.className='tag-chip';chip.innerHTML=`${__esc(s)} <button onclick="removeSubjectTag(${i})">×</button>`;wrap.appendChild(chip);});
   wrap.appendChild(input);input.focus();
 }
 function removeSubjectTag(i){subjectTags.splice(i,1);renderSubjectTags();}

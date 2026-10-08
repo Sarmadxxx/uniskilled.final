@@ -559,6 +559,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 
 const CURRENCY_SYMBOLS = {
   GBP:'£', EUR:'€', USD:'$', TRY:'₺', AED:'AED', SAR:'SAR',
@@ -679,12 +684,12 @@ async function loadProfile() {
   // Avatar
   const av = document.getElementById('avatarEl');
   const avatarUrl = tp?.avatar_url || p?.avatar_url;
-  if (avatarUrl) av.innerHTML = `<img src="${avatarUrl}" alt="${fullName}">`;
+  if (avatarUrl) av.innerHTML = `<img src="${__safeUrl(avatarUrl)}" alt="${__esc(fullName)}">`;
   else av.textContent = initials;
 
   // Cover
   if (tp?.cover_url) {
-    document.getElementById('coverContent').innerHTML = `<img src="${tp.cover_url}" style="width:100%;height:100%;object-fit:cover;">`;
+    document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(tp.cover_url)}" style="width:100%;height:100%;object-fit:cover;">`;
   }
 
   // Header
@@ -696,9 +701,9 @@ async function loadProfile() {
   if (p?.country) metaParts.push(`📍 ${p.country}`);
   if (p?.language) metaParts.push(`🌐 ${p.language}`);
   if (tp?.teaching_format) metaParts.push(`💻 ${tp.teaching_format === 'both' ? 'Online & In-person' : cap(tp.teaching_format)}`);
-  document.getElementById('profileMeta').innerHTML = metaParts.map(m => `<span>${m}</span>`).join('');
+  document.getElementById('profileMeta').innerHTML = metaParts.map(m => `<span>${__esc(m)}</span>`).join('');
 
-  document.getElementById('profileTags').innerHTML = subjects.map(s => `<span class="subject-tag">${s}</span>`).join('');
+  document.getElementById('profileTags').innerHTML = subjects.map(s => `<span class="subject-tag">${__esc(s)}</span>`).join('');
 
   // Rate
   const currency = tp?.currency || 'EUR';
@@ -708,12 +713,12 @@ async function loadProfile() {
 
   // Book/Edit actions
   const bookDiv = document.getElementById('bookActions');
-  const certLink = `<a href="tutor-certificate.html?tutor=${tutorId}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.7rem;text-decoration:none;">🏆 View Certificate</a>`;
+  const certLink = `<a href="tutor-certificate.html?tutor=${__safeUrl(tutorId)}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.7rem;text-decoration:none;">🏆 View Certificate</a>`;
   const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.7rem;text-decoration:none;">🚫 Manage Availability</a>`;
   if (isOwner) {
     bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>` + availabilityLink + certLink;
   } else if (currentUserId) {
-    bookDiv.innerHTML = `<a href="book-session.html?tutor=${tutorId}&name=${encodeURIComponent(fullName)}" class="book-btn">📅 Book a session</a><a href="messages.html?with=${tutorId}" class="msg-btn">💬 Send message</a>` + certLink;
+    bookDiv.innerHTML = `<a href="book-session.html?tutor=${__safeUrl(tutorId)}&name=${__safeUrl(encodeURIComponent(fullName))}" class="book-btn">📅 Book a session</a><a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">💬 Send message</a>` + certLink;
   } else {
     bookDiv.innerHTML = `<a href="signin.html" class="book-btn">Sign in to book</a>` + certLink;
   }
@@ -734,8 +739,8 @@ async function loadProfile() {
     ? subjectEntries.map(([subj, count]) => `
         <div style="margin-bottom:0.7rem;">
           <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;">
-            <span style="font-weight:600;color:var(--ink);">${subj}</span>
-            <span style="color:var(--mid);">${count} session${count === 1 ? '' : 's'}</span>
+            <span style="font-weight:600;color:var(--ink);">${__esc(subj)}</span>
+            <span style="color:var(--mid);">${__esc(count)} session${__esc(count === 1 ? '' : 's')}</span>
           </div>
           <div style="background:var(--off);border-radius:100px;height:6px;overflow:hidden;">
             <div style="background:var(--blue);height:100%;width:${(count / maxCount * 100).toFixed(0)}%;border-radius:100px;"></div>
@@ -750,11 +755,11 @@ async function loadProfile() {
   }
 
   // Bio
-  document.getElementById('bioText').innerHTML = tp?.bio ? `<span class="about-text">${tp.bio}</span>` : '<span class="empty">No bio added yet.</span>';
+  document.getElementById('bioText').innerHTML = tp?.bio ? `<span class="about-text">${__esc(tp.bio)}</span>` : '<span class="empty">No bio added yet.</span>';
 
   // Subjects
   document.getElementById('subjectsBody').innerHTML = subjects.length > 0
-    ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${s}</span>`).join('')}</div>`
+    ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>`
     : '<span class="empty">No subjects added yet.</span>';
 
   // Courses
@@ -763,8 +768,8 @@ async function loadProfile() {
         <div style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--border);">
           <div style="width:36px;height:36px;background:var(--blue-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🎯</div>
           <div>
-            <div style="font-weight:700;font-size:0.85rem;">${c.course_code}${c.course_name ? ' — ' + c.course_name : ''}</div>
-            ${c.professor_name ? `<div style="font-size:0.75rem;color:var(--mid);">Prof. ${c.professor_name}</div>` : ''}
+            <div style="font-weight:700;font-size:0.85rem;">${__esc(c.course_code)}${__esc(c.course_name ? ' — ' + c.course_name : '')}</div>
+            ${c.professor_name ? `<div style="font-size:0.75rem;color:var(--mid);">Prof. ${__esc(c.professor_name)}</div>` : ''}
           </div>
         </div>`).join('')}</div>`
     : '<span class="empty">No specific courses added yet.</span>';
@@ -778,19 +783,19 @@ async function loadProfile() {
     tp?.overall_grade ? ['Grade', tp.overall_grade] : null,
   ].filter(Boolean);
   document.getElementById('academicBody').innerHTML = acadItems.length > 0
-    ? acadItems.map(([l, v]) => `<div class="info-row"><span class="info-label">${l}</span><span class="info-value">${v}</span></div>`).join('')
+    ? acadItems.map(([l, v]) => `<div class="info-row"><span class="info-label">${__esc(l)}</span><span class="info-value">${__esc(v)}</span></div>`).join('')
     : '<span class="empty">No academic info added yet.</span>';
 
   // Levels & Languages
   const levelLabels = {high_school:'High School', undergrad:'Undergrad', graduate:'Graduate', professional:'Professional / Adult'};
   const levelsHtml = teachingLevels.length > 0
-    ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:${teachLanguages.length ? '0.8rem' : '0'};">${teachingLevels.map(l => `<span class="subject-tag">${levelLabels[l] || l}</span>`).join('')}</div>`
+    ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:${teachLanguages.length ? '0.8rem' : '0'};">${teachingLevels.map(l => `<span class="subject-tag">${__esc(levelLabels[l] || l)}</span>`).join('')}</div>`
     : '';
   const langsHtml = teachLanguages.length > 0
     ? `<div class="info-row"><span class="info-label">Languages</span><span class="info-value">${teachLanguages.join(', ')}</span></div>`
     : '';
   const videoHtml = tp?.video_link
-    ? `<div class="info-row"><span class="info-label">Intro video</span><span class="info-value"><a href="${tp.video_link}" target="_blank" style="color:var(--blue);">▶ Watch</a></span></div>`
+    ? `<div class="info-row"><span class="info-label">Intro video</span><span class="info-value"><a href="${__safeUrl(tp.video_link)}" target="_blank" style="color:var(--blue);">▶ Watch</a></span></div>`
     : '';
   document.getElementById('levelsBody').innerHTML = (levelsHtml + langsHtml + videoHtml) || '<span class="empty">Not set yet.</span>';
 
@@ -801,13 +806,13 @@ async function loadProfile() {
         const icon = c.fileUrl ? (isPdf ? '📄' : '🖼️') : '🏅';
         const iconClass = c.fileUrl && isPdf ? 'cert-icon pdf' : 'cert-icon';
         const rightSide = c.fileUrl
-          ? `<a href="${c.fileUrl}" target="_blank" class="cert-view-btn">${isPdf ? '📄' : '🖼️'} View ${isPdf ? 'PDF' : 'Image'}</a>`
+          ? `<a href="${__safeUrl(c.fileUrl)}" target="_blank" class="cert-view-btn">${__esc(isPdf ? '📄' : '🖼️')} View ${__esc(isPdf ? 'PDF' : 'Image')}</a>`
           : (c.fileName ? '<span class="cert-missing">File pending</span>' : '');
         return `<div class="cert-row">
-          <div class="${iconClass}">${icon}</div>
+          <div class="${__esc(iconClass)}">${__esc(icon)}</div>
           <div style="flex:1;">
-            <div class="cert-name">${c.subject}</div>
-            <div class="cert-grade">${c.grade ? 'Grade: ' + c.grade : 'No grade specified'}</div>
+            <div class="cert-name">${__esc(c.subject)}</div>
+            <div class="cert-grade">${__esc(c.grade ? 'Grade: ' + c.grade : 'No grade specified')}</div>
           </div>
           ${rightSide}
         </div>`;
@@ -817,7 +822,7 @@ async function loadProfile() {
   // Availability
   const days = ['mon','tue','wed','thu','fri','sat','sun'];
   const labels = ['M','T','W','T','F','S','S'];
-  document.getElementById('availGrid').innerHTML = days.map((d, i) => `<div class="avail-chip ${availability.includes(d) ? 'on' : 'off'}">${labels[i]}</div>`).join('');
+  document.getElementById('availGrid').innerHTML = days.map((d, i) => `<div class="avail-chip ${availability.includes(d) ? 'on' : 'off'}">${__esc(labels[i])}</div>`).join('');
   if (tp?.preferred_time) document.getElementById('prefTimeDisplay').textContent = 'Preferred: ' + tp.preferred_time;
 
   // Teaching
@@ -827,7 +832,7 @@ async function loadProfile() {
     tp?.max_students ? ['Max students/week', tp.max_students] : null,
   ].filter(Boolean);
   document.getElementById('teachingBody').innerHTML = teachItems.length > 0
-    ? teachItems.map(([l, v]) => `<div class="info-row"><span class="info-label">${l}</span><span class="info-value">${v}</span></div>`).join('')
+    ? teachItems.map(([l, v]) => `<div class="info-row"><span class="info-label">${__esc(l)}</span><span class="info-value">${__esc(v)}</span></div>`).join('')
     : '<span class="empty">Not set yet.</span>';
 }
 
@@ -837,7 +842,7 @@ async function loadMeetingLink() {
   const { data: tp } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).single();
   if (tp?.meeting_link) {
     const display = tp.meeting_link.replace('https://','').slice(0,50) + (tp.meeting_link.length > 53 ? '…' : '');
-    body.innerHTML = `<div class="info-row"><span class="info-label">Link</span><span class="info-value"><a href="${tp.meeting_link}" target="_blank" style="color:var(--blue);word-break:break-all;">🔗 ${display}</a></span></div><div style="font-size:0.78rem;color:var(--mid);margin-top:0.5rem;">Students use this link to join confirmed sessions with you.</div>`;
+    body.innerHTML = `<div class="info-row"><span class="info-label">Link</span><span class="info-value"><a href="${__safeUrl(tp.meeting_link)}" target="_blank" style="color:var(--blue);word-break:break-all;">🔗 ${__esc(display)}</a></span></div><div style="font-size:0.78rem;color:var(--mid);margin-top:0.5rem;">Students use this link to join confirmed sessions with you.</div>`;
   } else {
     body.innerHTML = '<span class="empty">No meeting link added yet. Click Edit to add your Zoom or Google Meet link.</span>';
   }
@@ -869,11 +874,11 @@ async function loadReviews() {
     document.getElementById('reviewsBody').innerHTML = reviews.map(r => `
       <div class="review-item" style="padding:1rem 1.4rem;border-bottom:1px solid var(--border);">
         <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
-          <span class="reviewer-name">${r.student_name || 'Student'}</span>
-          <span style="font-size:0.7rem;color:var(--light);">${new Date(r.created_at).toLocaleDateString()}</span>
+          <span class="reviewer-name">${__esc(r.student_name || 'Student')}</span>
+          <span style="font-size:0.7rem;color:var(--light);">${__esc(new Date(r.created_at).toLocaleDateString())}</span>
         </div>
         <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-        <div class="review-text">${r.comment || ''}</div>
+        <div class="review-text">${__esc(r.comment || '')}</div>
       </div>`).join('');
   }
 }
@@ -895,7 +900,7 @@ async function submitReview() {
 // AVATAR & COVER UPLOAD
 async function uploadAvatar() {
   const file = this.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${e.target.result}">`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${__safeUrl(e.target.result)}">`; }; r.readAsDataURL(file);
 
   const fd = new FormData();
   fd.append('user_id', currentUserId);
@@ -916,7 +921,7 @@ async function uploadAvatar() {
 
 async function uploadCover() {
   const file = this.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(e.target.result)}" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
 
   const fd = new FormData();
   fd.append('user_id', currentUserId);
@@ -964,8 +969,8 @@ function renderCoursesModal() {
     ? courses.map((c, i) => `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:var(--off);border-radius:8px;">
         <div>
-          <div style="font-weight:700;font-size:0.83rem;">${c.course_code}${c.course_name ? ' — ' + c.course_name : ''}</div>
-          ${c.professor_name ? `<div style="font-size:0.73rem;color:var(--mid);">Prof. ${c.professor_name}</div>` : ''}
+          <div style="font-weight:700;font-size:0.83rem;">${__esc(c.course_code)}${__esc(c.course_name ? ' — ' + c.course_name : '')}</div>
+          ${c.professor_name ? `<div style="font-size:0.73rem;color:var(--mid);">Prof. ${__esc(c.professor_name)}</div>` : ''}
         </div>
         <button onclick="courses.splice(${i},1);renderCoursesModal()" style="background:none;border:none;color:var(--mid);font-size:1.1rem;cursor:pointer;">×</button>
       </div>`).join('')
@@ -1028,7 +1033,7 @@ async function saveTeaching() {
 
 function renderLanguagesModal() {
   document.getElementById('languagesModal').innerHTML = teachLanguages.map((l, i) =>
-    `<span class="tag-item">${l}<button onclick="teachLanguages.splice(${i},1);renderLanguagesModal()">×</button></span>`
+    `<span class="tag-item">${__esc(l)}<button onclick="teachLanguages.splice(${i},1);renderLanguagesModal()">×</button></span>`
   ).join('');
 }
 window.addLanguage = function() {
@@ -1073,7 +1078,7 @@ function renderCertsModal() {
   document.getElementById('certsModalList').innerHTML = certificates.map((c, i) => `
     <div style="display:flex;align-items:center;gap:0.7rem;background:var(--off);border-radius:9px;padding:0.7rem;margin-bottom:0.5rem;">
       <span>🏅</span>
-      <div style="flex:1;"><div style="font-weight:700;font-size:0.83rem;">${c.subject}</div><div style="font-size:0.73rem;color:var(--green);">${c.grade ? 'Grade: ' + c.grade : 'No grade specified'}${c.fileName ? ' · 📎 ' + c.fileName : ''}</div></div>
+      <div style="flex:1;"><div style="font-weight:700;font-size:0.83rem;">${__esc(c.subject)}</div><div style="font-size:0.73rem;color:var(--green);">${__esc(c.grade ? 'Grade: ' + c.grade : 'No grade specified')}${__esc(c.fileName ? ' · 📎 ' + c.fileName : '')}</div></div>
       <button onclick="certificates.splice(${i},1);renderCertsModal();" style="background:none;border:none;cursor:pointer;color:var(--light);font-size:1rem;">×</button>
     </div>`).join('');
 }
@@ -1183,7 +1188,7 @@ function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 // Subjects modal add
 function renderSubjectsModal() {
   document.getElementById('subjectsModal').innerHTML = subjects.map((s, i) =>
-    `<span class="tag-item">${s}<button onclick="subjects.splice(${i},1);renderSubjectsModal()">×</button></span>`
+    `<span class="tag-item">${__esc(s)}<button onclick="subjects.splice(${i},1);renderSubjectsModal()">×</button></span>`
   ).join('');
 }
 window.addSubject = function() {

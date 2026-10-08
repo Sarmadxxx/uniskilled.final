@@ -142,6 +142,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const _sb = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
@@ -201,7 +206,7 @@ function render() {
 
   let cells = '';
   for (let i = firstDay - 1; i >= 0; i--) {
-    cells += `<div class="cal-day other-month"><div class="day-num">${daysInPrevMonth - i}</div></div>`;
+    cells += `<div class="cal-day other-month"><div class="day-num">${__esc(daysInPrevMonth - i)}</div></div>`;
   }
   for (let d = 1; d <= daysInMonth; d++) {
     const key = dateKey(viewYear, viewMonth, d);
@@ -218,16 +223,16 @@ function render() {
 
     const tag = hasFullBlock ? '<span class="day-tag full">Blocked</span>' : hasPartialBlock ? '<span class="day-tag partial">Partial</span>' : '';
     const onclick = isPast ? '' : `onclick="selectDay('${key}')"`;
-    cells += `<div class="${cls}" ${onclick}><div class="day-num">${d}</div>${tag}</div>`;
+    cells += `<div class="${__esc(cls)}" ${onclick}><div class="day-num">${__esc(d)}</div>${tag}</div>`;
   }
   const totalCells = firstDay + daysInMonth;
   const trailing = (7 - (totalCells % 7)) % 7;
   for (let d = 1; d <= trailing; d++) {
-    cells += `<div class="cal-day other-month"><div class="day-num">${d}</div></div>`;
+    cells += `<div class="cal-day other-month"><div class="day-num">${__esc(d)}</div></div>`;
   }
 
   document.getElementById('calGrid').innerHTML = `
-    <div class="cal-weekdays">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w => `<div class="cal-weekday">${w}</div>`).join('')}</div>
+    <div class="cal-weekdays">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w => `<div class="cal-weekday">${__esc(w)}</div>`).join('')}</div>
     <div class="cal-days">${cells}</div>
   `;
 }
@@ -300,8 +305,8 @@ function renderBlockedList() {
     const detail = b.all_day ? 'Whole day' : `${b.start_time.slice(0,5)} – ${b.end_time.slice(0,5)}`;
     return `<div class="blocked-item">
       <div>
-        <div class="blocked-item-date">${dateStr}</div>
-        <div class="blocked-item-detail">${detail}${b.reason ? ' · ' + b.reason : ''}</div>
+        <div class="blocked-item-date">${__esc(dateStr)}</div>
+        <div class="blocked-item-detail">${__esc(detail)}${__esc(b.reason ? ' · ' + b.reason : '')}</div>
       </div>
       <button class="blocked-remove" onclick="removeBlock('${b.id}')">Remove</button>
     </div>`;

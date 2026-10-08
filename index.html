@@ -325,6 +325,11 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -350,9 +355,9 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const dashIcon = role === 'tutor' ? '📊' : '📊';
 
   document.getElementById('navEnd').innerHTML =
-    `<a href="${dashUrl}" class="btn-text">📊 Dashboard</a>` +
+    `<a href="${__safeUrl(dashUrl)}" class="btn-text">📊 Dashboard</a>` +
     `<a href="messages.html" class="btn-text">💬 Messages</a>` +
-    `<a href="${profUrl}" class="btn-profile">👤 ${name}</a>` +
+    `<a href="${__safeUrl(profUrl)}" class="btn-profile">👤 ${__esc(name)}</a>` +
     `<a href="#" class="btn-text" style="color:#999;font-size:0.8rem;" onclick="event.preventDefault();handleSignOut()">Sign out</a>`;
   syncMobileNav();
 })();

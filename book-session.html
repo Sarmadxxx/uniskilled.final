@@ -154,6 +154,11 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const SUPABASE_URL='https://orghkbbohnabcietidiv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
 const CURRENCY_SYMBOLS = {
@@ -196,7 +201,7 @@ async function init(){
   const initials=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
   const av=document.getElementById('tutorAv');
   const avatarUrl=tp?.avatar_url||u?.avatar_url;
-  if(avatarUrl)av.innerHTML=`<img src="${avatarUrl}" alt="${name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+  if(avatarUrl)av.innerHTML=`<img src="${__safeUrl(avatarUrl)}" alt="${__esc(name)}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
   else av.textContent=initials;
 
   document.getElementById('tutorName').textContent=name;
@@ -352,7 +357,8 @@ async function submitBooking(){
   await _sb.from('notifications').insert({user_id:tutorId,type:'booking_request',title:'📅 New session request — '+subject,body:studentName+' would like to book a '+subject+' session for '+(currency === 'USD' ? '$' : '€')+offerPrice.toFixed(2)+'. No payment has been taken yet.',link:'tutor-dashboard.html',read:false});
 
   try {
-    if(tutorId) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time,duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
+    const __tok=(await _sb.auth.getSession()).data.session?.access_token;
+    if(tutorId&&__tok) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+__tok},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time,duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);

@@ -237,6 +237,11 @@ tr:last-child td{border-bottom:none;}
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
 const _sb = window.supabase.createClient(
   SUPABASE_URL,
@@ -377,19 +382,19 @@ function renderOverview() {
   const pendingPayouts = allPayments.filter(p => p.status === 'paid' && !p.released_at).length;
 
   document.getElementById('statsGrid').innerHTML = `
-    <div class="stat-card"><div class="stat-num">${totalStudents}</div><div class="stat-lbl">Students</div></div>
-    <div class="stat-card"><div class="stat-num">${totalTutors}</div><div class="stat-lbl">Tutors</div></div>
-    <div class="stat-card"><div class="stat-num">${confirmedSessions}</div><div class="stat-lbl">Sessions Booked</div></div>
-    <div class="stat-card"><div class="stat-num">€${totalRevenue.toFixed(2)}</div><div class="stat-lbl">Platform Revenue</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:${openDisputes > 0 ? 'var(--red)' : 'var(--ink)'};">${openDisputes}</div><div class="stat-lbl">Open Disputes</div></div>
-    <div class="stat-card"><div class="stat-num">${pendingPayouts}</div><div class="stat-lbl">Pending Payouts</div></div>
+    <div class="stat-card"><div class="stat-num">${__esc(totalStudents)}</div><div class="stat-lbl">Students</div></div>
+    <div class="stat-card"><div class="stat-num">${__esc(totalTutors)}</div><div class="stat-lbl">Tutors</div></div>
+    <div class="stat-card"><div class="stat-num">${__esc(confirmedSessions)}</div><div class="stat-lbl">Sessions Booked</div></div>
+    <div class="stat-card"><div class="stat-num">€${__esc(totalRevenue.toFixed(2))}</div><div class="stat-lbl">Platform Revenue</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:${openDisputes > 0 ? 'var(--red)' : 'var(--ink)'};">${__esc(openDisputes)}</div><div class="stat-lbl">Open Disputes</div></div>
+    <div class="stat-card"><div class="stat-num">${__esc(pendingPayouts)}</div><div class="stat-lbl">Pending Payouts</div></div>
   `;
 
   const recent = [...allPayments].slice(0, 8).map(p => {
     const s = allSessions.find(s => s.id === p.session_id);
     return `<div style="display:flex;justify-content:space-between;padding:0.6rem 0;border-bottom:1px solid var(--off);font-size:0.82rem;">
-      <span>${s?.subject || p.type || 'Payment'}</span>
-      <span style="font-weight:700;">${p.currency === 'USD' ? '$' : '€'}${p.amount} <span class="badge ${p.status === 'refunded' ? 'badge-red' : p.status === 'released' ? 'badge-green' : 'badge-gray'}">${p.status}</span></span>
+      <span>${__esc(s?.subject || p.type || 'Payment')}</span>
+      <span style="font-weight:700;">${__esc(p.currency === 'USD' ? '$' : '€')}${__esc(p.amount)} <span class="badge ${__esc(p.status === 'refunded' ? 'badge-red' : p.status === 'released' ? 'badge-green' : 'badge-gray')}">${__esc(p.status)}</span></span>
     </div>`;
   }).join('');
   document.getElementById('recentActivity').innerHTML = recent || '<div class="empty-state">No activity yet.</div>';
@@ -408,7 +413,7 @@ function renderDisputes() {
   const list = document.getElementById('disputesList');
 
   if (filtered.length === 0) {
-    list.innerHTML = `<div class="empty-state">No ${disputeFilter} disputes.</div>`;
+    list.innerHTML = `<div class="empty-state">No ${__esc(disputeFilter)} disputes.</div>`;
     return;
   }
 
@@ -416,21 +421,21 @@ function renderDisputes() {
     const s = d.sessions;
     if (d.status === 'resolved') {
       return `<div class="dispute-card">
-        <div style="display:flex;justify-content:space-between;"><strong>${s?.subject || 'Session'}</strong><span class="badge badge-green">${d.resolution}</span></div>
-        <div style="font-size:0.78rem;color:var(--mid);margin-top:4px;">${s?.student_name || '?'} & ${s?.tutor_name || '?'} · Resolved ${new Date(d.resolved_at).toLocaleDateString()}</div>
-        <div style="font-size:0.8rem;color:var(--mid);font-style:italic;margin-top:6px;">${d.resolution_notes || 'No notes.'}</div>
+        <div style="display:flex;justify-content:space-between;"><strong>${__esc(s?.subject || 'Session')}</strong><span class="badge badge-green">${__esc(d.resolution)}</span></div>
+        <div style="font-size:0.78rem;color:var(--mid);margin-top:4px;">${__esc(s?.student_name || '?')} & ${__esc(s?.tutor_name || '?')} · Resolved ${__esc(new Date(d.resolved_at).toLocaleDateString())}</div>
+        <div style="font-size:0.8rem;color:var(--mid);font-style:italic;margin-top:6px;">${__esc(d.resolution_notes || 'No notes.')}</div>
       </div>`;
     }
     return `<div class="dispute-card">
-      <div style="display:flex;justify-content:space-between;"><strong>${s?.subject || 'Session'}</strong><span class="badge badge-amber">open</span></div>
-      <div style="font-size:0.78rem;color:var(--mid);margin-top:4px;">Between ${s?.student_name || '?'} and ${s?.tutor_name || '?'} · ${new Date(d.created_at).toLocaleDateString()}</div>
-      <div class="dispute-reason">"${d.reason}"</div>
+      <div style="display:flex;justify-content:space-between;"><strong>${__esc(s?.subject || 'Session')}</strong><span class="badge badge-amber">open</span></div>
+      <div style="font-size:0.78rem;color:var(--mid);margin-top:4px;">Between ${__esc(s?.student_name || '?')} and ${__esc(s?.tutor_name || '?')} · ${__esc(new Date(d.created_at).toLocaleDateString())}</div>
+      <div class="dispute-reason">"${__esc(d.reason)}"</div>
       <div class="resolve-row">
         <button class="resolve-btn release" onclick="resolveDispute('${d.id}','released',this)">✅ Release to tutor</button>
         <button class="resolve-btn refund" onclick="resolveDispute('${d.id}','refunded',this)">↩️ Full refund</button>
         <button class="resolve-btn partial" onclick="togglePartial('${d.id}',this)">➗ Partial</button>
-        <input type="number" class="partial-amount-input" id="partial-${d.id}" placeholder="Amount" step="0.5">
-        <input type="text" class="notes-input" id="notes-${d.id}" placeholder="Notes (optional)">
+        <input type="number" class="partial-amount-input" id="partial-${__esc(d.id)}" placeholder="Amount" step="0.5">
+        <input type="text" class="notes-input" id="notes-${__esc(d.id)}" placeholder="Notes (optional)">
       </div>
     </div>`;
   }).join('');
@@ -481,11 +486,11 @@ function renderTransactions() {
     const badgeClass = p.status === 'refunded' || p.status === 'partially_refunded' ? 'badge-red' : p.status === 'released' ? 'badge-green' : 'badge-gray';
     return `<tr>
       <td>${new Date(p.paid_at || p.created_at || Date.now()).toLocaleDateString()}</td>
-      <td>${s?.subject || p.type || '—'}</td>
-      <td>${sym}${p.amount}</td>
-      <td>${sym}${p.platform_fee || 0}</td>
-      <td>${sym}${p.tutor_payout || 0}</td>
-      <td><span class="badge ${badgeClass}">${p.status}</span></td>
+      <td>${__esc(s?.subject || p.type || '—')}</td>
+      <td>${__esc(sym)}${__esc(p.amount)}</td>
+      <td>${__esc(sym)}${__esc(p.platform_fee || 0)}</td>
+      <td>${__esc(sym)}${__esc(p.tutor_payout || 0)}</td>
+      <td><span class="badge ${__esc(badgeClass)}">${__esc(p.status)}</span></td>
     </tr>`;
   }).join('');
 
@@ -509,12 +514,12 @@ function renderSessions() {
   const rows = filtered.slice(0, 100).map(s => {
     const badgeMap = { confirmed: 'badge-green', completed: 'badge-gray', cancelled: 'badge-red', payment_expired: 'badge-red', awaiting_payment: 'badge-amber', pending: 'badge-amber' };
     return `<tr>
-      <td>${s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString() : '—'}</td>
-      <td>${s.subject || '—'}</td>
-      <td>${s.student_name || '—'}</td>
-      <td>${s.tutor_name || '—'}</td>
-      <td>${s.currency === 'USD' ? '$' : '€'}${s.price || 0}</td>
-      <td><span class="badge ${badgeMap[s.status] || 'badge-gray'}">${s.status}</span></td>
+      <td>${__esc(s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString() : '—')}</td>
+      <td>${__esc(s.subject || '—')}</td>
+      <td>${__esc(s.student_name || '—')}</td>
+      <td>${__esc(s.tutor_name || '—')}</td>
+      <td>${__esc(s.currency === 'USD' ? '$' : '€')}${__esc(s.price || 0)}</td>
+      <td><span class="badge ${__esc(badgeMap[s.status] || 'badge-gray')}">${__esc(s.status)}</span></td>
     </tr>`;
   }).join('');
 
@@ -533,12 +538,12 @@ function renderGroupSessions() {
     const confirmed = (gs.group_session_participants || []).filter(p => p.status === 'confirmed').length;
     const badgeMap = { open: 'badge-amber', completed: 'badge-gray', cancelled: 'badge-red' };
     return `<tr>
-      <td>${new Date(gs.scheduled_date).toLocaleDateString()}</td>
-      <td>${gs.subject}</td>
-      <td>${gs.tutor_name || '—'}</td>
-      <td>${confirmed}/${gs.max_students}</td>
-      <td>${gs.currency === 'USD' ? '$' : '€'}${gs.price_per_student}</td>
-      <td><span class="badge ${badgeMap[gs.status] || 'badge-gray'}">${gs.status}</span></td>
+      <td>${__esc(new Date(gs.scheduled_date).toLocaleDateString())}</td>
+      <td>${__esc(gs.subject)}</td>
+      <td>${__esc(gs.tutor_name || '—')}</td>
+      <td>${__esc(confirmed)}/${__esc(gs.max_students)}</td>
+      <td>${__esc(gs.currency === 'USD' ? '$' : '€')}${__esc(gs.price_per_student)}</td>
+      <td><span class="badge ${__esc(badgeMap[gs.status] || 'badge-gray')}">${__esc(gs.status)}</span></td>
     </tr>`;
   }).join('');
   document.getElementById('groupSessionsTable').innerHTML = `<table><thead><tr><th>Date</th><th>Subject</th><th>Tutor</th><th>Joined</th><th>Price</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table>`;
@@ -565,10 +570,10 @@ function renderUsers() {
   const rows = filtered.slice(0, 150).map(u => {
     const roleLabel = (u.roles || []).join(', ') || u.role || '—';
     return `<tr>
-      <td>${u.full_name || '—'}</td>
-      <td>${u.email || '—'}</td>
-      <td>${roleLabel}</td>
-      <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+      <td>${__esc(u.full_name || '—')}</td>
+      <td>${__esc(u.email || '—')}</td>
+      <td>${__esc(roleLabel)}</td>
+      <td>${__esc(u.created_at ? new Date(u.created_at).toLocaleDateString() : '—')}</td>
       <td>${u.suspended_at ? '<span class="badge badge-red">suspended</span>' : '<span class="badge badge-green">active</span>'}</td>
       <td>${u.suspended_at
         ? `<button class="unsuspend-btn" onclick="unsuspendUser('${u.id}')">Unsuspend</button>`
@@ -607,10 +612,10 @@ async function loadNotifications() {
   document.getElementById('notifPanelBody').innerHTML = notifs.length === 0
     ? '<div class="empty-state">No notifications yet.</div>'
     : notifs.map(n => `
-      <div class="notif-row ${n.read ? '' : 'unread'}" onclick="markNotifRead('${n.id}')">
-        <div class="notif-row-title">${n.title || 'Notification'}</div>
-        <div class="notif-row-body">${n.body || ''}</div>
-        <div class="notif-row-time">${new Date(n.created_at).toLocaleString()}</div>
+      <div class="notif-row ${__esc(n.read ? '' : 'unread')}" onclick="markNotifRead('${n.id}')">
+        <div class="notif-row-title">${__esc(n.title || 'Notification')}</div>
+        <div class="notif-row-body">${__esc(n.body || '')}</div>
+        <div class="notif-row-time">${__esc(new Date(n.created_at).toLocaleString())}</div>
       </div>`).join('');
 }
 

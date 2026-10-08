@@ -271,6 +271,11 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -309,20 +314,20 @@ function setStep(step) {
 
 function renderSubjects() {
   document.getElementById('subjectsList').innerHTML = subjects.map((s, i) =>
-    `<span class="tag">${s}<button onclick="removeSubject(${i})">×</button></span>`).join('');
+    `<span class="tag">${__esc(s)}<button onclick="removeSubject(${i})">×</button></span>`).join('');
 }
 window.removeSubject = function(i) { subjects.splice(i, 1); renderSubjects(); };
 
 function renderCerts() {
   document.getElementById('certList').innerHTML = certificates.map((c, i) =>
-    `<div class="cert-item"><span class="cert-icon">🏅</span><div class="cert-info"><div class="cert-name">${c.subject}</div><div class="cert-grade">Grade: ${c.grade}${c.fileName ? ' · 📎 ' + c.fileName : ''}</div></div><button class="cert-remove" onclick="removeCert(${i})">×</button></div>`
+    `<div class="cert-item"><span class="cert-icon">🏅</span><div class="cert-info"><div class="cert-name">${__esc(c.subject)}</div><div class="cert-grade">Grade: ${__esc(c.grade)}${__esc(c.fileName ? ' · 📎 ' + c.fileName : '')}</div></div><button class="cert-remove" onclick="removeCert(${i})">×</button></div>`
   ).join('');
 }
 window.removeCert = function(i) { certificates.splice(i, 1); renderCerts(); };
 
 function renderCourses() {
   document.getElementById('courseList').innerHTML = courses.map((c, i) =>
-    `<div class="cert-item"><span class="cert-icon">🎯</span><div class="cert-info"><div class="cert-name">${c.course_code}</div><div class="cert-grade">${c.course_name || 'No details added'}</div></div><button class="cert-remove" onclick="removeCourse(${i})">×</button></div>`
+    `<div class="cert-item"><span class="cert-icon">🎯</span><div class="cert-info"><div class="cert-name">${__esc(c.course_code)}</div><div class="cert-grade">${__esc(c.course_name || 'No details added')}</div></div><button class="cert-remove" onclick="removeCourse(${i})">×</button></div>`
   ).join('');
 }
 window.removeCourse = function(i) { courses.splice(i, 1); renderCourses(); };
@@ -512,7 +517,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const { data, error } = await _sb.auth.signUp({
       email, password,
       options: {
-        data: { full_name: fullName, role: selectedRole },
+        // The database creates the user + profile rows from this data at signup (server-side),
+        // so the browser never needs write access before the email is confirmed.
+        data: {
+          full_name: fullName, role: selectedRole,
+          profile: {
+            gender: gender || null, country: country || null, language: language || null,
+            university: university || null, degree: degree || null,
+            year_of_study: yearOfStudy || null,
+            subjects: subjects, availability: availability, preferred_times: preferredTimes,
+            hourly_rate: hourlyRate || null, currency: hourlyCurrency || 'EUR',
+            teaching_format: teachingFormat || null, bio: bio || null,
+            certificates: selectedRole === 'tutor' ? certificates.map(c => ({ subject: c.subject, grade: c.grade, fileName: c.fileName })) : [],
+            courses: selectedRole === 'tutor' ? courses.map(c => ({ course_code: c.course_code, course_name: c.course_name })) : []
+          }
+        },
         emailRedirectTo: 'https://uniskilled.com/signin.html'
       }
     });
@@ -522,82 +541,43 @@ document.addEventListener('DOMContentLoaded', function() {
       setLoading(false); return;
     }
 
-    if (data.user) {
-      await _sb.from('users').upsert({
-        id: data.user.id, email, full_name: fullName,
-        roles: [selectedRole],
-        role: selectedRole,
-        university_email: email,
-        gender: gender || null, country: country || null, language: language || null
-      });
-
-      if (selectedRole === 'student') {
-        await _sb.from('student_profiles').upsert({
-          user_id: data.user.id, university, degree, major: degree,
-          year_of_study: yearOfStudy ? (parseInt(yearOfStudy) || yearOfStudy) : null,
-          gender: gender || null, country: country || null, language: language || null,
-          subjects: subjects.length > 0 ? subjects : null,
-          availability: availability.length > 0 ? availability : null,
-          preferred_time: preferredTimes[0] || null
-        });
-      } else if (selectedRole === 'tutor') {
-        let certUploadFailures = 0;
-        // Upload certificate files via a server-side function — the browser has
-        // no active session yet at this point (email confirmation is pending),
-        // so a direct client-side storage upload would silently fail every time.
-        const certsToSave = [];
+    if (data.user && selectedRole === 'tutor' && certificates.some(c => c.file)) {
+      // Profile rows were created server-side at signup. Certificate FILES need a logged-in
+      // session to upload; with email confirmation on there isn't one yet, so they're added later.
+      let certUploadFailures = 0;
+      if (data.session?.access_token) {
+        const saved = [];
         for (const cert of certificates) {
           let fileUrl = null;
           if (cert.file) {
             const fd = new FormData();
-            fd.append('user_id', data.user.id);
             fd.append('file', cert.file);
             fd.append('subject_label', cert.subject || 'certificate');
             try {
               const uploadRes = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/upload-certificate', {
-                method: 'POST', headers: (data.session?.access_token ? { 'Authorization': 'Bearer ' + data.session.access_token } : {}), body: fd,
+                method: 'POST', headers: { 'Authorization': 'Bearer ' + data.session.access_token }, body: fd,
               });
               const uploadResult = await uploadRes.json();
-              if (uploadRes.ok && uploadResult.fileUrl) {
-                fileUrl = uploadResult.fileUrl;
-              } else {
-                console.error('Certificate upload failed:', uploadResult.error);
-              }
-            } catch (e) {
-              console.error('Certificate upload request failed:', e);
-            }
+              if (uploadRes.ok && uploadResult.fileUrl) fileUrl = uploadResult.fileUrl;
+              else console.error('Certificate upload failed:', uploadResult.error);
+            } catch (e) { console.error('Certificate upload request failed:', e); }
+            if (!fileUrl) certUploadFailures++;
           }
-          certsToSave.push({ subject: cert.subject, grade: cert.grade, fileUrl: fileUrl, fileName: cert.fileName });
-          if (cert.file && !fileUrl) certUploadFailures++;
+          saved.push({ subject: cert.subject, grade: cert.grade, fileUrl: fileUrl, fileName: cert.fileName });
         }
+        await _sb.from('tutor_profiles').update({ certificates: saved }).eq('user_id', data.user.id);
+      } else {
+        certUploadFailures = certificates.filter(c => c.file).length;
+      }
 
-        await _sb.from('tutor_profiles').upsert({
-          user_id: data.user.id, location: university,
-          gender: gender || null, country: country || null, language: language || null,
-          subjects: subjects.length > 0 ? subjects : null,
-          hourly_rate: hourlyRate ? parseFloat(hourlyRate) : null,
-          currency: hourlyCurrency || 'EUR',
-          teaching_format: teachingFormat || null,
-          bio: bio || null,
-          certificates: certsToSave.length > 0 ? certsToSave : null,
-          availability: availability.length > 0 ? availability : null,
-          preferred_time: preferredTimes[0] || null,
-          preferred_times: preferredTimes.length > 0 ? preferredTimes : null
-        });
-
-        if (courses.length > 0) {
-          await _sb.from('tutor_courses').insert(
-            courses.map(c => ({ tutor_id: data.user.id, course_code: c.course_code, course_name: c.course_name }))
-          );
-        }
-
-        if (certUploadFailures > 0) {
-          const warn = document.getElementById('certWarning');
-          warn.textContent = certUploadFailures === 1
-            ? '⚠️ One certificate file couldn\'t be uploaded. You can add it again later from your profile.'
-            : `⚠️ ${certUploadFailures} certificate files couldn't be uploaded. You can add them again later from your profile.`;
-          warn.style.display = 'block';
-        }
+      if (certUploadFailures > 0) {
+        const warn = document.getElementById('certWarning');
+        warn.textContent = data.session?.access_token
+          ? (certUploadFailures === 1
+              ? '⚠️ One certificate file couldn\'t be uploaded. You can add it again later from your profile.'
+              : `⚠️ ${certUploadFailures} certificate files couldn't be uploaded. You can add them again later from your profile.`)
+          : '📎 Your certificate details are saved. Please upload the files from your profile after confirming your email.';
+        warn.style.display = 'block';
       }
     }
 

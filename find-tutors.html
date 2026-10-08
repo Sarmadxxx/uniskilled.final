@@ -182,6 +182,11 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 
 const CURRENCY_SYMBOLS = {
   GBP:'£', EUR:'€', USD:'$', TRY:'₺', AED:'AED', SAR:'SAR',
@@ -267,20 +272,20 @@ function renderTutors(tutors) {
     const stars = t.avgRating ? '★'.repeat(Math.round(t.avgRating))+'☆'.repeat(5-Math.round(t.avgRating)) : '';
     return `<div class="tutor-card" onclick="window.location.href='tutor-profile.html?id=${t.user_id}'">
       <div class="card-top">
-        <div class="tutor-av">${t.avatarUrl?`<img src="${t.avatarUrl}" alt="${t.fullName}">`:initials}</div>
+        <div class="tutor-av">${t.avatarUrl?`<img src="${__safeUrl(t.avatarUrl)}" alt="${__esc(t.fullName)}">`:initials}</div>
         <div>
-          <div class="tutor-name">${t.fullName}</div>
-          <div class="tutor-uni">${t.location||t.country||''}</div>
-          ${t.avgRating?`<div><span class="stars">${stars}</span> <span style="font-size:0.72rem;color:var(--mid);">${t.avgRating} (${t.reviewCount})</span></div>`:''}
+          <div class="tutor-name">${__esc(t.fullName)}</div>
+          <div class="tutor-uni">${__esc(t.location||t.country||'')}</div>
+          ${t.avgRating?`<div><span class="stars">${__esc(stars)}</span> <span style="font-size:0.72rem;color:var(--mid);">${__esc(t.avgRating)} (${__esc(t.reviewCount)})</span></div>`:''}
           <div class="verified">✓ Verified</div>
         </div>
       </div>
-      ${t.bio?`<p style="font-size:0.82rem;color:var(--mid);line-height:1.5;margin-bottom:0.9rem;">${t.bio.slice(0,120)}${t.bio.length>120?'...':''}</p>`:''}
-      ${(t.courses||[]).length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;">${t.courses.slice(0,3).map(c=>`<span style="background:var(--blue-pale);color:var(--blue);font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:100px;">🎯 ${c.course_code}</span>`).join('')}</div>` : ''}
-      <div class="subjects">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${s}</span>`).join('')}</div>
+      ${t.bio?`<p style="font-size:0.82rem;color:var(--mid);line-height:1.5;margin-bottom:0.9rem;">${__esc(t.bio.slice(0,120))}${__esc(t.bio.length>120?'...':'')}</p>`:''}
+      ${(t.courses||[]).length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;">${t.courses.slice(0,3).map(c=>`<span style="background:var(--blue-pale);color:var(--blue);font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:100px;">🎯 ${__esc(c.course_code)}</span>`).join('')}</div>` : ''}
+      <div class="subjects">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>
       <div class="card-footer">
-        <div class="tutor-rate">${rate} <span>per hour</span></div>
-        <button class="book-btn" onclick="event.stopPropagation();window.location.href='book-session.html?tutor=${t.user_id}&name=${encodeURIComponent(t.fullName)}'">Book session</button>
+        <div class="tutor-rate">${__esc(rate)} <span>per hour</span></div>
+        <button class="book-btn" onclick="event.stopPropagation();window.location.href='book-session.html?tutor=${t.user_id}&name=${encodeURIComponent(t.fullName).replace(/'/g,'%27')}'">Book session</button>
       </div>
     </div>`;
   }).join('');

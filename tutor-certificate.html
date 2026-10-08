@@ -107,6 +107,11 @@ body{font-family:'Manrope',sans-serif;background:#eef2f7;color:var(--ink);min-he
 <div class="empty-msg" id="emptyMsg" style="display:none;">This tutor's certificate isn't available yet.</div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const _sb = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
@@ -138,7 +143,7 @@ async function init() {
 
   const avatarUrl = tp?.avatar_url || p?.avatar_url;
   const avEl = document.getElementById('certAvatar');
-  if (avatarUrl) avEl.innerHTML = `<img src="${avatarUrl}" alt="${fullName}">`;
+  if (avatarUrl) avEl.innerHTML = `<img src="${__safeUrl(avatarUrl)}" alt="${__esc(fullName)}">`;
   else avEl.textContent = initials;
 
   // Sessions + subject breakdown
@@ -155,9 +160,9 @@ async function init() {
   document.getElementById('certSubjects').innerHTML = entries.length > 0
     ? entries.map(([subj, count]) => `
         <div class="subject-row">
-          <span style="font-weight:600;min-width:120px;">${subj}</span>
+          <span style="font-weight:600;min-width:120px;">${__esc(subj)}</span>
           <div class="subject-bar-bg"><div class="subject-bar-fill" style="width:${(count / maxCount * 100).toFixed(0)}%;"></div></div>
-          <span style="color:var(--mid);min-width:70px;text-align:right;">${count} session${count === 1 ? '' : 's'}</span>
+          <span style="color:var(--mid);min-width:70px;text-align:right;">${__esc(count)} session${__esc(count === 1 ? '' : 's')}</span>
         </div>`).join('')
     : '<span style="color:var(--mid);font-size:0.85rem;">No completed sessions yet.</span>';
 

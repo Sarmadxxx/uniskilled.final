@@ -663,6 +663,11 @@ td{padding:.72rem 1rem;color:var(--ink2);vertical-align:middle}
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 // ── NAVIGATION ──
 var pages={overview:'Dashboard',analytics:'Analytics',students:'Students',tutors:'Tutors',businesses:'Businesses',orders:'Orders',sessions:'Sessions',payments:'Payments',disputes:'Disputes',reports:'Reports',verification:'Verification Queue',credentials:'Credentials',jobs:'Job Posts',settings:'Platform Settings',fees:'Fees & Plans',logs:'Audit Logs'};
 var subs={overview:'Platform overview · UniSkilled Admin',analytics:'Traffic, revenue & growth metrics',students:'Manage all student accounts',tutors:'Manage tutor accounts & verification',businesses:'Manage business accounts & subscriptions',orders:'Active freelance orders',sessions:'Active tutoring sessions',payments:'Escrow, payouts & flagged transactions',disputes:'User disputes requiring admin review',reports:'Reported users and off-platform violations',verification:'Tutor & business verification queue',credentials:'UniSkilled credential issuance & management',jobs:'All job posts on the platform',settings:'Global platform configuration',fees:'Fee structure & subscription plans',logs:'Admin action audit trail'};
@@ -718,37 +723,37 @@ var reportsData=[
 function renderStudents(){
   var tbody=document.getElementById('studentsTbody');if(!tbody)return;
   tbody.innerHTML=students.map(s=>`<tr onclick="openSheet('user','${s.name}')">
-    <td><div class="td-name"><div class="td-av" style="background:linear-gradient(135deg,#${s.color});">${s.init}</div>${s.name}<div style="font-size:.65rem;color:var(--soft);margin-left:.25rem">${s.email}</div></div></td>
-    <td>${s.uni}</td>
-    <td><span class="badge ${s.status==='verified'?'b-green':s.status==='pending'?'b-amber':'b-red'}">${s.status}</span></td>
-    <td style="font-size:.75rem;color:var(--mid)">${s.role}</td>
-    <td style="font-size:.75rem;color:var(--mid)">${s.joined}</td>
-    <td style="font-size:.75rem">${s.activity}</td>
-    <td><button class="da da-warn" onclick="event.stopPropagation();toast('⚠️','Warning sent','Warning email sent to ${s.name}')">Warn</button> <button class="da da-ban ${s.status==='suspended'?'da-resolve':''}" onclick="event.stopPropagation();toast('${s.status==='suspended'?'✅':'🚫'}','${s.status==='suspended'?'Unsuspended':'Suspended'}','${s.name} account updated')">${s.status==='suspended'?'Restore':'Suspend'}</button></td>
+    <td><div class="td-name"><div class="td-av" style="background:linear-gradient(135deg,#${s.color});">${__esc(s.init)}</div>${__esc(s.name)}<div style="font-size:.65rem;color:var(--soft);margin-left:.25rem">${__esc(s.email)}</div></div></td>
+    <td>${__esc(s.uni)}</td>
+    <td><span class="badge ${__esc(s.status==='verified'?'b-green':s.status==='pending'?'b-amber':'b-red')}">${__esc(s.status)}</span></td>
+    <td style="font-size:.75rem;color:var(--mid)">${__esc(s.role)}</td>
+    <td style="font-size:.75rem;color:var(--mid)">${__esc(s.joined)}</td>
+    <td style="font-size:.75rem">${__esc(s.activity)}</td>
+    <td><button class="da da-warn" onclick="event.stopPropagation();toast('⚠️','Warning sent','Warning email sent to ${s.name}')">Warn</button> <button class="da da-ban ${__esc(s.status==='suspended'?'da-resolve':'')}" onclick="event.stopPropagation();toast('${s.status==='suspended'?'✅':'🚫'}','${s.status==='suspended'?'Unsuspended':'Suspended'}','${s.name} account updated')">${__esc(s.status==='suspended'?'Restore':'Suspend')}</button></td>
   </tr>`).join('');
 }
 function renderTutors(){
   var tbody=document.getElementById('tutorsTbody');if(!tbody)return;
   tbody.innerHTML=tutors.map(t=>`<tr onclick="openSheet('user','${t.name}')">
-    <td><div class="td-name"><div class="td-av" style="background:linear-gradient(135deg,#${t.color});">${t.init}</div>${t.name}</div></td>
-    <td style="font-size:.78rem">${t.uni}</td>
-    <td style="font-size:.78rem">${t.subject}</td>
-    <td><span class="badge ${t.status==='verified'?'b-green':'b-amber'}">${t.status}</span></td>
-    <td>${t.rating!=='—'?'★ '+t.rating:'—'}</td>
-    <td>${t.sessions}</td>
-    <td style="font-weight:600;color:var(--green)">${t.earnings}</td>
+    <td><div class="td-name"><div class="td-av" style="background:linear-gradient(135deg,#${t.color});">${__esc(t.init)}</div>${__esc(t.name)}</div></td>
+    <td style="font-size:.78rem">${__esc(t.uni)}</td>
+    <td style="font-size:.78rem">${__esc(t.subject)}</td>
+    <td><span class="badge ${__esc(t.status==='verified'?'b-green':'b-amber')}">${__esc(t.status)}</span></td>
+    <td>${__esc(t.rating!=='—'?'★ '+t.rating:'—')}</td>
+    <td>${__esc(t.sessions)}</td>
+    <td style="font-weight:600;color:var(--green)">${__esc(t.earnings)}</td>
     <td><button class="da da-resolve" onclick="event.stopPropagation();toast('✅','Verified','${t.name} verified!')">Verify</button> <button class="da da-ban" onclick="event.stopPropagation();toast('🚫','Suspended','Account suspended')">Suspend</button></td>
   </tr>`).join('');
 }
 function renderBiz(){
   var tbody=document.getElementById('bizTbody');if(!tbody)return;
   tbody.innerHTML=bizs.map(b=>`<tr onclick="openSheet('biz','${b.name}')">
-    <td><div class="td-name"><div class="td-av" style="background:linear-gradient(135deg,#${b.color});">${b.init}</div>${b.name}</div></td>
-    <td><span class="badge ${b.plan==='Enterprise'?'b-purple':b.plan==='Pro'?'b-blue':b.plan==='Growth'?'b-green':'b-gray'}">${b.plan}</span></td>
-    <td><span class="badge ${b.status==='verified'?'b-green':'b-amber'}">${b.status}</span></td>
-    <td>${b.hires}</td>
-    <td style="font-weight:600">${b.spend}</td>
-    <td style="font-size:.75rem;color:var(--mid)">${b.joined}</td>
+    <td><div class="td-name"><div class="td-av" style="background:linear-gradient(135deg,#${b.color});">${__esc(b.init)}</div>${__esc(b.name)}</div></td>
+    <td><span class="badge ${__esc(b.plan==='Enterprise'?'b-purple':b.plan==='Pro'?'b-blue':b.plan==='Growth'?'b-green':'b-gray')}">${__esc(b.plan)}</span></td>
+    <td><span class="badge ${__esc(b.status==='verified'?'b-green':'b-amber')}">${__esc(b.status)}</span></td>
+    <td>${__esc(b.hires)}</td>
+    <td style="font-weight:600">${__esc(b.spend)}</td>
+    <td style="font-size:.75rem;color:var(--mid)">${__esc(b.joined)}</td>
     <td><button class="da da-warn" onclick="event.stopPropagation();toast('⚠️','Warning','Warning sent to ${b.name}')">Warn</button> <button class="da da-ban" onclick="event.stopPropagation();toast('🚫','Suspended','${b.name} suspended')">Suspend</button></td>
   </tr>`).join('');
 }
@@ -758,12 +763,12 @@ function renderDisputes(){
     <div class="dis">
       <div class="dis-top">
         <div>
-          <div class="dis-title">${d.id} · ${d.title}</div>
-          <div class="dis-meta">${d.amount} · ${d.status}</div>
+          <div class="dis-title">${__esc(d.id)} · ${__esc(d.title)}</div>
+          <div class="dis-meta">${__esc(d.amount)} · ${__esc(d.status)}</div>
         </div>
-        <span class="badge ${d.priority==='high'?'b-red':d.priority==='med'?'b-amber':'b-gray'}">${d.priority} priority</span>
+        <span class="badge ${__esc(d.priority==='high'?'b-red':d.priority==='med'?'b-amber':'b-gray')}">${__esc(d.priority)} priority</span>
       </div>
-      <div style="font-size:.78rem;color:var(--mid);line-height:1.55">${d.desc}</div>
+      <div style="font-size:.78rem;color:var(--mid);line-height:1.55">${__esc(d.desc)}</div>
       <div class="dis-actions">
         <button class="da da-resolve" onclick="toast('✅','Resolved','Dispute ${d.id} marked as resolved')">✓ Resolve</button>
         <button class="da da-refund" onclick="toast('💰','Refund','Initiating refund for ${d.id}')">💰 Refund</button>
@@ -778,8 +783,8 @@ function renderReports(){
     <div class="fr" onclick="toast('🚩','Report','Opening full report...')">
       <div class="fr-ico" style="background:var(--red-l)">🚩</div>
       <div style="flex:1">
-        <div class="fr-title">${r.type} — ${r.against}</div>
-        <div class="fr-meta">Reported by: ${r.from} · ${r.date}<br>${r.desc}</div>
+        <div class="fr-title">${__esc(r.type)} — ${__esc(r.against)}</div>
+        <div class="fr-meta">Reported by: ${__esc(r.from)} · ${__esc(r.date)}<br>${__esc(r.desc)}</div>
       </div>
       <div class="fr-r">
         <button class="da da-warn" onclick="event.stopPropagation();toast('⚠️','Warning','Warning sent to ${r.against}')">Warn</button>
@@ -801,7 +806,7 @@ function filterTable(inp,tblId){
 function openSheet(type,name){
   var s=document.getElementById('sheetContent');
   if(type==='user'){
-    s.innerHTML=`<div class="sh-h"></div><div class="sh-title">👤 ${name||'User'}</div><div class="sh-sub">Admin view · All actions are logged in the audit trail</div>
+    s.innerHTML=`<div class="sh-h"></div><div class="sh-title">👤 ${__esc(name||'User')}</div><div class="sh-sub">Admin view · All actions are logged in the audit trail</div>
       <div style="display:flex;flex-direction:column;gap:.6rem">
         <button class="sbtn sbtn-p" onclick="toast('📧','Email sent','Email sent to user')">📧 Send email</button>
         <button class="sbtn" style="background:var(--amber-l);color:var(--amber);border:1.5px solid rgba(217,119,6,.2)" onclick="toast('⚠️','Warning sent','Formal warning issued')">⚠️ Issue formal warning</button>
@@ -809,7 +814,7 @@ function openSheet(type,name){
         <button class="sbtn sbtn-g" onclick="closeSheet()">Cancel</button>
       </div>`;
   } else if(type==='biz'){
-    s.innerHTML=`<div class="sh-h"></div><div class="sh-title">🏢 ${name||'Business'}</div><div class="sh-sub">Business account management</div>
+    s.innerHTML=`<div class="sh-h"></div><div class="sh-title">🏢 ${__esc(name||'Business')}</div><div class="sh-sub">Business account management</div>
       <div style="display:flex;flex-direction:column;gap:.6rem">
         <button class="sbtn sbtn-p" onclick="toast('✅','Verified','Business account verified')">✅ Verify account</button>
         <button class="sbtn" style="background:var(--amber-l);color:var(--amber);border:1.5px solid rgba(217,119,6,.2)">⚠️ Issue warning</button>
@@ -824,7 +829,7 @@ function openSheet(type,name){
       <button class="sbtn sbtn-p" onclick="closeSheetAndToast('📢','Announcement sent','Message sent to all selected users')">📢 Send announcement</button>
       <button class="sbtn sbtn-g" onclick="closeSheet()">Cancel</button>`;
   } else if(type==='verify'){
-    s.innerHTML=`<div class="sh-h"></div><div class="sh-title">🔐 Verify ${name||'Tutor'}</div><div class="sh-sub">Review submitted documents and approve or reject verification.</div>
+    s.innerHTML=`<div class="sh-h"></div><div class="sh-title">🔐 Verify ${__esc(name||'Tutor')}</div><div class="sh-sub">Review submitted documents and approve or reject verification.</div>
       <div style="background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:.85rem;margin-bottom:1rem;font-size:.82rem;color:var(--mid)">Documents submitted: Student ID ✓ · Transcript ✓ · All appear genuine.</div>
       <button class="sbtn sbtn-p" onclick="closeSheetAndToast('✅','Approved','${name} has been verified as a UniSkilled tutor')">✅ Approve verification</button>
       <button class="sbtn" style="background:var(--amber-l);color:var(--amber);border:1.5px solid rgba(217,119,6,.2)" onclick="closeSheetAndToast('📧','Documents requested','Requesting clearer documents from ${name}')">📧 Request better documents</button>

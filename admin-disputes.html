@@ -58,6 +58,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const _sb = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
@@ -105,7 +110,7 @@ async function loadDisputes() {
     .order('created_at', { ascending: false });
 
   if (!disputes || disputes.length === 0) {
-    list.innerHTML = `<div class="empty-state">No ${currentFilter} disputes.</div>`;
+    list.innerHTML = `<div class="empty-state">No ${__esc(currentFilter)} disputes.</div>`;
     return;
   }
 
@@ -117,35 +122,35 @@ async function loadDisputes() {
       return `<div class="dispute-card">
         <div class="dispute-head">
           <div>
-            <div class="dispute-id">#${d.id.slice(0,8)}</div>
-            <div class="dispute-subject">${s?.subject || 'Session'}</div>
+            <div class="dispute-id">#${__esc(d.id.slice(0,8))}</div>
+            <div class="dispute-subject">${__esc(s?.subject || 'Session')}</div>
           </div>
-          <span class="badge badge-resolved">${d.resolution}</span>
+          <span class="badge badge-resolved">${__esc(d.resolution)}</span>
         </div>
-        <div class="dispute-meta">Between ${s?.student_name || '?'} and ${s?.tutor_name || '?'} · Resolved ${new Date(d.resolved_at).toLocaleDateString()}</div>
-        <div class="resolution-summary">${d.resolution_notes || 'No notes added.'}</div>
+        <div class="dispute-meta">Between ${__esc(s?.student_name || '?')} and ${__esc(s?.tutor_name || '?')} · Resolved ${__esc(new Date(d.resolved_at).toLocaleDateString())}</div>
+        <div class="resolution-summary">${__esc(d.resolution_notes || 'No notes added.')}</div>
       </div>`;
     }
 
     return `<div class="dispute-card">
       <div class="dispute-head">
         <div>
-          <div class="dispute-id">#${d.id.slice(0,8)}</div>
-          <div class="dispute-subject">${s?.subject || 'Session'}</div>
+          <div class="dispute-id">#${__esc(d.id.slice(0,8))}</div>
+          <div class="dispute-subject">${__esc(s?.subject || 'Session')}</div>
         </div>
         <span class="badge badge-open">open</span>
       </div>
       <div class="dispute-meta">
-        Between <strong>${s?.student_name || '?'}</strong> and <strong>${s?.tutor_name || '?'}</strong> ·
-        Reported by ${openedByStudent ? s?.student_name : s?.tutor_name} · ${new Date(d.created_at).toLocaleDateString()}
+        Between <strong>${__esc(s?.student_name || '?')}</strong> and <strong>${__esc(s?.tutor_name || '?')}</strong> ·
+        Reported by ${__esc(openedByStudent ? s?.student_name : s?.tutor_name)} · ${__esc(new Date(d.created_at).toLocaleDateString())}
       </div>
-      <div class="dispute-reason">"${d.reason}"</div>
+      <div class="dispute-reason">"${__esc(d.reason)}"</div>
       <div class="resolve-row">
         <button class="resolve-btn release" onclick="resolve('${d.id}', 'released', this)">✅ Release to tutor</button>
         <button class="resolve-btn refund" onclick="resolve('${d.id}', 'refunded', this)">↩️ Full refund</button>
         <button class="resolve-btn partial" onclick="togglePartial('${d.id}', this)">➗ Partial refund</button>
-        <input type="number" class="partial-amount-input" id="partial-${d.id}" placeholder="Amount" step="0.5">
-        <input type="text" class="notes-input" id="notes-${d.id}" placeholder="Resolution notes (optional)">
+        <input type="number" class="partial-amount-input" id="partial-${__esc(d.id)}" placeholder="Amount" step="0.5">
+        <input type="text" class="notes-input" id="notes-${__esc(d.id)}" placeholder="Resolution notes (optional)">
       </div>
     </div>`;
   }).join('');

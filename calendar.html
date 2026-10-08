@@ -110,6 +110,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const _sb = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
@@ -195,7 +200,7 @@ function render() {
   let cells = '';
   // Leading days from previous month
   for (let i = firstDay - 1; i >= 0; i--) {
-    cells += `<div class="cal-day other-month"><div class="day-num">${daysInPrevMonth - i}</div></div>`;
+    cells += `<div class="cal-day other-month"><div class="day-num">${__esc(daysInPrevMonth - i)}</div></div>`;
   }
   // Days of current month
   for (let d = 1; d <= daysInMonth; d++) {
@@ -203,9 +208,9 @@ function render() {
     const isToday = key === todayStr;
     const daySessions = sessionsByDate[key] || [];
     const dots = daySessions.slice(0, 4).map(s => `<span class="day-dot dot-${badgeInfoFor(s.status).cls}"></span>`).join('');
-    const more = daySessions.length > 4 ? `<div class="day-more">+${daySessions.length - 4}</div>` : '';
-    cells += `<div class="cal-day ${isToday ? 'today' : ''} ${key === selectedDateKey ? 'selected' : ''}" onclick="selectDay('${key}', ${d})">
-      <div class="day-num">${d}</div>
+    const more = daySessions.length > 4 ? `<div class="day-more">+${__esc(daySessions.length - 4)}</div>` : '';
+    cells += `<div class="cal-day ${__esc(isToday ? 'today' : '')} ${__esc(key === selectedDateKey ? 'selected' : '')}" onclick="selectDay('${key}', ${d})">
+      <div class="day-num">${__esc(d)}</div>
       <div class="day-dots">${dots}</div>
       ${more}
     </div>`;
@@ -214,12 +219,12 @@ function render() {
   const totalCells = firstDay + daysInMonth;
   const trailing = (7 - (totalCells % 7)) % 7;
   for (let d = 1; d <= trailing; d++) {
-    cells += `<div class="cal-day other-month"><div class="day-num">${d}</div></div>`;
+    cells += `<div class="cal-day other-month"><div class="day-num">${__esc(d)}</div></div>`;
   }
 
   document.getElementById('calGrid').innerHTML = `
     <div class="cal-weekdays">
-      ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w => `<div class="cal-weekday">${w}</div>`).join('')}
+      ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w => `<div class="cal-weekday">${__esc(w)}</div>`).join('')}
     </div>
     <div class="cal-days">${cells}</div>
   `;
@@ -246,17 +251,17 @@ function selectDay(key, dayNum, skipRerender) {
         const time = s.scheduled_time ? s.scheduled_time.slice(0, 5) : '';
         let action = '';
         if (s.status === 'confirmed') {
-          action = `<a href="${userRole === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html'}" style="font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;">Go to session →</a>`;
+          action = `<a href="${__safeUrl(userRole === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html')}" style="font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;">Go to session →</a>`;
         } else if (s.status === 'awaiting_payment' && userRole === 'student') {
-          action = `<a href="complete-payment.html?session=${s.id}" style="font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;">Pay now →</a>`;
+          action = `<a href="complete-payment.html?session=${__safeUrl(s.id)}" style="font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;">Pay now →</a>`;
         }
         return `<div class="session-item">
-          <div class="session-av">${initials}</div>
+          <div class="session-av">${__esc(initials)}</div>
           <div class="session-details">
-            <div class="session-name">${otherName}</div>
-            <div class="session-meta">${s.subject || ''} ${time ? '· ' + time : ''}</div>
+            <div class="session-name">${__esc(otherName)}</div>
+            <div class="session-meta">${__esc(s.subject || '')} ${__esc(time ? '· ' + time : '')}</div>
           </div>
-          <span class="badge badge-${info.cls}">${info.label}</span>
+          <span class="badge badge-${__esc(info.cls)}">${__esc(info.label)}</span>
           ${action}
         </div>`;
       }).join('');

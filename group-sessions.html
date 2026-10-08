@@ -59,6 +59,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const _sb = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
@@ -113,25 +118,25 @@ async function loadGroupSessions() {
     if (alreadyJoined) {
       btnHtml = alreadyJoined.status === 'confirmed'
         ? `<span class="gs-spots">✓ You're in</span>`
-        : `<a href="complete-payment.html?group_participant=${alreadyJoined.id}" class="join-btn" style="text-decoration:none;display:inline-block;">Complete Payment</a>`;
+        : `<a href="complete-payment.html?group_participant=${__safeUrl(alreadyJoined.id)}" class="join-btn" style="text-decoration:none;display:inline-block;">Complete Payment</a>`;
     } else if (isFull) {
       btnHtml = `<button class="join-btn" disabled>Full</button>`;
     } else {
-      btnHtml = `<button class="join-btn" onclick="joinGroupSession('${gs.id}')">Join · ${gs.currency === 'USD' ? '$' : '€'}${gs.price_per_student}</button>`;
+      btnHtml = `<button class="join-btn" onclick="joinGroupSession('${gs.id}')">Join · ${__esc(gs.currency === 'USD' ? '$' : '€')}${__esc(gs.price_per_student)}</button>`;
     }
 
     return `<div class="gs-card">
       <div class="gs-icon">👥</div>
       <div class="gs-info">
-        <div class="gs-subject">${gs.subject}</div>
-        <div class="gs-tutor">with ${gs.tutor_name || 'Tutor'}</div>
+        <div class="gs-subject">${__esc(gs.subject)}</div>
+        <div class="gs-tutor">with ${__esc(gs.tutor_name || 'Tutor')}</div>
         <div class="gs-meta">
-          <span>📅 ${date} · ${gs.scheduled_time.slice(0,5)}</span>
-          <span>⏱️ ${gs.duration_minutes} min</span>
-          <span>💻 ${gs.format === 'in-person' ? 'In-person' : 'Online'}</span>
+          <span>📅 ${__esc(date)} · ${__esc(gs.scheduled_time.slice(0,5))}</span>
+          <span>⏱️ ${__esc(gs.duration_minutes)} min</span>
+          <span>💻 ${__esc(gs.format === 'in-person' ? 'In-person' : 'Online')}</span>
         </div>
       </div>
-      <span class="gs-spots ${isFull ? 'full' : ''}">${isFull ? 'Full' : spotsLeft + ' spot' + (spotsLeft === 1 ? '' : 's') + ' left'}</span>
+      <span class="gs-spots ${__esc(isFull ? 'full' : '')}">${__esc(isFull ? 'Full' : spotsLeft + ' spot' + (spotsLeft === 1 ? '' : 's') + ' left')}</span>
       ${btnHtml}
     </div>`;
   }).join('');

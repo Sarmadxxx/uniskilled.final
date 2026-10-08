@@ -421,6 +421,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 // Stop the browser from "helpfully" restoring the previous scroll position
 // when navigating between ?tab= variants of this same page (a known iOS
 // Safari behavior that was causing the sidebar to feel like it wasn't
@@ -497,7 +502,7 @@ async function init() {
 
   // Sidebar profile
   const av = document.getElementById('sideAv');
-  if (tp && tp.avatar_url) av.innerHTML = `<img src="${tp.avatar_url}" alt="${fullName}">`;
+  if (tp && tp.avatar_url) av.innerHTML = `<img src="${__safeUrl(tp.avatar_url)}" alt="${__esc(fullName)}">`;
   else av.textContent = initials;
   document.getElementById('sideName').textContent = fullName;
   const subjects = Array.isArray(tp?.subjects) ? tp.subjects : [];
@@ -554,7 +559,7 @@ function openGroupSessionModal(prefillSubject, studentIdsCsv) {
     options.unshift(prefillSubject);
   }
   sel.innerHTML = options.length > 0
-    ? options.map(s => `<option value="${s}">${s}</option>`).join('')
+    ? options.map(s => `<option value="${__esc(s)}">${__esc(s)}</option>`).join('')
     : '<option value="">Add a subject to your profile first</option>';
   if (prefillSubject) sel.value = prefillSubject;
 
@@ -674,8 +679,8 @@ async function loadGroupSessions() {
     return `<div class="session-row">
       <div class="session-av">👥</div>
       <div class="session-info">
-        <div class="session-name">${gs.subject}</div>
-        <div class="session-sub">${date} · ${gs.scheduled_time.slice(0,5)} · ${gs.currency === 'USD' ? '$' : '€'}${gs.price_per_student}/student · ${confirmed.length}/${gs.max_students} joined</div>
+        <div class="session-name">${__esc(gs.subject)}</div>
+        <div class="session-sub">${__esc(date)} · ${__esc(gs.scheduled_time.slice(0,5))} · ${__esc(gs.currency === 'USD' ? '$' : '€')}${__esc(gs.price_per_student)}/student · ${__esc(confirmed.length)}/${__esc(gs.max_students)} joined</div>
       </div>
       ${statusBadge}
     </div>`;
@@ -703,28 +708,28 @@ async function loadRequests() {
         const expectedAtListedRate = tutorRate * ((r.duration_minutes || 60) / 60);
         const isNegotiated = tutorRate > 0 && Math.abs(offeredPrice - expectedAtListedRate) >= 0.5;
         const priceHtml = `<div style="margin-top:0.4rem;">
-          <span style="font-weight:800;font-size:0.95rem;color:var(--ink);">${sym}${offeredPrice.toFixed(2)}</span>
+          <span style="font-weight:800;font-size:0.95rem;color:var(--ink);">${__esc(sym)}${__esc(offeredPrice.toFixed(2))}</span>
           ${isNegotiated
-            ? `<span style="margin-left:0.4rem;font-size:0.7rem;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:100px;">🏷️ Negotiated — your rate: ${sym}${expectedAtListedRate.toFixed(2)}</span>`
+            ? `<span style="margin-left:0.4rem;font-size:0.7rem;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:100px;">🏷️ Negotiated — your rate: ${__esc(sym)}${__esc(expectedAtListedRate.toFixed(2))}</span>`
             : `<span style="margin-left:0.4rem;font-size:0.72rem;color:var(--mid);">at your listed rate</span>`}
         </div>`;
         return `
       <div class="request-row">
         <div class="request-header">
           <div>
-            <div class="request-name">${r.student_name || 'Student'}</div>
-            <div class="request-subject">Subject: <strong>${r.subject || '—'}</strong></div>
+            <div class="request-name">${__esc(r.student_name || 'Student')}</div>
+            <div class="request-subject">Subject: <strong>${__esc(r.subject || '—')}</strong></div>
             ${priceHtml}
           </div>
-          <span style="font-size:0.75rem;color:var(--mid);">${r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : ''} ${r.scheduled_time ? r.scheduled_time.slice(0,5) : ''}</span>
+          <span style="font-size:0.75rem;color:var(--mid);">${__esc(r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : '')} ${__esc(r.scheduled_time ? r.scheduled_time.slice(0,5) : '')}</span>
         </div>
         <div class="request-meta">
-          📋 ${r.duration_minutes || 60} min · ${r.format || 'Online'} 
-          ${r.notes ? ' · "' + r.notes.slice(0, 60) + '"' : ''}
+          📋 ${__esc(r.duration_minutes || 60)} min · ${__esc(r.format || 'Online')} 
+          ${__esc(r.notes ? ' · "' + r.notes.slice(0, 60) + '"' : '')}
         </div>
         <div class="request-actions">
-          <button class="btn-accept" onclick="respond('${r.id}','confirmed','${r.student_id}','${(r.student_name||'').replace(/'/g,"\\'")}','${(r.subject||'').replace(/'/g,"\\'")}')">✓ Accept</button>
-          <button class="btn-decline" onclick="respond('${r.id}','declined','${r.student_id}','${(r.student_name||'').replace(/'/g,"\\'")}','${(r.subject||'').replace(/'/g,"\\'")}')">✗ Decline</button>
+          <button class="btn-accept" onclick="respond('${r.id}','confirmed','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}')">✓ Accept</button>
+          <button class="btn-decline" onclick="respond('${r.id}','declined','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}')">✗ Decline</button>
           <button class="btn-msg" onclick="window.location.href='messages.html?with=${r.student_id}'">💬</button>
         </div>
       </div>`;
@@ -763,9 +768,10 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
       .eq('id', sessionId).single();
     if (studentId && sessionData) {
       const dateStr = sessionData.scheduled_date ? new Date(sessionData.scheduled_date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) : 'TBD';
+      const __tok = (await _sb.auth.getSession()).data.session?.access_token;
       await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (__tok || '') },
         body: JSON.stringify({
           type: newStatus === 'awaiting_payment' ? 'awaiting_payment' : 'booking_declined',
           to_user_id: studentId,
@@ -788,19 +794,19 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
 // ── OPEN SUBJECT REQUESTS (students post; any tutor can offer to teach) ──
 function renderSubjectRequestRow(r) {
   const isMatch = tutorSubjects.some(s => s.toLowerCase() === (r.subject || '').toLowerCase());
-  const safeName = (r.student_name || 'A student').replace(/'/g, "\\'");
-  const safeSubject = (r.subject || '').replace(/'/g, "\\'");
+  const safeName = __jsStr(r.student_name || 'A student');
+  const safeSubject = __jsStr(r.subject || '');
   return `
     <div class="request-row">
       <div class="request-header">
         <div>
-          <div class="request-name">${r.subject}${isMatch ? ' <span style="background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:6px;">Matches your subjects</span>' : ''}</div>
-          <div class="request-subject">Requested by ${r.student_name || 'a student'}${r.level ? ' · ' + r.level : ''}${r.frequency ? ' · ' + r.frequency : ''}</div>
+          <div class="request-name">${__esc(r.subject)}${isMatch ? ' <span style="background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:6px;">Matches your subjects</span>' : ''}</div>
+          <div class="request-subject">Requested by ${__esc(r.student_name || 'a student')}${__esc(r.level ? ' · ' + r.level : '')}${__esc(r.frequency ? ' · ' + r.frequency : '')}</div>
         </div>
-        <span style="font-size:0.75rem;color:var(--mid);">${new Date(r.created_at).toLocaleDateString()}</span>
+        <span style="font-size:0.75rem;color:var(--mid);">${__esc(new Date(r.created_at).toLocaleDateString())}</span>
       </div>
-      ${r.notes ? `<div class="request-meta">💬 "${r.notes.slice(0, 160)}${r.notes.length > 160 ? '…' : ''}"</div>` : ''}
-      ${r.language ? `<div class="request-meta">🌍 ${r.language}</div>` : ''}
+      ${r.notes ? `<div class="request-meta">💬 "${__esc(r.notes.slice(0, 160))}${__esc(r.notes.length > 160 ? '…' : '')}"</div>` : ''}
+      ${r.language ? `<div class="request-meta">🌍 ${__esc(r.language)}</div>` : ''}
       <div class="request-actions">
         <button class="btn-accept" onclick="acceptSubjectRequest('${r.id}','${r.student_id}','${safeName}','${safeSubject}')">✓ I can offer this</button>
         <button class="btn-msg-wide" onclick="window.location.href='messages.html?with=${r.student_id}'">💬 Message first</button>
@@ -847,12 +853,12 @@ function renderClusteredDemand(reqs) {
   document.getElementById('clusteredDemandList').innerHTML = grouped.map(c => {
     const names = c.requests.map(r => r.student_name || 'A student').join(', ');
     const ids = c.requests.map(r => r.student_id).join(',');
-    const safeSubject = c.subject.replace(/'/g, "\\'");
+    const safeSubject = __jsStr(c.subject || '');
     return `<div style="border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:0.8rem;background:#fffbeb;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.6rem;">
         <div>
-          <div style="font-weight:800;font-size:0.92rem;">${c.subject}</div>
-          <div style="font-size:0.8rem;color:var(--mid);margin-top:2px;">${c.requests.length} students want this · ${names}</div>
+          <div style="font-weight:800;font-size:0.92rem;">${__esc(c.subject)}</div>
+          <div style="font-size:0.8rem;color:var(--mid);margin-top:2px;">${__esc(c.requests.length)} students want this · ${__esc(names)}</div>
         </div>
         <button class="btn-accept" onclick="openGroupSessionModal('${safeSubject}','${ids}')" style="white-space:nowrap;">🚀 Create Group Session</button>
       </div>
@@ -953,12 +959,12 @@ async function loadSessions() {
       const hoursLeft = dueAt ? Math.max(0, Math.round((dueAt.getTime() - Date.now()) / 3600000)) : null;
       const timeLeftText = hoursLeft !== null ? `${hoursLeft}h left to pay before this expires` : 'Waiting on payment';
       return `<div class="session-row">
-        <div class="session-av">${ini}</div>
+        <div class="session-av">${__esc(ini)}</div>
         <div class="session-info">
-          <div class="session-name">${s.student_name || 'Student'}</div>
-          <div class="session-sub">${s.subject || '—'} — you accepted this, now waiting on the student to pay</div>
+          <div class="session-name">${__esc(s.student_name || 'Student')}</div>
+          <div class="session-sub">${__esc(s.subject || '—')} — you accepted this, now waiting on the student to pay</div>
         </div>
-        <span class="badge badge-awaiting-payment" style="white-space:nowrap;">${timeLeftText}</span>
+        <span class="badge badge-awaiting-payment" style="white-space:nowrap;">${__esc(timeLeftText)}</span>
       </div>`;
     }).join('');
   } else {
@@ -978,7 +984,7 @@ async function loadSessions() {
       : s.status === 'payment_expired' ? 'payment expired'
       : s.status;
     const joinBtn = s.status === 'confirmed'
-      ? `<button class="btn-join" onclick="joinSession('${s.id}','${(s.subject||'Session').replace(/'/g,"\'")}','${(s.student_name||'Student').replace(/'/g,"\'")}')">🎥 Join Session</button>`
+      ? `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.student_name||'Student')}')">🎥 Join Session</button>`
       : '';
     const cancelBtn = s.status === 'confirmed'
       ? `<button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>`
@@ -987,12 +993,12 @@ async function loadSessions() {
       ? `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`
       : '';
     return `<div class="session-row">
-      <div class="session-av">${ini}</div>
+      <div class="session-av">${__esc(ini)}</div>
       <div class="session-info">
-        <div class="session-name">${s.student_name || 'Student'}</div>
-        <div class="session-sub">${s.subject || '—'} ${date ? '· ' + date : ''} ${s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) : ''}</div>
+        <div class="session-name">${__esc(s.student_name || 'Student')}</div>
+        <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) : '')}</div>
       </div>
-      <span class="badge ${badgeClass}">${badgeLabel}</span>
+      <span class="badge ${__esc(badgeClass)}">${__esc(badgeLabel)}</span>
       ${joinBtn}${cancelBtn}${reportBtn}
     </div>`;
   };
@@ -1018,11 +1024,11 @@ async function loadReviews() {
     document.getElementById('reviewsList').innerHTML = reviews.map(r => `
       <div class="review-row">
         <div class="review-header">
-          <span class="review-name">${r.student_name || 'Student'}</span>
+          <span class="review-name">${__esc(r.student_name || 'Student')}</span>
           <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
         </div>
-        <div style="font-size:0.7rem;color:var(--light);margin-bottom:0.4rem;">${new Date(r.created_at).toLocaleDateString()}</div>
-        <div class="review-text">${r.comment || ''}</div>
+        <div style="font-size:0.7rem;color:var(--light);margin-bottom:0.4rem;">${__esc(new Date(r.created_at).toLocaleDateString())}</div>
+        <div class="review-text">${__esc(r.comment || '')}</div>
       </div>`).join('');
   }
 }
@@ -1051,12 +1057,12 @@ async function loadNotifications() {
   const typeIcons = { booking_request: '📥', booking_confirmed: '✅', booking_declined: '❌', new_message: '💬', new_review: '⭐' };
 
   document.getElementById('notifsList').innerHTML = notifs.map(n => `
-    <div class="notif-row ${n.read ? '' : 'unread'}" onclick="if('${n.link}')window.location.href='${n.link}'">
-      <div class="notif-ico">${typeIcons[n.type] || '🔔'}</div>
+    <div class="notif-row ${__esc(n.read ? '' : 'unread')}" onclick="if('${__jsStr(n.link||'')}')window.location.href='${__jsStr(n.link||'')}'">
+      <div class="notif-ico">${__esc(typeIcons[n.type] || '🔔')}</div>
       <div class="notif-info">
-        <div class="notif-title">${n.title || ''}</div>
-        <div class="notif-body">${n.body || ''}</div>
-        <div class="notif-time">${new Date(n.created_at).toLocaleString()}</div>
+        <div class="notif-title">${__esc(n.title || '')}</div>
+        <div class="notif-body">${__esc(n.body || '')}</div>
+        <div class="notif-time">${__esc(new Date(n.created_at).toLocaleString())}</div>
       </div>
     </div>`).join('');
 }
@@ -1181,7 +1187,7 @@ async function checkPayoutStatus() {
     const emailForm = document.getElementById('paypalEmailForm');
 
     if (tp?.paypal_email) {
-      statusLine.innerHTML = `✅ PayPal payouts enabled<br><span style="font-weight:500; font-size:0.9em; opacity:0.85;">${tp.paypal_email}</span>`;
+      statusLine.innerHTML = `✅ PayPal payouts enabled<br><span style="font-weight:500; font-size:0.9em; opacity:0.85;">${__esc(tp.paypal_email)}</span>`;
       statusLine.style.background = '#f0fdf4';
       statusLine.style.border = '1.5px solid #86efac';
       statusLine.style.color = '#15803d';
@@ -1331,14 +1337,14 @@ async function loadReferralCard() {
         const roleLabel = r.invitee_role === 'tutor' ? 'tutor' : 'student';
         const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
         const statusBadge = r.status === 'qualified'
-          ? `<span class="badge badge-confirmed">+€${Number(r.referrer_reward_amount || 10).toFixed(2)} earned</span>`
+          ? `<span class="badge badge-confirmed">+€${__esc(Number(r.referrer_reward_amount || 10).toFixed(2))} earned</span>`
           : `<span class="badge badge-pending">pending first session</span>`;
         const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
         return `<div class="session-row">
-          <div class="session-av">${initials}</div>
+          <div class="session-av">${__esc(initials)}</div>
           <div class="session-info">
-            <div class="session-name">${name}</div>
-            <div class="session-sub">Joined as a ${roleLabel} ${dateStr ? '· ' + dateStr : ''}</div>
+            <div class="session-name">${__esc(name)}</div>
+            <div class="session-sub">Joined as a ${__esc(roleLabel)} ${__esc(dateStr ? '· ' + dateStr : '')}</div>
           </div>
           ${statusBadge}
         </div>`;
@@ -1456,7 +1462,7 @@ async function confirmCancel(confirmNoRefund) {
   }
 
   if (data.error) {
-    document.getElementById('cancelModalBody').innerHTML = `<span style="color:#dc2626;">${data.error}</span>`;
+    document.getElementById('cancelModalBody').innerHTML = `<span style="color:#dc2626;">${__esc(data.error)}</span>`;
     document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Close</button>`;
     return;
   }

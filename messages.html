@@ -115,6 +115,11 @@ nav{height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);bor
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const SUPABASE_URL='https://orghkbbohnabcietidiv.supabase.co';
 const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
 const _sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
@@ -181,16 +186,16 @@ async function loadConversations(){
     const initials=(otherName||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
     const time=c.last_message_at?new Date(c.last_message_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
     const unread = unreadMap[c.id]||0;
-    const unreadBadge = unread>0 ? `<div class="unread-dot" title="${unread} unread" style="min-width:18px;height:18px;border-radius:9px;padding:0 4px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;">${unread}</div>` : '';
+    const unreadBadge = unread>0 ? `<div class="unread-dot" title="${__esc(unread)} unread" style="min-width:18px;height:18px;border-radius:9px;padding:0 4px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;">${__esc(unread)}</div>` : '';
     const boldClass = unread>0 ? 'style="font-weight:800;"' : '';
-    return`<div class="conv-item ${unread>0?'unread-conv':''}" id="conv-${c.id}" onclick="openConv('${c.id}','${otherId}','${(otherName||'').replace(/'/g,"\\'")}')">
-      <div class="conv-av">${initials}</div>
+    return`<div class="conv-item ${__esc(unread>0?'unread-conv':'')}" id="conv-${__esc(c.id)}" onclick="openConv('${c.id}','${otherId}','${__jsStr(otherName||'')}')">
+      <div class="conv-av">${__esc(initials)}</div>
       <div class="conv-info">
-        <div class="conv-name" ${boldClass}>${otherName||'Unknown'}</div>
-        <div class="conv-preview" ${boldClass}>${c.last_message||''}</div>
+        <div class="conv-name" ${boldClass}>${__esc(otherName||'Unknown')}</div>
+        <div class="conv-preview" ${boldClass}>${__esc(c.last_message||'')}</div>
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
-        <div class="conv-time">${time}</div>
+        <div class="conv-time">${__esc(time)}</div>
         ${unreadBadge}
       </div>
     </div>`;
@@ -285,7 +290,7 @@ function appendMessage(msg,scroll=true){
   const time=new Date(msg.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const div=document.createElement('div');
   div.className='msg '+(isSent?'sent':'received');
-  div.innerHTML=`${msg.content}<div class="msg-time">${isSent?'':msg.sender_name+' · '}${time}</div>`;
+  div.innerHTML=`${__esc(msg.content)}<div class="msg-time">${__esc(isSent?'':msg.sender_name+' · ')}${__esc(time)}</div>`;
   container.appendChild(div);
   if(scroll)container.scrollTop=container.scrollHeight;
 }

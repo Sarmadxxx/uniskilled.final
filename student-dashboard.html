@@ -311,6 +311,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </div>
 
 <script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+
 const _sb = window.supabase.createClient(
   'https://orghkbbohnabcietidiv.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
@@ -357,7 +362,7 @@ async function init() {
 
   // Sidebar
   const av = document.getElementById('sideAv');
-  if (p && p.avatar_url) av.innerHTML = `<img src="${p.avatar_url}" alt="${fullName}">`;
+  if (p && p.avatar_url) av.innerHTML = `<img src="${__safeUrl(p.avatar_url)}" alt="${__esc(fullName)}">`;
   else av.textContent = initials;
   document.getElementById('sideName').textContent = fullName;
   const subLine = [sp?.university, sp?.year_of_study ? 'Year ' + sp.year_of_study : '', sp?.degree].filter(Boolean).join(' · ');
@@ -374,7 +379,7 @@ async function init() {
   const subjects = Array.isArray(sp?.subjects) ? sp.subjects : [];
   document.getElementById('statSubjects').textContent = subjects.length > 0 ? subjects.length : '—';
   if (subjects.length > 0) {
-    document.getElementById('subjectsBody').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${s}</span>`).join('')}</div>`;
+    document.getElementById('subjectsBody').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>`;
   }
 
   // Sessions
@@ -398,7 +403,7 @@ async function init() {
 
       let actionBtn = '';
       if (s.status === 'confirmed') {
-        actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${(s.subject||'Session').replace(/'/g,"\'")}','${(s.tutor_name||'Tutor').replace(/'/g,"\'")}')">🎥 Join Session</button>
+        actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.tutor_name||'Tutor')}')">🎥 Join Session</button>
         <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>
         <button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`;
       } else if (s.status === 'completed') {
@@ -407,16 +412,16 @@ async function init() {
         const remaining = s.payment_due_at ? Math.max(0, new Date(s.payment_due_at).getTime() - Date.now()) : 0;
         const hoursLeft = Math.floor(remaining / 3600000);
         const minsLeft = Math.floor((remaining % 3600000) / 60000);
-        actionBtn = `<a href="complete-payment.html?session=${s.id}" class="pay-now-btn">💳 Pay now (${hoursLeft}h ${minsLeft}m left)</a>`;
+        actionBtn = `<a href="complete-payment.html?session=${__safeUrl(s.id)}" class="pay-now-btn">💳 Pay now (${__esc(hoursLeft)}h ${__esc(minsLeft)}m left)</a>`;
       }
 
       return `<div class="session-row">
-        <div class="session-av">${initials}</div>
+        <div class="session-av">${__esc(initials)}</div>
         <div class="session-info">
-          <div class="session-name">${s.tutor_name || 'Tutor'}</div>
-          <div class="session-sub">${s.subject || ''} ${date ? '· ' + date : ''} ${time ? '· ' + time : ''}</div>
+          <div class="session-name">${__esc(s.tutor_name || 'Tutor')}</div>
+          <div class="session-sub">${__esc(s.subject || '')} ${__esc(date ? '· ' + date : '')} ${__esc(time ? '· ' + time : '')}</div>
         </div>
-        <span class="badge ${badgeClass}">${badgeLabel}</span>
+        <span class="badge ${__esc(badgeClass)}">${__esc(badgeLabel)}</span>
         ${actionBtn}
       </div>`;
     }).join('');
@@ -489,12 +494,12 @@ async function loadNotifications() {
   };
 
   body.innerHTML = notifs.map(n => `
-    <div class="notif-row ${n.read ? '' : 'unread'}" onclick="openNotif('${n.id}','${(n.link || '').replace(/'/g, "\\'")}')">
+    <div class="notif-row ${__esc(n.read ? '' : 'unread')}" onclick="openNotif('${n.id}','${__jsStr(n.link || '')}')">
       <div class="notif-ico">${iconFor(n.type)}</div>
       <div style="flex:1;">
-        <div class="notif-title">${n.title || 'Notification'}</div>
-        <div class="notif-body">${n.body || ''}</div>
-        <div class="notif-time">${new Date(n.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
+        <div class="notif-title">${__esc(n.title || 'Notification')}</div>
+        <div class="notif-body">${__esc(n.body || '')}</div>
+        <div class="notif-time">${__esc(new Date(n.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }))}</div>
       </div>
     </div>`).join('');
 }
@@ -535,18 +540,18 @@ async function loadMyRequests() {
     const othersCount = (demandCounts[r.subject] || 1) - 1; // exclude the student's own request
     const demandHtml = (r.status === 'open' && othersCount > 0)
       ? `<div style="margin-top:0.5rem;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:0.5rem 0.7rem;font-size:0.78rem;color:#92400e;">
-          👥 ${othersCount} other student${othersCount > 1 ? 's are' : ' is'} also looking for <strong>${r.subject}</strong> help. Group sessions often form once a tutor notices — check <a href="group-sessions.html" style="color:#92400e;text-decoration:underline;">Group Sessions</a> or ask around your class to speed it up.
+          👥 ${__esc(othersCount)} other student${__esc(othersCount > 1 ? 's are' : ' is')} also looking for <strong>${__esc(r.subject)}</strong> help. Group sessions often form once a tutor notices — check <a href="group-sessions.html" style="color:#92400e;text-decoration:underline;">Group Sessions</a> or ask around your class to speed it up.
         </div>`
       : '';
     return `
     <div class="myreq-row">
       <div class="myreq-top">
-        <div class="myreq-subject">${r.subject}</div>
-        <span class="myreq-status ${r.status}">${r.status === 'accepted' ? '✓ Tutor found' : '⏳ Open'}</span>
+        <div class="myreq-subject">${__esc(r.subject)}</div>
+        <span class="myreq-status ${__esc(r.status)}">${__esc(r.status === 'accepted' ? '✓ Tutor found' : '⏳ Open')}</span>
       </div>
       <div class="myreq-meta">
         ${r.status === 'accepted' && r.accepted_tutor_name
-          ? `${r.accepted_tutor_name} can help with this — <a href="messages.html?with=${r.accepted_tutor_id}" style="color:var(--blue);font-weight:600;">message them →</a>`
+          ? `${__esc(r.accepted_tutor_name)} can help with this — <a href="messages.html?with=${__safeUrl(r.accepted_tutor_id)}" style="color:var(--blue);font-weight:600;">message them →</a>`
           : 'Waiting for a tutor to respond'}
       </div>
       ${demandHtml}
@@ -637,7 +642,7 @@ async function confirmCancel(confirmNoRefund) {
   }
 
   if (data.error) {
-    document.getElementById('cancelModalBody').innerHTML = `<span style="color:#dc2626;">${data.error}</span>`;
+    document.getElementById('cancelModalBody').innerHTML = `<span style="color:#dc2626;">${__esc(data.error)}</span>`;
     document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Close</button>`;
     return;
   }
