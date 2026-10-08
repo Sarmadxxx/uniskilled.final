@@ -63,6 +63,14 @@ const _sb = window.supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
 );
 
+// Sends the signed-in user's access token with calls to secured edge functions,
+// so the server can verify who is really asking (instead of trusting an ID in the request body).
+async function authedHeaders() {
+  const { data: { session } } = await _sb.auth.getSession();
+  return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (session?.access_token || '') };
+}
+
+
 let currentUser = null;
 let currentFilter = 'open';
 
@@ -172,7 +180,7 @@ async function resolve(disputeId, resolution, btn) {
   btn.textContent = 'Processing...';
 
   const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/resolve-dispute', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: await authedHeaders(),
     body: JSON.stringify({ dispute_id: disputeId, admin_id: currentUser.id, resolution, resolution_notes: notes, refund_amount: refundAmount }),
   });
   const data = await res.json();

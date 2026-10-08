@@ -431,6 +431,14 @@ const _sb = window.supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
 );
 
+// Sends the signed-in user's access token with calls to secured edge functions,
+// so the server can verify who is really asking (instead of trusting an ID in the request body).
+async function authedHeaders() {
+  const { data: { session } } = await _sb.auth.getSession();
+  return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (session?.access_token || '') };
+}
+
+
 let userId = null;
 let tutorName = 'Tutor';
 let tutorSubjects = [];
@@ -1385,7 +1393,7 @@ async function submitReport() {
   btn.textContent = 'Submitting...';
 
   const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/open-dispute', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: await authedHeaders(),
     body: JSON.stringify({ session_id: reportTargetSessionId, opener_id: userId, reason }),
   });
   const data = await res.json();
@@ -1421,7 +1429,7 @@ function closeCancelModal() {
 
 async function confirmCancel(confirmNoRefund) {
   const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/cancel-session', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    method: 'POST', headers: await authedHeaders(),
     body: JSON.stringify({ session_id: cancelTargetSessionId, requester_id: userId, confirm_no_refund: confirmNoRefund }),
   });
   const data = await res.json();
