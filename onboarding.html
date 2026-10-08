@@ -247,7 +247,7 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
       <p class="subtitle">Set up your login credentials.</p>
       <div class="form-group"><label class="form-label">Email address *</label><input type="email" id="email" class="form-input" placeholder="you@university.ac.uk"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Password *</label><input type="password" id="password" class="form-input" placeholder="Min. 8 characters"><div class="hint">At least 8 characters</div></div>
+        <div class="form-group"><label class="form-label">Password *</label><input type="password" id="password" class="form-input" placeholder="Min. 10 characters"><div class="hint">At least 10 characters, with upper- and lowercase letters, a number and a symbol</div></div>
         <div class="form-group"><label class="form-label">Confirm password *</label><input type="password" id="confirmPassword" class="form-input" placeholder="Repeat password"></div>
       </div>
       <button class="btn-primary" id="submitBtn"><span id="btnText">Create account</span><div class="spinner" id="spinner"></div></button>
@@ -275,6 +275,7 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+function __pwProblem(p){if(p.length<10)return 'Password must be at least 10 characters.';if(!/[a-z]/.test(p)||!/[A-Z]/.test(p))return 'Password needs both lowercase and uppercase letters.';if(!/[0-9]/.test(p))return 'Password needs at least one number.';if(!/[^A-Za-z0-9]/.test(p))return 'Password needs at least one symbol (e.g. ! ? # @).';return null;}
 
 const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
@@ -494,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirmPassword').value;
     if (!email) { showAlert('Please enter your email.', 'error'); return; }
-    if (password.length < 8) { showAlert('Password must be at least 8 characters.', 'error'); return; }
+    { const __pp = __pwProblem(password); if (__pp) { showAlert(__pp, 'error'); return; } }
     if (password !== confirmPassword) { showAlert('Passwords do not match.', 'error'); return; }
 
     setLoading(true);
