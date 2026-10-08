@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
 <title>Legal — UniSkilled</title>
 <meta name="description" content="Terms of service, privacy policy and legal information for UniSkilled.">
 <link rel="canonical" href="https://uniskilled.com/legal.html">
@@ -11,9 +19,10 @@
 <meta property="og:title" content="Legal — UniSkilled">
 <meta property="og:description" content="Terms of service, privacy policy and legal information for UniSkilled.">
 <meta property="og:url" content="https://uniskilled.com/legal.html">
-<meta property="og:image" content="https://uniskilled.com/uniskilled-logo.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -86,12 +95,13 @@ nav{position:sticky;top:0;z-index:100;height:62px;background:rgba(255,255,255,.9
   .impressum-card .lbl{min-width:auto;}
 }
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 
 <nav>
   <a href="index.html" class="logo">
-    <img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;">
+    <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;">
   </a>
   <a href="index.html" class="nav-back">← Back to home</a>
 </nav>
@@ -224,7 +234,7 @@ nav{position:sticky;top:0;z-index:100;height:62px;background:rgba(255,255,255,.9
     <p>The data controller responsible for your personal data is the operator identified in the Impressum above. Contact: <a href="mailto:info@uniskilled.com">info@uniskilled.com</a></p>
 
     <h3>2. Data We Collect</h3>
-    <table class="data-table">
+    <div class="table-scroll"><table class="data-table">
       <thead><tr><th>Category</th><th>Examples</th><th>Legal Basis (GDPR Art. 6)</th></tr></thead>
       <tbody>
         <tr><td>Account data</td><td>Name, email address, password (hashed), role (tutor/student)</td><td>Art. 6(1)(b) — contract performance</td></tr>
@@ -234,7 +244,7 @@ nav{position:sticky;top:0;z-index:100;height:62px;background:rgba(255,255,255,.9
         <tr><td>Technical data</td><td>IP address, browser type, session timestamps</td><td>Art. 6(1)(f) — legitimate interest (security, fraud prevention)</td></tr>
         <tr><td>Reviews &amp; ratings</td><td>Written reviews, star ratings</td><td>Art. 6(1)(b) — contract performance</td></tr>
       </tbody>
-    </table>
+    </table></div>
 
     <h3>3. How We Use Your Data</h3>
     <ul>
@@ -249,7 +259,7 @@ nav{position:sticky;top:0;z-index:100;height:62px;background:rgba(255,255,255,.9
 
     <h3>4. Third-Party Processors</h3>
     <p>We work with the following sub-processors who may process your personal data:</p>
-    <table class="data-table">
+    <div class="table-scroll"><table class="data-table">
       <thead><tr><th>Provider</th><th>Purpose</th><th>Location</th></tr></thead>
       <tbody>
         <tr><td>Supabase (via AWS eu-north-1)</td><td>Database, authentication, file storage</td><td>EU (Stockholm)</td></tr>
@@ -258,7 +268,7 @@ nav{position:sticky;top:0;z-index:100;height:62px;background:rgba(255,255,255,.9
         <tr><td>Zoom / Google Meet</td><td>Video call sessions (link only — not controlled by UniSkilled)</td><td>Global (user's own account)</td></tr>
         <tr><td>Google Fonts</td><td>Font delivery (Manrope typeface)</td><td>Global CDN</td></tr>
       </tbody>
-    </table>
+    </table></div>
     <p>All EU-based processors operate under Data Processing Agreements (DPAs) compliant with GDPR Article 28. For transfers outside the EU/EEA, Standard Contractual Clauses (SCCs) are in place.</p>
 
     <div class="callout callout-amber">
@@ -297,14 +307,14 @@ nav{position:sticky;top:0;z-index:100;height:62px;background:rgba(255,255,255,.9
 
     <p>UniSkilled uses cookies and similar technologies. Under German law and the ePrivacy Directive, non-essential cookies require your prior explicit consent. Our current cookie usage is as follows:</p>
 
-    <table class="data-table">
+    <div class="table-scroll"><table class="data-table">
       <thead><tr><th>Cookie / Technology</th><th>Type</th><th>Purpose</th><th>Duration</th><th>Consent required?</th></tr></thead>
       <tbody>
         <tr><td>Supabase auth token</td><td>Essential</td><td>Keeps you logged in — required for the platform to function</td><td>Session / 7 days (if "Keep me signed in")</td><td>No — strictly necessary</td></tr>
         <tr><td>localStorage (session data)</td><td>Essential</td><td>Stores authentication state in the browser</td><td>Session</td><td>No — strictly necessary</td></tr>
         <tr><td>Google Fonts</td><td>Functional</td><td>Loads the Manrope typeface from Google's CDN</td><td>1 year</td><td>Yes — transfers IP to Google</td></tr>
       </tbody>
-    </table>
+    </table></div>
 
     <div class="callout callout-green">
       <strong>Good news</strong>

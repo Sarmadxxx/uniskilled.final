@@ -1,0 +1,40 @@
+/* UniSkilled — shared baseline (loaded last in <head> on every page).
+   Only behaviour / accessibility rules live here; page look stays in each page's own <style>. */
+
+/* Keyboard focus: visible ring for keyboard users only, never for mouse clicks */
+:focus-visible { outline: 2px solid #1a6bff; outline-offset: 2px; }
+a:focus-visible, button:focus-visible, [role="button"]:focus-visible { border-radius: 6px; }
+
+/* Anchor jumps land below the fixed/sticky navbar instead of underneath it */
+html { scroll-padding-top: 84px; }
+
+/* Skip link — first Tab stop on public pages */
+.skip-link {
+  position: absolute; left: 12px; top: -48px; z-index: 10000;
+  background: #111827; color: #fff; padding: 10px 16px; border-radius: 8px;
+  font: 600 14px/1 'Manrope', system-ui, sans-serif; text-decoration: none;
+  transition: top .15s ease;
+}
+.skip-link:focus { top: 12px; }
+
+/* Wide tables scroll inside their own box on phones instead of stretching the page */
+.table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-scroll > table { min-width: 520px; }
+
+/* Users who ask their OS for less motion get none of the decorative animation */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0s !important;
+  }
+}
+
+/* iOS: stop text auto-zoom in landscape, and keep tap highlight on-brand */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+a, button { -webkit-tap-highlight-color: rgba(26, 107, 255, .12); }
+
+/* Body scroll lock while a mobile menu is open */
+body.nav-open { overflow: hidden; }

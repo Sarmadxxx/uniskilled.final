@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
 <title>Get Started — UniSkilled</title>
 <meta name="description" content="Create your free UniSkilled account as a student or tutor.">
 <link rel="canonical" href="https://uniskilled.com/onboarding.html">
@@ -11,8 +19,8 @@
 <meta property="og:title" content="Get Started — UniSkilled">
 <meta property="og:description" content="Create your free UniSkilled account as a student or tutor.">
 <meta property="og:url" content="https://uniskilled.com/onboarding.html">
-<meta property="og:image" content="https://uniskilled.com/uniskilled-logo.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -102,11 +110,12 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
   .cert-add-row{grid-template-columns:1fr 1fr;}.cert-add-row .tag-btn{grid-column:span 2;}
 }
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 <div class="container">
   <a class="logo" href="index.html">
-    <img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;">
+    <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;">
   </a>
   <div class="steps" id="stepsBar">
     <div class="step active" id="s1"><div class="step-num" id="sn1">1</div><span>Role</span></div>
@@ -128,7 +137,7 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
       <h2>How will you use UniSkilled?</h2>
       <p class="subtitle">Choose your role. You can add more later.</p>
       <div class="role-cards">
-        <div class="role-card" data-role="student"><span class="role-icon">🎓</span><div class="role-name">Student</div><div class="role-desc">Earn through freelance and tutoring</div></div>
+        <div class="role-card" data-role="student"><span class="role-icon">🎓</span><div class="role-name">Student</div><div class="role-desc">Find a tutor for your courses</div></div>
         <div class="role-card" data-role="tutor"><span class="role-icon">📚</span><div class="role-name">Tutor</div><div class="role-desc">Teach students in your subject</div></div>
         <div class="role-card" data-role="business" style="opacity:0.65;"><span class="cs-badge">Soon</span><span class="role-icon">🏢</span><div class="role-name">Business</div><div class="role-desc">Hire verified student talent</div></div>
       </div>
@@ -245,7 +254,7 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
     <div class="screen" id="screen4">
       <h2>Create your account</h2>
       <p class="subtitle">Set up your login credentials.</p>
-      <div class="form-group"><label class="form-label">Email address *</label><input type="email" id="email" class="form-input" placeholder="you@university.ac.uk"></div>
+      <div class="form-group"><label class="form-label" for="email">Email address *</label><input type="email" id="email" class="form-input" autocomplete="email" placeholder="you@university.ac.uk"></div>
       <div class="form-row">
         <div class="form-group"><label class="form-label">Password *</label><input type="password" id="password" class="form-input" placeholder="Min. 10 characters"><div class="hint">At least 10 characters, with upper- and lowercase letters, a number and a symbol</div></div>
         <div class="form-group"><label class="form-label">Confirm password *</label><input type="password" id="confirmPassword" class="form-input" placeholder="Repeat password"></div>
@@ -375,6 +384,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Pre-select role from URL param (e.g. onboarding.html?role=tutor)
   const urlRole = new URLSearchParams(window.location.search).get('role');
+  const urlEmail = new URLSearchParams(window.location.search).get('email');
+  if (urlEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(urlEmail)) document.getElementById('email').value = urlEmail;
   if (urlRole === 'tutor' || urlRole === 'student') {
     const targetCard = document.querySelector('.role-card[data-role="' + urlRole + '"]');
     if (targetCard) targetCard.click();

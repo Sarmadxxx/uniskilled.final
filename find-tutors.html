@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
 <title>Find a Tutor — UniSkilled</title>
 <meta name="description" content="Browse university-verified peer tutors by subject, price and format, and book a session in minutes.">
 <link rel="canonical" href="https://uniskilled.com/find-tutors.html">
@@ -11,8 +19,8 @@
 <meta property="og:title" content="Find a Tutor — UniSkilled">
 <meta property="og:description" content="Browse university-verified peer tutors by subject, price and format, and book a session in minutes.">
 <meta property="og:url" content="https://uniskilled.com/find-tutors.html">
-<meta property="og:image" content="https://uniskilled.com/uniskilled-logo.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
@@ -28,6 +36,13 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 .nav-cta{font-size:0.83rem;font-weight:700;background:var(--blue);color:#fff;text-decoration:none;padding:0.4rem 1rem;border-radius:8px;}
 .nav-burger{display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;}
 .mobile-nav{display:none;position:fixed;top:60px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:99;padding:1rem;flex-direction:column;gap:0.5rem;}
+body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!important;}
+.tutor-card{position:relative;}
+.tutor-link{color:inherit;text-decoration:none;}
+.tutor-link::after{content:"";position:absolute;inset:0;border-radius:16px;}
+.tutor-link:focus-visible{outline:none;}
+.tutor-card:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,.18);}
+.book-btn{position:relative;z-index:1;white-space:nowrap;flex-shrink:0;}
 .mobile-nav a{display:block;padding:0.7rem 1rem;font-weight:600;color:var(--ink);text-decoration:none;border-radius:8px;background:var(--off);}
 .hero-search{background:linear-gradient(135deg,#0b1f4a,#1a6bff);padding:3rem 5%;text-align:center;}
 .hero-search h1{font-size:2rem;font-weight:800;color:#fff;margin-bottom:0.5rem;}
@@ -77,29 +92,39 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 .loading-text{text-align:center;padding:3rem;color:var(--mid);grid-column:1/-1;}
 @media(max-width:768px){.nav-links{display:none;}.nav-burger{display:block;}.search-bar{flex-direction:column;}.grid{grid-template-columns:1fr;}}
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
+<script>try{if(localStorage.getItem("sb-orghkbbohnabcietidiv-auth-token"))document.body.classList.add("signed-in")}catch(e){}</script>
+<a class="skip-link" href="#main">Skip to results</a>
 <nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;"></a>
+  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;"></a>
   <div class="nav-links">
     <a href="index.html" class="nav-link">🏠 Home</a>
-    <a href="student-dashboard.html" class="nav-link">📊 Dashboard</a>
-    <a href="messages.html" class="nav-link">💬 Messages</a>
-    <a href="student-profile.html" class="nav-cta" id="navCta">My Profile</a>
+    <a href="group-sessions.html" class="nav-link guest-only">Group sessions</a>
+    <a href="student-dashboard.html" class="nav-link auth-only" data-dash>📊 Dashboard</a>
+    <a href="messages.html" class="nav-link auth-only">💬 Messages</a>
+    <a href="signin.html" class="nav-link guest-only">Sign in</a>
+    <a href="onboarding.html" class="nav-cta guest-only">Get started</a>
+    <a href="student-profile.html" class="nav-cta auth-only" id="navCta">My Profile</a>
   </div>
-  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
+  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
 </nav>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html">🏠 Home</a>
-  <a href="student-dashboard.html">📊 Dashboard</a>
-  <a href="messages.html">💬 Messages</a>
+  <a href="group-sessions.html" class="guest-only">Group sessions</a>
+  <a href="student-dashboard.html" class="auth-only" data-dash>📊 Dashboard</a>
+  <a href="messages.html" class="auth-only">💬 Messages</a>
+  <a href="student-profile.html" class="auth-only" id="navCtaMobile">👤 My Profile</a>
+  <a href="signin.html" class="guest-only">Sign in</a>
+  <a href="onboarding.html" class="guest-only" style="background:var(--blue);color:#fff;">Get started →</a>
 </div>
 
 <div class="hero-search">
   <h1>Find your perfect tutor</h1>
   <p>University-verified tutors matched to your subjects</p>
   <div class="search-bar">
-    <input type="text" class="search-input" id="searchInput" placeholder="Search by subject, course code, professor, name...">
+    <input type="search" class="search-input" id="searchInput" aria-label="Search tutors" enterkeyhint="search" placeholder="Search by subject, course code, professor, name...">
     <button class="search-btn" onclick="filterTutors()">Search</button>
   </div>
   <div id="postRequestBanner" style="display:none;margin-top:1.1rem;">
@@ -141,12 +166,12 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
   </select>
 </div>
 
-<div class="main">
-  <div class="results-count" id="resultsCount">Loading tutors...</div>
+<main class="main" id="main">
+  <div class="results-count" id="resultsCount" role="status" aria-live="polite">Loading tutors...</div>
   <div class="grid" id="tutorGrid">
     <div class="loading-text">⏳ Loading tutors...</div>
   </div>
-</div>
+</main>
 
 <!-- POST SUBJECT REQUEST MODAL -->
 <div class="req-modal-overlay" id="requestModal" onclick="if(event.target===this)closeRequestModal()">
@@ -252,7 +277,7 @@ async function loadTutors() {
 
   } catch(e) {
     console.error(e);
-    grid.innerHTML = '<div class="empty"><div style="font-size:2rem;margin-bottom:1rem;">⚠️</div><div style="font-weight:700;">Could not load tutors</div><p style="margin-top:0.5rem;">'+e.message+'</p></div>';
+    grid.innerHTML = '<div class="empty"><div style="font-size:2rem;margin-bottom:1rem;">⚠️</div><div style="font-weight:700;">Could not load tutors</div><p style="margin-top:0.5rem;">Please refresh the page or try again in a moment.</p></div>';
     document.getElementById('resultsCount').textContent = '';
   }
 }
@@ -268,13 +293,13 @@ function renderTutors(tutors) {
     const initials = (t.fullName||'T').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
     const subjects = Array.isArray(t.subjects) ? t.subjects : [];
     const sym = currSymbol(t.currency);
-    const rate = t.hourly_rate ? sym+t.hourly_rate+'/hr' : 'Free';
+    const rate = t.hourly_rate ? sym+t.hourly_rate : '';
     const stars = t.avgRating ? '★'.repeat(Math.round(t.avgRating))+'☆'.repeat(5-Math.round(t.avgRating)) : '';
-    return `<div class="tutor-card" onclick="window.location.href='tutor-profile.html?id=${t.user_id}'">
+    return `<article class="tutor-card">
       <div class="card-top">
         <div class="tutor-av">${t.avatarUrl?`<img src="${__safeUrl(t.avatarUrl)}" alt="${__esc(t.fullName)}">`:initials}</div>
         <div>
-          <div class="tutor-name">${__esc(t.fullName)}</div>
+          <h2 class="tutor-name"><a class="tutor-link" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}">${__esc(t.fullName)}</a></h2>
           <div class="tutor-uni">${__esc(t.location||t.country||'')}</div>
           ${t.avgRating?`<div><span class="stars">${__esc(stars)}</span> <span style="font-size:0.72rem;color:var(--mid);">${__esc(t.avgRating)} (${__esc(t.reviewCount)})</span></div>`:''}
           <div class="verified">✓ Verified</div>
@@ -284,15 +309,16 @@ function renderTutors(tutors) {
       ${(t.courses||[]).length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;">${t.courses.slice(0,3).map(c=>`<span style="background:var(--blue-pale);color:var(--blue);font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:100px;">🎯 ${__esc(c.course_code)}</span>`).join('')}</div>` : ''}
       <div class="subjects">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>
       <div class="card-footer">
-        <div class="tutor-rate">${__esc(rate)} <span>per hour</span></div>
-        <button class="book-btn" onclick="event.stopPropagation();window.location.href='book-session.html?tutor=${t.user_id}&name=${encodeURIComponent(t.fullName).replace(/'/g,'%27')}'">Book session</button>
+        <div class="tutor-rate">${rate ? `${__esc(rate)} <span>per hour</span>` : `<span style="font-size:0.8rem;">Rate on request</span>`}</div>
+        <a class="book-btn" href="book-session.html?tutor=${encodeURIComponent(t.user_id)}&name=${encodeURIComponent(t.fullName)}" style="text-decoration:none;" aria-label="Book a session with ${__esc(t.fullName)}">Book session</a>
       </div>
-    </div>`;
+    </article>`;
   }).join('');
 }
 
 function filterTutors() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  try { const u = new URL(location.href); q ? u.searchParams.set('q', q) : u.searchParams.delete('q'); history.replaceState(null, '', u); } catch (e) {}
   const fmt = document.getElementById('filterFormat').value;
   const price = document.getElementById('filterPrice').value;
   const day = document.getElementById('filterDay').value;
@@ -323,7 +349,18 @@ function filterTutors() {
   }));
 }
 
-function toggleNav(btn){const n=document.getElementById('mobileNav');const o=n.style.display==='flex';n.style.display=o?'none':'flex';btn.textContent=o?'☰':'✕';}
+function toggleNav(btn, force){
+  btn = btn || document.querySelector('.nav-burger');
+  const n = document.getElementById('mobileNav');
+  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
+  n.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '✕' : '☰';
+  btn.setAttribute('aria-expanded', open);
+  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+}
+document.getElementById('mobileNav').addEventListener('click', e => { if (e.target.closest('a')) toggleNav(null, false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleNav(null, false); });
+document.addEventListener('click', e => { if (!e.target.closest('#mobileNav,.nav-burger')) toggleNav(null, false); });
 document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')filterTutors();});
 
 let currentUserId = null;
@@ -334,23 +371,23 @@ let currentStudentUni = null;
 async function setNav(){
   try {
     const {data:{session}} = await _sb.auth.getSession();
+    if(!session){ document.body.classList.remove('signed-in'); }
     if(session){
       currentUserId = session.user.id;
       const meta = session.user.user_metadata||{};
       const role = meta.role||'student';
       currentUserRole = role;
       currentUserName = meta.full_name || 'Student';
-      const cta = document.getElementById('navCta');
+      document.body.classList.add('signed-in');
       if(role==='tutor'){
-        cta.href='tutor-profile.html';
-        cta.textContent='My Profile';
-        document.querySelector('a[href="student-dashboard.html"]').href='tutor-dashboard.html';
-        document.querySelector('a[href="student-dashboard.html"]').textContent='📊 Dashboard';
+        document.getElementById('navCta').href='tutor-profile.html';
+        document.getElementById('navCtaMobile').href='tutor-profile.html';
+        document.querySelectorAll('[data-dash]').forEach(a => a.href='tutor-dashboard.html');
       } else {
         // Only students can post subject requests
         document.getElementById('postRequestBanner').style.display = 'block';
         // Load student's university for "Same as mine" filter
-        const {data:sp} = await _sb.from('student_profiles').select('university').eq('user_id', currentUserId).single();
+        const {data:sp} = await _sb.from('student_profiles').select('university').eq('user_id', currentUserId).maybeSingle();
         if(sp?.university) currentStudentUni = sp.university;
       }
     }
@@ -401,7 +438,9 @@ window.submitRequest = async function(){
 };
 
 document.addEventListener('DOMContentLoaded',async ()=>{
-  loadTutors();
+  const q0 = new URLSearchParams(location.search).get('q');
+  if (q0) document.getElementById('searchInput').value = q0;
+  loadTutors().then(() => { if (q0) filterTutors(); });
   await setNav();
   if (window.location.hash === '#request') {
     setTimeout(openRequestModal, 300); // small delay so currentUserId/role are set after setNav resolves

@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
 <title>Sign In — UniSkilled</title>
 <meta name="description" content="Sign in to your UniSkilled account.">
 <link rel="canonical" href="https://uniskilled.com/signin.html">
@@ -11,9 +19,10 @@
 <meta property="og:title" content="Sign In — UniSkilled">
 <meta property="og:description" content="Sign in to your UniSkilled account.">
 <meta property="og:url" content="https://uniskilled.com/signin.html">
-<meta property="og:image" content="https://uniskilled.com/uniskilled-logo.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -61,13 +70,14 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 .signup-link a{color:var(--blue);font-weight:700;text-decoration:none;}
 @media(max-width:768px){body{grid-template-columns:1fr;}.left{display:none;}.right{padding:3rem 2rem;}}
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 
 <!-- LEFT -->
 <div class="left">
   <div class="left-logo" style="background:#fff;border-radius:12px;padding:0.6rem 1rem;display:inline-flex;width:fit-content;">
-    <img src="uniskilled-logo.png" alt="UniSkilled" style="height:36px;width:auto;display:block;">
+    <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="104" height="36" style="height:36px;width:auto;display:block;">
   </div>
   <div class="left-content">
     <h1>Welcome back to <span>UniSkilled</span></h1>

@@ -3,6 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="description" id="metaDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
+<link rel="canonical" id="canonicalLink" href="https://uniskilled.com/find-tutors.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UniSkilled">
+<meta property="og:title" id="ogTitle" content="Tutor Profile — UniSkilled">
+<meta property="og:description" id="ogDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
+<meta property="og:url" id="ogUrl" content="https://uniskilled.com/find-tutors.html">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
 <title>Tutor Profile — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
@@ -152,25 +169,34 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
   .stat-item:nth-child(1),.stat-item:nth-child(2){border-bottom:1px solid var(--border);padding-bottom:0.9rem;}
   .form-row{grid-template-columns:1fr;}
 }
+body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!important;}
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
+<script>try{if(localStorage.getItem("sb-orghkbbohnabcietidiv-auth-token"))document.body.classList.add("signed-in")}catch(e){}</script>
 
 <nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;"></a>
+  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;"></a>
   <div class="nav-links" id="navLinks">
     <a href="index.html" class="nav-link">🏠 Home</a>
-    <a href="#" class="nav-link" id="dashLink">📊 Dashboard</a>
-    <a href="messages.html" class="nav-link">💬 Messages</a>
-    <a href="#" class="nav-cta" id="navCta">Edit Profile</a>
+    <a href="find-tutors.html" class="nav-link guest-only">Find tutors</a>
+    <a href="#" class="nav-link auth-only" id="dashLink">📊 Dashboard</a>
+    <a href="messages.html" class="nav-link auth-only">💬 Messages</a>
+    <a href="signin.html" class="nav-link guest-only">Sign in</a>
+    <a href="onboarding.html" class="nav-cta guest-only">Get started</a>
+    <a href="#" class="nav-cta auth-only" id="navCta">Edit Profile</a>
     <a href="#" class="nav-link" id="navSignOut" style="display:none;font-size:0.8rem;" onclick="event.preventDefault();profileSignOut()">Sign out</a>
   </div>
-  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
+  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
 </nav>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html">🏠 Home</a>
-  <a href="#" id="dashLinkMobile">📊 Dashboard</a>
-  <a href="messages.html">💬 Messages</a>
+  <a href="find-tutors.html" class="guest-only">🔍 Find tutors</a>
+  <a href="#" id="dashLinkMobile" class="auth-only">📊 Dashboard</a>
+  <a href="messages.html" class="auth-only">💬 Messages</a>
+  <a href="signin.html" class="guest-only">Sign in</a>
+  <a href="onboarding.html" class="guest-only">Get started →</a>
   <a href="#" id="mobileSignOut" style="display:none;" onclick="event.preventDefault();profileSignOut()">🚪 Sign out</a>
 </div>
 
@@ -245,7 +271,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="card-body" id="coursesBody">
         <span class="empty">No specific courses added yet.</span>
       </div>
-      <p style="font-size:0.75rem;color:var(--mid);margin-top:0.7rem;">Add exact course codes so students searching for their specific class — not just the general subject — can find you.</p>
+      <p class="owner-only" style="display:none;font-size:0.75rem;color:var(--mid);margin:0 1.4rem 1.2rem;">Add exact course codes so students searching for their specific class — not just the general subject — can find you.</p>
     </div>
 
     <!-- TRACK RECORD -->
@@ -601,6 +627,7 @@ async function init() {
   const { data: { session } } = await _supabase.auth.getSession();
 
   if (session) {
+    document.body.classList.add('signed-in');
     currentUserId = session.user.id;
     const meta = session.user.user_metadata || {};
     const role = meta.role || 'student';
@@ -630,8 +657,9 @@ async function init() {
       if (role === 'student') document.getElementById('reviewFormWrap').style.display = 'block';
     }
   } else {
+    document.body.classList.remove('signed-in');
     tutorId = urlId;
-    if (!tutorId) { window.location.href = 'signin.html'; return; }
+    if (!tutorId) { window.location.href = 'find-tutors.html'; return; }
     document.getElementById('navCta').href = 'signin.html';
     document.getElementById('navCta').textContent = 'Sign in';
     document.getElementById('dashLink').href = 'signin.html';
@@ -666,9 +694,45 @@ async function init() {
   });
 }
 
+function showTutorNotFound() {
+  document.title = 'Tutor not found — UniSkilled';
+  const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex'; document.head.appendChild(m);
+  document.getElementById('profileName').textContent = 'Tutor not found';
+  const t = document.getElementById('profileTitle');
+  if (t) t.innerHTML = 'This profile may have been removed. <a href="find-tutors.html" style="color:var(--blue);font-weight:700;">Browse all tutors →</a>';
+  document.querySelectorAll('.verified-badge').forEach(el => el.style.display = 'none');
+}
+
+// Per-tutor title, description, canonical, social tags and structured data
+function applyTutorSeo(fullName, p, tp, subjects) {
+  const subj = (subjects || []).slice(0, 3);
+  const place = tp?.location || p?.country || '';
+  const title = fullName + (subj.length ? ' — ' + subj.join(', ') + ' Tutor' : ' — Tutor') + ' | UniSkilled';
+  const sym = currSymbol(tp?.currency || 'EUR');
+  const bioBit = (p?.bio || '').replace(/\s+/g, ' ').trim().slice(0, 110);
+  const desc = (bioBit ? bioBit + (bioBit.length >= 110 ? '… ' : ' ') : '') +
+    'University-verified tutor' + (subj.length ? ' for ' + subj.join(', ') : '') + (place ? ' · ' + place : '') +
+    (tp?.hourly_rate ? ' · from ' + sym + tp.hourly_rate + '/hr' : '') + '. Book securely on UniSkilled.';
+  const url = 'https://uniskilled.com/tutor-profile.html?id=' + encodeURIComponent(tutorId);
+  document.title = title;
+  const set = (id, attr, v) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, v); };
+  set('metaDesc', 'content', desc.slice(0, 300)); set('ogDesc', 'content', desc.slice(0, 300));
+  set('ogTitle', 'content', title); set('ogUrl', 'content', url); set('canonicalLink', 'href', url);
+  const ld = { '@context': 'https://schema.org', '@type': 'Person', name: fullName, url: url,
+    jobTitle: 'Tutor', knowsAbout: subj, description: bioBit || undefined,
+    image: (tp?.avatar_url || p?.avatar_url) || undefined,
+    makesOffer: tp?.hourly_rate ? { '@type': 'Offer', priceCurrency: tp.currency || 'EUR',
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: tp.hourly_rate, priceCurrency: tp.currency || 'EUR', unitText: 'HOUR' },
+      itemOffered: { '@type': 'Service', name: (subj[0] || 'Tutoring') + ' tutoring', provider: { '@type': 'Organization', name: 'UniSkilled', url: 'https://uniskilled.com/' } } } : undefined };
+  let tag = document.getElementById('tutorLd');
+  if (!tag) { tag = document.createElement('script'); tag.type = 'application/ld+json'; tag.id = 'tutorLd'; document.head.appendChild(tag); }
+  tag.textContent = JSON.stringify(ld);
+}
+
 async function loadProfile() {
-  const { data: p } = await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).single();
-  const { data: tp } = await _supabase.from('tutor_profiles').select('*').eq('user_id', tutorId).single();
+  const { data: p } = await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).maybeSingle();
+  const { data: tp } = await _supabase.from('tutor_profiles').select('*').eq('user_id', tutorId).maybeSingle();
+  if (!p && !tp) { showTutorNotFound(); return; }
   profileData = p; tutorData = tp;
 
   const fullName = (p && p.full_name) || 'Tutor';
@@ -682,7 +746,7 @@ async function loadProfile() {
   const { data: tc } = await _supabase.from('tutor_courses').select('*').eq('tutor_id', tutorId).order('created_at', { ascending: true });
   courses = tc || [];
 
-  document.title = fullName + ' — UniSkilled';
+  applyTutorSeo(fullName, p, tp, subjects);
 
   // Avatar
   const av = document.getElementById('avatarEl');
@@ -1210,7 +1274,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('languageInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addLanguage(); });
 });
 
-function toggleNav(btn) { const n = document.getElementById('mobileNav'); const o = n.style.display === 'flex'; n.style.display = o ? 'none' : 'flex'; btn.textContent = o ? '☰' : '✕'; }
+function toggleNav(btn, force) {
+  btn = btn || document.querySelector('.nav-burger');
+  const n = document.getElementById('mobileNav');
+  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
+  n.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '✕' : '☰';
+  btn.setAttribute('aria-expanded', open);
+  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+}
+document.getElementById('mobileNav').addEventListener('click', e => { if (e.target.closest('a')) toggleNav(null, false); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleNav(null, false); });
+document.addEventListener('click', e => { if (!e.target.closest('#mobileNav,.nav-burger')) toggleNav(null, false); });
 
 function profileSignOut() {
   _supabase.auth.signOut().then(function() {

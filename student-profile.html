@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="robots" content="noindex, nofollow">
 <title>My Profile — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
@@ -104,10 +110,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
   .profile-actions .btn{width:100%;justify-content:center;}
 }
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 <nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;"></a>
+  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;"></a>
   <div class="nav-links">
     <a href="index.html" class="nav-link">🏠 Home</a>
     <a href="student-dashboard.html" class="nav-link">📊 Dashboard</a>
@@ -115,7 +122,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     <a href="find-tutors.html" class="nav-cta">Find Tutors</a>
     <a href="#" class="nav-link" style="font-size:0.78rem;color:var(--mid);" onclick="event.preventDefault();profileSignOut()">Sign out</a>
   </div>
-  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
+  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
 </nav>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html">🏠 Home</a>
@@ -435,7 +442,20 @@ function openModal(id){
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
-function toggleNav(btn){const n=document.getElementById('mobileNav');const o=n.style.display==='flex';n.style.display=o?'none':'flex';btn.textContent=o?'☰':'✕';}
+function toggleNav(btn, force) {
+  btn = btn || document.querySelector('.nav-burger');
+  const n = document.getElementById('mobileNav'); if (!n || !btn) return;
+  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
+  n.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '✕' : '☰';
+  btn.setAttribute('aria-expanded', open);
+  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+}
+document.addEventListener('click', e => {
+  const n = document.getElementById('mobileNav'); if (!n || n.style.display !== 'flex') return;
+  if (e.target.closest('#mobileNav a') || !e.target.closest('#mobileNav,.nav-burger')) toggleNav(null, false);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleNav(null, false); });
 function profileSignOut(){_sb.auth.signOut().then(()=>window.location.href='index.html');}
 
 document.addEventListener('DOMContentLoaded',()=>{

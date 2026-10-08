@@ -506,7 +506,7 @@
       var data = await res.json();
       if (data.success) {
         localStorage.clear();
-        window.location.href = '/Home.html';
+        window.location.href = '/index.html';
       }
       return data;
     }
@@ -601,7 +601,7 @@
 
 
   // ── DISPUTES ──
-  Disputes: {
+  var Disputes = {
     list: async function() {
       var res = await fetch(FUNCTIONS_URL + '/manage-disputes', { headers: authHeaders() });
       return await res.json();
@@ -620,10 +620,10 @@
       });
       return await res.json();
     }
-  },
+  };
 
   // ── STUDENTS SEARCH (for businesses) ──
-  Students: {
+  var Students = {
     search: async function(skills, minRating, limit) {
       var params = new URLSearchParams({
         action: 'students',
@@ -636,7 +636,7 @@
       });
       return await res.json();
     }
-  },
+  };
 
   // ── EXPOSE GLOBAL API ──
   window.UniSkilled = {
@@ -654,8 +654,8 @@
     Payments: Payments,
     Credentials: Credentials,
     Admin: Admin,
-    Disputes: UniSkilled.Disputes,
-    Students: UniSkilled.Students,
+    Disputes: Disputes,
+    Students: Students,
     SUPABASE_URL: SUPABASE_URL,
     SUPABASE_ANON_KEY: SUPABASE_ANON_KEY
   };

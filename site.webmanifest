@@ -1,0 +1,13 @@
+{
+  "name": "UniSkilled",
+  "short_name": "UniSkilled",
+  "description": "University-verified peer tutoring with payment protection.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1a6bff",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
