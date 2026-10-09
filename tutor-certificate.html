@@ -77,9 +77,9 @@ body{font-family:'Manrope',sans-serif;background:#eef2f7;color:var(--ink);min-he
   <div class="cert-inner">
     <div class="cert-header">
       <img src="uniskilled-logo.png" alt="UniSkilled" class="cert-logo">
-      <div class="cert-eyebrow">Verified Tutor Certificate</div>
+      <div class="cert-eyebrow" id="certEyebrow">Tutor Certificate</div>
       <div class="cert-title">Certificate of Tutoring Achievement</div>
-      <div class="cert-sub">Issued by UniSkilled — University-Verified Tutoring</div>
+      <div class="cert-sub" id="certSubLine">Issued by UniSkilled</div>
     </div>
 
     <div class="cert-person">
@@ -106,7 +106,7 @@ body{font-family:'Manrope',sans-serif;background:#eef2f7;color:var(--ink);min-he
       <div class="cert-verify">
         Verify this certificate at<br><a id="verifyUrl" href="#">uniskilled.com</a>
       </div>
-      <div class="cert-seal">✓ UniSkilled Verified</div>
+      <div class="cert-seal" id="certSeal" style="display:none;">✓ UniSkilled Verified</div>
     </div>
   </div>
 </div>
@@ -135,9 +135,18 @@ async function init() {
   document.getElementById('verifyUrl').textContent = window.location.href.replace('https://', '');
 
   const { data: p } = await _sb.from('public_tutors').select('*').eq('id', tutorId).maybeSingle();
-  const { data: tp } = await _sb.from('tutor_profiles').select('id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url').eq('user_id', tutorId).maybeSingle();
+  const { data: tp } = await _sb.from('tutor_profiles').select('id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url').eq('user_id', tutorId).maybeSingle();
 
   if (!p) { document.getElementById('emptyMsg').style.display = 'block'; return; }
+
+  // "Verified" wording and seal only when the tutor's university email was confirmed
+  if (tp && tp.university_verified_at) {
+    document.getElementById('certEyebrow').textContent = 'Verified Tutor Certificate';
+    document.getElementById('certSubLine').textContent = 'Issued by UniSkilled — University-Verified Tutoring';
+    const seal = document.getElementById('certSeal');
+    seal.style.display = '';
+    seal.textContent = '✓ University verified' + (tp.verified_university ? ' · ' + tp.verified_university : '');
+  }
 
   const fullName = p.full_name || 'Tutor';
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();

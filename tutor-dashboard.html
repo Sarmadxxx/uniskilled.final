@@ -167,6 +167,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="university-verify.js"></script>
 </head>
 <body>
 
@@ -198,6 +199,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
         <div class="profile-av" id="sideAv" onclick="window.location.href='tutor-profile.html'">?</div>
         <div class="profile-name" id="sideName" onclick="window.location.href='tutor-profile.html'">Loading...</div>
         <div class="profile-sub" id="sideSub"></div>
+        <a href="#verify" id="sideVerifyLink" class="hit" style="display:none;font-size:0.75rem;font-weight:700;color:var(--blue);text-decoration:none;margin-bottom:0.6rem;">○ Not verified yet — get your badge</a>
         <a href="tutor-profile.html" class="profile-btn">✏️ Edit Profile</a>
         <button class="switch-btn" id="switchModeBtn" onclick="switchToStudent()">🎓 Switch to Student mode</button>
         <button class="become-btn" id="becomeStudentBtn" onclick="openBecomeStudentModal()">+ Browse as Student</button>
@@ -279,6 +281,9 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
           <div><div class="hero-stat-n" id="statReviews">—</div><div class="hero-stat-l">Reviews</div></div>
         </div>
       </div>
+
+      <!-- University verification (shows until verified; reminder on every visit) -->
+      <div id="uniVerifyMount"></div>
 
       <!-- Booking requests preview -->
       <div class="card" style="margin-bottom:1.2rem;">
@@ -489,6 +494,9 @@ async function init() {
 
   // Check payout setup status after profile loads
   setTimeout(checkPayoutStatus, 800);
+
+  // University email verification card (Verified badge)
+  if (window.initUniVerify) initUniVerify(_sb, document.getElementById('uniVerifyMount'));
 
   // Check if this tutor also has a student profile → show switch; otherwise show "Browse as Student"
   const { data: existingSp } = await _sb.from('student_profiles').select('user_id').eq('user_id', userId).maybeSingle();

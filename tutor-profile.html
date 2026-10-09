@@ -198,8 +198,9 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       <div class="identity-info">
         <div class="identity-name-row">
           <div class="profile-name" id="profileName">Loading...</div>
-          <div class="verified-badge">✓ Verified Tutor</div>
+          <div class="verified-badge" id="verifiedBadge" style="display:none;">✓ Verified Tutor</div>
         </div>
+        <a id="verifyNudge" href="tutor-dashboard.html#verify" style="display:none;margin-top:0.35rem;font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;" class="hit">Get your Verified badge — verify your university email →</a>
         <div class="profile-title" id="profileTitle"></div>
         <div class="profile-meta" id="profileMeta"></div>
         <div class="profile-tags" id="profileTags"></div>
@@ -680,7 +681,7 @@ function applyTutorSeo(fullName, p, tp, subjects) {
   const sym = currSymbol(tp?.currency || 'EUR');
   const bioBit = (p?.bio || '').replace(/\s+/g, ' ').trim().slice(0, 110);
   const desc = (bioBit ? bioBit + (bioBit.length >= 110 ? '… ' : ' ') : '') +
-    'University-verified tutor' + (subj.length ? ' for ' + subj.join(', ') : '') + (place ? ' · ' + place : '') +
+    (tp?.university_verified_at ? 'University-verified tutor' : 'Tutor') + (subj.length ? ' for ' + subj.join(', ') : '') + (place ? ' · ' + place : '') +
     (tp?.hourly_rate ? ' · from ' + sym + tp.hourly_rate + '/hr' : '') + '. Book securely on UniSkilled.';
   const url = 'https://uniskilled.com/tutor-profile.html?id=' + encodeURIComponent(tutorId);
   document.title = title;
@@ -701,7 +702,7 @@ function applyTutorSeo(fullName, p, tp, subjects) {
 async function loadProfile() {
   // The owner loads their full record (for the edit forms); everyone else — signed in or not —
   // gets the public view, so visitors see real names and nobody sees payout details.
-  const TP_PUBLIC = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url';
+  const TP_PUBLIC = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url';
   const { data: p } = isOwner
     ? await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).maybeSingle()
     : await _supabase.from('public_tutors').select('*').eq('id', tutorId).maybeSingle();
@@ -721,6 +722,16 @@ async function loadProfile() {
   courses = tc || [];
 
   applyTutorSeo(fullName, p, tp, subjects);
+
+  // Verified badge only when the university email was actually confirmed; owners get a nudge otherwise
+  const vb = document.getElementById('verifiedBadge');
+  if (tp?.university_verified_at) {
+    vb.style.display = '';
+    vb.textContent = '✓ Verified' + (tp.verified_university ? ' · ' + tp.verified_university : ' Tutor');
+    vb.title = 'University email confirmed';
+  } else if (isOwner) {
+    document.getElementById('verifyNudge').style.display = 'inline-block';
+  }
 
   // Avatar
   const av = document.getElementById('avatarEl');
