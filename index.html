@@ -21,9 +21,7 @@
 <meta property="og:url" content="https://uniskilled.com/">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1a6bff;--blue-mid:#4d8fff;--blue-light:#e8f0ff;--blue-pale:#f0f5ff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#ffffff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--orange:#ea580c;--orange-bg:#fff7ed;--purple:#7c3aed;--purple-bg:#f5f3ff;}
@@ -254,7 +252,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   <h2 class="sh">One platform. <em>Both sides of learning.</em></h2>
   <div class="who-cards">
     <div class="wcard w1"><div class="wcard-top-line"></div><div class="wcard-icon">📚</div><h3>Need a Tutor</h3><p>Book a peer who's already aced your exact course — verified tutors carry a badge. Nothing charged until they accept — and your payment stays protected for 48 hours after your session.</p><ul><li>Verified tutors listed first</li><li>Pay only after they accept</li><li>48-hour refund guarantee</li></ul><a class="wcard-cta" href="find-tutors.html">Find a tutor →</a></div>
-    <div class="wcard w2"><div class="wcard-top-line"></div><div class="wcard-icon">🎓</div><h3>Want to Tutor</h3><p>Set your own rate and hours, teach what you know, and get paid safely through PayPal — with a real, verifiable track record building behind every session.</p><ul><li>Set your own rate and schedule</li><li>Verified reviews & track record</li><li>Fast, secure PayPal payouts</li></ul><a class="wcard-cta" href="onboarding.html?role=tutor">Start tutoring →</a></div>
+    <div class="wcard w2"><div class="wcard-top-line"></div><div class="wcard-icon">🎓</div><h3>Want to Tutor</h3><p>Set your own rate and hours, teach what you know, and get paid safely through Stripe — with a real, verifiable track record building behind every session.</p><ul><li>Set your own rate and schedule</li><li>Verified reviews & track record</li><li>Fast, secure payouts to your bank</li></ul><a class="wcard-cta" href="onboarding.html?role=tutor">Start tutoring →</a></div>
     <div class="wcard w3"><div class="wcard-top-line"></div><div class="wcard-icon">👥</div><h3>Group Sessions</h3><p>Studying the same course as your classmates? Split one session between up to 4 students and everyone pays less — same tutor, same quality.</p><ul><li>Split the cost, up to 4 students</li><li>Same 48-hour protection</li><li>Great for shared coursework</li></ul><a class="wcard-cta" href="group-sessions.html">Browse group sessions →</a></div>
   </div>
 </section>
@@ -350,7 +348,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
     <div class="fb-live"><span class="fb-dot"></span>Made in Berlin</div>
   </div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="vendor/supabase-2.39.3.js"></script>
 <script>
 // ── XSS protection (security review Oct 2026) ──
 function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}

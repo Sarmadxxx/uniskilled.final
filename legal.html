@@ -21,9 +21,7 @@
 <meta property="og:url" content="https://uniskilled.com/legal.html">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -256,15 +254,11 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
         <tr><td>Resend</td><td>Transactional email delivery</td><td>EU (based on sending region)</td></tr>
         <tr><td>GitHub Pages</td><td>Static website hosting</td><td>Global CDN</td></tr>
         <tr><td>Zoom / Google Meet</td><td>Video call sessions (link only — not controlled by UniSkilled)</td><td>Global (user's own account)</td></tr>
-        <tr><td>Google Fonts</td><td>Font delivery (Manrope typeface)</td><td>Global CDN</td></tr>
+        <tr><td>Stripe (Stripe Payments Europe, Ltd.)</td><td>Payment processing, tutor payouts and the identity verification tutors complete to receive payouts</td><td>EU (Ireland); some data may be transferred to Stripe, Inc. in the US under Standard Contractual Clauses</td></tr>
       </tbody>
     </table></div>
     <p>All EU-based processors operate under Data Processing Agreements (DPAs) compliant with GDPR Article 28. For transfers outside the EU/EEA, Standard Contractual Clauses (SCCs) are in place.</p>
 
-    <div class="callout callout-amber">
-      <strong>Google Fonts Notice</strong>
-      Google Fonts loads from fonts.googleapis.com, which may transfer your IP address to Google's servers. To achieve full GDPR compliance in Germany, self-host the Manrope font or replace with a locally hosted alternative. This is recommended before your public launch.
-    </div>
 
     <h3>5. Data Retention</h3>
     <ul>
@@ -302,7 +296,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
       <tbody>
         <tr><td>Supabase auth token</td><td>Essential</td><td>Keeps you logged in — required for the platform to function</td><td>Session / 7 days (if "Keep me signed in")</td><td>No — strictly necessary</td></tr>
         <tr><td>localStorage (session data)</td><td>Essential</td><td>Stores authentication state in the browser</td><td>Session</td><td>No — strictly necessary</td></tr>
-        <tr><td>Google Fonts</td><td>Functional</td><td>Loads the Manrope typeface from Google's CDN</td><td>1 year</td><td>Yes — transfers IP to Google</td></tr>
+        <tr><td>Stripe checkout</td><td>Essential (payments)</td><td>Set by Stripe on its own secure checkout page when you pay, for fraud prevention — not set on uniskilled.com</td><td>Set by Stripe</td><td>No — strictly necessary to process your payment</td></tr>
       </tbody>
     </table></div>
 
@@ -352,7 +346,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     </ul>
 
     <h3>Refund Process</h3>
-    <p>Refunds under this policy are issued automatically and instantly by using the "Cancel" option on your session in your UniSkilled dashboard — no need to email support for a standard cancellation. Refunds are returned to your original payment method (PayPal or card), and typically appear within a few business days depending on your bank or PayPal account. For any cancellation outside these standard cases, or a payment issue that the automatic system doesn't resolve, contact <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> with your booking reference.</p>
+    <p>Refunds under this policy are issued automatically and instantly by using the "Cancel" option on your session in your UniSkilled dashboard — no need to email support for a standard cancellation. Refunds are returned to the card or other payment method used at checkout, and typically appear within 5–10 business days depending on your bank or card issuer. For any cancellation outside these standard cases, or a payment issue that the automatic system doesn't resolve, contact <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> with your booking reference.</p>
     <p>If a valid refund is approved after a tutor's payout has already been released, UniSkilled reserves the right to recover the refunded amount from the tutor's future earnings or to otherwise seek reimbursement where permitted by law.</p>
 
     <h3>Dissatisfaction with a Session</h3>
@@ -367,7 +361,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     <p>Students must report any issue within <strong>48 hours of the session being marked complete</strong>, using the "Report an Issue" option on the session in your UniSkilled dashboard (or by contacting <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> if you're unable to access your account). This window matches the 48-hour period during which the tutor's payout is held, described under "Payment Processing" below. UniSkilled may request supporting information before making a decision. No dispute raised after this 48-hour window will be considered.</p>
 
     <h3>Payment Processing</h3>
-    <p>All payments for tutoring sessions are processed securely through PayPal or, where offered at checkout, by card. Students are charged only after the tutor has accepted the booking request. UniSkilled securely holds the payment until the tutoring session has been completed.</p>
+    <p>All payments for tutoring sessions are processed securely by our payment provider, Stripe — by card or by the other methods shown at checkout (such as Apple Pay, Google Pay or Klarna). Students are charged only after the tutor has accepted the booking request. The payment is held and is not paid out to the tutor until the session has been completed and the 48-hour hold has passed.</p>
     <p>Tutor earnings become available <strong>48 hours</strong> after the session is marked complete. UniSkilled reviews any issue reported to <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> within that window before the payout is released.</p>
     <p>Once released, payouts are sent automatically to the tutor's chosen payout method. UniSkilled's 20% platform fee is deducted before the tutor's payout is released. A detailed breakdown of the payment, fee, and payout amount is available in the tutor's account.</p>
   </div>
@@ -380,7 +374,8 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     <h3>Tutor Payouts</h3>
     <p>Where UniSkilled processes payments, funds are held until the tutoring session has been completed and the 48-hour hold period below has passed.</p>
     <ul>
-      <li>Tutor earnings become available <strong>48 hours</strong> after the scheduled session end time, and are released automatically to the tutor's chosen payout method (PayPal or, where set up, direct card payout).</li>
+      <li>Tutor earnings become available <strong>48 hours</strong> after the scheduled session end time, and are then paid out automatically to the bank account the tutor connected through Stripe.</li>
+      <li>To receive payouts, a tutor must connect a Stripe payout account and complete Stripe's identity verification before accepting bookings. Payouts are currently available to tutors whose bank account is in the European Economic Area, the United Kingdom, Switzerland, the United States or Canada.</li>
       <li>UniSkilled deducts its 20% platform fee before releasing the payout, so the tutor receives 80% of the session price. A full breakdown of the session price, platform fee, and net payout is displayed in the tutor's account.</li>
       <li>If a valid refund is approved after a tutor's payout has already been released, UniSkilled reserves the right to recover the refunded amount from the tutor's future earnings or to otherwise seek reimbursement where permitted by law.</li>
     </ul>
@@ -390,14 +385,17 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     <p>Tutors set their own hourly rates, displayed in their chosen currency on their profile. The price shown when booking is the total the student pays — UniSkilled does not add a booking or service fee for students. UniSkilled's platform fee is taken from the tutor's side (see "Platform Fee" below).</p>
 
     <h3>Payment Methods</h3>
-    <p>All sessions booked on UniSkilled are paid through UniSkilled's checkout (PayPal or, where offered, card). Students pay only after the tutor has accepted the booking request, and must complete payment within 24 hours of acceptance or the booking expires and the slot is released. UniSkilled holds the payment until the session is complete and the 48-hour hold has passed, then releases the tutor's payout.</p>
+    <p>All sessions booked on UniSkilled are paid through UniSkilled's checkout, processed by Stripe (card, Apple Pay, Google Pay, Klarna or other methods shown at checkout). Students pay only after the tutor has accepted the booking request, and must complete payment within 24 hours of acceptance or the booking expires and the slot is released. The payment is held until the session is complete and the 48-hour hold has passed, then the tutor's payout is released.</p>
     <p>Tutors and students must not arrange or accept payment for sessions booked through UniSkilled by any other means (such as bank transfer, cash, cryptocurrency, or a direct PayPal payment between users). Payments made outside UniSkilled are not covered by the 48-hour hold, dispute resolution, or refund protections, and may breach the Non-Circumvention Policy.</p>
+
+    <h3>Payment Processing by Stripe</h3>
+    <p>Payment processing services for tutors on UniSkilled are provided by Stripe and are subject to the <a href="https://stripe.com/connect-account/legal" target="_blank" rel="noopener">Stripe Connected Account Agreement</a>, which includes the <a href="https://stripe.com/legal" target="_blank" rel="noopener">Stripe Terms of Service</a> (collectively, the "Stripe Services Agreement"). By connecting a payout account and receiving payouts through UniSkilled, tutors agree to be bound by the Stripe Services Agreement, as it may be modified by Stripe from time to time. As a condition of UniSkilled enabling payment processing services through Stripe, tutors agree to provide UniSkilled accurate and complete information about themselves, and authorise UniSkilled to share it and transaction information related to their use of the payment processing services provided by Stripe.</p>
 
     <h3>Invoicing &amp; VAT</h3>
     <p>Tutors who are registered for VAT in their jurisdiction must charge VAT to students as required by applicable law. UniSkilled does not automatically collect or remit VAT on behalf of tutors. Tutors operating as businesses must issue proper invoices to students upon request.</p>
 
     <h3>Currency</h3>
-    <p>Tutors price their sessions in euros (EUR) or US dollars (USD). The currency shown on the tutor's profile is the currency the student is charged in. Any currency conversion by the student's bank or PayPal account, and its cost, is the student's responsibility.</p>
+    <p>Tutors price their sessions in euros (EUR) or US dollars (USD). The currency shown on the tutor's profile is the currency the student is charged in. Any currency conversion by the student's bank or card issuer, and its cost, is the student's responsibility.</p>
 
     <h3>Unpaid Bookings</h3>
     <p>A session is only confirmed once payment has been received. If a student does not pay within 24 hours of the tutor accepting, the booking expires automatically and both sides are notified. Repeatedly letting accepted bookings expire may result in account restrictions.</p>
