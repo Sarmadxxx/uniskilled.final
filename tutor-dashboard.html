@@ -1017,7 +1017,10 @@ async function loadSessions() {
     const cancelBtn = s.status === 'confirmed'
       ? `<button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>`
       : '';
-    const reportBtn = (s.status === 'confirmed' || s.status === 'completed')
+    // Issues can be reported until 48h after the session ended (same window open-dispute enforces)
+    const reportOpen = s.status === 'confirmed'
+      || (s.status === 'completed' && (!s.completed_at || Date.now() - new Date(s.completed_at).getTime() <= 48 * 3600 * 1000));
+    const reportBtn = reportOpen
       ? `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`
       : '';
     return `<div class="session-row">
