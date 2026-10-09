@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1a6bff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#ffffff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;}
@@ -102,7 +102,7 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
   <form id="signinForm">
     <div class="form-group">
       <label for="email" class="form-label">Email address</label>
-      <input type="email" id="email" class="form-input" autocomplete="email" inputmode="email" placeholder="your@university.ac.uk" required>
+      <input type="email" id="email" class="form-input" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
     </div>
     <div class="form-group">
       <label for="password" class="form-label">Password</label>

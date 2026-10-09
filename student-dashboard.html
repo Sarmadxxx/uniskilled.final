@@ -417,7 +417,8 @@ async function init() {
         actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.tutor_name||'Tutor')}')">🎥 Join Session</button>
         <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>
         <button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`;
-      } else if (s.status === 'completed') {
+      } else if (s.status === 'completed' && (!s.completed_at || Date.now() - new Date(s.completed_at).getTime() <= 48 * 3600 * 1000)) {
+        // Issues can be reported until 48h after the session ended (same window open-dispute enforces)
         actionBtn = `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`;
       } else if (s.status === 'awaiting_payment') {
         const remaining = s.payment_due_at ? Math.max(0, new Date(s.payment_due_at).getTime() - Date.now()) : 0;
