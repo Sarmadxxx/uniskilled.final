@@ -10,8 +10,8 @@
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
 <title>Student Dashboard — UniSkilled</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="vendor/supabase-2.39.3.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--yellow:#f59e0b;}
@@ -241,7 +241,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.9rem;">
         <div>
           <div style="font-weight:800;font-size:1.05rem;color:var(--ink);">🎁 Refer & earn</div>
-          <div style="font-size:0.8rem;color:var(--ink2);margin-top:0.15rem;">Give €10, get €10 — for every friend who completes their first session.</div>
+          <div style="font-size:0.8rem;color:var(--ink2);margin-top:0.15rem;">Give €10 credit, get €10 credit — for every friend who completes their first session. Credit takes up to 20% off each booking until it's used up.</div>
         </div>
         <div style="text-align:right;">
           <div style="font-size:0.7rem;color:var(--mid);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">Your credit balance</div>
@@ -661,7 +661,7 @@ async function confirmCancel(confirmNoRefund) {
 
   if (data.success) {
     document.getElementById('cancelModalBody').innerHTML = data.refunded
-      ? '✅ Cancelled. A full refund has been issued to your PayPal account.'
+      ? '✅ Cancelled. A full refund has been issued to your original payment method.'
       : 'Session cancelled.';
     document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal(); location.reload();" style="background:#1a6bff;color:#fff;border:none;padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Done</button>`;
   }
@@ -841,7 +841,7 @@ async function loadReferralCard() {
 
   const statsEl = document.getElementById('referralStats');
   if (total === 0) {
-    statsEl.textContent = 'Share your link — you\'ll both get €10 once they complete their first session.';
+    statsEl.textContent = 'Share your link — you\'ll both get €10 credit once they complete their first session.';
   } else {
     statsEl.textContent = `${total} friend${total === 1 ? '' : 's'} referred · ${qualified} qualified for your €10 credit`;
   }
@@ -861,7 +861,7 @@ function copyReferralLink() {
 
 function shareReferralLink() {
   if (!myReferralLink) return;
-  const text = `I've been using UniSkilled for university-verified tutoring — use my link and we both get €10: ${myReferralLink}`;
+  const text = `I've been using UniSkilled for university-verified tutoring — use my link and we both get €10 credit: ${myReferralLink}`;
   if (navigator.share) {
     navigator.share({ title: 'Join me on UniSkilled', text, url: myReferralLink }).catch(() => {});
   } else {

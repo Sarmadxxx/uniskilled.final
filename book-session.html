@@ -10,8 +10,8 @@
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
 <title>Book a Session — UniSkilled</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="vendor/supabase-2.39.3.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1a6bff;--ink:#111827;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#fff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;}
@@ -99,7 +99,7 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 
     <div class="no-charge-note">
       <span>ℹ️</span>
-      <span><strong>You won't be charged yet.</strong> This just sends a request to the tutor. If they accept, you'll get 24 hours to complete payment via PayPal to lock in the session.</span>
+      <span><strong>You won't be charged yet.</strong> This just sends a request to the tutor. If they accept, you'll get 24 hours to pay by card (or Apple Pay, Google Pay or Klarna) to lock in the session.</span>
     </div>
 
     <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#166534;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:0.7rem 0.9rem;margin-bottom:0.6rem;line-height:1.4;">
@@ -377,7 +377,7 @@ async function submitBooking(){
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);
-  showAlert('✅ Request sent! We\'ll notify you the moment '+tutorName+' responds. If they accept, you\'ll have 24 hours to complete payment via PayPal to lock in the session.','success');
+  showAlert('✅ Request sent! We\'ll notify you the moment '+tutorName+' responds. If they accept, you\'ll have 24 hours to pay by card to lock in the session.','success');
   document.getElementById('submitBtn').style.display='none';
   setTimeout(()=>window.location.href='student-dashboard.html',3500);
 }

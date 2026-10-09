@@ -10,8 +10,8 @@
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
 <title>Complete Payment — UniSkilled</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="vendor/supabase-2.39.3.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1a6bff;--ink:#111827;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#fff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--amber:#92400e;--amber-bg:#fffbeb;}
@@ -29,7 +29,6 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 .price-breakdown{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:0.9rem 1rem;margin-bottom:1.5rem;font-size:0.85rem;}
 .price-row{display:flex;justify-content:space-between;margin-bottom:0.3rem;color:#374151;}
 .price-row.total{font-weight:800;font-size:1.05rem;color:#111827;border-top:1px solid #bae6fd;padding-top:0.5rem;margin-top:0.3rem;}
-#paypal-button-container{min-height:45px;}
 .status-box{text-align:center;padding:2rem 1rem;}
 .status-icon{font-size:2.5rem;margin-bottom:0.8rem;}
 .status-title{font-size:1.15rem;font-weight:800;margin-bottom:0.4rem;}
@@ -80,7 +79,7 @@ renderSimpleNav();</script>
 
     <div class="price-breakdown">
       <div class="price-row"><span>Session price</span><span id="priceAmount">—</span></div>
-      <div class="price-row" id="discountRow" style="display:none;color:#059669;"><span id="discountLabel">Discount</span><span id="discountAmount">—</span></div>
+      <div class="price-row" id="discountRow" style="display:none;color:#059669;"><span id="discountLabel">Discount</span><span id="discountAmount" style="white-space:nowrap;padding-left:0.6rem;">—</span></div>
       <div class="price-row total"><span>Total due now</span><span id="priceTotal">—</span></div>
     </div>
 
@@ -91,16 +90,9 @@ renderSimpleNav();</script>
 
     <div class="error-box" id="errorBox"></div>
 
-    <div id="methodToggle" style="display:flex;gap:0.5rem;margin-bottom:1rem;">
-      <button id="btnUsePaypal" onclick="setPaymentMethod('paypal')" style="flex:1;padding:0.7rem;border-radius:9px;border:2px solid var(--blue);background:#eff6ff;color:var(--blue);font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">PayPal</button>
-      <button id="btnUseCard" onclick="setPaymentMethod('card')" style="flex:1;padding:0.7rem;border-radius:9px;border:2px solid var(--border);background:#fff;color:var(--ink2,#374151);font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">💳 Card</button>
-    </div>
-
-    <div id="paypal-button-container"></div>
-
-    <div id="cardPayContainer" style="display:none;">
+    <div id="cardPayContainer">
       <button id="btnPayWithCard" onclick="payWithCard()" style="width:100%;background:#0b1f4a;color:#fff;border:none;padding:0.85rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;">💳 Pay with Card</button>
-      <div style="font-size:0.72rem;color:var(--mid);text-align:center;margin-top:0.6rem;">You'll be taken to a secure Stripe checkout page.</div>
+      <div style="font-size:0.72rem;color:var(--mid);text-align:center;margin-top:0.6rem;">You'll be taken to Stripe's secure checkout page — card, Apple Pay, Google Pay or Klarna.</div>
     </div>
 
     <div id="cardProcessing" style="display:none;text-align:center;padding:1.5rem 0;">
@@ -155,27 +147,6 @@ function showCard(id) {
   });
 }
 
-// The PayPal Client ID (test or live) comes from the server, so this page always matches
-// the mode the backend is in — switching to live is a Supabase setting, not a code change.
-async function getPayPalClientId() {
-  const res = await fetch(`${SUPABASE_URL}/functions/v1/paypal-config`, { cache: 'no-store' });
-  const cfg = await res.json();
-  if (!res.ok || !cfg.client_id) throw new Error(cfg.error || 'PayPal is not available right now');
-  return cfg.client_id;
-}
-
-async function loadPayPalScript(currency) {
-  if (window.paypal) return;
-  const clientId = await getPayPalClientId();
-  await new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency || 'EUR')}`;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.appendChild(script);
-  });
-}
-
 function startCountdown(dueAtISO) {
   const dueAt = new Date(dueAtISO).getTime();
   function tick() {
@@ -192,25 +163,6 @@ function startCountdown(dueAtISO) {
   }
   tick();
   countdownInterval = setInterval(tick, 1000);
-}
-
-function setPaymentMethod(method) {
-  const paypalBtn = document.getElementById('btnUsePaypal');
-  const cardBtn = document.getElementById('btnUseCard');
-  const paypalContainer = document.getElementById('paypal-button-container');
-  const cardContainer = document.getElementById('cardPayContainer');
-
-  if (method === 'paypal') {
-    paypalBtn.style.background = '#eff6ff'; paypalBtn.style.color = '#1a6bff'; paypalBtn.style.borderColor = '#1a6bff';
-    cardBtn.style.background = '#fff'; cardBtn.style.color = '#374151'; cardBtn.style.borderColor = '#e5e7eb';
-    paypalContainer.style.display = 'block';
-    cardContainer.style.display = 'none';
-  } else {
-    cardBtn.style.background = '#eff6ff'; cardBtn.style.color = '#1a6bff'; cardBtn.style.borderColor = '#1a6bff';
-    paypalBtn.style.background = '#fff'; paypalBtn.style.color = '#374151'; paypalBtn.style.borderColor = '#e5e7eb';
-    cardContainer.style.display = 'block';
-    paypalContainer.style.display = 'none';
-  }
 }
 
 async function payWithCard() {
@@ -246,8 +198,6 @@ async function payWithCard() {
 // have finished confirming it — poll briefly rather than assume it's done.
 async function pollForCardConfirmation() {
   showCard('paymentCard');
-  document.getElementById('methodToggle').style.display = 'none';
-  document.getElementById('paypal-button-container').style.display = 'none';
   document.getElementById('cardPayContainer').style.display = 'none';
   document.getElementById('cardProcessing').style.display = 'block';
 
@@ -332,24 +282,30 @@ async function init() {
   document.getElementById('priceTotal').textContent = currSym + price;
 
   // Preview an applicable discount before the student even clicks Pay — the real
-  // decision is always made server-side in create-paypal-order, this is just so
+  // decision is always made server-side in create-stripe-checkout, this is just so
   // they see the incentive up front rather than as a surprise mid-checkout.
   if (!isGroup) {
     try {
+      // Discounts are capped at UniSkilled's platform fee (20%) on each booking;
+      // whatever isn't used stays as account credit for the next one.
+      const maxDiscount = Math.max(0, Math.min(Math.floor(price * 0.20 * 100) / 100, price - 1));
       const { data: referral } = await _sb.from('referrals')
         .select('invitee_discount_amount').eq('invitee_id', currentUser.id).eq('invitee_discount_applied', false).maybeSingle();
-      let previewDiscount = 0, previewLabel = '';
+      let previewDiscount = 0, previewLabel = '', available = 0;
       if (referral) {
-        previewDiscount = Math.min(Number(referral.invitee_discount_amount), price - 1);
-        previewLabel = '🎉 Welcome discount';
+        available = Number(referral.invitee_discount_amount);
+        previewDiscount = Math.min(available, maxDiscount);
+        previewLabel = '🎉 Welcome credit';
       } else {
         const { data: userRow } = await _sb.rpc('get_my_account').maybeSingle();
-        const balance = Number(userRow?.credit_balance || 0);
-        if (balance > 0) {
-          previewDiscount = Math.min(balance, price - 1);
-          previewLabel = '💳 Account credit applied';
+        available = Number(userRow?.credit_balance || 0);
+        if (available > 0) {
+          previewDiscount = Math.min(available, maxDiscount);
+          previewLabel = '💳 Account credit';
         }
       }
+      const leftover = Math.round((available - previewDiscount) * 100) / 100;
+      if (previewDiscount > 0 && leftover > 0) previewLabel += ` (${currSym}${leftover.toFixed(2)} kept for next time)`;
       if (previewDiscount > 0) {
         previewDiscount = Math.round(previewDiscount * 100) / 100;
         document.getElementById('discountLabel').textContent = previewLabel;
@@ -365,73 +321,6 @@ async function init() {
   showCard('paymentCard');
   startCountdown(paymentDueAt);
 
-  try {
-    await loadPayPalScript(currency);
-  } catch (e) {
-    console.error('PayPal failed to load:', e);
-    const box = document.getElementById('errorBox');
-    box.textContent = "PayPal checkout couldn't load. Please refresh the page — if it keeps happening, contact info@uniskilled.com. You haven't been charged.";
-    box.style.display = 'block';
-    return;
-  }
-
-  window.paypal.Buttons({
-    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
-
-    createOrder: async () => {
-      document.getElementById('errorBox').style.display = 'none';
-      const body = isGroup ? { group_participant_id: groupParticipantId } : { session_id: sessionId };
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/create-paypal-order`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json();
-      if (!res.ok || !data.order_id) {
-        document.getElementById('errorBox').textContent = data.error || 'Could not start payment. Please try again.';
-        document.getElementById('errorBox').style.display = 'block';
-        throw new Error(data.error || 'Order creation failed');
-      }
-      // Reconcile the displayed price with what was actually charged server-side —
-      // this is the authoritative number, the preview above was only an estimate.
-      if (typeof data.discount_applied === 'number' && data.discount_applied > 0) {
-        const label = data.discount_source === 'referral_welcome' ? '🎉 Welcome discount' : '💳 Account credit applied';
-        document.getElementById('discountLabel').textContent = label;
-        document.getElementById('discountAmount').textContent = '−' + currSym + data.discount_applied.toFixed(2);
-        document.getElementById('discountRow').style.display = 'flex';
-        document.getElementById('priceTotal').textContent = currSym + Number(data.charge_amount).toFixed(2);
-      } else {
-        document.getElementById('discountRow').style.display = 'none';
-        document.getElementById('priceTotal').textContent = currSym + price;
-      }
-      return data.order_id;
-    },
-
-    onApprove: async (data) => {
-      const body = isGroup
-        ? { order_id: data.orderID, group_participant_id: groupParticipantId }
-        : { order_id: data.orderID, session_id: sessionId };
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/capture-paypal-order`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const result = await res.json();
-      if (!res.ok || !result.success) {
-        document.getElementById('errorBox').textContent = result.error || 'Payment could not be completed. Please contact support.';
-        document.getElementById('errorBox').style.display = 'block';
-        return;
-      }
-      clearInterval(countdownInterval);
-      showCard('doneCard');
-    },
-
-    onError: (err) => {
-      console.error('PayPal error:', err);
-      document.getElementById('errorBox').textContent = 'Something went wrong with PayPal. Please try again.';
-      document.getElementById('errorBox').style.display = 'block';
-    },
-  }).render('#paypal-button-container');
 }
 
 document.addEventListener('DOMContentLoaded', init);
