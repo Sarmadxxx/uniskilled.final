@@ -38,3 +38,10 @@ a, button { -webkit-tap-highlight-color: rgba(26, 107, 255, .12); }
 
 /* Body scroll lock while a mobile menu is open */
 body.nav-open { overflow: hidden; }
+
+/* Touch targets: the ☰ menu button meets the 44px minimum on every page */
+.nav-burger { min-width: 44px; min-height: 44px; border-radius: 8px; }
+
+/* Bigger tap area for small standalone links — invisible, layout unchanged
+   (padding grows the hit area, the equal negative margin cancels it out) */
+.hit { display: inline-block; padding-block: 10px; margin-block: -10px; }
