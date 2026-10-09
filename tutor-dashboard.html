@@ -324,7 +324,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;margin-bottom:1.1rem;">
           <div>
             <div style="font-weight:800;font-size:1.15rem;color:var(--ink);">🎁 Refer & earn</div>
-            <div style="font-size:0.84rem;color:var(--ink2);margin-top:0.2rem;">Give €10, get €10 — for every student or tutor you refer who completes their first paid session.</div>
+            <div style="font-size:0.84rem;color:var(--ink2);margin-top:0.2rem;">Give €10 credit, get €10 credit — for every student or tutor you refer who completes their first paid session. Credit takes up to 20% off sessions you book yourself; it isn't paid out as money.</div>
           </div>
           <div style="text-align:right;">
             <div style="font-size:0.7rem;color:var(--mid);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">Your credit balance</div>
@@ -1361,7 +1361,7 @@ async function loadReferralCard() {
   const statsEl = document.getElementById('referralStats');
   if (statsEl) {
     statsEl.textContent = total === 0
-      ? 'Share your link — you\'ll both get €10 once they complete their first session.'
+      ? 'Share your link — you\'ll both get €10 credit once they complete their first session.'
       : `${total} referred · ${qualified} qualified for your €10 credit`;
   }
 
@@ -1406,7 +1406,7 @@ function copyReferralLink() {
 
 function shareReferralLink() {
   if (!myReferralLink) return;
-  const text = `I've been using UniSkilled for university-verified tutoring — use my link and we both get €10: ${myReferralLink}`;
+  const text = `I've been using UniSkilled for university-verified tutoring — use my link and we both get €10 credit: ${myReferralLink}`;
   if (navigator.share) {
     navigator.share({ title: 'Join me on UniSkilled', text, url: myReferralLink }).catch(() => {});
   } else {

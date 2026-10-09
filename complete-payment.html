@@ -336,20 +336,26 @@ async function init() {
   // they see the incentive up front rather than as a surprise mid-checkout.
   if (!isGroup) {
     try {
+      // Discounts are capped at UniSkilled's platform fee (20%) on each booking;
+      // whatever isn't used stays as account credit for the next one.
+      const maxDiscount = Math.max(0, Math.min(Math.floor(price * 0.20 * 100) / 100, price - 1));
       const { data: referral } = await _sb.from('referrals')
         .select('invitee_discount_amount').eq('invitee_id', currentUser.id).eq('invitee_discount_applied', false).maybeSingle();
-      let previewDiscount = 0, previewLabel = '';
+      let previewDiscount = 0, previewLabel = '', available = 0;
       if (referral) {
-        previewDiscount = Math.min(Number(referral.invitee_discount_amount), price - 1);
-        previewLabel = '🎉 Welcome discount';
+        available = Number(referral.invitee_discount_amount);
+        previewDiscount = Math.min(available, maxDiscount);
+        previewLabel = '🎉 Welcome credit';
       } else {
         const { data: userRow } = await _sb.rpc('get_my_account').maybeSingle();
-        const balance = Number(userRow?.credit_balance || 0);
-        if (balance > 0) {
-          previewDiscount = Math.min(balance, price - 1);
-          previewLabel = '💳 Account credit applied';
+        available = Number(userRow?.credit_balance || 0);
+        if (available > 0) {
+          previewDiscount = Math.min(available, maxDiscount);
+          previewLabel = '💳 Account credit';
         }
       }
+      const leftover = Math.round((available - previewDiscount) * 100) / 100;
+      if (previewDiscount > 0 && leftover > 0) previewLabel += ` (${currSym}${leftover.toFixed(2)} kept for next time)`;
       if (previewDiscount > 0) {
         previewDiscount = Math.round(previewDiscount * 100) / 100;
         document.getElementById('discountLabel').textContent = previewLabel;
@@ -395,7 +401,7 @@ async function init() {
       // Reconcile the displayed price with what was actually charged server-side —
       // this is the authoritative number, the preview above was only an estimate.
       if (typeof data.discount_applied === 'number' && data.discount_applied > 0) {
-        const label = data.discount_source === 'referral_welcome' ? '🎉 Welcome discount' : '💳 Account credit applied';
+        const label = document.getElementById('discountLabel').textContent || (data.discount_source === 'referral_welcome' ? '🎉 Welcome credit' : '💳 Account credit');
         document.getElementById('discountLabel').textContent = label;
         document.getElementById('discountAmount').textContent = '−' + currSym + data.discount_applied.toFixed(2);
         document.getElementById('discountRow').style.display = 'flex';
