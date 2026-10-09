@@ -103,8 +103,14 @@ async function loadGroupSessions() {
     return;
   }
 
-  const { data: allParticipants } = await _sb.from('group_session_participants')
-    .select('*').in('group_session_id', sessions.map(s => s.id));
+  const ids = sessions.map(s => s.id);
+  // Seat counts come from a summary view everyone can read (no student names).
+  // The participant list itself is only needed — and only readable — when signed in.
+  const { data: seatRows } = await _sb.from('group_session_seats').select('group_session_id,confirmed_count').in('group_session_id', ids);
+  const seatMap = {}; (seatRows || []).forEach(r => { seatMap[r.group_session_id] = r.confirmed_count; });
+  const { data: allParticipants } = currentUser
+    ? await _sb.from('group_session_participants').select('id,group_session_id,student_id,status').in('group_session_id', ids).eq('student_id', currentUser.id)
+    : { data: [] };
 
   // Only show future sessions with room left
   const now = new Date();
@@ -122,7 +128,7 @@ async function loadGroupSessions() {
     const participants = (allParticipants || []).filter(p => p.group_session_id === gs.id);
     const confirmed = participants.filter(p => p.status === 'confirmed');
     const alreadyJoined = currentUser && participants.find(p => p.student_id === currentUser.id && (p.status === 'confirmed' || p.status === 'awaiting_payment'));
-    const spotsLeft = gs.max_students - confirmed.length;
+    const spotsLeft = gs.max_students - (seatMap[gs.id] ?? confirmed.length);
     const isFull = spotsLeft <= 0;
     const date = new Date(gs.scheduled_date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 

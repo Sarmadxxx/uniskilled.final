@@ -699,8 +699,13 @@ function applyTutorSeo(fullName, p, tp, subjects) {
 }
 
 async function loadProfile() {
-  const { data: p } = await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).maybeSingle();
-  const { data: tp } = await _supabase.from('tutor_profiles').select('*').eq('user_id', tutorId).maybeSingle();
+  // The owner loads their full record (for the edit forms); everyone else — signed in or not —
+  // gets the public view, so visitors see real names and nobody sees payout details.
+  const TP_PUBLIC = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url';
+  const { data: p } = isOwner
+    ? await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).maybeSingle()
+    : await _supabase.from('public_tutors').select('*').eq('id', tutorId).maybeSingle();
+  const { data: tp } = await _supabase.from('tutor_profiles').select(isOwner ? '*' : TP_PUBLIC).eq('user_id', tutorId).maybeSingle();
   if (!p && !tp) { showTutorNotFound(); return; }
   profileData = p; tutorData = tp;
 
@@ -760,15 +765,14 @@ async function loadProfile() {
   }
 
   // Stats
-  const { data: sessions } = await _supabase.from('sessions').select('id, subject').eq('tutor_id', tutorId).eq('status', 'completed');
-  document.getElementById('statSessions').textContent = (sessions || []).length;
+  // Completed sessions per subject — from a public summary view, so every visitor sees the
+  // tutor's real total (the sessions table itself is private to the two people in each session).
+  const { data: subjStats } = await _supabase.from('public_tutor_subject_stats').select('subject,completed_sessions').eq('tutor_id', tutorId);
+  const bySubject = {};
+  (subjStats || []).forEach(r => { bySubject[r.subject || 'Other'] = (bySubject[r.subject || 'Other'] || 0) + r.completed_sessions; });
+  document.getElementById('statSessions').textContent = Object.values(bySubject).reduce((a, b) => a + b, 0);
 
   // Track record: sessions completed per subject
-  const bySubject = {};
-  (sessions || []).forEach(s => {
-    const subj = s.subject || 'Other';
-    bySubject[subj] = (bySubject[subj] || 0) + 1;
-  });
   const subjectEntries = Object.entries(bySubject).sort((a, b) => b[1] - a[1]);
   const maxCount = subjectEntries.length ? subjectEntries[0][1] : 1;
   document.getElementById('trackRecordBody').innerHTML = subjectEntries.length > 0

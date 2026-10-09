@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>/* Demo/prototype page: only for these roles; everyone else is sent on before it renders */(function(){var ok=false;try{var t=JSON.parse(localStorage.getItem("sb-orghkbbohnabcietidiv-auth-token")||"null");var s=t&&(t.currentSession||t);var r=s&&s.user&&s.user.user_metadata&&s.user.user_metadata.role;ok=['business','admin'].indexOf(r)>-1;}catch(e){}if(!ok)location.replace("coming-soon.html");})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
@@ -907,6 +908,8 @@ function toast(ico,title,msg){
 updateDashboardData();renderTalent();renderJobs();renderPool();renderChart();
 </script>
 
+<script src="uniskilled-api.js"></script>
+<script>
 // ── REAL DATA FROM BACKEND ──
 async function loadBusinessDashboard() {
   if (typeof UniSkilled === 'undefined') return;
@@ -947,6 +950,6 @@ document.addEventListener('DOMContentLoaded', function() {
   setTimeout(loadBusinessDashboard, 500);
 });
 
-<script src="uniskilled-api.js"></script>
+</script>
 </body>
 </html>

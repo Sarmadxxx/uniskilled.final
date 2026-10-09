@@ -9,6 +9,8 @@ Disallow: /admin-disputes.html
 Disallow: /student-dashboard.html
 Disallow: /tutor-dashboard.html
 Disallow: /business-dashboard.html
+Disallow: /business-profile.html
+Disallow: /hire-talent.html
 Disallow: /student-profile.html
 Disallow: /book-session.html
 Disallow: /complete-payment.html

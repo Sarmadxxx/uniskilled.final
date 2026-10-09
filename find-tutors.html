@@ -211,7 +211,8 @@ let allTutors = [];
 async function loadTutors() {
   const grid = document.getElementById('tutorGrid');
   try {
-    const { data: profiles } = await _sb.from('tutor_profiles').select('*');
+    // Public columns only — payout details and meeting links are never needed here
+    const { data: profiles } = await _sb.from('tutor_profiles').select('id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url');
     if (!profiles || profiles.length === 0) {
       grid.innerHTML = '<div class="empty"><div style="font-size:2.5rem;margin-bottom:1rem;">🎓</div><div style="font-weight:700;margin-bottom:0.5rem;">No tutors yet</div><p>Be the first to sign up as a tutor!</p></div>';
       document.getElementById('resultsCount').textContent = '0 tutors found';
@@ -219,7 +220,8 @@ async function loadTutors() {
     }
 
     const userIds = profiles.map(p => p.user_id).filter(Boolean);
-    const { data: users } = await _sb.from('users').select('id,full_name,avatar_url,country').in('id', userIds);
+    // public_tutors view: tutor names/photos readable by everyone, students' data never exposed
+    const { data: users } = await _sb.from('public_tutors').select('id,full_name,avatar_url,country').in('id', userIds);
     const { data: reviews } = await _sb.from('reviews').select('tutor_id,rating');
     const { data: courseRows } = await _sb.from('tutor_courses').select('*').in('tutor_id', userIds);
 
