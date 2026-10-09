@@ -159,28 +159,28 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <div class="req-modal-sub">Can't find a tutor for what you need? Post a request and any tutor who can help will see it and reach out.</div>
     <div class="req-alert" id="reqAlert"></div>
     <div class="req-form-group">
-      <label class="req-form-label">Subject you need help with *</label>
+      <label for="reqSubject" class="req-form-label">Subject you need help with *</label>
       <input type="text" class="req-form-input" id="reqSubject" placeholder="e.g. Organic Chemistry, Arabic, Linear Algebra...">
     </div>
     <div class="req-form-group">
-      <label class="req-form-label">What specifically do you need help with?</label>
+      <label for="reqNotes" class="req-form-label">What specifically do you need help with?</label>
       <textarea class="req-form-input" id="reqNotes" placeholder="The more detail you give, the better tutors can judge if they can help." style="min-height:80px;resize:vertical;"></textarea>
     </div>
     <div class="req-form-row">
-      <div class="req-form-group"><label class="req-form-label">Level</label>
+      <div class="req-form-group"><label for="reqLevel" class="req-form-label">Level</label>
         <select class="req-form-input" id="reqLevel">
           <option value="">Not specified</option>
           <option>High school</option><option>Undergraduate</option><option>Masters</option><option>PhD</option>
         </select>
       </div>
-      <div class="req-form-group"><label class="req-form-label">How often?</label>
+      <div class="req-form-group"><label for="reqFrequency" class="req-form-label">How often?</label>
         <select class="req-form-input" id="reqFrequency">
           <option value="">Not specified</option>
           <option>Once — specific topic</option><option>1x per week</option><option>2x per week</option><option>Flexible</option>
         </select>
       </div>
     </div>
-    <div class="req-form-group"><label class="req-form-label">Preferred language</label><input type="text" class="req-form-input" id="reqLanguage" placeholder="e.g. English, German"></div>
+    <div class="req-form-group"><label for="reqLanguage" class="req-form-label">Preferred language</label><input type="text" class="req-form-input" id="reqLanguage" placeholder="e.g. English, German"></div>
     <button class="req-submit-btn" id="reqSubmitBtn" onclick="submitRequest()">Post request →</button>
   </div>
 </div>

@@ -173,7 +173,9 @@ async function loadConversations(){
 
   const convItems=document.getElementById('convItems');
   if(!convs||convs.length===0){
-    convItems.innerHTML='<div class="empty-conv">No conversations yet</div>';
+    convItems.innerHTML = currentRole==='tutor'
+      ? '<div class="empty-conv">No conversations yet.<br>Students who message you or book a session will appear here. <a href="tutor-profile.html" style="color:var(--blue,#1a6bff);font-weight:700;text-decoration:none;">Check your profile</a> is complete.</div>'
+      : '<div class="empty-conv">No conversations yet.<br><a href="find-tutors.html" style="color:var(--blue,#1a6bff);font-weight:700;text-decoration:none;">Find a tutor</a> and message them from their profile.</div>';
     return;
   }
 
@@ -261,14 +263,14 @@ async function openOrCreateConv(otherId){
 
   const {data:existing}=await _sb.from('conversations')
     .select('id,participant_1_name,participant_2_name')
-    .eq('participant_1',p1).eq('participant_2',p2).single();
+    .eq('participant_1',p1).eq('participant_2',p2).maybeSingle();
 
   let convId, otherName;
   if(existing){
     convId=existing.id;
     otherName=p1===currentUser.id?existing.participant_2_name:existing.participant_1_name;
   } else {
-    const {data:otherUser}=await _sb.from('users').select('full_name').eq('id',otherId).single();
+    const {data:otherUser}=await _sb.from('users').select('full_name').eq('id',otherId).maybeSingle();
     const myName=(currentUser.user_metadata&&currentUser.user_metadata.full_name)||'User';
     otherName=otherUser?.full_name||'User';
     const {data:newConv}=await _sb.from('conversations').insert({
@@ -344,7 +346,7 @@ async function sendMessage(){
   const myName=(currentUser.user_metadata&&currentUser.user_metadata.full_name)||'User';
 
   // Get receiver
-  const {data:conv}=await _sb.from('conversations').select('*').eq('id',currentConvId).single();
+  const {data:conv}=await _sb.from('conversations').select('*').eq('id',currentConvId).maybeSingle();
   const receiverId=conv.participant_1===currentUser.id?conv.participant_2:conv.participant_1;
 
   const { error: sendErr } = await _sb.from('messages').insert({

@@ -166,6 +166,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 }
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
 </head>
 <body>
 
@@ -490,7 +491,7 @@ async function init() {
   setTimeout(checkPayoutStatus, 800);
 
   // Check if this tutor also has a student profile → show switch; otherwise show "Browse as Student"
-  const { data: existingSp } = await _sb.from('student_profiles').select('user_id').eq('user_id', userId).single();
+  const { data: existingSp } = await _sb.from('student_profiles').select('user_id').eq('user_id', userId).maybeSingle();
   if (existingSp) {
     const sb = document.getElementById('switchModeBtn');
     if (sb) sb.style.display = 'block';
@@ -499,8 +500,8 @@ async function init() {
     if (bb) bb.style.display = 'block';
   }
 
-  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', userId).single();
-  const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', userId).single();
+  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', userId).maybeSingle();
+  const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', userId).maybeSingle();
 
   const fullName = (p && p.full_name) || (meta.full_name) || 'Tutor';
   const firstName = fullName.split(' ')[0];
@@ -761,7 +762,7 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
 
   const { error: respondErr } = await _sb.from('sessions').update(updatePayload).eq('id', sessionId);
   if (respondErr) {
-    alert(__friendlyDbError(respondErr, 'Could not update this request. Please refresh and try again.'));
+    showToast(__friendlyDbError(respondErr, 'Could not update this request. Please refresh and try again.'), 'error');
     await loadAll();
     return;
   }
@@ -781,7 +782,7 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
   try {
     const { data: sessionData } = await _sb.from('sessions')
       .select('scheduled_date, scheduled_time, duration_minutes, student_id, price, currency, timezone')
-      .eq('id', sessionId).single();
+      .eq('id', sessionId).maybeSingle();
     if (studentId && sessionData) {
       const dateStr = sessionData.scheduled_date ? new Date(sessionData.scheduled_date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) : 'TBD';
       const __tok = (await _sb.auth.getSession()).data.session?.access_token;
@@ -895,9 +896,9 @@ window.acceptSubjectRequest = async function(requestId, studentId, studentName, 
     accepted_at: new Date().toISOString()
   }).eq('id', requestId).eq('status', 'open').select(); // guard: only matches if still open (first-accept-wins)
 
-  if (error) { alert('Could not accept this request: ' + error.message); if(btn){btn.disabled=false;btn.textContent='✓ I can offer this';} return; }
+  if (error) { showToast(__friendlyDbError(error, 'Could not accept this request. Please try again.'), 'error'); if(btn){btn.disabled=false;btn.textContent='✓ I can offer this';} return; }
   if (!data || data.length === 0) {
-    alert('Another tutor already accepted this request.');
+    showToast('Another tutor already accepted this request.', 'info');
     await loadSubjectRequests();
     return;
   }
@@ -1155,7 +1156,7 @@ function dashSignOut() {
 // Check if returning from Stripe Connect onboarding
 if (new URLSearchParams(window.location.search).get('payout') === 'success') {
   setTimeout(() => {
-    alert('✅ Payout account connected! You can now receive payments.');
+    showToast('Payout account connected. You can now receive payments.', 'success');
     window.history.replaceState({}, '', 'tutor-dashboard.html');
   }, 1000);
 }
@@ -1163,7 +1164,7 @@ if (new URLSearchParams(window.location.search).get('payout') === 'success') {
 async function checkPayoutStatus() {
   const { data: tp } = await _sb.from('tutor_profiles')
     .select('stripe_account_id, stripe_account_status, payout_method, paypal_email')
-    .eq('user_id', userId).single();
+    .eq('user_id', userId).maybeSingle();
 
   // If Stripe setup was started but the tutor isn't marked active yet, ask Stripe (through our
   // server) whether setup is finished, so the status updates by itself after onboarding.
@@ -1256,7 +1257,7 @@ async function selectPayoutMethod(method) {
     .eq('user_id', userId);
 
   if (error) {
-    alert('Could not update payout method: ' + error.message);
+    showToast(__friendlyDbError(error, 'Could not update your payout method. Please try again.'), 'error');
     return;
   }
 
@@ -1307,7 +1308,7 @@ async function setupPayouts() {
     });
     const data = await res.json();
     if (!res.ok || !data.url) {
-      alert('Could not start payout setup: ' + (data.error || 'Unknown error'));
+      showToast('Could not start payout setup. Please try again in a moment.', 'error');
       btn.textContent = '💳 Set up payouts';
       btn.disabled = false;
       return;
@@ -1315,7 +1316,7 @@ async function setupPayouts() {
     // Open Stripe onboarding in same tab
     window.location.href = data.url;
   } catch (err) {
-    alert('Error: ' + err.message);
+    showToast('Could not start payout setup. Check your connection and try again.', 'error');
     btn.textContent = '💳 Set up payouts';
     btn.disabled = false;
   }
@@ -1451,7 +1452,7 @@ async function submitReport() {
   }
 
   closeReportModal();
-  alert('Your report has been submitted. Our team will review it shortly.');
+  showToast('Report submitted. We\'ll review it and email you — the payout stays on hold meanwhile.', 'success', {afterReload:true});
   location.reload();
 }
 
@@ -1503,12 +1504,12 @@ async function joinSession(sessionId, subject, otherName) {
   try {
     const { data: sessionData } = await _sb.from('sessions')
       .select('student_id, tutor_id')
-      .eq('id', sessionId).single();
+      .eq('id', sessionId).maybeSingle();
 
     // Get the tutor's meeting link
     const { data: tp } = await _sb.from('tutor_profiles')
       .select('meeting_link')
-      .eq('user_id', userId).single();
+      .eq('user_id', userId).maybeSingle();
 
     // Notify student that session is starting
     if (sessionData?.student_id) {
@@ -1527,13 +1528,13 @@ async function joinSession(sessionId, subject, otherName) {
       window.open(tp.meeting_link, '_blank');
     } else {
       // No meeting link set — prompt tutor to add one
-      alert('Please add your Zoom or Google Meet link to your profile first. Go to Edit Profile → Levels & Languages → Meeting link.');
+      showToast('Add your Zoom or Google Meet link first: Edit Profile → Levels & Languages → Meeting link.', 'info');
     }
 
     btn.disabled = false;
     btn.textContent = '🎥 Join Session';
   } catch (err) {
-    alert('Error: ' + err.message);
+    showToast('Couldn\'t open the session. Check your connection and try again.', 'error');
     btn.disabled = false;
     btn.textContent = '🎥 Join Session';
   }
@@ -1556,16 +1557,16 @@ async function joinSession(sessionId, subject, otherName) {
       <div class="dm-alert" id="becomeStudentAlert"></div>
       <p style="font-size:0.85rem;color:var(--mid);margin-bottom:1.2rem;line-height:1.6;">Set up a student profile so you can also browse tutors and book sessions. You can switch between modes any time.</p>
       <div class="dm-form-group">
-        <label class="dm-label">University</label>
+        <label for="bsUniversity" class="dm-label">University</label>
         <input type="text" class="dm-input" id="bsUniversity" placeholder="e.g. TU Berlin">
       </div>
       <div class="dm-row">
         <div class="dm-form-group">
-          <label class="dm-label">Degree / Course</label>
+          <label for="bsDegree" class="dm-label">Degree / Course</label>
           <input type="text" class="dm-input" id="bsDegree" placeholder="e.g. Computer Science">
         </div>
         <div class="dm-form-group">
-          <label class="dm-label">Year</label>
+          <label for="bsYear" class="dm-label">Year</label>
           <select class="dm-select" id="bsYear">
             <option value="">Select</option>
             <option value="1">1st Year</option><option value="2">2nd Year</option>
@@ -1575,7 +1576,7 @@ async function joinSession(sessionId, subject, otherName) {
         </div>
       </div>
       <div class="dm-form-group">
-        <label class="dm-label">Subjects you want to learn</label>
+        <label for="bsSubjects" class="dm-label">Subjects you want to learn</label>
         <input type="text" class="dm-input" id="bsSubjects" placeholder="e.g. Python, Statistics, French">
       </div>
     </div>
@@ -1595,25 +1596,25 @@ async function joinSession(sessionId, subject, otherName) {
 
     <div style="display:flex;flex-direction:column;gap:0.9rem;">
       <div>
-        <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Subject</label>
+        <label for="gsSubject" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Subject</label>
         <select id="gsSubject" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;"></select>
         <div id="gsNotifyHint" style="display:none;font-size:0.76rem;color:var(--green);font-weight:600;margin-top:0.4rem;"></div>
       </div>
 
       <div style="display:flex;gap:0.7rem;">
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Date</label>
+          <label for="gsDate" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Date</label>
           <input type="date" id="gsDate" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Time</label>
+          <label for="gsTime" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Time</label>
           <input type="time" id="gsTime" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
       </div>
 
       <div style="display:flex;gap:0.7rem;">
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Duration</label>
+          <label for="gsDuration" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Duration</label>
           <select id="gsDuration" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
             <option value="30">30 min</option>
             <option value="45">45 min</option>
@@ -1622,7 +1623,7 @@ async function joinSession(sessionId, subject, otherName) {
           </select>
         </div>
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</label>
+          <label for="gsFormat" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</label>
           <select id="gsFormat" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
             <option value="online" selected>Online</option>
             <option value="in-person">In-person</option>
@@ -1632,7 +1633,7 @@ async function joinSession(sessionId, subject, otherName) {
 
       <div style="display:flex;gap:0.7rem;">
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Max students</label>
+          <label for="gsMaxStudents" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Max students</label>
           <select id="gsMaxStudents" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
             <option value="2">2</option>
             <option value="3">3</option>
@@ -1640,13 +1641,13 @@ async function joinSession(sessionId, subject, otherName) {
           </select>
         </div>
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;" id="gsPriceLabel">Price per student (€)</label>
+          <label for="gsPrice" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;" id="gsPriceLabel">Price per student (€)</label>
           <input type="number" id="gsPrice" min="1" step="0.5" placeholder="e.g. 12" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
       </div>
 
       <div>
-        <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Notes (optional)</label>
+        <label for="gsNotes" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Notes (optional)</label>
         <textarea id="gsNotes" rows="2" placeholder="e.g. Covers chapters 3-4, bring a calculator" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;resize:vertical;"></textarea>
       </div>
 

@@ -207,22 +207,22 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     <div class="modal-body">
       <div class="alert-inline" id="alertBio"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">First name</label><input type="text" class="form-input" id="inputFirstName" placeholder="First name"></div>
-        <div class="form-group"><label class="form-label">Last name</label><input type="text" class="form-input" id="inputLastName" placeholder="Last name"></div>
+        <div class="form-group"><label for="inputFirstName" class="form-label">First name</label><input type="text" class="form-input" id="inputFirstName" placeholder="First name"></div>
+        <div class="form-group"><label for="inputLastName" class="form-label">Last name</label><input type="text" class="form-input" id="inputLastName" placeholder="Last name"></div>
       </div>
-      <div class="form-group"><label class="form-label">About me</label><textarea class="form-textarea" id="inputBio" placeholder="Tell tutors about yourself..."></textarea></div>
+      <div class="form-group"><label for="inputBio" class="form-label">About me</label><textarea class="form-textarea" id="inputBio" placeholder="Tell tutors about yourself..."></textarea></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Country</label>
+        <div class="form-group"><label for="inputCountry" class="form-label">Country</label>
           <select class="form-select" id="inputCountry">
             <option value="">Select country</option>
             <option>Germany</option><option>United Kingdom</option><option>France</option><option>Turkey</option><option>Qatar</option><option>UAE</option><option>Saudi Arabia</option><option>Egypt</option><option>Jordan</option><option>Lebanon</option><option>Morocco</option><option>Pakistan</option><option>India</option><option>Nigeria</option><option>United States</option><option>Canada</option><option>Australia</option><option>Netherlands</option><option>Belgium</option><option>Spain</option><option>Italy</option><option>Poland</option><option>Sweden</option><option>Switzerland</option><option>Austria</option><option>Other</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-label">Gender (optional)</label>
+        <div class="form-group"><label for="inputGender" class="form-label">Gender (optional)</label>
           <select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Other</option></select>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Preferred language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German, Arabic"></div>
+      <div class="form-group"><label for="inputLanguage" class="form-label">Preferred language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German, Arabic"></div>
     </div>
     <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button><button class="btn btn-primary" onclick="saveBio()">Save</button></div>
   </div>
@@ -233,16 +233,16 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     <div class="modal-head"><div class="modal-title">Academic Background</div><button class="modal-x" onclick="closeModal('modalAcademic')">✕</button></div>
     <div class="modal-body">
       <div class="alert-inline" id="alertAcademic"></div>
-      <div class="form-group"><label class="form-label">University / College</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
+      <div class="form-group"><label for="inputUniversity" class="form-label">University / College</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Degree</label><input type="text" class="form-input" id="inputDegree" placeholder="e.g. Computer Science"></div>
-        <div class="form-group"><label class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. AI & Machine Learning"></div>
+        <div class="form-group"><label for="inputDegree" class="form-label">Degree</label><input type="text" class="form-input" id="inputDegree" placeholder="e.g. Computer Science"></div>
+        <div class="form-group"><label for="inputMajor" class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. AI & Machine Learning"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Year of study</label>
+        <div class="form-group"><label for="inputYear" class="form-label">Year of study</label>
           <select class="form-select" id="inputYear"><option value="">Select</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option><option value="graduate">Graduate</option><option value="phd">PhD</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Graduation year</label><input type="number" class="form-input" id="inputGradYear" placeholder="e.g. 2027" min="2024" max="2035"></div>
+        <div class="form-group"><label for="inputGradYear" class="form-label">Graduation year</label><input type="number" class="form-input" id="inputGradYear" placeholder="e.g. 2027" min="2024" max="2035"></div>
       </div>
     </div>
     <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAcademic')">Cancel</button><button class="btn btn-primary" onclick="saveAcademic()">Save</button></div>
@@ -255,7 +255,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     <div class="modal-body">
       <div class="alert-inline" id="alertSubjects"></div>
       <div class="form-group">
-        <label class="form-label">Add subjects</label>
+        <label for="subjectInput" class="form-label">Add subjects</label>
         <div class="tag-input-wrap" id="subjectTagWrap" onclick="document.getElementById('subjectInput').focus()">
           <input type="text" class="tag-input" id="subjectInput" placeholder="Type a subject and press Enter...">
         </div>
@@ -276,7 +276,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
           <button class="day-btn" data-day="mon">Mon</button><button class="day-btn" data-day="tue">Tue</button><button class="day-btn" data-day="wed">Wed</button><button class="day-btn" data-day="thu">Thu</button><button class="day-btn" data-day="fri">Fri</button><button class="day-btn" data-day="sat">Sat</button><button class="day-btn" data-day="sun">Sun</button>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Preferred time</label>
+      <div class="form-group"><label for="inputPrefTime" class="form-label">Preferred time</label>
         <select class="form-select" id="inputPrefTime"><option value="">Flexible</option><option value="morning">Morning (before 12pm)</option><option value="afternoon">Afternoon (12–5pm)</option><option value="evening">Evening (after 5pm)</option><option value="weekend">Weekends only</option></select>
       </div>
     </div>
@@ -303,8 +303,8 @@ async function init(){
 }
 
 async function loadProfile(){
-  const {data:u}=await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id',currentUserId).single();
-  const {data:sp}=await _sb.from('student_profiles').select('*').eq('user_id',currentUserId).single();
+  const {data:u}=await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id',currentUserId).maybeSingle();
+  const {data:sp}=await _sb.from('student_profiles').select('*').eq('user_id',currentUserId).maybeSingle();
   userData=u||{};profileData=sp||{};
   const fullName=u?.full_name||'Student';
   const initials=fullName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();

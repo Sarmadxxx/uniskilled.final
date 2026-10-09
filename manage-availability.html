@@ -89,6 +89,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 }
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
 </head>
 <body>
 <nav>
@@ -276,12 +277,12 @@ async function saveBlock() {
   };
 
   if (type === 'partial' && payload.start_time >= payload.end_time) {
-    alert('End time must be after start time.');
+    showToast('End time must be after the start time.', 'error');
     return;
   }
 
   const { error } = await _sb.from('tutor_blocked_slots').insert(payload);
-  if (error) { alert('Could not save: ' + error.message); return; }
+  if (error) { showToast('Could not save this block. Please try again.', 'error'); return; }
 
   closeForm();
   await loadBlocks();

@@ -248,7 +248,7 @@ async function pollForCardConfirmation() {
   const confirmedValue = isGroup ? 'confirmed' : 'paid';
 
   for (let i = 0; i < 10; i++) {
-    const { data } = await _sb.from(table).select(statusField).eq('id', id).single();
+    const { data } = await _sb.from(table).select(statusField).eq('id', id).maybeSingle();
     if (data && data[statusField] === confirmedValue) {
       showCard('doneCard');
       return;
@@ -277,7 +277,7 @@ async function init() {
 
   if (isGroup) {
     const { data: p, error } = await _sb.from('group_session_participants')
-      .select('*, group_sessions(*)').eq('id', groupParticipantId).single();
+      .select('*, group_sessions(*)').eq('id', groupParticipantId).maybeSingle();
     if (error || !p || p.student_id !== currentUser.id) { showCard('notFoundCard'); return; }
 
     const gs = p.group_sessions;
@@ -295,7 +295,7 @@ async function init() {
     paymentDueAt = p.payment_due_at;
 
   } else {
-    const { data: s, error } = await _sb.from('sessions').select('*').eq('id', sessionId).single();
+    const { data: s, error } = await _sb.from('sessions').select('*').eq('id', sessionId).maybeSingle();
     if (error || !s || s.student_id !== currentUser.id) { showCard('notFoundCard'); return; }
 
     if (s.status === 'confirmed' && s.payment_status === 'paid') { showCard('doneCard'); return; }

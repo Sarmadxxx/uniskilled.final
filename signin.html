@@ -101,12 +101,12 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 
   <form id="signinForm">
     <div class="form-group">
-      <label class="form-label">Email address</label>
-      <input type="email" id="email" class="form-input" placeholder="your@university.ac.uk" required>
+      <label for="email" class="form-label">Email address</label>
+      <input type="email" id="email" class="form-input" autocomplete="email" inputmode="email" placeholder="your@university.ac.uk" required>
     </div>
     <div class="form-group">
-      <label class="form-label">Password</label>
-      <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+      <label for="password" class="form-label">Password</label>
+      <input type="password" id="password" class="form-input" autocomplete="current-password" placeholder="••••••••" required>
       <div class="forgot"><a href="#" id="forgotLink">Forgot password?</a></div>
     </div>
 

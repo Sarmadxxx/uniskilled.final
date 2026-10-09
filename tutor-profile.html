@@ -172,6 +172,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!important;}
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
 </head>
 <body>
 
@@ -379,14 +380,14 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <div class="modal-head"><div class="modal-title">Edit About</div><button class="modal-close" onclick="closeModal('modalBio')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertBio"></div>
-      <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea" id="inputBio" rows="5" placeholder="Tell students about yourself..."></textarea></div>
-      <div class="form-group"><label class="form-label">First name</label><input type="text" class="form-input" id="inputFirst" placeholder="First name"></div>
-      <div class="form-group"><label class="form-label">Last name</label><input type="text" class="form-input" id="inputLast" placeholder="Last name"></div>
+      <div class="form-group"><label for="inputBio" class="form-label">Bio</label><textarea class="form-textarea" id="inputBio" rows="5" placeholder="Tell students about yourself..."></textarea></div>
+      <div class="form-group"><label for="inputFirst" class="form-label">First name</label><input type="text" class="form-input" id="inputFirst" placeholder="First name"></div>
+      <div class="form-group"><label for="inputLast" class="form-label">Last name</label><input type="text" class="form-input" id="inputLast" placeholder="Last name"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Gender</label><select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option></select></div>
-        <div class="form-group"><label class="form-label">Country</label><input type="text" class="form-input" id="inputCountry" placeholder="e.g. Germany"></div>
+        <div class="form-group"><label for="inputGender" class="form-label">Gender</label><select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option></select></div>
+        <div class="form-group"><label for="inputCountry" class="form-label">Country</label><input type="text" class="form-input" id="inputCountry" placeholder="e.g. Germany"></div>
       </div>
-      <div class="form-group"><label class="form-label">Language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German"></div>
+      <div class="form-group"><label for="inputLanguage" class="form-label">Language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button>
@@ -459,7 +460,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
           <button class="btn btn-primary" onclick="addLanguage()">+ Add</button>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Intro video link (optional)</label><input type="text" class="form-input" id="inputVideoLink" placeholder="YouTube or Loom link"></div>
+      <div class="form-group"><label for="inputVideoLink" class="form-label">Intro video link (optional)</label><input type="text" class="form-input" id="inputVideoLink" placeholder="YouTube or Loom link"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalLevels')">Cancel</button>
@@ -474,18 +475,18 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <div class="modal-head"><div class="modal-title">Academic Background</div><button class="modal-close" onclick="closeModal('modalAcademic')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertAcademic"></div>
-      <div class="form-group"><label class="form-label">University</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
+      <div class="form-group"><label for="inputUniversity" class="form-label">University</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Degree level</label>
+        <div class="form-group"><label for="inputDegree" class="form-label">Degree level</label>
           <select class="form-select" id="inputDegree"><option value="">Select</option><option value="bachelor">Bachelor's</option><option value="master">Master's</option><option value="phd">PhD</option><option value="other">Other</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. Mathematics"></div>
+        <div class="form-group"><label for="inputMajor" class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. Mathematics"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Year / Status</label>
+        <div class="form-group"><label for="inputYear" class="form-label">Year / Status</label>
           <select class="form-select" id="inputYear"><option value="">Select</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option><option value="5">5th Year+</option><option value="graduate">Graduate</option><option value="phd">PhD Candidate</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Grade / GPA</label><input type="text" class="form-input" id="inputGrade" placeholder="e.g. First, 3.8"></div>
+        <div class="form-group"><label for="inputGrade" class="form-label">Grade / GPA</label><input type="text" class="form-input" id="inputGrade" placeholder="e.g. First, 3.8"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -503,22 +504,22 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       <div class="alert-bar" id="alertTeaching"></div>
       <div class="form-row">
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="10" min="10"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum booking value is €10.</div></div>
-          <div class="form-group"><label class="form-label">Currency</label>
+          <div class="form-group"><label for="inputRate" class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="10" min="10"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum booking value is €10.</div></div>
+          <div class="form-group"><label for="inputCurrency" class="form-label">Currency</label>
             <select class="form-select" id="inputCurrency">
               <option value="EUR">€ — Euro (EUR)</option>
           <option value="USD">$ — US Dollar (USD)</option>
             </select>
           </div>
         </div>
-        <div class="form-group"><label class="form-label">Session length</label>
+        <div class="form-group"><label for="inputSessionLen" class="form-label">Session length</label>
           <select class="form-select" id="inputSessionLen"><option value="60">60 min</option><option value="90">90 min</option><option value="120">120 min</option><option value="flexible">Flexible</option></select>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Teaching format</label>
+      <div class="form-group"><label for="inputFormat" class="form-label">Teaching format</label>
         <select class="form-select" id="inputFormat"><option value="online">Online only</option><option value="inperson">In-person only</option><option value="both">Online & In-person</option></select>
       </div>
-      <div class="form-group"><label class="form-label">Preferred time</label>
+      <div class="form-group"><label for="inputPrefTime" class="form-label">Preferred time</label>
         <select class="form-select" id="inputPrefTime"><option value="">Any time</option><option value="morning">Morning (8am–12pm)</option><option value="afternoon">Afternoon (12pm–5pm)</option><option value="evening">Evening (5pm–10pm)</option><option value="flexible">Flexible</option></select>
       </div>
       <div class="form-group"><label class="form-label">Available days</label>
@@ -529,7 +530,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
           <button class="avail-toggle" data-day="sun">Sun</button>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Max students/week</label><input type="number" class="form-input" id="inputMaxStudents" placeholder="5" min="1" max="50"></div>
+      <div class="form-group"><label for="inputMaxStudents" class="form-label">Max students/week</label><input type="number" class="form-input" id="inputMaxStudents" placeholder="5" min="1" max="50"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalTeaching')">Cancel</button>
@@ -547,10 +548,10 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       <div id="certsModalList" style="margin-bottom:1rem;"></div>
       <div style="background:var(--off);border-radius:10px;padding:1rem;">
         <div class="form-row" style="margin-bottom:0.7rem;">
-          <div class="form-group" style="margin:0;"><label class="form-label">Subject</label><input type="text" class="form-input" id="certSubjectInput" placeholder="e.g. Linear Algebra"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label">Grade</label><input type="text" class="form-input" id="certGradeInput" placeholder="e.g. A, 95%"></div>
+          <div class="form-group" style="margin:0;"><label for="certSubjectInput" class="form-label">Subject</label><input type="text" class="form-input" id="certSubjectInput" placeholder="e.g. Linear Algebra"></div>
+          <div class="form-group" style="margin:0;"><label for="certGradeInput" class="form-label">Grade</label><input type="text" class="form-input" id="certGradeInput" placeholder="e.g. A, 95%"></div>
         </div>
-        <div class="form-group"><label class="form-label">Upload proof (optional)</label><input type="file" id="certFileInput" accept="image/jpeg,image/png,application/pdf" class="form-input" style="padding:0.4rem;"></div>
+        <div class="form-group"><label for="certFileInput" class="form-label">Upload proof (optional)</label><input type="file" id="certFileInput" accept="image/jpeg,image/png,application/pdf" class="form-input" style="padding:0.4rem;"></div>
         <button class="btn btn-outline" onclick="addCert()" style="width:100%;">+ Add certificate</button>
         <div style="font-size:0.72rem;color:var(--mid);margin-top:0.5rem;">After adding, don't forget to click <strong>Save</strong> below to actually store it on your profile.</div>
       </div>
@@ -874,7 +875,7 @@ async function loadProfile() {
 async function loadMeetingLink() {
   const body = document.getElementById('meetingLinkBody');
   if (!body) return;
-  const { data: tp } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).single();
+  const { data: tp } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).maybeSingle();
   if (tp?.meeting_link) {
     const display = tp.meeting_link.replace('https://','').slice(0,50) + (tp.meeting_link.length > 53 ? '…' : '');
     body.innerHTML = `<div class="info-row"><span class="info-label">Link</span><span class="info-value"><a href="${__safeUrl(tp.meeting_link)}" target="_blank" style="color:var(--blue);word-break:break-all;">🔗 ${__esc(display)}</a></span></div><div style="font-size:0.78rem;color:var(--mid);margin-top:0.5rem;">Students use this link to join confirmed sessions with you.</div>`;
@@ -885,15 +886,15 @@ async function loadMeetingLink() {
 
 async function saveMeetingLink() {
   const link = document.getElementById('inputMeetingLink').value.trim();
-  if (link && !link.startsWith('http')) { alert('Please enter a valid URL starting with https://'); return; }
+  if (link && !link.startsWith('http')) { showToast('Enter a full link starting with https://', 'error'); return; }
   const { error } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, meeting_link: link || null }, { onConflict: 'user_id' });
-  if (error) { alert('Error saving: ' + error.message); return; }
+  if (error) { showToast(__friendlyDbError(error, 'Could not save your meeting link. Please try again.'), 'error'); return; }
   closeModal('modalMeetingLink');
   await loadMeetingLink();
 }
 
 async function openMeetingLinkModal() {
-  const { data } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).single();
+  const { data } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).maybeSingle();
   document.getElementById('inputMeetingLink').value = data?.meeting_link || '';
   openModal('modalMeetingLink');
 }
@@ -922,7 +923,7 @@ async function submitReview() {
   if (!selectedRating) { showAlert('reviewAlert', 'Please select a rating.', 'error'); return; }
   const comment = document.getElementById('reviewText').value.trim();
   if (!comment) { showAlert('reviewAlert', 'Please write a comment.', 'error'); return; }
-  const { data: u } = await _supabase.from('users').select('full_name').eq('id', currentUserId).single();
+  const { data: u } = await _supabase.from('users').select('full_name').eq('id', currentUserId).maybeSingle();
   const { error } = await _supabase.from('reviews').insert({ tutor_id: tutorId, student_id: currentUserId, student_name: u?.full_name || 'Student', rating: selectedRating, comment });
   if (error) { showAlert('reviewAlert', /row-level security|violates/i.test(error.message || '') ? 'You can review this tutor after completing a session with them.' : 'Could not submit your review. Please try again.', 'error'); return; }
   showAlert('reviewAlert', 'Review submitted! Thank you.', 'success');
@@ -947,10 +948,10 @@ async function uploadAvatar() {
     if (res.ok && result.fileUrl) {
       await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, avatar_url: result.fileUrl }, { onConflict: 'user_id' });
     } else {
-      alert('Photo upload failed: ' + (result.error || 'unknown error') + '. Please try again.');
+      showToast('Photo upload failed. Please try again, or try a different image.', 'error');
     }
   } catch (e) {
-    alert('Photo upload failed — check your connection and try again.');
+    showToast('Photo upload failed — check your connection and try again.', 'error');
   }
 }
 
@@ -968,10 +969,10 @@ async function uploadCover() {
     if (res.ok && result.fileUrl) {
       await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, cover_url: result.fileUrl }, { onConflict: 'user_id' });
     } else {
-      alert('Cover photo upload failed: ' + (result.error || 'unknown error') + '. Please try again.');
+      showToast('Cover photo upload failed. Please try again, or try a different image.', 'error');
     }
   } catch (e) {
-    alert('Cover photo upload failed — check your connection and try again.');
+    showToast('Cover photo upload failed — check your connection and try again.', 'error');
   }
 }
 
@@ -1056,7 +1057,7 @@ async function saveTeaching() {
   const selectedCurrency = document.getElementById('inputCurrency').value || 'EUR';
   const minRate = selectedCurrency === 'USD' ? 11 : 10;
   if (rateVal !== null && rateVal < minRate) {
-    alert(`The minimum hourly rate on UniSkilled is ${selectedCurrency === 'USD' ? '$11' : '€10'} (so a 60-minute session meets the ${selectedCurrency === 'USD' ? '$11' : '€10'} minimum booking value). Please update your rate.`);
+    showToast(`The minimum hourly rate on UniSkilled is ${selectedCurrency === 'USD' ? '$11' : '€10'} (so a 60-minute session meets the ${selectedCurrency === 'USD' ? '$11' : '€10'} minimum booking value). Please update your rate.`, 'error');
     return;
   }
   const data = { user_id: currentUserId, hourly_rate: rateVal, currency: selectedCurrency, session_length: document.getElementById('inputSessionLen').value || null, teaching_format: document.getElementById('inputFormat').value || null, preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
@@ -1264,7 +1265,7 @@ function profileSignOut() {
     <div class="modal-body">
       <p style="font-size:0.83rem;color:var(--mid);line-height:1.6;margin-bottom:1.2rem;">Add your Zoom or Google Meet personal link. Students will use this to join confirmed sessions with you.</p>
       <div class="form-group">
-        <label class="form-label">Your meeting link</label>
+        <label for="inputMeetingLink" class="form-label">Your meeting link</label>
         <input type="url" class="form-input" id="inputMeetingLink" placeholder="https://zoom.us/j/your-personal-room">
         <div style="font-size:0.75rem;color:var(--mid);margin-top:0.4rem;">💡 Use your free Zoom personal room link — no time limits for 1-on-1 sessions.</div>
       </div>

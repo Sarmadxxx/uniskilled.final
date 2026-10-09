@@ -52,6 +52,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
 </head>
 <body>
 <header id="site-nav"></header>
@@ -168,9 +169,9 @@ async function joinGroupSession(groupSessionId) {
 
   if (error) {
     if (error.code === '23505') {
-      alert("You've already joined this group session.");
+      showToast("You've already joined this group session.", 'info');
     } else {
-      alert(__friendlyDbError(error, 'Could not join this session. Please try again.'));
+      showToast(__friendlyDbError(error, 'Could not join this session. Please try again.'), 'error');
     }
     return;
   }
