@@ -3,8 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="description" content="UniSkilled is building a freelance marketplace for university students. Join the waitlist to hear when it launches.">
+<link rel="canonical" href="https://uniskilled.com/coming-soon.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UniSkilled">
+<meta property="og:title" content="Coming Soon — UniSkilled">
+<meta property="og:description" content="UniSkilled is building a freelance marketplace for university students. Join the waitlist to hear when it launches.">
+<meta property="og:url" content="https://uniskilled.com/coming-soon.html">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
 <title>Coming Soon — UniSkilled</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -64,6 +82,7 @@ body{font-family:'Manrope',sans-serif;background:var(--white);color:var(--ink);m
   .cd-num{font-size:2rem;}
 }
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 
@@ -84,7 +103,7 @@ body{font-family:'Manrope',sans-serif;background:var(--white);color:var(--ink);m
   </div>
   <div class="left-bottom">
     <a class="logo" href="index.html" style="background:#fff;border-radius:10px;padding:0.5rem 0.9rem;display:inline-flex;width:fit-content;">
-      <img src="uniskilled-logo.png" alt="UniSkilled" style="height:28px;width:auto;display:block;">
+      <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="81" height="28" style="height:28px;width:auto;display:block;">
     </a>
   </div>
 </div>
@@ -110,12 +129,20 @@ function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 
-function toggleMobileNav(btn){
-  const nav=document.getElementById('mobileNav');
-  const isOpen=nav.style.display==='flex';
-  nav.style.display=isOpen?'none':'flex';
-  btn.textContent=isOpen?'☰':'✕';
+function toggleMobileNav(btn, force) {
+  btn = btn || document.querySelector('.nav-burger');
+  const n = document.getElementById('mobileNav'); if (!n || !btn) return;
+  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
+  n.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '✕' : '☰';
+  btn.setAttribute('aria-expanded', open);
+  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
 }
+document.addEventListener('click', e => {
+  const n = document.getElementById('mobileNav'); if (!n || n.style.display !== 'flex') return;
+  if (e.target.closest('#mobileNav a') || !e.target.closest('#mobileNav,.nav-burger')) toggleMobileNav(null, false);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleMobileNav(null, false); });
 </script>
 </body>
 </html>

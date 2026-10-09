@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="robots" content="noindex, nofollow">
 <title>Student Dashboard — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
@@ -156,11 +162,13 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
   .hero-stats{gap:1rem;}
 }
 </style>
+<link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
 </head>
 <body>
 
 <nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;"></a>
+  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;"></a>
   <div class="nav-links">
     <a href="index.html" class="nav-link">🏠 Home</a>
     <a href="student-profile.html" class="nav-link">👤 My Profile</a>
@@ -168,7 +176,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <a href="find-tutors.html" class="nav-cta">Find Tutors</a>
     <a href="#" class="nav-link" style="font-size:0.78rem;color:var(--mid);" onclick="event.preventDefault();dashSignOut()">Sign out</a>
   </div>
-  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
+  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
 </nav>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html">🏠 Home</a>
@@ -345,7 +353,7 @@ async function init() {
   if (meta.role === 'tutor' && !switchingMode) { window.location.href = 'tutor-dashboard.html'; return; }
 
   // Check if this student also has a tutor profile → show switch; otherwise show "Become a Tutor"
-  const { data: existingTp } = await _sb.from('tutor_profiles').select('user_id').eq('user_id', user.id).single();
+  const { data: existingTp } = await _sb.from('tutor_profiles').select('user_id').eq('user_id', user.id).maybeSingle();
   if (existingTp) {
     const sb = document.getElementById('switchModeBtn');
     if (sb) sb.style.display = 'block';
@@ -355,8 +363,8 @@ async function init() {
   }
 
   // Load profile
-  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', user.id).single();
-  const { data: sp } = await _sb.from('student_profiles').select('*').eq('user_id', user.id).single();
+  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', user.id).maybeSingle();
+  const { data: sp } = await _sb.from('student_profiles').select('*').eq('user_id', user.id).maybeSingle();
 
   const fullName = (p && p.full_name) || (meta.full_name) || 'Student';
   currentUserName = fullName;
@@ -607,7 +615,7 @@ async function submitReport() {
   }
 
   closeReportModal();
-  alert('Your report has been submitted. Our team will review it shortly.');
+  showToast('Report submitted. We\'ll review it and email you — the payment stays on hold meanwhile.', 'success', {afterReload:true});
   location.reload();
 }
 
@@ -695,12 +703,12 @@ async function joinSession(sessionId, subject, otherName) {
   try {
     const { data: sessionData } = await _sb.from('sessions')
       .select('tutor_id, tutor_name')
-      .eq('id', sessionId).single();
+      .eq('id', sessionId).maybeSingle();
 
     // Get the tutor's meeting link
     const { data: tp } = await _sb.from('tutor_profiles')
       .select('meeting_link')
-      .eq('user_id', sessionData?.tutor_id).single();
+      .eq('user_id', sessionData?.tutor_id).maybeSingle();
 
     // Notify tutor that student has joined
     if (sessionData?.tutor_id) {
@@ -717,13 +725,13 @@ async function joinSession(sessionId, subject, otherName) {
     if (tp?.meeting_link) {
       window.open(tp.meeting_link, '_blank');
     } else {
-      alert('The tutor has not set up a meeting link yet. Please message them to get the meeting details.');
+      showToast('Your tutor hasn\'t added a meeting link yet. Message them for the call details.', 'info');
     }
 
     btn.disabled = false;
     btn.textContent = '🎥 Join Session';
   } catch (err) {
-    alert('Error: ' + err.message);
+    showToast('Couldn\'t open the session. Check your connection and try again.', 'error');
     btn.disabled = false;
     btn.textContent = '🎥 Join Session';
   }
@@ -793,12 +801,20 @@ async function submitBecomeTutor() {
   setTimeout(() => window.location.href = 'tutor-dashboard.html', 1200);
 }
 
-function toggleNav(btn) {
-  const n = document.getElementById('mobileNav');
-  const o = n.style.display === 'flex';
-  n.style.display = o ? 'none' : 'flex';
-  btn.textContent = o ? '☰' : '✕';
+function toggleNav(btn, force) {
+  btn = btn || document.querySelector('.nav-burger');
+  const n = document.getElementById('mobileNav'); if (!n || !btn) return;
+  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
+  n.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '✕' : '☰';
+  btn.setAttribute('aria-expanded', open);
+  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
 }
+document.addEventListener('click', e => {
+  const n = document.getElementById('mobileNav'); if (!n || n.style.display !== 'flex') return;
+  if (e.target.closest('#mobileNav a') || !e.target.closest('#mobileNav,.nav-burger')) toggleNav(null, false);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleNav(null, false); });
 
 function dashSignOut() {
   _sb.auth.signOut().then(() => { window.location.href = 'index.html'; });
@@ -870,23 +886,23 @@ function shareReferralLink() {
       <div class="dm-alert" id="becomeTutorAlert"></div>
       <p style="font-size:0.85rem;color:var(--mid);margin-bottom:1.2rem;line-height:1.6;">Set up your tutor profile. You can switch between student and tutor mode any time from your dashboard.</p>
       <div class="dm-form-group">
-        <label class="dm-label">Subject(s) you can teach *</label>
+        <label for="btSubject" class="dm-label">Subject(s) you can teach *</label>
         <input type="text" class="dm-input" id="btSubject" placeholder="e.g. Mathematics, Python, French">
       </div>
       <div class="dm-row">
         <div class="dm-form-group">
-          <label class="dm-label">Hourly rate</label>
+          <label for="btRate" class="dm-label">Hourly rate</label>
           <input type="number" class="dm-input" id="btRate" placeholder="e.g. 10" min="10">
         </div>
         <div class="dm-form-group">
-          <label class="dm-label">Currency</label>
+          <label for="btCurrency" class="dm-label">Currency</label>
           <select class="dm-select" id="btCurrency">
             <option value="EUR">€ EUR</option><option value="USD">$ USD</option>
           </select>
         </div>
       </div>
       <div class="dm-form-group">
-        <label class="dm-label">Teaching format</label>
+        <label for="btFormat" class="dm-label">Teaching format</label>
         <select class="dm-select" id="btFormat">
           <option value="online">Online only</option>
           <option value="inperson">In-person only</option>
@@ -894,7 +910,7 @@ function shareReferralLink() {
         </select>
       </div>
       <div class="dm-form-group">
-        <label class="dm-label">Short bio as a tutor</label>
+        <label for="btBio" class="dm-label">Short bio as a tutor</label>
         <textarea class="dm-textarea" id="btBio" placeholder="Tell students about your experience and teaching style..."></textarea>
       </div>
     </div>
@@ -904,12 +920,12 @@ function shareReferralLink() {
     </div>
   </div>
 </div>
-<div style="text-align:center;padding:1.5rem;font-size:0.75rem;color:var(--light);border-top:1px solid var(--border);margin-top:2rem;">
-  <a href="legal.html" style="color:var(--light);text-decoration:none;margin:0 0.7rem;">Terms of Service</a> ·
-  <a href="legal.html#privacy" style="color:var(--light);text-decoration:none;margin:0 0.7rem;">Privacy Policy</a> ·
-  <a href="legal.html#refund" style="color:var(--light);text-decoration:none;margin:0 0.7rem;">Refund Policy</a> ·
-  <a href="mailto:info@uniskilled.com" style="color:var(--light);text-decoration:none;margin:0 0.7rem;">Contact</a>
-  <div style="margin-top:0.4rem;">© 2026 UniSkilled</div>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:0 .2rem;padding:1.5rem;font-size:0.75rem;color:var(--light);border-top:1px solid var(--border);margin-top:2rem;">
+  <a href="legal.html" style="color:var(--light);text-decoration:none;display:inline-block;padding:8px 0.5rem;">Terms of Service</a> ·
+  <a href="legal.html#privacy" style="color:var(--light);text-decoration:none;display:inline-block;padding:8px 0.5rem;">Privacy Policy</a> ·
+  <a href="legal.html#refund" style="color:var(--light);text-decoration:none;display:inline-block;padding:8px 0.5rem;">Refund Policy</a> ·
+  <a href="mailto:info@uniskilled.com" style="color:var(--light);text-decoration:none;display:inline-block;padding:8px 0.5rem;">Contact</a>
+  <div style="flex-basis:100%;text-align:center;margin-top:0.2rem;">© 2026 UniSkilled</div>
 </div>
 
 <!-- CANCEL / RESCHEDULE SESSION MODAL -->

@@ -3,6 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="description" id="metaDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
+<link rel="canonical" id="canonicalLink" href="https://uniskilled.com/find-tutors.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UniSkilled">
+<meta property="og:title" id="ogTitle" content="Tutor Profile — UniSkilled">
+<meta property="og:description" id="ogDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
+<meta property="og:url" id="ogUrl" content="https://uniskilled.com/find-tutors.html">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
 <title>Tutor Profile — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
@@ -152,27 +169,15 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
   .stat-item:nth-child(1),.stat-item:nth-child(2){border-bottom:1px solid var(--border);padding-bottom:0.9rem;}
   .form-row{grid-template-columns:1fr;}
 }
+body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!important;}
 </style>
+<link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
 </head>
 <body>
 
-<nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;"></a>
-  <div class="nav-links" id="navLinks">
-    <a href="index.html" class="nav-link">🏠 Home</a>
-    <a href="#" class="nav-link" id="dashLink">📊 Dashboard</a>
-    <a href="messages.html" class="nav-link">💬 Messages</a>
-    <a href="#" class="nav-cta" id="navCta">Edit Profile</a>
-    <a href="#" class="nav-link" id="navSignOut" style="display:none;font-size:0.8rem;" onclick="event.preventDefault();profileSignOut()">Sign out</a>
-  </div>
-  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
-</nav>
-<div class="mobile-nav" id="mobileNav">
-  <a href="index.html">🏠 Home</a>
-  <a href="#" id="dashLinkMobile">📊 Dashboard</a>
-  <a href="messages.html">💬 Messages</a>
-  <a href="#" id="mobileSignOut" style="display:none;" onclick="event.preventDefault();profileSignOut()">🚪 Sign out</a>
-</div>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
 
 <!-- COVER -->
 <div class="cover-wrap" id="coverWrap">
@@ -193,8 +198,9 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="identity-info">
         <div class="identity-name-row">
           <div class="profile-name" id="profileName">Loading...</div>
-          <div class="verified-badge">✓ Verified Tutor</div>
+          <div class="verified-badge" id="verifiedBadge" style="display:none;">✓ Verified Tutor</div>
         </div>
+        <a id="verifyNudge" href="tutor-dashboard.html#verify" style="display:none;margin-top:0.35rem;font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;" class="hit">Get your Verified badge — verify your university email →</a>
         <div class="profile-title" id="profileTitle"></div>
         <div class="profile-meta" id="profileMeta"></div>
         <div class="profile-tags" id="profileTags"></div>
@@ -245,7 +251,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="card-body" id="coursesBody">
         <span class="empty">No specific courses added yet.</span>
       </div>
-      <p style="font-size:0.75rem;color:var(--mid);margin-top:0.7rem;">Add exact course codes so students searching for their specific class — not just the general subject — can find you.</p>
+      <p class="owner-only" style="display:none;font-size:0.75rem;color:var(--mid);margin:0 1.4rem 1.2rem;">Add exact course codes so students searching for their specific class — not just the general subject — can find you.</p>
     </div>
 
     <!-- TRACK RECORD -->
@@ -375,14 +381,14 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     <div class="modal-head"><div class="modal-title">Edit About</div><button class="modal-close" onclick="closeModal('modalBio')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertBio"></div>
-      <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea" id="inputBio" rows="5" placeholder="Tell students about yourself..."></textarea></div>
-      <div class="form-group"><label class="form-label">First name</label><input type="text" class="form-input" id="inputFirst" placeholder="First name"></div>
-      <div class="form-group"><label class="form-label">Last name</label><input type="text" class="form-input" id="inputLast" placeholder="Last name"></div>
+      <div class="form-group"><label for="inputBio" class="form-label">Bio</label><textarea class="form-textarea" id="inputBio" rows="5" placeholder="Tell students about yourself..."></textarea></div>
+      <div class="form-group"><label for="inputFirst" class="form-label">First name</label><input type="text" class="form-input" id="inputFirst" placeholder="First name"></div>
+      <div class="form-group"><label for="inputLast" class="form-label">Last name</label><input type="text" class="form-input" id="inputLast" placeholder="Last name"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Gender</label><select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option></select></div>
-        <div class="form-group"><label class="form-label">Country</label><input type="text" class="form-input" id="inputCountry" placeholder="e.g. Germany"></div>
+        <div class="form-group"><label for="inputGender" class="form-label">Gender</label><select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option></select></div>
+        <div class="form-group"><label for="inputCountry" class="form-label">Country</label><input type="text" class="form-input" id="inputCountry" placeholder="e.g. Germany"></div>
       </div>
-      <div class="form-group"><label class="form-label">Language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German"></div>
+      <div class="form-group"><label for="inputLanguage" class="form-label">Language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button>
@@ -455,7 +461,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
           <button class="btn btn-primary" onclick="addLanguage()">+ Add</button>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Intro video link (optional)</label><input type="text" class="form-input" id="inputVideoLink" placeholder="YouTube or Loom link"></div>
+      <div class="form-group"><label for="inputVideoLink" class="form-label">Intro video link (optional)</label><input type="text" class="form-input" id="inputVideoLink" placeholder="YouTube or Loom link"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalLevels')">Cancel</button>
@@ -470,18 +476,18 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     <div class="modal-head"><div class="modal-title">Academic Background</div><button class="modal-close" onclick="closeModal('modalAcademic')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertAcademic"></div>
-      <div class="form-group"><label class="form-label">University</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
+      <div class="form-group"><label for="inputUniversity" class="form-label">University</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Degree level</label>
+        <div class="form-group"><label for="inputDegree" class="form-label">Degree level</label>
           <select class="form-select" id="inputDegree"><option value="">Select</option><option value="bachelor">Bachelor's</option><option value="master">Master's</option><option value="phd">PhD</option><option value="other">Other</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. Mathematics"></div>
+        <div class="form-group"><label for="inputMajor" class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. Mathematics"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Year / Status</label>
+        <div class="form-group"><label for="inputYear" class="form-label">Year / Status</label>
           <select class="form-select" id="inputYear"><option value="">Select</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option><option value="5">5th Year+</option><option value="graduate">Graduate</option><option value="phd">PhD Candidate</option></select>
         </div>
-        <div class="form-group"><label class="form-label">Grade / GPA</label><input type="text" class="form-input" id="inputGrade" placeholder="e.g. First, 3.8"></div>
+        <div class="form-group"><label for="inputGrade" class="form-label">Grade / GPA</label><input type="text" class="form-input" id="inputGrade" placeholder="e.g. First, 3.8"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -499,22 +505,22 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="alert-bar" id="alertTeaching"></div>
       <div class="form-row">
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="10" min="10"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum booking value is €10.</div></div>
-          <div class="form-group"><label class="form-label">Currency</label>
+          <div class="form-group"><label for="inputRate" class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="10" min="10"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum booking value is €10.</div></div>
+          <div class="form-group"><label for="inputCurrency" class="form-label">Currency</label>
             <select class="form-select" id="inputCurrency">
               <option value="EUR">€ — Euro (EUR)</option>
           <option value="USD">$ — US Dollar (USD)</option>
             </select>
           </div>
         </div>
-        <div class="form-group"><label class="form-label">Session length</label>
+        <div class="form-group"><label for="inputSessionLen" class="form-label">Session length</label>
           <select class="form-select" id="inputSessionLen"><option value="60">60 min</option><option value="90">90 min</option><option value="120">120 min</option><option value="flexible">Flexible</option></select>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Teaching format</label>
+      <div class="form-group"><label for="inputFormat" class="form-label">Teaching format</label>
         <select class="form-select" id="inputFormat"><option value="online">Online only</option><option value="inperson">In-person only</option><option value="both">Online & In-person</option></select>
       </div>
-      <div class="form-group"><label class="form-label">Preferred time</label>
+      <div class="form-group"><label for="inputPrefTime" class="form-label">Preferred time</label>
         <select class="form-select" id="inputPrefTime"><option value="">Any time</option><option value="morning">Morning (8am–12pm)</option><option value="afternoon">Afternoon (12pm–5pm)</option><option value="evening">Evening (5pm–10pm)</option><option value="flexible">Flexible</option></select>
       </div>
       <div class="form-group"><label class="form-label">Available days</label>
@@ -525,7 +531,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
           <button class="avail-toggle" data-day="sun">Sun</button>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Max students/week</label><input type="number" class="form-input" id="inputMaxStudents" placeholder="5" min="1" max="50"></div>
+      <div class="form-group"><label for="inputMaxStudents" class="form-label">Max students/week</label><input type="number" class="form-input" id="inputMaxStudents" placeholder="5" min="1" max="50"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalTeaching')">Cancel</button>
@@ -543,10 +549,10 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div id="certsModalList" style="margin-bottom:1rem;"></div>
       <div style="background:var(--off);border-radius:10px;padding:1rem;">
         <div class="form-row" style="margin-bottom:0.7rem;">
-          <div class="form-group" style="margin:0;"><label class="form-label">Subject</label><input type="text" class="form-input" id="certSubjectInput" placeholder="e.g. Linear Algebra"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label">Grade</label><input type="text" class="form-input" id="certGradeInput" placeholder="e.g. A, 95%"></div>
+          <div class="form-group" style="margin:0;"><label for="certSubjectInput" class="form-label">Subject</label><input type="text" class="form-input" id="certSubjectInput" placeholder="e.g. Linear Algebra"></div>
+          <div class="form-group" style="margin:0;"><label for="certGradeInput" class="form-label">Grade</label><input type="text" class="form-input" id="certGradeInput" placeholder="e.g. A, 95%"></div>
         </div>
-        <div class="form-group"><label class="form-label">Upload proof (optional)</label><input type="file" id="certFileInput" accept="image/jpeg,image/png,application/pdf" class="form-input" style="padding:0.4rem;"></div>
+        <div class="form-group"><label for="certFileInput" class="form-label">Upload proof (optional)</label><input type="file" id="certFileInput" accept="image/jpeg,image/png,application/pdf" class="form-input" style="padding:0.4rem;"></div>
         <button class="btn btn-outline" onclick="addCert()" style="width:100%;">+ Add certificate</button>
         <div style="font-size:0.72rem;color:var(--mid);margin-top:0.5rem;">After adding, don't forget to click <strong>Save</strong> below to actually store it on your profile.</div>
       </div>
@@ -601,6 +607,7 @@ async function init() {
   const { data: { session } } = await _supabase.auth.getSession();
 
   if (session) {
+    document.body.classList.add('signed-in');
     currentUserId = session.user.id;
     const meta = session.user.user_metadata || {};
     const role = meta.role || 'student';
@@ -609,13 +616,6 @@ async function init() {
     isOwner = (tutorId === currentUserId && role === 'tutor');
 
     // Nav
-    document.getElementById('dashLink').href = role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
-    document.getElementById('dashLinkMobile').href = role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
-    document.getElementById('navSignOut').style.display = '';
-    document.getElementById('mobileSignOut').style.display = '';
-    document.getElementById('navCta').href = isOwner ? '#' : 'find-tutors.html';
-    document.getElementById('navCta').textContent = isOwner ? 'Edit Profile' : 'Find Tutors';
-    if (isOwner) document.getElementById('navCta').onclick = e => { e.preventDefault(); openModal('modalBio'); };
 
     if (isOwner) {
       document.querySelectorAll('.owner-only').forEach(el => el.style.display = '');
@@ -630,11 +630,9 @@ async function init() {
       if (role === 'student') document.getElementById('reviewFormWrap').style.display = 'block';
     }
   } else {
+    document.body.classList.remove('signed-in');
     tutorId = urlId;
-    if (!tutorId) { window.location.href = 'signin.html'; return; }
-    document.getElementById('navCta').href = 'signin.html';
-    document.getElementById('navCta').textContent = 'Sign in';
-    document.getElementById('dashLink').href = 'signin.html';
+    if (!tutorId) { window.location.href = 'find-tutors.html'; return; }
   }
 
   await loadProfile();
@@ -666,9 +664,50 @@ async function init() {
   });
 }
 
+function showTutorNotFound() {
+  document.title = 'Tutor not found — UniSkilled';
+  const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex'; document.head.appendChild(m);
+  document.getElementById('profileName').textContent = 'Tutor not found';
+  const t = document.getElementById('profileTitle');
+  if (t) t.innerHTML = 'This profile may have been removed. <a href="find-tutors.html" style="color:var(--blue);font-weight:700;">Browse all tutors →</a>';
+  document.querySelectorAll('.verified-badge').forEach(el => el.style.display = 'none');
+}
+
+// Per-tutor title, description, canonical, social tags and structured data
+function applyTutorSeo(fullName, p, tp, subjects) {
+  const subj = (subjects || []).slice(0, 3);
+  const place = tp?.location || p?.country || '';
+  const title = fullName + (subj.length ? ' — ' + subj.join(', ') + ' Tutor' : ' — Tutor') + ' | UniSkilled';
+  const sym = currSymbol(tp?.currency || 'EUR');
+  const bioBit = (p?.bio || '').replace(/\s+/g, ' ').trim().slice(0, 110);
+  const desc = (bioBit ? bioBit + (bioBit.length >= 110 ? '… ' : ' ') : '') +
+    (tp?.university_verified_at ? 'University-verified tutor' : 'Tutor') + (subj.length ? ' for ' + subj.join(', ') : '') + (place ? ' · ' + place : '') +
+    (tp?.hourly_rate ? ' · from ' + sym + tp.hourly_rate + '/hr' : '') + '. Book securely on UniSkilled.';
+  const url = 'https://uniskilled.com/tutor-profile.html?id=' + encodeURIComponent(tutorId);
+  document.title = title;
+  const set = (id, attr, v) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, v); };
+  set('metaDesc', 'content', desc.slice(0, 300)); set('ogDesc', 'content', desc.slice(0, 300));
+  set('ogTitle', 'content', title); set('ogUrl', 'content', url); set('canonicalLink', 'href', url);
+  const ld = { '@context': 'https://schema.org', '@type': 'Person', name: fullName, url: url,
+    jobTitle: 'Tutor', knowsAbout: subj, description: bioBit || undefined,
+    image: (tp?.avatar_url || p?.avatar_url) || undefined,
+    makesOffer: tp?.hourly_rate ? { '@type': 'Offer', priceCurrency: tp.currency || 'EUR',
+      priceSpecification: { '@type': 'UnitPriceSpecification', price: tp.hourly_rate, priceCurrency: tp.currency || 'EUR', unitText: 'HOUR' },
+      itemOffered: { '@type': 'Service', name: (subj[0] || 'Tutoring') + ' tutoring', provider: { '@type': 'Organization', name: 'UniSkilled', url: 'https://uniskilled.com/' } } } : undefined };
+  let tag = document.getElementById('tutorLd');
+  if (!tag) { tag = document.createElement('script'); tag.type = 'application/ld+json'; tag.id = 'tutorLd'; document.head.appendChild(tag); }
+  tag.textContent = JSON.stringify(ld);
+}
+
 async function loadProfile() {
-  const { data: p } = await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).single();
-  const { data: tp } = await _supabase.from('tutor_profiles').select('*').eq('user_id', tutorId).single();
+  // The owner loads their full record (for the edit forms); everyone else — signed in or not —
+  // gets the public view, so visitors see real names and nobody sees payout details.
+  const TP_PUBLIC = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url';
+  const { data: p } = isOwner
+    ? await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).maybeSingle()
+    : await _supabase.from('public_tutors').select('*').eq('id', tutorId).maybeSingle();
+  const { data: tp } = await _supabase.from('tutor_profiles').select(isOwner ? '*' : TP_PUBLIC).eq('user_id', tutorId).maybeSingle();
+  if (!p && !tp) { showTutorNotFound(); return; }
   profileData = p; tutorData = tp;
 
   const fullName = (p && p.full_name) || 'Tutor';
@@ -682,7 +721,17 @@ async function loadProfile() {
   const { data: tc } = await _supabase.from('tutor_courses').select('*').eq('tutor_id', tutorId).order('created_at', { ascending: true });
   courses = tc || [];
 
-  document.title = fullName + ' — UniSkilled';
+  applyTutorSeo(fullName, p, tp, subjects);
+
+  // Verified badge only when the university email was actually confirmed; owners get a nudge otherwise
+  const vb = document.getElementById('verifiedBadge');
+  if (tp?.university_verified_at) {
+    vb.style.display = '';
+    vb.textContent = '✓ Verified' + (tp.verified_university ? ' · ' + tp.verified_university : ' Tutor');
+    vb.title = 'University email confirmed';
+  } else if (isOwner) {
+    document.getElementById('verifyNudge').style.display = 'inline-block';
+  }
 
   // Avatar
   const av = document.getElementById('avatarEl');
@@ -716,8 +765,8 @@ async function loadProfile() {
 
   // Book/Edit actions
   const bookDiv = document.getElementById('bookActions');
-  const certLink = `<a href="tutor-certificate.html?tutor=${__safeUrl(tutorId)}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.7rem;text-decoration:none;">🏆 View Certificate</a>`;
-  const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.7rem;text-decoration:none;">🚫 Manage Availability</a>`;
+  const certLink = `<a href="tutor-certificate.html?tutor=${__safeUrl(tutorId)}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">🏆 View Certificate</a>`;
+  const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">🚫 Manage Availability</a>`;
   if (isOwner) {
     bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>` + availabilityLink + certLink;
   } else if (currentUserId) {
@@ -727,15 +776,14 @@ async function loadProfile() {
   }
 
   // Stats
-  const { data: sessions } = await _supabase.from('sessions').select('id, subject').eq('tutor_id', tutorId).eq('status', 'completed');
-  document.getElementById('statSessions').textContent = (sessions || []).length;
+  // Completed sessions per subject — from a public summary view, so every visitor sees the
+  // tutor's real total (the sessions table itself is private to the two people in each session).
+  const { data: subjStats } = await _supabase.from('public_tutor_subject_stats').select('subject,completed_sessions').eq('tutor_id', tutorId);
+  const bySubject = {};
+  (subjStats || []).forEach(r => { bySubject[r.subject || 'Other'] = (bySubject[r.subject || 'Other'] || 0) + r.completed_sessions; });
+  document.getElementById('statSessions').textContent = Object.values(bySubject).reduce((a, b) => a + b, 0);
 
   // Track record: sessions completed per subject
-  const bySubject = {};
-  (sessions || []).forEach(s => {
-    const subj = s.subject || 'Other';
-    bySubject[subj] = (bySubject[subj] || 0) + 1;
-  });
   const subjectEntries = Object.entries(bySubject).sort((a, b) => b[1] - a[1]);
   const maxCount = subjectEntries.length ? subjectEntries[0][1] : 1;
   document.getElementById('trackRecordBody').innerHTML = subjectEntries.length > 0
@@ -842,7 +890,7 @@ async function loadProfile() {
 async function loadMeetingLink() {
   const body = document.getElementById('meetingLinkBody');
   if (!body) return;
-  const { data: tp } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).single();
+  const { data: tp } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).maybeSingle();
   if (tp?.meeting_link) {
     const display = tp.meeting_link.replace('https://','').slice(0,50) + (tp.meeting_link.length > 53 ? '…' : '');
     body.innerHTML = `<div class="info-row"><span class="info-label">Link</span><span class="info-value"><a href="${__safeUrl(tp.meeting_link)}" target="_blank" style="color:var(--blue);word-break:break-all;">🔗 ${__esc(display)}</a></span></div><div style="font-size:0.78rem;color:var(--mid);margin-top:0.5rem;">Students use this link to join confirmed sessions with you.</div>`;
@@ -853,15 +901,15 @@ async function loadMeetingLink() {
 
 async function saveMeetingLink() {
   const link = document.getElementById('inputMeetingLink').value.trim();
-  if (link && !link.startsWith('http')) { alert('Please enter a valid URL starting with https://'); return; }
+  if (link && !link.startsWith('http')) { showToast('Enter a full link starting with https://', 'error'); return; }
   const { error } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, meeting_link: link || null }, { onConflict: 'user_id' });
-  if (error) { alert('Error saving: ' + error.message); return; }
+  if (error) { showToast(__friendlyDbError(error, 'Could not save your meeting link. Please try again.'), 'error'); return; }
   closeModal('modalMeetingLink');
   await loadMeetingLink();
 }
 
 async function openMeetingLinkModal() {
-  const { data } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).single();
+  const { data } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).maybeSingle();
   document.getElementById('inputMeetingLink').value = data?.meeting_link || '';
   openModal('modalMeetingLink');
 }
@@ -890,7 +938,7 @@ async function submitReview() {
   if (!selectedRating) { showAlert('reviewAlert', 'Please select a rating.', 'error'); return; }
   const comment = document.getElementById('reviewText').value.trim();
   if (!comment) { showAlert('reviewAlert', 'Please write a comment.', 'error'); return; }
-  const { data: u } = await _supabase.from('users').select('full_name').eq('id', currentUserId).single();
+  const { data: u } = await _supabase.from('users').select('full_name').eq('id', currentUserId).maybeSingle();
   const { error } = await _supabase.from('reviews').insert({ tutor_id: tutorId, student_id: currentUserId, student_name: u?.full_name || 'Student', rating: selectedRating, comment });
   if (error) { showAlert('reviewAlert', /row-level security|violates/i.test(error.message || '') ? 'You can review this tutor after completing a session with them.' : 'Could not submit your review. Please try again.', 'error'); return; }
   showAlert('reviewAlert', 'Review submitted! Thank you.', 'success');
@@ -915,10 +963,10 @@ async function uploadAvatar() {
     if (res.ok && result.fileUrl) {
       await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, avatar_url: result.fileUrl }, { onConflict: 'user_id' });
     } else {
-      alert('Photo upload failed: ' + (result.error || 'unknown error') + '. Please try again.');
+      showToast('Photo upload failed. Please try again, or try a different image.', 'error');
     }
   } catch (e) {
-    alert('Photo upload failed — check your connection and try again.');
+    showToast('Photo upload failed — check your connection and try again.', 'error');
   }
 }
 
@@ -936,10 +984,10 @@ async function uploadCover() {
     if (res.ok && result.fileUrl) {
       await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, cover_url: result.fileUrl }, { onConflict: 'user_id' });
     } else {
-      alert('Cover photo upload failed: ' + (result.error || 'unknown error') + '. Please try again.');
+      showToast('Cover photo upload failed. Please try again, or try a different image.', 'error');
     }
   } catch (e) {
-    alert('Cover photo upload failed — check your connection and try again.');
+    showToast('Cover photo upload failed — check your connection and try again.', 'error');
   }
 }
 
@@ -1024,7 +1072,7 @@ async function saveTeaching() {
   const selectedCurrency = document.getElementById('inputCurrency').value || 'EUR';
   const minRate = selectedCurrency === 'USD' ? 11 : 10;
   if (rateVal !== null && rateVal < minRate) {
-    alert(`The minimum hourly rate on UniSkilled is ${selectedCurrency === 'USD' ? '$11' : '€10'} (so a 60-minute session meets the ${selectedCurrency === 'USD' ? '$11' : '€10'} minimum booking value). Please update your rate.`);
+    showToast(`The minimum hourly rate on UniSkilled is ${selectedCurrency === 'USD' ? '$11' : '€10'} (so a 60-minute session meets the ${selectedCurrency === 'USD' ? '$11' : '€10'} minimum booking value). Please update your rate.`, 'error');
     return;
   }
   const data = { user_id: currentUserId, hourly_rate: rateVal, currency: selectedCurrency, session_length: document.getElementById('inputSessionLen').value || null, teaching_format: document.getElementById('inputFormat').value || null, preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
@@ -1210,7 +1258,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('languageInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addLanguage(); });
 });
 
-function toggleNav(btn) { const n = document.getElementById('mobileNav'); const o = n.style.display === 'flex'; n.style.display = o ? 'none' : 'flex'; btn.textContent = o ? '☰' : '✕'; }
+
 
 function profileSignOut() {
   _supabase.auth.signOut().then(function() {
@@ -1232,7 +1280,7 @@ function profileSignOut() {
     <div class="modal-body">
       <p style="font-size:0.83rem;color:var(--mid);line-height:1.6;margin-bottom:1.2rem;">Add your Zoom or Google Meet personal link. Students will use this to join confirmed sessions with you.</p>
       <div class="form-group">
-        <label class="form-label">Your meeting link</label>
+        <label for="inputMeetingLink" class="form-label">Your meeting link</label>
         <input type="url" class="form-input" id="inputMeetingLink" placeholder="https://zoom.us/j/your-personal-room">
         <div style="font-size:0.75rem;color:var(--mid);margin-top:0.4rem;">💡 Use your free Zoom personal room link — no time limits for 1-on-1 sessions.</div>
       </div>

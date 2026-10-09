@@ -7,12 +7,14 @@ function renderSimpleNav(backHref, backLabel) {
     console.error('renderSimpleNav: no #nav-root element found on this page.');
     return;
   }
+  // Lay the logo and back link out in one row (the wrapper sits inside each page's <nav>)
+  root.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:1rem;width:100%;min-width:0;';
   const label = backLabel || '← Back to Dashboard';
-  const backLink = backHref ? `<a id="navBackLink" href="${backHref}" class="nav-link">${label}</a>` : '';
+  const backLink = backHref ? `<a id="navBackLink" href="${backHref}" class="nav-link" style="white-space:nowrap;">${label}</a>` : '';
 
   root.innerHTML = `
     <a href="index.html" class="nav-logo">
-      <img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;">
+      <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;">
     </a>
     ${backLink}
   `;

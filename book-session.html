@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="robots" content="noindex, nofollow">
 <title>Book a Session — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -46,11 +52,12 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
   .nav-brand{display:none;}
 }
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 <nav style="position:sticky;top:0;z-index:200;height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;padding:0 5%;font-family:'Manrope',sans-serif;">
   <a href="index.html" style="display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:#111827;">
-    <img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;">
+    <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;">
   </a>
   <div style="display:flex;align-items:center;gap:0.5rem;" class="nav-links">
     <a href="index.html" style="font-size:0.82rem;font-weight:600;color:#6b7280;text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">🏠 Home</a>
@@ -58,7 +65,7 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
     <a href="messages.html" style="font-size:0.82rem;font-weight:600;color:#6b7280;text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;" onmouseover="this.style.background='#f9fafb'" onmouseout="this.style.background='none'">💬 Messages</a>
     <a href="find-tutors.html" style="font-size:0.82rem;font-weight:700;background:#1a6bff;color:#fff;text-decoration:none;padding:0.4rem 0.9rem;border-radius:8px;">Find Tutors</a>
   </div>
-  <button class="nav-burger" onclick="toggleMobileNav(this)" style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#111827;">☰</button>
+  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleMobileNav(this)" style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#111827;">☰</button>
 </nav>
 <div class="page">
   <div class="card">
@@ -102,28 +109,28 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 
     <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#166534;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:0.7rem 0.9rem;margin-bottom:1rem;line-height:1.4;">
       <span>✅</span>
-      <span><strong>Never lose money to a no-show.</strong> If your tutor cancels or doesn't show up, you're refunded automatically — no dispute, no waiting, no exceptions.</span>
+      <span><strong>Never lose money to a no-show.</strong> If your tutor cancels, you're refunded automatically. If they don't show up, report it from your dashboard within 48 hours for a full refund.</span>
     </div>
 
     <div id="alert" class="alert"></div>
 
     <div class="form-group">
-      <label class="form-label">Subject *</label>
+      <label for="subject" class="form-label">Subject *</label>
       <input type="text" id="subject" class="form-input" placeholder="e.g. Linear Algebra, Python basics...">
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Date *</label>
+        <label for="date" class="form-label">Date *</label>
         <input type="date" id="date" class="form-input">
       </div>
       <div class="form-group">
-        <label class="form-label">Time *</label>
+        <label for="time" class="form-label">Time *</label>
         <input type="time" id="time" class="form-input">
       </div>
     </div>
     <div class="form-row">
       <div class="form-group">
-        <label class="form-label">Duration</label>
+        <label for="duration" class="form-label">Duration</label>
         <select id="duration" class="form-select">
           <option value="60">60 minutes</option>
           <option value="90">90 minutes</option>
@@ -131,7 +138,7 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">Format</label>
+        <label for="format" class="form-label">Format</label>
         <select id="format" class="form-select">
           <option value="online">Online</option>
           <option value="inperson">In-person</option>
@@ -139,7 +146,7 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
       </div>
     </div>
     <div class="form-group">
-      <label class="form-label">Notes for tutor (optional)</label>
+      <label for="notes" class="form-label">Notes for tutor (optional)</label>
       <textarea id="notes" class="form-textarea" placeholder="What do you want to cover? Any specific topics or questions?"></textarea>
     </div>
 
@@ -196,8 +203,8 @@ async function init(){
   currentUser=session.user;
 
   // Load tutor info
-  const {data:tp}=await _sb.from('tutor_profiles').select('*').eq('user_id',tutorId).single();
-  const {data:u}=await _sb.from('users').select('full_name,avatar_url').eq('id',tutorId).single();
+  const {data:tp}=await _sb.from('tutor_profiles').select('*').eq('user_id',tutorId).maybeSingle();
+  const {data:u}=await _sb.from('users').select('full_name,avatar_url').eq('id',tutorId).maybeSingle();
   tutorData={...tp,...u};
 
   const name=u?.full_name||tutorNameParam;
@@ -324,7 +331,7 @@ async function submitBooking(){
 
   setLoading(true);
 
-  const {data:sp}=await _sb.from('users').select('full_name').eq('id',currentUser.id).single();
+  const {data:sp}=await _sb.from('users').select('full_name').eq('id',currentUser.id).maybeSingle();
   const studentName=sp?.full_name||'Student';
   const tutorName=tutorData?.full_name||tutorNameParam;
 
@@ -384,12 +391,20 @@ function setLoading(loading){
 document.addEventListener('DOMContentLoaded',init);
 </script>
 <script>
-function toggleMobileNav(btn){
-  const nav=document.getElementById('mobileNav');
-  const isOpen=nav.style.display==='flex';
-  nav.style.display=isOpen?'none':'flex';
-  btn.textContent=isOpen?'☰':'✕';
+function toggleMobileNav(btn, force) {
+  btn = btn || document.querySelector('.nav-burger');
+  const n = document.getElementById('mobileNav'); if (!n || !btn) return;
+  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
+  n.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '✕' : '☰';
+  btn.setAttribute('aria-expanded', open);
+  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
 }
+document.addEventListener('click', e => {
+  const n = document.getElementById('mobileNav'); if (!n || n.style.display !== 'flex') return;
+  if (e.target.closest('#mobileNav a') || !e.target.closest('#mobileNav,.nav-burger')) toggleMobileNav(null, false);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleMobileNav(null, false); });
 </script>
 </body>
 </html>

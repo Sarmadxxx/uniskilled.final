@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
 <title>Get Started — UniSkilled</title>
 <meta name="description" content="Create your free UniSkilled account as a student or tutor.">
 <link rel="canonical" href="https://uniskilled.com/onboarding.html">
@@ -11,8 +19,8 @@
 <meta property="og:title" content="Get Started — UniSkilled">
 <meta property="og:description" content="Create your free UniSkilled account as a student or tutor.">
 <meta property="og:url" content="https://uniskilled.com/onboarding.html">
-<meta property="og:image" content="https://uniskilled.com/uniskilled-logo.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -102,11 +110,12 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
   .cert-add-row{grid-template-columns:1fr 1fr;}.cert-add-row .tag-btn{grid-column:span 2;}
 }
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 <div class="container">
   <a class="logo" href="index.html">
-    <img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;">
+    <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;">
   </a>
   <div class="steps" id="stepsBar">
     <div class="step active" id="s1"><div class="step-num" id="sn1">1</div><span>Role</span></div>
@@ -128,12 +137,12 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
       <h2>How will you use UniSkilled?</h2>
       <p class="subtitle">Choose your role. You can add more later.</p>
       <div class="role-cards">
-        <div class="role-card" data-role="student"><span class="role-icon">🎓</span><div class="role-name">Student</div><div class="role-desc">Earn through freelance and tutoring</div></div>
+        <div class="role-card" data-role="student"><span class="role-icon">🎓</span><div class="role-name">Student</div><div class="role-desc">Find a tutor for your courses</div></div>
         <div class="role-card" data-role="tutor"><span class="role-icon">📚</span><div class="role-name">Tutor</div><div class="role-desc">Teach students in your subject</div></div>
         <div class="role-card" data-role="business" style="opacity:0.65;"><span class="cs-badge">Soon</span><span class="role-icon">🏢</span><div class="role-name">Business</div><div class="role-desc">Hire verified student talent</div></div>
       </div>
       <button class="btn-primary" id="nextBtn1" disabled>Continue →</button>
-      <div class="signin-link">Already have an account? <a href="signin.html">Sign in</a></div>
+      <div class="signin-link">Already have an account? <a href="signin.html" class="hit">Sign in</a></div>
     </div>
 
     <!-- SCREEN 2: Personal info (same for both roles) -->
@@ -142,19 +151,19 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
       <p class="subtitle">This builds your verified profile.</p>
       <div class="section-title">Personal details</div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">First name *</label><input type="text" id="firstName" class="form-input" placeholder="Sara"></div>
-        <div class="form-group"><label class="form-label">Last name *</label><input type="text" id="lastName" class="form-input" placeholder="Johnson"></div>
+        <div class="form-group"><label for="firstName" class="form-label">First name *</label><input type="text" id="firstName" class="form-input" autocomplete="given-name" placeholder="Sara"></div>
+        <div class="form-group"><label for="lastName" class="form-label">Last name *</label><input type="text" id="lastName" class="form-input" autocomplete="family-name" placeholder="Johnson"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Gender</label><select id="gender" class="form-select"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option><option value="other">Other</option></select></div>
-        <div class="form-group"><label class="form-label">Country *</label><input type="text" id="country" class="form-input" placeholder="e.g. Germany"></div>
+        <div class="form-group"><label for="gender" class="form-label">Gender</label><select id="gender" class="form-select"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option><option value="other">Other</option></select></div>
+        <div class="form-group"><label for="country" class="form-label">Country *</label><input type="text" id="country" class="form-input" autocomplete="country-name" placeholder="e.g. Germany"></div>
       </div>
-      <div class="form-group"><label class="form-label">Primary language *</label><input type="text" id="language" class="form-input" placeholder="e.g. English, German..."></div>
+      <div class="form-group"><label for="language" class="form-label">Primary language *</label><input type="text" id="language" class="form-input" placeholder="e.g. English, German..."></div>
       <div class="section-title">Academic details</div>
-      <div class="form-group"><label class="form-label">University *</label><input type="text" id="university" class="form-input" placeholder="e.g. University of Edinburgh"></div>
+      <div class="form-group"><label for="university" class="form-label">University *</label><input type="text" id="university" class="form-input" autocomplete="organization" placeholder="e.g. University of Edinburgh"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label" id="degreeLabel">Degree / Course *</label><input type="text" id="degree" class="form-input" placeholder="e.g. Computer Science"></div>
-        <div class="form-group" id="yearGroup"><label class="form-label">Year of study</label><select id="yearOfStudy" class="form-select"><option value="">Select year</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option><option value="5">5th Year+</option><option value="postgrad">Postgraduate</option><option value="phd">PhD</option></select></div>
+        <div class="form-group"><label for="degree" class="form-label" id="degreeLabel">Degree / Course *</label><input type="text" id="degree" class="form-input" placeholder="e.g. Computer Science"></div>
+        <div class="form-group" id="yearGroup"><label for="yearOfStudy" class="form-label">Year of study</label><select id="yearOfStudy" class="form-select"><option value="">Select year</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option><option value="5">5th Year+</option><option value="postgrad">Postgraduate</option><option value="phd">PhD</option></select></div>
       </div>
       <button class="btn-primary" id="nextBtn2">Continue →</button>
       <button class="btn-secondary" id="backBtn1">← Back</button>
@@ -177,30 +186,30 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
       <div id="tutorExtra" style="display:none;">
         <div class="section-title">Pricing & Teaching</div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Hourly rate *</label>
+          <div class="form-group"><label for="rateCurrency" class="form-label">Hourly rate *</label>
             <div style="display:flex;gap:0.6rem;">
               <select id="rateCurrency" class="form-select" style="max-width:110px;flex-shrink:0;">
                 <option value="EUR" selected>€ EUR</option>
                 <option value="USD">$ USD</option>
               </select>
-              <input type="number" id="hourlyRate" class="form-input" placeholder="10" min="10" max="200">
+              <input type="number" id="hourlyRate" class="form-input" inputmode="decimal" placeholder="10" min="10" max="200">
             </div>
             <div class="hint" id="rateHint">Minimum €10 per hour</div>
           </div>
-          <div class="form-group"><label class="form-label">Teaching format</label><select id="teachingFormat" class="form-select"><option value="online">Online only</option><option value="inperson">In-person only</option><option value="both">Both</option></select></div>
+          <div class="form-group"><label for="teachingFormat" class="form-label">Teaching format</label><select id="teachingFormat" class="form-select"><option value="online">Online only</option><option value="inperson">In-person only</option><option value="both">Both</option></select></div>
         </div>
-        <div class="form-group"><label class="form-label">Bio — tell students about yourself</label><textarea id="bio" class="form-textarea" placeholder="Describe your teaching style, experience, and qualifications..."></textarea></div>
+        <div class="form-group"><label for="bio" class="form-label">Bio — tell students about yourself</label><textarea id="bio" class="form-textarea" placeholder="Describe your teaching style, experience, and qualifications..."></textarea></div>
 
         <div class="section-title">Certificates & Grades</div>
         <p style="font-size:0.8rem;color:var(--mid);margin-bottom:0.8rem;">Add your grades or certificates. These will appear on your public tutor profile so students can see your qualifications.</p>
         <div class="cert-list" id="certList"></div>
         <div class="cert-add-row">
-          <div class="form-group" style="margin:0;"><label class="form-label">Subject / Certificate</label><input type="text" class="form-input" id="certSubject" placeholder="e.g. Linear Algebra"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label">Grade</label><input type="text" class="form-input" id="certGrade" placeholder="e.g. A, 95%, First"></div>
+          <div class="form-group" style="margin:0;"><label for="certSubject" class="form-label">Subject / Certificate</label><input type="text" class="form-input" id="certSubject" placeholder="e.g. Linear Algebra"></div>
+          <div class="form-group" style="margin:0;"><label for="certGrade" class="form-label">Grade</label><input type="text" class="form-input" id="certGrade" placeholder="e.g. A, 95%, First"></div>
           <button class="tag-btn" id="addCertBtn" style="align-self:flex-end;margin-bottom:0;">+ Add</button>
         </div>
         <div class="form-group" style="margin-top:0.7rem;">
-          <label class="form-label">Upload proof (PDF or image) — optional</label>
+          <label for="certFile" class="form-label">Upload proof (PDF or image) — optional</label>
           <input type="file" id="certFile" accept="image/jpeg,image/png,image/jpg,application/pdf" class="form-input" style="padding:0.5rem;cursor:pointer;">
           <div class="hint">Max 5MB. PDF, JPG or PNG. Will appear on your public tutor profile.</div>
         </div>
@@ -209,8 +218,8 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
         <p style="font-size:0.8rem;color:var(--mid);margin-bottom:0.8rem;">Add exact course codes you can help with, so students searching for their specific class — not just the general subject — can find you.</p>
         <div class="cert-list" id="courseList"></div>
         <div class="cert-add-row">
-          <div class="form-group" style="margin:0;"><label class="form-label">Course code</label><input type="text" class="form-input" id="courseCode" placeholder="e.g. MATH 201"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label">Course name / Professor</label><input type="text" class="form-input" id="courseNameProf" placeholder="e.g. Calculus II — Prof. Chen"></div>
+          <div class="form-group" style="margin:0;"><label for="courseCode" class="form-label">Course code</label><input type="text" class="form-input" id="courseCode" placeholder="e.g. MATH 201"></div>
+          <div class="form-group" style="margin:0;"><label for="courseNameProf" class="form-label">Course name / Professor</label><input type="text" class="form-input" id="courseNameProf" placeholder="e.g. Calculus II — Prof. Chen"></div>
           <button class="tag-btn" id="addCourseBtn" style="align-self:flex-end;margin-bottom:0;">+ Add</button>
         </div>
       </div>
@@ -245,14 +254,14 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
     <div class="screen" id="screen4">
       <h2>Create your account</h2>
       <p class="subtitle">Set up your login credentials.</p>
-      <div class="form-group"><label class="form-label">Email address *</label><input type="email" id="email" class="form-input" placeholder="you@university.ac.uk"></div>
+      <div class="form-group"><label class="form-label" for="email">Email address *</label><input type="email" id="email" class="form-input" autocomplete="email" placeholder="you@university.ac.uk"></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Password *</label><input type="password" id="password" class="form-input" placeholder="Min. 10 characters"><div class="hint">At least 10 characters, with upper- and lowercase letters, a number and a symbol</div></div>
-        <div class="form-group"><label class="form-label">Confirm password *</label><input type="password" id="confirmPassword" class="form-input" placeholder="Repeat password"></div>
+        <div class="form-group"><label for="password" class="form-label">Password *</label><input type="password" id="password" class="form-input" autocomplete="new-password" placeholder="Min. 10 characters"><div class="hint">At least 10 characters, with upper- and lowercase letters, a number and a symbol</div></div>
+        <div class="form-group"><label for="confirmPassword" class="form-label">Confirm password *</label><input type="password" id="confirmPassword" class="form-input" autocomplete="new-password" placeholder="Repeat password"></div>
       </div>
       <button class="btn-primary" id="submitBtn"><span id="btnText">Create account</span><div class="spinner" id="spinner"></div></button>
       <button class="btn-secondary" id="backBtn3">← Back</button>
-      <div class="signin-link">Already have an account? <a href="signin.html">Sign in</a></div>
+      <div class="signin-link">Already have an account? <a href="signin.html" class="hit">Sign in</a></div>
     </div>
 
     <!-- SCREEN 5: Success -->
@@ -375,6 +384,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Pre-select role from URL param (e.g. onboarding.html?role=tutor)
   const urlRole = new URLSearchParams(window.location.search).get('role');
+  const urlEmail = new URLSearchParams(window.location.search).get('email');
+  if (urlEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(urlEmail)) document.getElementById('email').value = urlEmail;
   if (urlRole === 'tutor' || urlRole === 'student') {
     const targetCard = document.querySelector('.role-card[data-role="' + urlRole + '"]');
     if (targetCard) targetCard.click();

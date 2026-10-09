@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<script>/* Demo/prototype page: only for these roles; everyone else is sent on before it renders */(function(){var ok=false;try{var t=JSON.parse(localStorage.getItem("sb-orghkbbohnabcietidiv-auth-token")||"null");var s=t&&(t.currentSession||t);var r=s&&s.user&&s.user.user_metadata&&s.user.user_metadata.role;ok=['business','admin'].indexOf(r)>-1;}catch(e){}if(!ok)location.replace("coming-soon.html");})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="robots" content="noindex, nofollow">
 <title>Momentum Digital — Verified Employer · UniSkilled</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -251,6 +259,7 @@ html,body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:
   .tab{font-size:.72rem;padding:.45rem .5rem}
 }
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 
@@ -258,7 +267,7 @@ html,body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:
 
 <!-- NAV -->
 <nav class="nav">
-  <a class="nav-logo" href="Home.html">
+  <a class="nav-logo" href="index.html">
     <div class="nav-logo-icon">U</div>
     UniSkilled
   </a>
@@ -522,8 +531,8 @@ html,body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:
       </div>
       <!-- Company name + industry -->
       <div class="fgrid2">
-        <div class="fgroup"><label class="flabel">Company Name *</label><input class="finput" id="fName" value="Momentum Digital GmbH"></div>
-        <div class="fgroup"><label class="flabel">Industry *</label>
+        <div class="fgroup"><label for="fName" class="flabel">Company Name *</label><input class="finput" id="fName" value="Momentum Digital GmbH"></div>
+        <div class="fgroup"><label for="fIndustry" class="flabel">Industry *</label>
           <select class="fselect" id="fIndustry">
             <option selected>SaaS · B2B Software</option><option>Fintech</option><option>E-commerce</option><option>Healthcare</option><option>EdTech</option><option>Media & Marketing</option><option>Consulting</option><option>Other</option>
           </select>
@@ -531,29 +540,29 @@ html,body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:
       </div>
       <!-- City + country -->
       <div class="fgrid2">
-        <div class="fgroup"><label class="flabel">City *</label><input class="finput" id="fCity" value="Berlin"></div>
-        <div class="fgroup"><label class="flabel">Country *</label><input class="finput" id="fCountry" value="Germany"></div>
+        <div class="fgroup"><label for="fCity" class="flabel">City *</label><input class="finput" id="fCity" value="Berlin"></div>
+        <div class="fgroup"><label for="fCountry" class="flabel">Country *</label><input class="finput" id="fCountry" value="Germany"></div>
       </div>
       <!-- Size + founded -->
       <div class="fgrid2">
-        <div class="fgroup"><label class="flabel">Company Size</label>
+        <div class="fgroup"><label for="fSize" class="flabel">Company Size</label>
           <select class="fselect" id="fSize">
             <option>1–10 employees</option><option>10–30 employees</option><option selected>30–50 employees</option><option>50–100 employees</option><option>100–500 employees</option><option>500+ employees</option>
           </select>
         </div>
-        <div class="fgroup"><label class="flabel">Founded Year</label><input class="finput" id="fFounded" value="2019"></div>
+        <div class="fgroup"><label for="fFounded" class="flabel">Founded Year</label><input class="finput" id="fFounded" value="2019"></div>
       </div>
       <!-- Website + LinkedIn -->
       <div class="fgrid2">
-        <div class="fgroup"><label class="flabel">Website</label><input class="finput" id="fWebsite" value="momentumdigital.de"></div>
-        <div class="fgroup"><label class="flabel">LinkedIn</label><input class="finput" id="fLinkedin" placeholder="linkedin.com/company/..."></div>
+        <div class="fgroup"><label for="fWebsite" class="flabel">Website</label><input class="finput" id="fWebsite" value="momentumdigital.de"></div>
+        <div class="fgroup"><label for="fLinkedin" class="flabel">LinkedIn</label><input class="finput" id="fLinkedin" placeholder="linkedin.com/company/..."></div>
       </div>
       <!-- Description -->
-      <div class="fgroup"><label class="flabel">Company Description</label>
+      <div class="fgroup"><label for="fDesc" class="flabel">Company Description</label>
         <textarea class="ftextarea" id="fDesc">Momentum Digital is a Berlin-based SaaS company building intelligent logistics and operations tools for mid-market businesses across DACH. We serve over 200 customers and process 2M+ logistics events monthly.</textarea>
       </div>
       <!-- Tech stack -->
-      <div class="fgroup"><label class="flabel">Tech Stack <span style="font-size:.68rem;color:var(--soft);font-weight:400;text-transform:none;letter-spacing:0">(comma separated)</span></label>
+      <div class="fgroup"><label for="fStack" class="flabel">Tech Stack <span style="font-size:.68rem;color:var(--soft);font-weight:400;text-transform:none;letter-spacing:0">(comma separated)</span></label>
         <input class="finput" id="fStack" value="React, TypeScript, Python, PostgreSQL, AWS, Docker, Figma">
       </div>
     </div>

@@ -3,17 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UniSkilled — Where Student Talent Meets Real Opportunity</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<title>UniSkilled — University-Verified Peer Tutoring, Payment Protected</title>
 <meta name="description" content="Book a university-verified peer tutor in your exact course, or become one. Secure payments held until your session is done.">
 <link rel="canonical" href="https://uniskilled.com/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
-<meta property="og:title" content="UniSkilled — Where Student Talent Meets Real Opportunity">
+<meta property="og:title" content="UniSkilled — University-Verified Peer Tutoring, Payment Protected">
 <meta property="og:description" content="Book a university-verified peer tutor in your exact course, or become one. Secure payments held until your session is done.">
 <meta property="og:url" content="https://uniskilled.com/">
-<meta property="og:image" content="https://uniskilled.com/uniskilled-logo.png">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Lora:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -26,7 +35,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:900;height:64px;padding:0 6%;dis
 .nav-links{display:flex;gap:2rem}
 .nav-links a{font-size:0.85rem;color:var(--mid);text-decoration:none;font-weight:500;transition:color .18s}
 .nav-links a:hover{color:var(--ink)}
-.nav-burger{display:none}
+.nav-burger{display:none;width:44px;height:44px;align-items:center;justify-content:center;background:none;border:none;font-size:1.4rem;color:var(--ink);cursor:pointer;border-radius:8px}
+nav.scrolled{box-shadow:0 4px 20px rgba(17,24,39,.06)}
 .nav-end{display:flex;align-items:center;gap:1rem;flex-shrink:0}
 .nav-end a{white-space:nowrap}
 .btn-text{font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:600;background:none;border:none;color:var(--ink2);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
@@ -163,6 +173,9 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   nav{padding:0 5%;}
   .nav-end{display:none}
   .nav-links.open #navEndMobile{display:flex!important;}
+  .nav-links.open > a{font-size:1rem;color:var(--ink);padding:0.55rem 0;min-height:44px;display:flex;align-items:center}
+  .nav-links.open .btn-text{color:var(--ink2);font-size:1rem;min-height:44px}
+  .nav-links.open .btn-profile{color:#0f172a;font-size:0.95rem;padding:0.75rem 1.4rem}
   .hero{grid-template-columns:1fr;min-height:auto}
   .hero-l{padding:2.4rem 6%;}
   .hero-r{height:320px}
@@ -185,10 +198,19 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   h1.h1{font-size:clamp(2rem,8vw,2.6rem)}
 }
 </style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"Organization","@id":"https://uniskilled.com/#org","name":"UniSkilled","url":"https://uniskilled.com/","logo":"https://uniskilled.com/icon-512.png","email":"info@uniskilled.com","description":"University-verified peer tutoring marketplace with escrow-protected payments."},
+ {"@type":"WebSite","@id":"https://uniskilled.com/#website","url":"https://uniskilled.com/","name":"UniSkilled","publisher":{"@id":"https://uniskilled.com/#org"},
+  "potentialAction":{"@type":"SearchAction","target":"https://uniskilled.com/find-tutors.html?q={search_term_string}","query-input":"required name=search_term_string"}}
+]}
+</script>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <nav>
-  <a class="logo" href="index.html"><img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;"></a>
+  <a class="logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;"></a>
   <div class="nav-links" id="navLinks">
     <a href="about.html">About</a>
     <a href="find-tutors.html">Find Tutors</a>
@@ -200,8 +222,9 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
     <a href="signin.html" class="btn-text">Sign in</a>
     <a href="onboarding.html" class="btn-profile">Get started →</a>
   </div>
-  <button class="nav-burger" id="navBurger" onclick="document.getElementById('navLinks').classList.toggle('open')">☰</button>
+  <button class="nav-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
 </nav>
+<main id="main">
 <section class="hero">
   <div class="hero-l">
     <div class="hero-badge"><span class="badge-live"></span>University-verified tutoring, protected by real escrow</div>
@@ -218,7 +241,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
     </div>
   </div>
   <div class="hero-r">
-    <img class="hero-photo" src="hero-photo.jpg" alt="Students studying together">
+    <img class="hero-photo" src="hero-photo.jpg" alt="University student tutoring online from a campus library" width="1256" height="832" fetchpriority="high" decoding="async">
     <div class="hero-r-overlay"></div>
     <div class="hero-stat hs1"><div class="hs-l">Platform</div><div class="hs-v">Live now</div><div class="hs-s">Book your first session today</div></div>
     <div class="hero-stat hs2"><div class="hs-l">Every payment</div><div class="hs-v">48hr held</div><div class="hs-chip">🔐 Real refund protection</div></div>
@@ -230,7 +253,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   <div class="sk" style="color:var(--blue)"><span class="sk-dot" style="background:var(--blue)"></span>Who it's for</div>
   <h2 class="sh">One platform. <em>Both sides of learning.</em></h2>
   <div class="who-cards">
-    <div class="wcard w1"><div class="wcard-top-line"></div><div class="wcard-icon">📚</div><h3>Need a Tutor</h3><p>Book a university-verified peer who's already aced your exact course. Nothing charged until they accept — and your payment stays protected for 48 hours after your session.</p><ul><li>University-verified tutors</li><li>Pay only after they accept</li><li>48-hour refund guarantee</li></ul><a class="wcard-cta" href="find-tutors.html">Find a tutor →</a></div>
+    <div class="wcard w1"><div class="wcard-top-line"></div><div class="wcard-icon">📚</div><h3>Need a Tutor</h3><p>Book a peer who's already aced your exact course — verified tutors carry a badge. Nothing charged until they accept — and your payment stays protected for 48 hours after your session.</p><ul><li>Verified tutors listed first</li><li>Pay only after they accept</li><li>48-hour refund guarantee</li></ul><a class="wcard-cta" href="find-tutors.html">Find a tutor →</a></div>
     <div class="wcard w2"><div class="wcard-top-line"></div><div class="wcard-icon">🎓</div><h3>Want to Tutor</h3><p>Set your own rate and hours, teach what you know, and get paid safely through PayPal — with a real, verifiable track record building behind every session.</p><ul><li>Set your own rate and schedule</li><li>Verified reviews & track record</li><li>Fast, secure PayPal payouts</li></ul><a class="wcard-cta" href="onboarding.html?role=tutor">Start tutoring →</a></div>
     <div class="wcard w3"><div class="wcard-top-line"></div><div class="wcard-icon">👥</div><h3>Group Sessions</h3><p>Studying the same course as your classmates? Split one session between up to 4 students and everyone pays less — same tutor, same quality.</p><ul><li>Split the cost, up to 4 students</li><li>Same 48-hour protection</li><li>Great for shared coursework</li></ul><a class="wcard-cta" href="group-sessions.html">Browse group sessions →</a></div>
   </div>
@@ -240,12 +263,12 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   <h2 class="sh">Simple to book. <em>Genuinely protected.</em></h2>
   <div class="how-wrap">
     <div class="how-steps">
-      <div class="hstep"><div class="hstep-num">01</div><div><span class="hstep-tag">🔍 Find your tutor</span><h4>Search by exact course</h4><p>Browse university-verified peer tutors who've already succeeded in your subject.</p><a class="hstep-link" href="find-tutors.html">Find a tutor →</a></div></div>
+      <div class="hstep"><div class="hstep-num">01</div><div><span class="hstep-tag">🔍 Find your tutor</span><h4>Search by exact course</h4><p>Browse peer tutors who've already succeeded in your subject — verified ones are listed first.</p><a class="hstep-link" href="find-tutors.html">Find a tutor →</a></div></div>
       <div class="hstep"><div class="hstep-num">02</div><div><span class="hstep-tag">📅 Request & confirm</span><h4>You're not charged yet</h4><p>Send a request with your proposed time and price. Nothing is charged until your tutor actually accepts.</p><a class="hstep-link" href="find-tutors.html">See how it works →</a></div></div>
       <div class="hstep"><div class="hstep-num">03</div><div><span class="hstep-tag">🛡️ Pay safely</span><h4>Held for 48 hours, refund guaranteed</h4><p>Your payment is held securely and only released to your tutor 48 hours after the session — giving you a real window to report any issue and get a genuine refund.</p><a class="hstep-link" href="onboarding.html?role=tutor">Start tutoring →</a></div></div>
     </div>
     <div class="profile-card" style="padding:0;overflow:hidden;">
-      <img src="video-session.jpg" alt="Live online tutoring session" style="display:block;width:100%;height:auto;border-radius:20px;">
+      <img src="video-session.jpg" alt="Live online tutoring session between a physics tutor and a student" width="1083" height="611" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:20px;">
     </div>
   </div>
 </section>
@@ -253,8 +276,8 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   <div class="sk" style="color:var(--purple)"><span class="sk-dot" style="background:var(--purple)"></span>Platform features</div>
   <h2 class="sh">Everything you need. <em>Nothing you don't.</em></h2>
   <div class="feat-grid">
-    <div class="fc"><span class="fc-icon">✓</span><h4>University Verified</h4><p>Every student verifies through their real university email. No guesswork about who you're learning from.</p></div>
-    <div class="fc"><span class="fc-icon">✅</span><h4>Never Lose Money to a No-Show</h4><p>If your tutor cancels or doesn't show up, you're refunded automatically — no dispute, no waiting, no exceptions. Your payment is held securely for 48 hours either way.</p></div>
+    <div class="fc"><span class="fc-icon">✓</span><h4>University Verified</h4><p>Tutors verify with their university email — look for the ✓ Verified badge. No guesswork about who you're learning from.</p></div>
+    <div class="fc"><span class="fc-icon">✅</span><h4>Never Lose Money to a No-Show</h4><p>If your tutor cancels, you're refunded automatically. If they don't show up, report it from your dashboard within 48 hours for a full refund — your payment stays on hold until then.</p></div>
     <div class="fc"><span class="fc-icon">🛡️</span><h4>Real Dispute Resolution</h4><p>Something wrong? Report it directly from your dashboard. Every case is reviewed by a real person, with real refunds when warranted — not just a policy page.</p></div>
     <div class="fc"><span class="fc-icon">👥</span><h4>Group Sessions</h4><p>Split a session with up to 3 classmates studying the same course. Same tutor, same quality, lower cost for everyone.</p></div>
     <div class="fc"><span class="fc-icon">📊</span><h4>Verified Track Record</h4><p>Every completed session, review, and certificate builds a real, verifiable profile — not a black-box score you have to trust blindly.</p></div>
@@ -301,26 +324,30 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   <div class="cta-r">
     <h3>Join UniSkilled today</h3>
     <p>Sign up with your university email — book or offer your first session today, fully protected.</p>
-    <input class="inp" type="email" placeholder="your@university.ac.uk">
-    <button class="sub-btn" onclick="window.location.href='onboarding.html'">Get started →</button>
+    <form action="onboarding.html" method="get" id="ctaForm">
+      <label for="ctaEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">University email</label>
+      <input class="inp" id="ctaEmail" name="email" type="email" autocomplete="email" placeholder="your@university.ac.uk">
+      <button class="sub-btn" type="submit">Get started →</button>
+    </form>
     <div class="perks">
       <div class="pk"><div class="pk-ic">✓</div>Free to join</div>
       <div class="pk"><div class="pk-ic">✓</div>48-hour protection</div>
-      <div class="pk"><div class="pk-ic">✓</div>Always free to join</div>
+      <div class="pk"><div class="pk-ic">✓</div>No card to sign up</div>
     </div>
   </div>
 </section>
+</main>
 <footer>
   <div class="ft">
     <div><div class="fl"><div class="fl-icon">U</div>UniSkilled</div><p class="fd">University-verified peer tutoring, with real payment protection.</p></div>
     <div class="fcol"><h5>Platform</h5><a href="find-tutors.html">Find Tutors</a><a href="onboarding.html?role=tutor">Start Tutoring</a><a href="group-sessions.html">Group Sessions</a></div>
-    <div class="fcol"><h5>Company</h5><a href="about.html">About</a><a href="about.html">Partner with us</a><a href="about.html">Contact</a></div>
+    <div class="fcol"><h5>Company</h5><a href="about.html">About</a><a href="about.html">Partner with us</a><a href="mailto:info@uniskilled.com">Contact</a></div>
     <div class="fcol"><h5>Legal</h5><a href="legal.html">Terms of Service</a><a href="legal.html#privacy">Privacy Policy</a><a href="legal.html#cookies">Cookie Policy</a><a href="legal.html#refund">Refund Policy</a><a href="legal.html#impressum">Impressum</a></div>
     <div class="fcol"><h5>Get in touch</h5><a href="mailto:info@uniskilled.com">info@uniskilled.com</a></div>
   </div>
   <div class="fb">
     <p>© 2026 UniSkilled. All rights reserved. · <a href="legal.html" style="color:rgba(255,255,255,0.5);text-decoration:none;">Legal & Privacy</a></p>
-    <div class="fb-live"><span class="fb-dot"></span>All systems operational</div>
+    <div class="fb-live"><span class="fb-dot"></span>Made in Berlin</div>
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
@@ -376,8 +403,42 @@ function handleSignOut() {
 }
 </script>
 <script>
-const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.style.opacity="1";x.target.style.transform="translateY(0)"}})},{threshold:0.08});
-document.querySelectorAll(".wcard,.hstep,.fc,.qc,.stat").forEach((el,i)=>{el.style.opacity="0";el.style.transform="translateY(18px)";el.style.transition=`opacity .55s ${i*0.07}s ease,transform .55s ${i*0.07}s ease`;io.observe(el);});
+// Scroll reveal — skipped entirely for reduced-motion users; stagger restarts per group
+// (the old version accumulated delay across the whole page, so the last cards waited ~1.5s).
+(function(){
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const io = new IntersectionObserver(entries => entries.forEach(x => {
+    if (!x.isIntersecting) return;
+    x.target.style.opacity = '1'; x.target.style.transform = 'none';
+    io.unobserve(x.target);
+  }), { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.who-cards,.how-steps,.feat-grid,.quote-cards').forEach(group => {
+    [...group.children].forEach((el, i) => {
+      el.style.opacity = '0'; el.style.transform = 'translateY(16px)';
+      el.style.transition = `opacity .5s ${Math.min(i, 5) * 0.06}s ease, transform .5s ${Math.min(i, 5) * 0.06}s cubic-bezier(.2,.7,.2,1)`;
+      io.observe(el);
+    });
+  });
+})();
+
+// Navbar: shadow once scrolled, accessible mobile menu that closes on link tap / Esc / outside tap
+(function(){
+  const nav = document.querySelector('nav'), burger = document.getElementById('navBurger'), links = document.getElementById('navLinks');
+  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 8);
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+  function setOpen(open) {
+    links.classList.toggle('open', open);
+    document.body.classList.toggle('nav-open', open);
+    burger.setAttribute('aria-expanded', open);
+    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    burger.textContent = open ? '✕' : '☰';
+  }
+  burger.addEventListener('click', () => setOpen(!links.classList.contains('open')));
+  links.addEventListener('click', e => { if (e.target.closest('a')) setOpen(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && links.classList.contains('open')) { setOpen(false); burger.focus(); } });
+  document.addEventListener('click', e => { if (links.classList.contains('open') && !e.target.closest('nav')) setOpen(false); });
+  matchMedia('(min-width: 961px)').addEventListener('change', e => { if (e.matches) setOpen(false); });
+})();
 </script>
 <script>
 // Referral links land here (e.g. uniskilled.com?ref=AB12CD3) — persist the code so it
@@ -395,9 +456,8 @@ document.querySelectorAll(".wcard,.hstep,.fc,.qc,.stat").forEach((el,i)=>{el.sty
     url.searchParams.set('ref', storedRef);
     a.setAttribute('href', url.pathname + url.search);
   });
-  document.querySelectorAll('button[onclick*="onboarding.html"]').forEach(function(btn) {
-    btn.setAttribute('onclick', `window.location.href='onboarding.html?ref=${storedRef}'`);
-  });
+  const f = document.getElementById('ctaForm');
+  if (f) { const h = document.createElement('input'); h.type = 'hidden'; h.name = 'ref'; h.value = storedRef; f.appendChild(h); }
 })();
 </script>
 </body>

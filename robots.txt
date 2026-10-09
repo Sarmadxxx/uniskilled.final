@@ -1,11 +1,25 @@
 User-agent: *
 Allow: /
+
+# Signed-in areas, admin, payments and utilities — nothing here is useful in search results
+Disallow: /admin
 Disallow: /admin.html
+Disallow: /admin-dashboard.html
 Disallow: /admin-disputes.html
 Disallow: /student-dashboard.html
 Disallow: /tutor-dashboard.html
+Disallow: /business-dashboard.html
+Disallow: /business-profile.html
+Disallow: /hire-talent.html
+Disallow: /student-profile.html
+Disallow: /book-session.html
 Disallow: /complete-payment.html
+Disallow: /calendar.html
+Disallow: /manage-availability.html
 Disallow: /messages.html
+Disallow: /feed.html
 Disallow: /reset-password.html
+Disallow: /reset-password-email-template.html
+Disallow: /INTEGRATION_GUIDE.md
 
 Sitemap: https://uniskilled.com/sitemap.xml

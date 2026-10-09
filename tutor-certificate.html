@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="robots" content="noindex, nofollow">
 <title>Tutor Certificate — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -57,11 +63,12 @@ body{font-family:'Manrope',sans-serif;background:#eef2f7;color:var(--ink);min-he
   .cert-stats{grid-template-columns:repeat(2,1fr);}
 }
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 
 <div class="toolbar">
-  <a href="#" id="backLink">← Back to profile</a>
+  <a href="#" id="backLink" class="hit">← Back to profile</a>
   <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
 </div>
 
@@ -70,9 +77,9 @@ body{font-family:'Manrope',sans-serif;background:#eef2f7;color:var(--ink);min-he
   <div class="cert-inner">
     <div class="cert-header">
       <img src="uniskilled-logo.png" alt="UniSkilled" class="cert-logo">
-      <div class="cert-eyebrow">Verified Tutor Certificate</div>
+      <div class="cert-eyebrow" id="certEyebrow">Tutor Certificate</div>
       <div class="cert-title">Certificate of Tutoring Achievement</div>
-      <div class="cert-sub">Issued by UniSkilled — University-Verified Tutoring</div>
+      <div class="cert-sub" id="certSubLine">Issued by UniSkilled</div>
     </div>
 
     <div class="cert-person">
@@ -99,7 +106,7 @@ body{font-family:'Manrope',sans-serif;background:#eef2f7;color:var(--ink);min-he
       <div class="cert-verify">
         Verify this certificate at<br><a id="verifyUrl" href="#">uniskilled.com</a>
       </div>
-      <div class="cert-seal">✓ UniSkilled Verified</div>
+      <div class="cert-seal" id="certSeal" style="display:none;">✓ UniSkilled Verified</div>
     </div>
   </div>
 </div>
@@ -127,10 +134,19 @@ async function init() {
   document.getElementById('verifyUrl').href = window.location.href;
   document.getElementById('verifyUrl').textContent = window.location.href.replace('https://', '');
 
-  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).single();
-  const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', tutorId).single();
+  const { data: p } = await _sb.from('public_tutors').select('*').eq('id', tutorId).maybeSingle();
+  const { data: tp } = await _sb.from('tutor_profiles').select('id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url').eq('user_id', tutorId).maybeSingle();
 
   if (!p) { document.getElementById('emptyMsg').style.display = 'block'; return; }
+
+  // "Verified" wording and seal only when the tutor's university email was confirmed
+  if (tp && tp.university_verified_at) {
+    document.getElementById('certEyebrow').textContent = 'Verified Tutor Certificate';
+    document.getElementById('certSubLine').textContent = 'Issued by UniSkilled — University-Verified Tutoring';
+    const seal = document.getElementById('certSeal');
+    seal.style.display = '';
+    seal.textContent = '✓ University verified' + (tp.verified_university ? ' · ' + tp.verified_university : '');
+  }
 
   const fullName = p.full_name || 'Tutor';
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
@@ -147,14 +163,11 @@ async function init() {
   else avEl.textContent = initials;
 
   // Sessions + subject breakdown
-  const { data: sessions } = await _sb.from('sessions').select('subject').eq('tutor_id', tutorId).eq('status', 'completed');
-  document.getElementById('certSessions').textContent = (sessions || []).length;
-
+  // Public summary view: anyone opening a shared certificate sees the real totals
+  const { data: subjStats } = await _sb.from('public_tutor_subject_stats').select('subject,completed_sessions').eq('tutor_id', tutorId);
   const bySubject = {};
-  (sessions || []).forEach(s => {
-    const subj = s.subject || 'Other';
-    bySubject[subj] = (bySubject[subj] || 0) + 1;
-  });
+  (subjStats || []).forEach(r => { bySubject[r.subject || 'Other'] = (bySubject[r.subject || 'Other'] || 0) + r.completed_sessions; });
+  document.getElementById('certSessions').textContent = Object.values(bySubject).reduce((a, b) => a + b, 0);
   const entries = Object.entries(bySubject).sort((a, b) => b[1] - a[1]);
   const maxCount = entries.length ? entries[0][1] : 1;
   document.getElementById('certSubjects').innerHTML = entries.length > 0

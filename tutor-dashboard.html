@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="robots" content="noindex, nofollow">
 <title>Tutor Dashboard — UniSkilled</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
@@ -159,11 +165,14 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
   .hero-stats{gap:1rem;}
 }
 </style>
+<link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
+<script src="university-verify.js"></script>
 </head>
 <body>
 
 <nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo.png" alt="UniSkilled" style="height:44px;width:auto;display:block;"></a>
+  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;"></a>
   <div class="nav-links">
     <a href="index.html" class="nav-link">🏠 Home</a>
     <a href="tutor-profile.html" class="nav-link">👤 My Profile</a>
@@ -171,7 +180,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <a href="tutor-profile.html" class="nav-cta">Edit Profile</a>
     <a href="#" class="nav-link" style="font-size:0.78rem;color:var(--mid);" onclick="event.preventDefault();dashSignOut()">Sign out</a>
   </div>
-  <button class="nav-burger" onclick="toggleNav(this)">☰</button>
+  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
 </nav>
 <div class="mobile-nav" id="mobileNav">
   <a href="index.html">🏠 Home</a>
@@ -190,6 +199,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
         <div class="profile-av" id="sideAv" onclick="window.location.href='tutor-profile.html'">?</div>
         <div class="profile-name" id="sideName" onclick="window.location.href='tutor-profile.html'">Loading...</div>
         <div class="profile-sub" id="sideSub"></div>
+        <a href="#verify" id="sideVerifyLink" class="hit" style="display:none;font-size:0.75rem;font-weight:700;color:var(--blue);text-decoration:none;margin-bottom:0.6rem;">○ Not verified yet — get your badge</a>
         <a href="tutor-profile.html" class="profile-btn">✏️ Edit Profile</a>
         <button class="switch-btn" id="switchModeBtn" onclick="switchToStudent()">🎓 Switch to Student mode</button>
         <button class="become-btn" id="becomeStudentBtn" onclick="openBecomeStudentModal()">+ Browse as Student</button>
@@ -272,11 +282,14 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
         </div>
       </div>
 
+      <!-- University verification (shows until verified; reminder on every visit) -->
+      <div id="uniVerifyMount"></div>
+
       <!-- Booking requests preview -->
       <div class="card" style="margin-bottom:1.2rem;">
         <div class="card-head">
           <div class="card-title">Booking Requests</div>
-          <a href="tutor-dashboard.html?tab=requests" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
+          <a href="tutor-dashboard.html?tab=requests" class="hit" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
         </div>
         <div class="card-body" id="overviewRequests">
           <div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>
@@ -287,7 +300,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <div class="card" style="margin-bottom:1.2rem;">
         <div class="card-head">
           <div class="card-title">Open Subject Requests</div>
-          <a href="tutor-dashboard.html?tab=subjectRequests" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
+          <a href="tutor-dashboard.html?tab=subjectRequests" class="hit" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
         </div>
         <div class="card-body" id="overviewSubjectRequests">
           <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
@@ -482,8 +495,11 @@ async function init() {
   // Check payout setup status after profile loads
   setTimeout(checkPayoutStatus, 800);
 
+  // University email verification card (Verified badge)
+  if (window.initUniVerify) initUniVerify(_sb, document.getElementById('uniVerifyMount'));
+
   // Check if this tutor also has a student profile → show switch; otherwise show "Browse as Student"
-  const { data: existingSp } = await _sb.from('student_profiles').select('user_id').eq('user_id', userId).single();
+  const { data: existingSp } = await _sb.from('student_profiles').select('user_id').eq('user_id', userId).maybeSingle();
   if (existingSp) {
     const sb = document.getElementById('switchModeBtn');
     if (sb) sb.style.display = 'block';
@@ -492,8 +508,8 @@ async function init() {
     if (bb) bb.style.display = 'block';
   }
 
-  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', userId).single();
-  const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', userId).single();
+  const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', userId).maybeSingle();
+  const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', userId).maybeSingle();
 
   const fullName = (p && p.full_name) || (meta.full_name) || 'Tutor';
   const firstName = fullName.split(' ')[0];
@@ -754,7 +770,7 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
 
   const { error: respondErr } = await _sb.from('sessions').update(updatePayload).eq('id', sessionId);
   if (respondErr) {
-    alert(__friendlyDbError(respondErr, 'Could not update this request. Please refresh and try again.'));
+    showToast(__friendlyDbError(respondErr, 'Could not update this request. Please refresh and try again.'), 'error');
     await loadAll();
     return;
   }
@@ -774,7 +790,7 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
   try {
     const { data: sessionData } = await _sb.from('sessions')
       .select('scheduled_date, scheduled_time, duration_minutes, student_id, price, currency, timezone')
-      .eq('id', sessionId).single();
+      .eq('id', sessionId).maybeSingle();
     if (studentId && sessionData) {
       const dateStr = sessionData.scheduled_date ? new Date(sessionData.scheduled_date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) : 'TBD';
       const __tok = (await _sb.auth.getSession()).data.session?.access_token;
@@ -888,9 +904,9 @@ window.acceptSubjectRequest = async function(requestId, studentId, studentName, 
     accepted_at: new Date().toISOString()
   }).eq('id', requestId).eq('status', 'open').select(); // guard: only matches if still open (first-accept-wins)
 
-  if (error) { alert('Could not accept this request: ' + error.message); if(btn){btn.disabled=false;btn.textContent='✓ I can offer this';} return; }
+  if (error) { showToast(__friendlyDbError(error, 'Could not accept this request. Please try again.'), 'error'); if(btn){btn.disabled=false;btn.textContent='✓ I can offer this';} return; }
   if (!data || data.length === 0) {
-    alert('Another tutor already accepted this request.');
+    showToast('Another tutor already accepted this request.', 'info');
     await loadSubjectRequests();
     return;
   }
@@ -1086,12 +1102,20 @@ async function loadMessageBadge() {
   else badge.style.display = 'none';
 }
 
-function toggleNav(btn) {
-  const n = document.getElementById('mobileNav');
-  const o = n.style.display === 'flex';
-  n.style.display = o ? 'none' : 'flex';
-  btn.textContent = o ? '☰' : '✕';
+function toggleNav(btn, force) {
+  btn = btn || document.querySelector('.nav-burger');
+  const n = document.getElementById('mobileNav'); if (!n || !btn) return;
+  const open = typeof force === 'boolean' ? force : n.style.display !== 'flex';
+  n.style.display = open ? 'flex' : 'none';
+  btn.textContent = open ? '✕' : '☰';
+  btn.setAttribute('aria-expanded', open);
+  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
 }
+document.addEventListener('click', e => {
+  const n = document.getElementById('mobileNav'); if (!n || n.style.display !== 'flex') return;
+  if (e.target.closest('#mobileNav a') || !e.target.closest('#mobileNav,.nav-burger')) toggleNav(null, false);
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') toggleNav(null, false); });
 
 function switchToStudent() {
   window.location.href = 'student-dashboard.html?mode=student';
@@ -1140,7 +1164,7 @@ function dashSignOut() {
 // Check if returning from Stripe Connect onboarding
 if (new URLSearchParams(window.location.search).get('payout') === 'success') {
   setTimeout(() => {
-    alert('✅ Payout account connected! You can now receive payments.');
+    showToast('Payout account connected. You can now receive payments.', 'success');
     window.history.replaceState({}, '', 'tutor-dashboard.html');
   }, 1000);
 }
@@ -1148,7 +1172,7 @@ if (new URLSearchParams(window.location.search).get('payout') === 'success') {
 async function checkPayoutStatus() {
   const { data: tp } = await _sb.from('tutor_profiles')
     .select('stripe_account_id, stripe_account_status, payout_method, paypal_email')
-    .eq('user_id', userId).single();
+    .eq('user_id', userId).maybeSingle();
 
   // If Stripe setup was started but the tutor isn't marked active yet, ask Stripe (through our
   // server) whether setup is finished, so the status updates by itself after onboarding.
@@ -1241,7 +1265,7 @@ async function selectPayoutMethod(method) {
     .eq('user_id', userId);
 
   if (error) {
-    alert('Could not update payout method: ' + error.message);
+    showToast(__friendlyDbError(error, 'Could not update your payout method. Please try again.'), 'error');
     return;
   }
 
@@ -1292,7 +1316,7 @@ async function setupPayouts() {
     });
     const data = await res.json();
     if (!res.ok || !data.url) {
-      alert('Could not start payout setup: ' + (data.error || 'Unknown error'));
+      showToast('Could not start payout setup. Please try again in a moment.', 'error');
       btn.textContent = '💳 Set up payouts';
       btn.disabled = false;
       return;
@@ -1300,7 +1324,7 @@ async function setupPayouts() {
     // Open Stripe onboarding in same tab
     window.location.href = data.url;
   } catch (err) {
-    alert('Error: ' + err.message);
+    showToast('Could not start payout setup. Check your connection and try again.', 'error');
     btn.textContent = '💳 Set up payouts';
     btn.disabled = false;
   }
@@ -1436,7 +1460,7 @@ async function submitReport() {
   }
 
   closeReportModal();
-  alert('Your report has been submitted. Our team will review it shortly.');
+  showToast('Report submitted. We\'ll review it and email you — the payout stays on hold meanwhile.', 'success', {afterReload:true});
   location.reload();
 }
 
@@ -1488,12 +1512,12 @@ async function joinSession(sessionId, subject, otherName) {
   try {
     const { data: sessionData } = await _sb.from('sessions')
       .select('student_id, tutor_id')
-      .eq('id', sessionId).single();
+      .eq('id', sessionId).maybeSingle();
 
     // Get the tutor's meeting link
     const { data: tp } = await _sb.from('tutor_profiles')
       .select('meeting_link')
-      .eq('user_id', userId).single();
+      .eq('user_id', userId).maybeSingle();
 
     // Notify student that session is starting
     if (sessionData?.student_id) {
@@ -1512,13 +1536,13 @@ async function joinSession(sessionId, subject, otherName) {
       window.open(tp.meeting_link, '_blank');
     } else {
       // No meeting link set — prompt tutor to add one
-      alert('Please add your Zoom or Google Meet link to your profile first. Go to Edit Profile → Levels & Languages → Meeting link.');
+      showToast('Add your Zoom or Google Meet link first: Edit Profile → Levels & Languages → Meeting link.', 'info');
     }
 
     btn.disabled = false;
     btn.textContent = '🎥 Join Session';
   } catch (err) {
-    alert('Error: ' + err.message);
+    showToast('Couldn\'t open the session. Check your connection and try again.', 'error');
     btn.disabled = false;
     btn.textContent = '🎥 Join Session';
   }
@@ -1541,16 +1565,16 @@ async function joinSession(sessionId, subject, otherName) {
       <div class="dm-alert" id="becomeStudentAlert"></div>
       <p style="font-size:0.85rem;color:var(--mid);margin-bottom:1.2rem;line-height:1.6;">Set up a student profile so you can also browse tutors and book sessions. You can switch between modes any time.</p>
       <div class="dm-form-group">
-        <label class="dm-label">University</label>
+        <label for="bsUniversity" class="dm-label">University</label>
         <input type="text" class="dm-input" id="bsUniversity" placeholder="e.g. TU Berlin">
       </div>
       <div class="dm-row">
         <div class="dm-form-group">
-          <label class="dm-label">Degree / Course</label>
+          <label for="bsDegree" class="dm-label">Degree / Course</label>
           <input type="text" class="dm-input" id="bsDegree" placeholder="e.g. Computer Science">
         </div>
         <div class="dm-form-group">
-          <label class="dm-label">Year</label>
+          <label for="bsYear" class="dm-label">Year</label>
           <select class="dm-select" id="bsYear">
             <option value="">Select</option>
             <option value="1">1st Year</option><option value="2">2nd Year</option>
@@ -1560,7 +1584,7 @@ async function joinSession(sessionId, subject, otherName) {
         </div>
       </div>
       <div class="dm-form-group">
-        <label class="dm-label">Subjects you want to learn</label>
+        <label for="bsSubjects" class="dm-label">Subjects you want to learn</label>
         <input type="text" class="dm-input" id="bsSubjects" placeholder="e.g. Python, Statistics, French">
       </div>
     </div>
@@ -1580,25 +1604,25 @@ async function joinSession(sessionId, subject, otherName) {
 
     <div style="display:flex;flex-direction:column;gap:0.9rem;">
       <div>
-        <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Subject</label>
+        <label for="gsSubject" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Subject</label>
         <select id="gsSubject" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;"></select>
         <div id="gsNotifyHint" style="display:none;font-size:0.76rem;color:var(--green);font-weight:600;margin-top:0.4rem;"></div>
       </div>
 
       <div style="display:flex;gap:0.7rem;">
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Date</label>
+          <label for="gsDate" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Date</label>
           <input type="date" id="gsDate" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Time</label>
+          <label for="gsTime" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Time</label>
           <input type="time" id="gsTime" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
       </div>
 
       <div style="display:flex;gap:0.7rem;">
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Duration</label>
+          <label for="gsDuration" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Duration</label>
           <select id="gsDuration" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
             <option value="30">30 min</option>
             <option value="45">45 min</option>
@@ -1607,7 +1631,7 @@ async function joinSession(sessionId, subject, otherName) {
           </select>
         </div>
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</label>
+          <label for="gsFormat" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</label>
           <select id="gsFormat" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
             <option value="online" selected>Online</option>
             <option value="in-person">In-person</option>
@@ -1617,7 +1641,7 @@ async function joinSession(sessionId, subject, otherName) {
 
       <div style="display:flex;gap:0.7rem;">
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Max students</label>
+          <label for="gsMaxStudents" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Max students</label>
           <select id="gsMaxStudents" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
             <option value="2">2</option>
             <option value="3">3</option>
@@ -1625,13 +1649,13 @@ async function joinSession(sessionId, subject, otherName) {
           </select>
         </div>
         <div style="flex:1;">
-          <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;" id="gsPriceLabel">Price per student (€)</label>
+          <label for="gsPrice" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;" id="gsPriceLabel">Price per student (€)</label>
           <input type="number" id="gsPrice" min="1" step="0.5" placeholder="e.g. 12" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
       </div>
 
       <div>
-        <label style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Notes (optional)</label>
+        <label for="gsNotes" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Notes (optional)</label>
         <textarea id="gsNotes" rows="2" placeholder="e.g. Covers chapters 3-4, bring a calculator" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;resize:vertical;"></textarea>
       </div>
 
