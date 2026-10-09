@@ -706,7 +706,9 @@ async function loadProfile() {
   const { data: p } = isOwner
     ? await _supabase.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', tutorId).maybeSingle()
     : await _supabase.from('public_tutors').select('*').eq('id', tutorId).maybeSingle();
-  const { data: tp } = await _supabase.from('tutor_profiles').select(isOwner ? '*' : TP_PUBLIC).eq('user_id', tutorId).maybeSingle();
+  // Owner's edit-form fields (still no payout details or meeting link — those come from get_my_tutor_private())
+  const TP_OWNER = TP_PUBLIC + ',materials_url,response_rate,completion_rate,no_show_count,updated_at,gender';
+  const { data: tp } = await _supabase.from('tutor_profiles').select(isOwner ? TP_OWNER : TP_PUBLIC).eq('user_id', tutorId).maybeSingle();
   if (!p && !tp) { showTutorNotFound(); return; }
   profileData = p; tutorData = tp;
 
@@ -890,7 +892,7 @@ async function loadProfile() {
 async function loadMeetingLink() {
   const body = document.getElementById('meetingLinkBody');
   if (!body) return;
-  const { data: tp } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).maybeSingle();
+  const { data: tp } = await _supabase.rpc('get_my_tutor_private').maybeSingle();
   if (tp?.meeting_link) {
     const display = tp.meeting_link.replace('https://','').slice(0,50) + (tp.meeting_link.length > 53 ? '…' : '');
     body.innerHTML = `<div class="info-row"><span class="info-label">Link</span><span class="info-value"><a href="${__safeUrl(tp.meeting_link)}" target="_blank" style="color:var(--blue);word-break:break-all;">🔗 ${__esc(display)}</a></span></div><div style="font-size:0.78rem;color:var(--mid);margin-top:0.5rem;">Students use this link to join confirmed sessions with you.</div>`;
@@ -901,15 +903,15 @@ async function loadMeetingLink() {
 
 async function saveMeetingLink() {
   const link = document.getElementById('inputMeetingLink').value.trim();
-  if (link && !link.startsWith('http')) { showToast('Enter a full link starting with https://', 'error'); return; }
-  const { error } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, meeting_link: link || null }, { onConflict: 'user_id' });
-  if (error) { showToast(__friendlyDbError(error, 'Could not save your meeting link. Please try again.'), 'error'); return; }
+  if (link && !link.startsWith('https://')) { showToast('Enter a full link starting with https://', 'error'); return; }
+  const { error } = await _supabase.rpc('set_my_meeting_link', { p_link: link || null });
+  if (error) { showToast(error.code === '22023' ? error.message : __friendlyDbError(error, 'Could not save your meeting link. Please try again.'), 'error'); return; }
   closeModal('modalMeetingLink');
   await loadMeetingLink();
 }
 
 async function openMeetingLinkModal() {
-  const { data } = await _supabase.from('tutor_profiles').select('meeting_link').eq('user_id', currentUserId).maybeSingle();
+  const { data } = await _supabase.rpc('get_my_tutor_private').maybeSingle();
   document.getElementById('inputMeetingLink').value = data?.meeting_link || '';
   openModal('modalMeetingLink');
 }

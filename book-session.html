@@ -203,7 +203,8 @@ async function init(){
   currentUser=session.user;
 
   // Load tutor info
-  const {data:tp}=await _sb.from('tutor_profiles').select('*').eq('user_id',tutorId).maybeSingle();
+  // Public columns only — a student never needs (or gets) the tutor's payout details or meeting link
+  const {data:tp}=await _sb.from('tutor_profiles').select('id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,is_active,session_length,availability,preferred_time,preferred_times,teaching_format,avatar_url,cover_url').eq('user_id',tutorId).maybeSingle();
   const {data:u}=await _sb.from('users').select('full_name,avatar_url').eq('id',tutorId).maybeSingle();
   tutorData={...tp,...u};
 

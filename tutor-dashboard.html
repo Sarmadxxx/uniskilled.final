@@ -509,7 +509,9 @@ async function init() {
   }
 
   const { data: p } = await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id', userId).maybeSingle();
-  const { data: tp } = await _sb.from('tutor_profiles').select('*').eq('user_id', userId).maybeSingle();
+  // Payout details and the meeting link aren't in this list — they're private and come from get_my_tutor_private()
+  const TP_COLS = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,materials_url,video_link,rating_avg,review_count,sessions_count,response_rate,completion_rate,no_show_count,university_verified_at,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,updated_at,session_length,availability,preferred_time,teaching_format,country,language,gender,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url,preferred_times,verified_university';
+  const { data: tp } = await _sb.from('tutor_profiles').select(TP_COLS).eq('user_id', userId).maybeSingle();
 
   const fullName = (p && p.full_name) || (meta.full_name) || 'Tutor';
   const firstName = fullName.split(' ')[0];
@@ -1170,9 +1172,8 @@ if (new URLSearchParams(window.location.search).get('payout') === 'success') {
 }
 
 async function checkPayoutStatus() {
-  const { data: tp } = await _sb.from('tutor_profiles')
-    .select('stripe_account_id, stripe_account_status, payout_method, paypal_email')
-    .eq('user_id', userId).maybeSingle();
+  // Private payout details — only the tutor themself can read these
+  const { data: tp } = await _sb.rpc('get_my_tutor_private').maybeSingle();
 
   // If Stripe setup was started but the tutor isn't marked active yet, ask Stripe (through our
   // server) whether setup is finished, so the status updates by itself after onboarding.
@@ -1515,9 +1516,7 @@ async function joinSession(sessionId, subject, otherName) {
       .eq('id', sessionId).maybeSingle();
 
     // Get the tutor's meeting link
-    const { data: tp } = await _sb.from('tutor_profiles')
-      .select('meeting_link')
-      .eq('user_id', userId).maybeSingle();
+    const { data: tp } = await _sb.rpc('get_my_tutor_private').maybeSingle();
 
     // Notify student that session is starting
     if (sessionData?.student_id) {
