@@ -203,7 +203,7 @@ async function init(){
   currentUser=session.user;
 
   // Load tutor info
-  const {data:tp}=await _sb.from('tutor_profiles').select('*').eq('user_id',tutorId).maybeSingle();
+  const {data:tp}=await _sb.from('tutor_profiles').select('user_id,subjects,hourly_rate,currency,avatar_url,teaching_format,availability').eq('user_id',tutorId).maybeSingle();
   const {data:u}=await _sb.from('users').select('full_name,avatar_url').eq('id',tutorId).maybeSingle();
   tutorData={...tp,...u};
 
