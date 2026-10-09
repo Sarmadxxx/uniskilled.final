@@ -705,10 +705,9 @@ async function joinSession(sessionId, subject, otherName) {
       .select('tutor_id, tutor_name')
       .eq('id', sessionId).maybeSingle();
 
-    // Get the tutor's meeting link
-    const { data: tp } = await _sb.from('tutor_profiles')
-      .select('meeting_link')
-      .eq('user_id', sessionData?.tutor_id).maybeSingle();
+    // Get the tutor's meeting link — only released for a confirmed, paid session you're part of
+    const { data: meetingLink } = await _sb.rpc('get_session_meeting_link', { p_session_id: sessionId });
+    const tp = { meeting_link: meetingLink || null };
 
     // Notify tutor that student has joined
     if (sessionData?.tutor_id) {
