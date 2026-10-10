@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { sessionPaymentDecision, groupSeatPaymentDecision, isDuplicateKeyError, reviewReason, type PaymentDecision } from './confirm-logic.ts';
 
 const STRIPE_SECRET = Deno.env.get('STRIPE_SECRET_KEY') ?? '';
 const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET') ?? '';
@@ -52,6 +53,26 @@ async function alertAdminsForReview(supabase: any, title: string, body: string) 
   } catch (e) {
     console.error('Admin review alert failed:', e);
   }
+}
+
+// Records a card payment that must NOT confirm a booking (late, duplicate, or orphaned) so it is
+// never lost and can be refunded. It is deliberately not linked to the session/group row, so the
+// payout job can never pick it up. Returns 'duplicate' when this exact payment was already recorded
+// (i.e. a repeat delivery of the same Stripe event), which callers treat as already processed.
+async function recordForReview(supabase: any, args: {
+  paymentIntentId: string; decision: PaymentDecision; ref: string; type: 'session' | 'group_session';
+  payerId?: string | null; payeeId?: string | null; paidCents: number; currency: string;
+}): Promise<'recorded' | 'duplicate' | 'error'> {
+  const { error } = await supabase.from('payments').insert({
+    type: args.type, payer_id: args.payerId ?? null, payee_id: args.payeeId ?? null,
+    amount: args.paidCents / 100, platform_fee: 0, tutor_payout: 0, currency: args.currency,
+    stripe_payment_intent_id: args.paymentIntentId, status: 'needs_review', paid_at: new Date().toISOString(),
+    flagged: true, flag_reason: reviewReason(args.decision, args.ref).slice(0, 250),
+  });
+  if (!error) return 'recorded';
+  if (isDuplicateKeyError(error)) return 'duplicate';
+  console.error('Could not record payment for review:', error.message, args);
+  return 'error';
 }
 
 function safeEqual(a: string, b: string): boolean {
@@ -141,9 +162,21 @@ Deno.serve(async (req: Request) => {
 
     if (groupParticipantId) {
       const { data: participant } = await supabase.from('group_session_participants')
-        .select('*, group_sessions(*)').eq('id', groupParticipantId).single();
+        .select('*, group_sessions(*)').eq('id', groupParticipantId).maybeSingle();
 
-      if (!participant || participant.status === 'confirmed') return ok({ received: true, already_processed: true });
+      const decision = groupSeatPaymentDecision(participant);
+      if (decision !== 'confirm') {
+        // Late, second or orphaned payment: never confirm — record it so it can be refunded.
+        const rec = await recordForReview(supabase, {
+          paymentIntentId, decision, ref: `group seat ${groupParticipantId}`, type: 'group_session',
+          payerId: participant?.student_id, payeeId: participant?.group_sessions?.tutor_id,
+          paidCents, currency: paidCurrency || 'EUR',
+        });
+        if (rec === 'duplicate') return ok({ received: true, already_processed: true });
+        if (rec === 'error') return new Response(JSON.stringify({ error: 'Could not record payment' }), { status: 500, headers: cors });
+        await alertAdminsForReview(supabase, '⚠️ Card payment needs a refund', `${reviewReason(decision, `group seat ${groupParticipantId}`)}. Stripe payment ${paymentIntentId}: refund it in the Stripe dashboard with "reverse transfer" ticked.`);
+        return ok({ received: true, needs_review: true, reason: decision });
+      }
 
       const gs = participant.group_sessions;
       const price = Number(gs.price_per_student);
@@ -157,14 +190,32 @@ Deno.serve(async (req: Request) => {
       const platformFee = parseFloat((price * feeRate).toFixed(2));
       const tutorPayout = parseFloat((price * (1 - feeRate)).toFixed(2));
 
-      await supabase.from('group_session_participants').update({ status: 'confirmed', payment_due_at: null }).eq('id', groupParticipantId);
-
-      await supabase.from('payments').insert({
+      // Record the payment FIRST. The unique index on stripe_payment_intent_id makes this the lock:
+      // if two deliveries of the same event race, only one insert succeeds and the other stops here.
+      const { data: payRow, error: payInsErr } = await supabase.from('payments').insert({
         group_session_id: gs.id, payer_id: participant.student_id, payee_id: gs.tutor_id,
         type: 'group_session', amount: price, platform_fee: platformFee, tutor_payout: tutorPayout,
         currency: gs.currency || 'EUR', stripe_payment_intent_id: paymentIntentId,
         status: 'paid', paid_at: new Date().toISOString(),
-      });
+      }).select('id').single();
+      if (payInsErr) {
+        if (isDuplicateKeyError(payInsErr)) return ok({ received: true, already_processed: true });
+        console.error('Could not record group card payment — Stripe will retry:', payInsErr.message);
+        return new Response(JSON.stringify({ error: 'Could not record payment' }), { status: 500, headers: cors });
+      }
+
+      // Only a seat that is still awaiting payment may be confirmed (it can expire in the meantime).
+      const { data: seatRows } = await supabase.from('group_session_participants')
+        .update({ status: 'confirmed', payment_due_at: null })
+        .eq('id', groupParticipantId).eq('status', 'awaiting_payment').select('id');
+      if (!seatRows || seatRows.length === 0) {
+        await supabase.from('payments').update({
+          status: 'needs_review', flagged: true, group_session_id: null,
+          flag_reason: reviewReason('not_awaiting_payment', `group seat ${groupParticipantId}`).slice(0, 250),
+        }).eq('id', payRow.id);
+        await alertAdminsForReview(supabase, '⚠️ Card payment needs a refund', `${reviewReason('not_awaiting_payment', `group seat ${groupParticipantId}`)}. Stripe payment ${paymentIntentId}: refund it in the Stripe dashboard with "reverse transfer" ticked.`);
+        return ok({ received: true, needs_review: true, reason: 'not_awaiting_payment' });
+      }
 
       await supabase.from('notifications').insert([
         { user_id: participant.student_id, type: 'payment_confirmed', title: '✅ Payment confirmed!', body: `You're in for the ${gs.subject} group session with ${gs.tutor_name}. If the group doesn't reach 2 paid students by 12 hours before the session, you'll be automatically refunded.`, link: 'student-dashboard.html', read: false },
@@ -184,9 +235,20 @@ Deno.serve(async (req: Request) => {
       return ok({ received: true });
     }
 
-    const { data: session } = await supabase.from('sessions').select('*').eq('id', sessionId).single();
-    if (!session || (session.status === 'confirmed' && session.payment_status === 'paid')) {
-      return ok({ received: true, already_processed: true });
+    const { data: session } = await supabase.from('sessions').select('*').eq('id', sessionId).maybeSingle();
+
+    const decision = sessionPaymentDecision(session);
+    if (decision !== 'confirm') {
+      // Late, second or orphaned payment: never confirm — record it so it can be refunded.
+      const rec = await recordForReview(supabase, {
+        paymentIntentId, decision, ref: `booking ${sessionId}`, type: 'session',
+        payerId: session?.student_id, payeeId: session?.tutor_id,
+        paidCents, currency: paidCurrency || 'EUR',
+      });
+      if (rec === 'duplicate') return ok({ received: true, already_processed: true });
+      if (rec === 'error') return new Response(JSON.stringify({ error: 'Could not record payment' }), { status: 500, headers: cors });
+      await alertAdminsForReview(supabase, '⚠️ Card payment needs a refund', `${reviewReason(decision, `booking ${sessionId}`)}${session?.subject ? ` (${session.subject})` : ''}. Stripe payment ${paymentIntentId}: refund it in the Stripe dashboard with "reverse transfer" ticked.`);
+      return ok({ received: true, needs_review: true, reason: decision });
     }
 
     const price = Number(session.price);
@@ -205,18 +267,36 @@ Deno.serve(async (req: Request) => {
     const platformFee = Math.max(0, parseFloat((price * feeRate - discount).toFixed(2)));
     const tutorPayout = parseFloat((price * (1 - feeRate)).toFixed(2));
 
-    await supabase.from('sessions').update({
-      status: 'confirmed', payment_status: 'paid', payment_due_at: null,
-      pending_discount_amount: null, pending_discount_source: null,
-    }).eq('id', sessionId);
-
-    await supabase.from('payments').insert({
+    // Record the payment FIRST. The unique index on stripe_payment_intent_id makes this the lock:
+    // if two deliveries of the same event race, only one insert succeeds and the other stops here —
+    // before credit is deducted or emails are sent a second time.
+    const { data: payRow, error: payInsErr } = await supabase.from('payments').insert({
       session_id: sessionId, payer_id: session.student_id, payee_id: session.tutor_id,
       type: 'session', amount: price, platform_fee: platformFee, tutor_payout: tutorPayout,
       discount_amount: discount,
       currency: session.currency || 'EUR', stripe_payment_intent_id: paymentIntentId,
       status: 'paid', paid_at: new Date().toISOString(),
-    });
+    }).select('id').single();
+    if (payInsErr) {
+      if (isDuplicateKeyError(payInsErr)) return ok({ received: true, already_processed: true });
+      console.error('Could not record card payment — Stripe will retry:', payInsErr.message);
+      return new Response(JSON.stringify({ error: 'Could not record payment' }), { status: 500, headers: cors });
+    }
+
+    // Only a booking that is still awaiting payment may be confirmed (the expiry job may have
+    // released it between the check above and now).
+    const { data: confirmedRows } = await supabase.from('sessions').update({
+      status: 'confirmed', payment_status: 'paid', payment_due_at: null,
+      pending_discount_amount: null, pending_discount_source: null,
+    }).eq('id', sessionId).eq('status', 'awaiting_payment').select('id');
+    if (!confirmedRows || confirmedRows.length === 0) {
+      await supabase.from('payments').update({
+        status: 'needs_review', flagged: true, session_id: null, tutor_payout: 0, platform_fee: 0,
+        flag_reason: reviewReason('not_awaiting_payment', `booking ${sessionId}`).slice(0, 250),
+      }).eq('id', payRow.id);
+      await alertAdminsForReview(supabase, '⚠️ Card payment needs a refund', `${reviewReason('not_awaiting_payment', `booking ${sessionId}`)} (${session.subject}). Stripe payment ${paymentIntentId}: refund it in the Stripe dashboard with "reverse transfer" ticked.`);
+      return ok({ received: true, needs_review: true, reason: 'not_awaiting_payment' });
+    }
 
     if (discount > 0 && discountSource === 'referral_welcome') {
       const { data: referral } = await supabase.from('referrals')

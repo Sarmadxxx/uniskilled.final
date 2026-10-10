@@ -1,0 +1,11 @@
+{
+  "//": "Offline type-check of the Edge Functions. The two Supabase library imports are mapped to local stand-ins so this works without network access; everything else (Deno APIs, our code) is checked for real. Run from repo root: deno check --config tests/typecheck/deno.json supabase/functions/*/index.ts",
+  "imports": {
+    "jsr:@supabase/supabase-js@2": "./stubs/supabase-js.ts",
+    "jsr:@supabase/functions-js/edge-runtime.d.ts": "./stubs/edge-runtime.ts"
+  },
+  "compilerOptions": {
+    "strict": false,
+    "noImplicitAny": false
+  }
+}

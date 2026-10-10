@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { paypalCheckoutEnabled, PAYPAL_DISABLED_MESSAGE } from './paypal-gate.ts';
 
 const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID') ?? '';
 const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET') ?? '';
@@ -32,6 +33,11 @@ Deno.serve(async (req: Request) => {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+
+  // PayPal checkout is off unless explicitly enabled AND live — see paypal-gate.ts.
+  if (!paypalCheckoutEnabled((k) => Deno.env.get(k))) {
+    return new Response(JSON.stringify({ error: PAYPAL_DISABLED_MESSAGE, paypal_disabled: true }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
 
   try {
     const { session_id, group_participant_id } = await req.json();

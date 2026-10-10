@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { checkoutExpiresAt } from './checkout-expiry.ts';
 
 const STRIPE_SECRET = Deno.env.get('STRIPE_SECRET_KEY') ?? '';
 const MIN_CHARGE = 1.00; // never let a discount take the card charge to zero
@@ -28,6 +29,7 @@ Deno.serve(async (req: Request) => {
 
     let price: number, subject: string, currency: string, referenceId: string, metadataKey: string, tutorId: string;
     let studentId: string | null = null;
+    let paymentDueAt: string | null = null;
 
     if (group_participant_id) {
       const { data: participant, error: pErr } = await supabase.from('group_session_participants')
@@ -44,6 +46,7 @@ Deno.serve(async (req: Request) => {
       subject = participant.group_sessions.subject;
       currency = (participant.group_sessions.currency || 'EUR').toLowerCase();
       tutorId = participant.group_sessions.tutor_id;
+      paymentDueAt = participant.payment_due_at;
       referenceId = group_participant_id;
       metadataKey = 'group_participant_id';
 
@@ -63,6 +66,7 @@ Deno.serve(async (req: Request) => {
       currency = (session.currency || 'EUR').toLowerCase();
       tutorId = session.tutor_id;
       studentId = session.student_id;
+      paymentDueAt = session.payment_due_at;
       referenceId = session_id;
       metadataKey = 'session_id';
     }
@@ -114,6 +118,8 @@ Deno.serve(async (req: Request) => {
       'mode': 'payment',
       'success_url': `${siteUrl}/complete-payment.html?${refParam}=${referenceId}&stripe_success=1`,
       'cancel_url': `${siteUrl}/complete-payment.html?${refParam}=${referenceId}`,
+      // The checkout link expires with the booking's payment window (see checkout-expiry.ts).
+      'expires_at': checkoutExpiresAt(paymentDueAt, Date.now()).toString(),
       'line_items[0][price_data][currency]': currency,
       'line_items[0][price_data][product_data][name]': `UniSkilled tutoring session — ${subject || 'Session'}`,
       'line_items[0][price_data][unit_amount]': chargeCents.toString(),

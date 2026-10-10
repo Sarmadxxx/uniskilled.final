@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { choosePayoutRoute } from './payout-route.ts';
 
 const STRIPE_SECRET = Deno.env.get('STRIPE_SECRET_KEY') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -100,11 +101,10 @@ async function releasePayment(supabase: any, payment: any, tutorId: string, ref:
     .select('stripe_account_id, stripe_account_status, payout_method, paypal_email')
     .eq('user_id', tutorId)
     .single();
-  if (tpErr || !tp) return { ...base, skipped: true, reason: 'tutor profile not found' };
-  if (tp.payout_method === 'paypal' && !tp.paypal_email) return { ...base, skipped: true, reason: 'no PayPal email on file' };
-  if (tp.payout_method !== 'paypal' && (!tp.stripe_account_id || tp.stripe_account_status !== 'active')) {
-    return { ...base, skipped: true, reason: 'tutor payout account not active' };
-  }
+  // The route follows where the money is (card → tutor's Stripe balance, PayPal → our PayPal),
+  // never the tutor's payout preference. See payout-route.ts.
+  const route = choosePayoutRoute(payment, tpErr ? null : tp);
+  if (route.method === 'skip') return { ...base, skipped: true, needs_attention: true, reason: route.reason };
 
   const { data: claimed } = await supabase.from('payments')
     .update({ status: 'releasing' })
@@ -117,10 +117,10 @@ async function releasePayment(supabase: any, payment: any, tutorId: string, ref:
   const restore = () => supabase.from('payments').update({ status: originalStatus }).eq('id', payment.id).eq('status', 'releasing');
 
   try {
-    if (tp.payout_method === 'paypal') {
+    if (route.method === 'paypal') {
       const ppRes = await supabase.functions.invoke('create-paypal-payout', {
         body: {
-          paypal_email: tp.paypal_email,
+          paypal_email: route.paypalEmail,
           amount: payment.tutor_payout,
           currency: (payment.currency || 'EUR').toUpperCase(),
           note: `UniSkilled tutoring payout (${ref.kind === 'group_session_id' ? 'group session' : 'session'} ${ref.id})`,
@@ -151,7 +151,7 @@ async function releasePayment(supabase: any, payment: any, tutorId: string, ref:
       headers: {
         'Authorization': `Bearer ${STRIPE_SECRET}`,
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Stripe-Account': tp.stripe_account_id,
+        'Stripe-Account': route.stripeAccountId,
         // Stripe returns the original payout instead of creating a second one on retry.
         'Idempotency-Key': `payout_${payment.id}`,
       },
@@ -220,7 +220,7 @@ Deno.serve(async (req: Request) => {
       }
       const { data: payment, error: payErr } = await supabase
         .from('payments')
-        .select('id, status, tutor_payout, currency, stripe_transfer_id, released_at')
+        .select('id, status, tutor_payout, currency, stripe_transfer_id, released_at, stripe_payment_intent_id, paypal_capture_id, paypal_order_id')
         .eq('session_id', session.id)
         .maybeSingle();
       if (payErr || !payment) {
@@ -240,10 +240,10 @@ Deno.serve(async (req: Request) => {
     if (gErr) throw new Error(`Failed to query group sessions: ${gErr.message}`);
 
     if (groups && groups.length > 0) {
-      const tutorByGroup = new Map(groups.map(g => [g.id, g.tutor_id]));
+      const tutorByGroup = new Map<string, string>(groups.map((g: any) => [g.id, g.tutor_id]));
       const { data: groupPayments, error: gpErr } = await supabase
         .from('payments')
-        .select('id, group_session_id, status, tutor_payout, currency, stripe_transfer_id, released_at')
+        .select('id, group_session_id, status, tutor_payout, currency, stripe_transfer_id, released_at, stripe_payment_intent_id, paypal_capture_id, paypal_order_id')
         .in('group_session_id', groups.map(g => g.id))
         .is('released_at', null)
         .is('stripe_transfer_id', null);
@@ -282,6 +282,30 @@ Deno.serve(async (req: Request) => {
             await sendEmail(supabaseUrl, 'admin_payout_summary', admin.email, { count: summary.count, total: totalStr, currency: sym });
           }
         }
+      }
+    }
+
+    // ── Admin alert for payouts that failed or need a human (previously only logged) ──
+    // The job runs hourly, so an identical alert is sent at most once per 24 hours.
+    const problems = results.filter(r => r.success === false || r.needs_attention);
+    if (problems.length > 0) {
+      try {
+        const lines = problems.map(p => `• payment ${String(p.payment_id).slice(0, 8)}: ${p.error || p.reason}`).sort();
+        const body = `${problems.length} tutor payout${problems.length === 1 ? '' : 's'} could not be released:\n${lines.join('\n')}`.slice(0, 1000);
+        const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+        const { data: admins } = await supabase.from('users').select('id').contains('roles', ['admin']);
+        for (const admin of admins || []) {
+          const { data: recent } = await supabase.from('notifications').select('id')
+            .eq('user_id', admin.id).eq('type', 'payout_attention').eq('body', body).gte('created_at', since).limit(1);
+          if (recent && recent.length > 0) continue;
+          await supabase.from('notifications').insert({
+            user_id: admin.id, type: 'payout_attention',
+            title: `⚠️ ${problems.length} payout${problems.length === 1 ? '' : 's'} need attention`,
+            body, link: 'admin.html?tab=transactions', read: false,
+          });
+        }
+      } catch (e) {
+        console.error('Payout problem alert failed (non-critical):', e);
       }
     }
 
