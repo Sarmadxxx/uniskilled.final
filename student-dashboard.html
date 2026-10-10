@@ -164,6 +164,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="analytics.js" defer></script>
 </head>
 <body>
 
@@ -616,6 +617,7 @@ async function submitReport() {
   }
 
   closeReportModal();
+  window.usTrack&&usTrack('issue_reported', { reporter_role: 'student' }, { now: true });
   showToast('Report submitted. We\'ll review it and email you — the payment stays on hold meanwhile.', 'success', {afterReload:true});
   location.reload();
 }
