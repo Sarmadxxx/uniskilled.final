@@ -25,7 +25,7 @@
  */
 (function () {
   // ── CONFIG ── paste the Project API key from PostHog → Settings → Project → "Project API key"
-  var POSTHOG_KEY = 'phc_REPLACE_WITH_YOUR_PROJECT_API_KEY';
+  var POSTHOG_KEY = 'phc_ybqrxZb9N7ZFRiE839Uv6iNSJ65hJkbdByGxrtiWjT37';
   var POSTHOG_HOST = 'https://eu.i.posthog.com';   // EU Cloud (data stays in Frankfurt)
   var POSTHOG_UI_HOST = 'https://eu.posthog.com';
   var LIB_URL = 'https://cdn.jsdelivr.net/npm/posthog-js@1.438.7/dist/array.full.js';
