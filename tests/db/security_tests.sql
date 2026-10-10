@@ -101,7 +101,7 @@ run AS (
           THEN format(c.sql_tpl, i.stu, i.str)
         WHEN c.test LIKE 'Cannot send a notification%'
           THEN format(c.sql_tpl, i.stu)
-        WHEN c.sql_tpl LIKE '%user_id = %L%' AND c.test LIKE '%tutor%'
+        WHEN c.sql_tpl LIKE '%user_id = %L%' AND c.test ILIKE '%tutor%'
           THEN format(c.sql_tpl, i.tut)
         WHEN c.sql_tpl LIKE '%FROM public.users WHERE id = %L%'
           THEN format(c.sql_tpl, i.stu)
