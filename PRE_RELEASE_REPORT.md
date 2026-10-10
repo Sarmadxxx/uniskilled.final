@@ -16,7 +16,7 @@ It is **not ready** because four things outside the code are still open, and one
 3. **The Impressum shows template placeholders** on the live Legal page (LEG-01) — a legal risk in Germany.
 4. **One payment-policy decision** (PAY-06): what happens to the money when a student cancels late.
 
-Once those are done (plus approving one database change and merging the PR), the honest status becomes **READY AFTER REQUIRED ACTIONS → READY FOR CONTROLLED RELEASE** with a small first cohort.
+Once those are done (plus merging the PR), the honest status becomes **READY AFTER REQUIRED ACTIONS → READY FOR CONTROLLED RELEASE** with a small first cohort.
 
 ---
 
@@ -26,9 +26,9 @@ Once those are done (plus approving one database change and merging the PR), the
 |---|---|---|---|---|---|
 | **P0** critical | 2 | **2** | – | – | – |
 | **P1** launch blocker | 7 | **3** | – | 4 | – |
-| **P2** important | 12 | **4** | 4 (one migration) | 3 | 1 not checked |
+| **P2** important | 12 | **8** | – | 3 | 1 not checked |
 | **P3** improvement | 9 | **1** | – | – | 8 |
-| **Total** | **30** | **10** | **4** | **7** | **9** |
+| **Total** | **30** | **14** | – | **7** | **9** |
 
 ---
 
@@ -60,6 +60,9 @@ Once those are done (plus approving one database change and merging the PR), the
 ### Improvement (P3)
 - **SEO-01 · Custom 404 page** added. *(in PR)*
 
+### Applied with your approval (10 Oct)
+- **DB-01** duplicate-payment safety indexes · **SEC-01** strangers can no longer list tutors' uploaded transcripts (tested: 0 of 9 visible) · **SEC-02** message attachments uploader/admin only · **SEC-03** 10 MB certificate limit.
+
 ---
 
 ## Tests run — actual results
@@ -79,7 +82,7 @@ Once those are done (plus approving one database change and merging the PR), the
 
 Strong overall. RLS is on for all 42 tables; protected fields (prices, payment status, roles, credit, verification, ratings, Stripe status) are guarded by database triggers; private columns are hidden by column permissions; all 43 Edge Functions check identity correctly (or are retired stubs); HTML output is escaped throughout; webhook signatures are verified fail-closed.
 
-Open: SEC-01/02/03 (storage listing/permissions — fix written, awaiting your approval), leaked-password protection off (SEC-04), security headers not applied on GitHub Pages (SEC-05), checkout endpoints don't check the caller (SEC-06, low risk).
+Fixed on 10 Oct: SEC-01/02/03 (strangers can no longer list tutors' transcripts — tested 0 of 9 visible; message attachments owner-only; 10 MB limit). Open: leaked-password protection off (SEC-04), security headers not applied on GitHub Pages (SEC-05), checkout endpoints don't check the caller (SEC-06, low risk).
 
 ## Payment & payout findings (summary)
 
@@ -89,7 +92,7 @@ Fixed: PAY-01, PAY-02, PAY-04, PAY-05, PAY-07. Open: OPS-01 (test mode), PAY-03 
 
 ## Database & deployment risks
 
-- **Migration awaiting approval:** `supabase/migrations/20261010120000_pre_release_hardening.sql` (2 unique indexes, certificate listing removed, message-attachment access restricted, certificate size limit). Non-destructive; no data changed.
+- **Hardening applied 10 Oct:** 2 unique indexes and the certificate size limit (migration `pre_release_hardening_part1`); storage rules changed in the dashboard. Non-destructive; no data changed.
 - **Test data** in the live database (DATA-01): 13 unpaid "completed" sessions and 2 "paid" sessions without payment records.
 - **Account deletion** (PRIV-01): deletes fail for anyone with payments/reviews (correctly — invoices must be kept 10 years), so erasure = anonymisation. Procedure below.
 - **Backups:** confirm your Supabase plan's backup retention and do one test restore.
@@ -99,7 +102,7 @@ Fixed: PAY-01, PAY-02, PAY-04, PAY-05, PAY-07. Open: OPS-01 (test mode), PAY-03 
 
 ## Manual actions required from you (in order)
 
-1. **Approve the database migration.** Reply "approve the migration" and I'll apply it and re-run the tests. *(Why: closes public listing of tutors' transcripts. 1 minute.)*
+1. ~~Approve the database migration~~ — **done 10 Oct**, verified.
 2. **Merge pull request `pre-release-audit`** on GitHub. *(Why: until then the live payment page still opens on the PayPal tab and shows "PayPal checkout couldn't load" — card still works on the Card tab. After merging, hard-refresh the site.)*
 3. **Fill in the Impressum** — send me your legal name/entity, a postal address for service, phone or second fast contact, and VAT ID if any, and I'll update `legal.html`. *(Legal requirement in Germany.)*
 4. **Decide PAY-06** (late student cancellation): (a) tutor gets paid, (b) refund the student, or (c) UniSkilled keeps it. And **PAY-08**: should a reschedule within 24 h keep the "no refund" rule for a later cancellation?
@@ -129,7 +132,7 @@ For a user with no payments: delete them in Supabase → Authentication (their d
 
 ## Recommended next steps (priority order)
 
-1. Approve the migration and merge the PR (today).
+1. Merge the PR (today).
 2. Complete the Impressum and the two policy decisions.
 3. Run the Stripe test-mode journey (step 5 above); I'll verify the backend side.
 4. Lawyer/tax review in parallel.
@@ -147,7 +150,7 @@ For a user with no payments: delete them in Supabase → Authentication (their d
 | `supabase/functions/stripe-webhook/` (`index.ts`, `confirm-logic.ts`) | PAY-04, PAY-07: record-then-confirm, duplicate stop, only confirm awaiting bookings, flag late/second/orphaned payments. **Deployed v16.** |
 | `supabase/functions/create-stripe-checkout/` (`index.ts`, `checkout-expiry.ts`) | PAY-04: checkout link expires with the payment window. **Deployed v11.** |
 | `supabase/functions/paypal-config/`, `create-paypal-order/`, `capture-paypal-order/` (+ `paypal-gate.ts` each) | PAY-01 PayPal off switch. **Deployed v2 / v13 / v18.** |
-| `supabase/migrations/20261010120000_pre_release_hardening.sql` | DB-01, SEC-01/02/03. **Not applied — awaiting approval.** |
+| `supabase/migrations/20261010120000_pre_release_hardening.sql` | DB-01, SEC-01/02/03. **Applied 10 Oct** (storage part via the dashboard). |
 | `complete-payment.html` | PAY-01 card default, PayPal only if enabled; discount preview capped like the server. |
 | `tutor-dashboard.html` | PAY-05 PayPal payout picker off. |
 | `legal.html` | LEG-02 factual payment/processor corrections; Google Fonts rows removed. |

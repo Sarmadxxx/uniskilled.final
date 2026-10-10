@@ -13,8 +13,8 @@ in Supabase (database, row-level security, 43 Edge Functions, 4 scheduled jobs, 
 > "PASS (tested)" means it was actually exercised (e.g. by the database security test suite).
 >
 > **Where fixes live:** backend fixes (Edge Functions) are **deployed and verified live**. Website fixes are in pull request
-> `pre-release-audit` and go live on uniskilled.com **when you merge it**. The database migration (DB-01, SEC-01/02/03)
-> is written and reviewed but **not applied** — the tool asked for your approval because it changes storage permissions.
+> `pre-release-audit` and go live on uniskilled.com **when you merge it**. The database/storage hardening (DB-01, SEC-01/02/03)
+> was **applied on 10 Oct** (storage rules via the dashboard, since only Supabase's storage role can change them).
 
 ---
 
@@ -95,10 +95,10 @@ in Supabase (database, row-level security, 43 Edge Functions, 4 scheduled jobs, 
 | ID | Finding | Status |
 |---|---|---|
 | PAY-07 | `stripe-webhook` continued after a failed payment insert. Two simultaneous deliveries of the same event could both pass the duplicate check; the second insert fails on the unique index but the code went on to **deduct the student's credit again** and send duplicate emails. Now records the payment first and stops on a duplicate-key error. Also: a **second payment** for an already-paid booking (two checkout tabs) used to be silently ignored — it is now recorded and flagged for refund. | `FIXED` (live) |
-| DB-01 | No uniqueness on `payments.paypal_order_id`, or one payment per one-to-one session. Two partial unique indexes written (verified no existing duplicates). | `BLOCKED (your approval)` — migration ready |
-| SEC-01 | Storage bucket `certificates` let **anyone list every tutor's uploaded transcripts**. Public file links don't need that permission (confirmed in Supabase docs); listing policy removal written. | `BLOCKED (your approval)` — migration ready |
-| SEC-02 | Bucket `messages` (unused, 0 files) let any signed-in user read every attachment. Restriction to owner + admins written. | `BLOCKED (your approval)` — migration ready |
-| SEC-03 | Bucket `certificates` had no size limit at storage level (only the Edge Function limited it). 10 MB limit written. | `BLOCKED (your approval)` — migration ready |
+| DB-01 | No uniqueness on `payments.paypal_order_id`, or one payment per one-to-one session. Two partial unique indexes added (verified no existing duplicates). | `FIXED` (applied 10 Oct) |
+| SEC-01 | Storage bucket `certificates` let **anyone list every tutor's uploaded transcripts**. Listing rule deleted in the dashboard; public file links on profiles keep working. **Tested:** anonymous visitor and signed-in stranger now list 0 of 9 files. | `FIXED` (applied 10 Oct) |
+| SEC-02 | Bucket `messages` (unused, 0 files) let any signed-in user read every attachment. Restricted to the uploader + admins (edited in the dashboard). | `FIXED` (applied 10 Oct) |
+| SEC-03 | Bucket `certificates` had no size limit at storage level (only the Edge Function limited it). 10 MB limit set. | `FIXED` (applied 10 Oct) |
 | PAY-08 | Reschedule loophole: < 24 h before a session the student can't get a refund, but they can reschedule to a later date and *then* cancel with a full refund. Either party can also reschedule without the other's agreement. | `NEEDS REVIEW (your decision)` |
 | LEG-03 | 26 pages load fonts from Google (IP address sent to Google without consent). Your own privacy policy flags this; German courts have awarded damages for it. All 5 font families now self-hosted (OFL licence), same names, so no visual change intended. | `FIXED` (in PR) |
 | PRIV-01 | No self-service account deletion; erasure requests go to info@uniskilled.com. A plain delete fails for any user with payments/reviews/referrals (correct — invoices must be kept 10 years), so erasure must be done by anonymising. Procedure documented in the report. | `NEEDS REVIEW` |
@@ -151,7 +151,7 @@ in Supabase (database, row-level security, 43 Edge Functions, 4 scheduled jobs, 
 | 20 % platform fee | PASS (inspected) | Read from `platform_settings`; application fee = 20 % − discount. |
 | Tutor earnings / platform revenue | PASS (inspected) | Tutor always 80 % of full price. |
 | Referral discounts — who pays | PASS (inspected) | Capped at platform fee; tutor unaffected; unused part kept as credit. |
-| Duplicate payments / bookings | PASS (tested) + PAY-07 fixed (live), DB-01 awaiting approval | Unique Stripe payment intent; tutor clash check; PayPal order reuse blocked. |
+| Duplicate payments / bookings | PASS (tested) + PAY-07 fixed (live), DB-01 fixed | Unique Stripe payment intent; tutor clash check; PayPal order reuse blocked. |
 | Failure / cancellation / refund / dispute | PASS (inspected) · PAY-06 open | Refunds reverse transfer + application fee; partial dispute refunds reduce tutor payout proportionally (earlier bug confirmed fixed). |
 | Payout eligibility & status | FIXED (PAY-02) | |
 | Stripe Connect onboarding | PASS (inspected) | Express, manual payouts, status only from Stripe. |
@@ -188,7 +188,7 @@ in Supabase (database, row-level security, 43 Edge Functions, 4 scheduled jobs, 
 | Secrets in frontend or Git history | PASS (tested) | 403 commits scanned; only the public anon key ever committed. No rotation needed. |
 | API keys & environment variables | PASS (inspected) | All secrets read from Supabase secrets. |
 | SQL injection / XSS / CSRF | PASS (inspected) | No raw SQL from the client; HTML escaping throughout; bearer-token auth (not cookies), so CSRF doesn't apply. |
-| File uploads | PASS (inspected) · SEC-01/02/03 awaiting approval | |
+| File uploads | PASS (inspected) · SEC-01/02/03 fixed and tested | |
 | Webhook security | PASS (inspected) | |
 | Impersonation / fake accounts | PASS (partial) | University verification for tutors; students are unverified by design. |
 | Personal-data exposure | PASS (tested) · PRIV-02 | |
