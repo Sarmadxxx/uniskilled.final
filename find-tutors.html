@@ -294,8 +294,8 @@ function renderTutors(tutors) {
       <div class="subjects">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>
       <div class="card-footer">
         <div class="tutor-rate">${rate ? `${__esc(rate)} <span>per hour</span>` : `<span style="font-size:0.8rem;">Rate on request</span>`}</div>
-        ${t.user_id === currentUserId
-          ? `<a class="book-btn" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}" style="text-decoration:none;">Your profile</a>`
+        ${t.user_id === currentUserId || currentUserRole === 'tutor'
+          ? `<a class="book-btn" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}" style="text-decoration:none;">${t.user_id === currentUserId ? 'Your profile' : 'View profile'}</a>`
           : `<a class="book-btn" href="book-session.html?tutor=${encodeURIComponent(t.user_id)}&name=${encodeURIComponent(t.fullName)}" style="text-decoration:none;" aria-label="Book a session with ${__esc(t.fullName)}">Book session</a>`}
       </div>
     </article>`;

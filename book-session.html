@@ -203,8 +203,8 @@ async function init(){
   }
   currentUser=session.user;
 
-  // Nobody can book a session with themselves
-  if(tutorId===currentUser.id){
+  // Only students book: tutors (including booking themselves) are sent back to the profile
+  if(tutorId===currentUser.id || (currentUser.user_metadata||{}).role==='tutor'){
     window.location.replace('tutor-profile.html?id='+encodeURIComponent(tutorId));
     return;
   }

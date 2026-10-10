@@ -136,6 +136,8 @@ async function loadGroupSessions() {
     let btnHtml;
     if (currentUser && gs.tutor_id === currentUser.id) {
       btnHtml = `<span class="gs-spots">Your session</span>`;
+    } else if (currentUser && (currentUser.user_metadata || {}).role === 'tutor') {
+      btnHtml = `<span class="gs-spots">Students only</span>`;
     } else if (alreadyJoined) {
       btnHtml = alreadyJoined.status === 'confirmed'
         ? `<span class="gs-spots">✓ You're in</span>`
@@ -165,6 +167,7 @@ async function loadGroupSessions() {
 
 async function joinGroupSession(groupSessionId) {
   if (!currentUser) { window.location.href = 'signin.html?redirect=' + encodeURIComponent('group-sessions.html'); return; }
+  if ((currentUser.user_metadata || {}).role === 'tutor') { showToast('Only student accounts can join group sessions.', 'info'); return; }
   const { data: own } = await _sb.from('group_sessions').select('tutor_id').eq('id', groupSessionId).maybeSingle();
   if (own && own.tutor_id === currentUser.id) { showToast("You can't join your own group session.", 'info'); return; }
   const { data: sp } = await _sb.from('users').select('full_name').eq('id', currentUser.id).maybeSingle();
