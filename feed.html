@@ -475,7 +475,7 @@ async function renderFeed() {
 
     // Only makes sense on a tutor's own share, viewed by someone else — not
     // on question posts, and not shown to the tutor on their own content.
-    const showBookBtn = isShare && p.author_id !== currentUser.id;
+    const showBookBtn = isShare && p.author_id !== currentUser.id && !isTutor;   // tutors only teach
     const bookUrl = `book-session.html?tutor=${p.author_id}&name=${encodeURIComponent(p.author_name)}${p.course_code || p.subject ? '&subject=' + encodeURIComponent(p.course_code || p.subject) : ''}`;
 
     return `<div class="post" data-post-id="${__esc(p.id)}" style="${isShare ? 'border-left:3px solid var(--green);' : ''}">

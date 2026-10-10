@@ -592,6 +592,7 @@ const _supabase = window.supabase.createClient(
 let isOwner = false;
 let tutorId = null;
 let currentUserId = null;
+let viewerRole = null;   // tutors only teach — they never see booking buttons
 let subjects = [];
 let courses = [];
 let availability = [];
@@ -612,6 +613,7 @@ async function init() {
     currentUserId = session.user.id;
     const meta = session.user.user_metadata || {};
     const role = meta.role || 'student';
+    viewerRole = role;
     tutorId = urlId || (role === 'tutor' ? currentUserId : null);
     if (!tutorId) { window.location.href = 'find-tutors.html'; return; }
     isOwner = (tutorId === currentUserId && role === 'tutor');
@@ -772,6 +774,8 @@ async function loadProfile() {
   const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">🚫 Manage Availability</a>`;
   if (isOwner) {
     bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>` + availabilityLink + certLink;
+  } else if (currentUserId && viewerRole === 'tutor') {
+    bookDiv.innerHTML = `<a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">💬 Send message</a>` + certLink;
   } else if (currentUserId) {
     bookDiv.innerHTML = `<a href="book-session.html?tutor=${__safeUrl(tutorId)}&name=${__safeUrl(encodeURIComponent(fullName))}" class="book-btn">📅 Book a session</a><a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">💬 Send message</a>` + certLink;
   } else {
