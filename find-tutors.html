@@ -93,6 +93,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
 @media(max-width:768px){.nav-links{display:none;}.nav-burger{display:block;}.search-bar{flex-direction:column;}.grid{grid-template-columns:1fr;}}
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="analytics.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to results</a>
@@ -307,6 +308,7 @@ function filterTutors() {
   const day = document.getElementById('filterDay').value;
   const uniFilter = document.getElementById('filterUniversity').value;
   const countryFilter = document.getElementById('filterCountry').value;
+  window.usTrack&&usTrack('tutor_search', { query: q.slice(0, 100), has_query: !!q, format: fmt || null, price: price || null, day: day || null, university: uniFilter || null, country: countryFilter || null });
 
   renderTutors(allTutors.filter(t => {
     const subjects = Array.isArray(t.subjects)?t.subjects:[];

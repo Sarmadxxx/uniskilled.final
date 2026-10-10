@@ -168,6 +168,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
 <script src="university-verify.js"></script>
+<script src="analytics.js" defer></script>
 </head>
 <body>
 
@@ -776,6 +777,7 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
     await loadAll();
     return;
   }
+  window.usTrack&&usTrack('booking_responded', { decision: newStatus === 'awaiting_payment' ? 'accepted' : 'declined' });
 
   await _sb.from('notifications').insert({
     user_id: studentId,
@@ -1464,6 +1466,7 @@ async function submitReport() {
   }
 
   closeReportModal();
+  window.usTrack&&usTrack('issue_reported', { reporter_role: 'tutor' }, { now: true });
   showToast('Report submitted. We\'ll review it and email you — the payout stays on hold meanwhile.', 'success', {afterReload:true});
   location.reload();
 }

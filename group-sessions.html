@@ -53,6 +53,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="analytics.js" defer></script>
 </head>
 <body>
 <header id="site-nav"></header>
@@ -182,6 +183,7 @@ async function joinGroupSession(groupSessionId) {
     return;
   }
 
+  window.usTrack&&usTrack('group_session_joined', {}, { now: true });
   window.location.href = 'complete-payment.html?group_participant=' + participant.id;
 }
 
