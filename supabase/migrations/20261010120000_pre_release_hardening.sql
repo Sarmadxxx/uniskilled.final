@@ -1,5 +1,12 @@
 -- Pre-release hardening (audit 2026-10-10). Non-destructive: adds indexes and tightens storage
 -- permissions. No rows are changed or deleted.
+--
+-- HOW IT WAS APPLIED (10 Oct 2026): the indexes and bucket size limit were applied as migration
+-- 'pre_release_hardening_part1'. The storage.objects policy changes cannot be run by the postgres
+-- role (storage.objects is owned by supabase_storage_admin), so they were made in the Dashboard →
+-- Storage → Policies: "Public can read certificates" was deleted (no own-read policy was added —
+-- nothing on the site lists certificates), and "Message files: authenticated read" was edited in
+-- place to the owner-or-admin expression below. The SQL is kept as the record of intent.
 
 -- DB-01 ─ one payment record per one-to-one booking, and a PayPal order can be recorded only once.
 -- (Verified before applying: no existing duplicates.) Payments recorded for refund review are stored
