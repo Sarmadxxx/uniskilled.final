@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
 <title>Tutor Dashboard — UniSkilled</title>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts/fonts.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -1178,9 +1178,16 @@ async function checkPayoutStatus() {
   // Private payout details — only the tutor themself can read these
   const { data: tp } = await _sb.rpc('get_my_tutor_private').maybeSingle();
 
+  // Card-only launch (decision of 9 Oct 2026): students pay by card through Stripe, and card money
+  // goes straight to the tutor's Stripe account, so Stripe is the only payout method that works.
+  // A tutor who switched to PayPal could not be paid for card bookings at all. The PayPal picker is
+  // kept in the page but hidden; set this to true only once PayPal checkout is live again.
+  const PAYPAL_PAYOUTS_ENABLED = false;
+  const effectiveMethod = PAYPAL_PAYOUTS_ENABLED ? (tp?.payout_method || 'stripe') : 'stripe';
+
   // If Stripe setup was started but the tutor isn't marked active yet, ask Stripe (through our
   // server) whether setup is finished, so the status updates by itself after onboarding.
-  if (tp && tp.stripe_account_id && tp.stripe_account_status !== 'active' && (tp.payout_method || 'stripe') === 'stripe') {
+  if (tp && tp.stripe_account_id && tp.stripe_account_status !== 'active' && effectiveMethod === 'stripe') {
     try {
       const syncRes = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/check-stripe-account-status', {
         method: 'POST', headers: await authedHeaders(), body: '{}'
@@ -1204,7 +1211,7 @@ async function checkPayoutStatus() {
     .in('status', ['pending', 'awaiting_payment', 'confirmed', 'completed']);
 
   const hasBookings = (count || 0) > 0;
-  const alreadyStarted = !!tp?.stripe_account_id || !!tp?.paypal_email;
+  const alreadyStarted = !!tp?.stripe_account_id || (PAYPAL_PAYOUTS_ENABLED && !!tp?.paypal_email);
 
   if (!hasBookings && !alreadyStarted) {
     stripeBtn.style.display = 'none';
@@ -1214,8 +1221,9 @@ async function checkPayoutStatus() {
     return;
   }
 
-  methodToggle.style.display = '';
-  const method = tp?.payout_method || 'stripe';
+  methodToggle.style.display = PAYPAL_PAYOUTS_ENABLED ? '' : 'none';
+  if (!PAYPAL_PAYOUTS_ENABLED) methodPicker.style.display = 'none';
+  const method = effectiveMethod;
 
   if (method === 'paypal') {
     stripeBtn.style.display = 'none';
