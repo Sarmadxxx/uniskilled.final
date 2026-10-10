@@ -71,6 +71,7 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 @media(max-width:768px){body{grid-template-columns:1fr;}.left{display:none;}.right{padding:3rem 2rem;}}
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="analytics.js" defer></script>
 </head>
 <body>
 
@@ -187,6 +188,8 @@ document.getElementById('signinForm').addEventListener('submit', async (e) => {
     setLoading(false);
     return;
   }
+
+  window.usTrack&&usTrack('signed_in', { role: (data.user.user_metadata || {}).role || 'student' }, { now: true });
 
   // Return people to the page that sent them here (booking, payment link, ...), same site only
   const back = safeRedirect(new URLSearchParams(location.search).get('redirect'));
