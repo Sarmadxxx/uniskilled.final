@@ -14,52 +14,200 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--blue:#1a6bff;--ink:#111827;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#fff;--off:#f9fafb;--green:#059669;}
-body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);height:100vh;display:flex;flex-direction:column;}
-nav{height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;flex-shrink:0;}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
-.logo-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;}
-.chat-layout{flex:1;display:grid;grid-template-columns:320px 1fr;overflow:hidden;}
-/* Conversation list */
-.conv-list{border-right:1px solid var(--border);background:var(--white);overflow-y:auto;min-height:0;}
-.conv-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border);font-weight:800;font-size:1rem;}
-.conv-item{display:flex;align-items:center;gap:0.9rem;padding:1rem 1.2rem;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s;}
-.conv-item:hover{background:var(--off);}
-.conv-item.active{background:#e8f0ff;}
-.conv-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:0.95rem;flex-shrink:0;overflow:hidden;}
-.conv-av img{width:100%;height:100%;object-fit:cover;}
-.conv-info{flex:1;min-width:0;}
-.conv-name{font-weight:700;font-size:0.88rem;margin-bottom:2px;}
-.conv-preview{font-size:0.75rem;color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.conv-time{font-size:0.7rem;color:var(--light);flex-shrink:0;}
-.unread-dot{width:8px;height:8px;background:var(--blue);border-radius:50%;flex-shrink:0;}
-.unread-conv{background:#f0f6ff;}
-.unread-conv:hover{background:#e4efff!important;}
-/* Chat area */
-.chat-area{display:flex;flex-direction:column;background:var(--off);min-height:0;overflow:hidden;}
-.chat-header{padding:1rem 1.5rem;background:var(--white);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;flex-shrink:0;}
-.back-to-list{display:none;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--ink);padding:4px 6px 4px 0;flex-shrink:0;}
-.chat-messages{flex:1;overflow-y:auto;padding:1.5rem;display:flex;flex-direction:column;gap:0.8rem;}
-.msg{max-width:70%;padding:0.75rem 1rem;border-radius:16px;font-size:0.88rem;line-height:1.5;}
-.msg.sent{align-self:flex-end;background:var(--blue);color:#fff;border-bottom-right-radius:4px;}
-.msg.received{align-self:flex-start;background:var(--white);border:1px solid var(--border);border-bottom-left-radius:4px;}
-.msg-time{font-size:0.65rem;opacity:0.6;margin-top:3px;}
-.msg.sent .msg-time{text-align:right;}
-.chat-input-area{padding:1rem 1.5rem;background:var(--white);border-top:1px solid var(--border);display:flex;gap:0.8rem;flex-shrink:0;}
-.chat-input{flex:1;padding:0.78rem 1rem;border:1.5px solid var(--border);border-radius:25px;font-family:'Manrope',sans-serif;font-size:0.88rem;outline:none;transition:border-color .18s;}
-.chat-input:focus{border-color:var(--blue);}
-.send-btn{width:44px;height:44px;background:var(--blue);color:#fff;border:none;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .18s;}
-.send-btn:hover{background:#1558e0;}
-.no-conv{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0.8rem;color:var(--mid);}
-.empty-conv{padding:2rem;text-align:center;color:var(--mid);font-size:0.85rem;}
+/* Messages — redesign 11 Oct 2026 (matches the profiles and dashboards). Navbar unchanged. */
+:root{--blue:#1a6bff;--blue-d:#1550d4;--navy:#01367c;--tint:#eef4ff;--ink:#0f172a;--ink2:#334155;--mid:#5b6474;--line:#e3e8ef;--line2:#eef1f5;--canvas:#f4f6f9;--white:#fff;--green:#047857;--red:#b91c1c;}
+html,body{height:100%}
+nav{flex-shrink:0}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--canvas);color:var(--ink);height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+.ico{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.chat-layout{flex:1;min-height:0;display:grid;grid-template-columns:360px minmax(0,1fr);max-width:1400px;width:100%;margin:0 auto;background:var(--white);border-left:1px solid var(--line);border-right:1px solid var(--line)}
+
+/* conversation list */
+.conv-list{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;background:var(--white)}
+.conv-top{padding:18px 16px 12px;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--line2)}
+.conv-top h2{font-size:1.5rem;line-height:2rem;font-weight:800;letter-spacing:-.02em}
+.conv-search{position:relative}
+.conv-search .ico{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--mid);pointer-events:none}
+.conv-search input{width:100%;height:40px;border:1px solid transparent;border-radius:999px;background:var(--canvas);padding:0 14px 0 38px;font:500 0.9375rem 'Manrope',sans-serif;color:var(--ink)}
+.conv-search input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,107,255,.2)}
+#convItems{flex:1;overflow-y:auto;padding:6px 8px 12px}
+.conv-item{width:100%;display:flex;align-items:center;gap:12px;padding:10px;border:0;background:none;border-radius:12px;cursor:pointer;text-align:left;font-family:inherit;color:inherit}
+.conv-item:hover{background:var(--canvas)}
+.conv-item.active{background:var(--tint)}
+.conv-item:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+.av{width:48px;height:48px;border-radius:50%;flex:none;background:#dbe7ff;color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9375rem;overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover}
+.av.sm{width:28px;height:28px;font-size:0.6875rem}
+.av.md{width:40px;height:40px;font-size:0.875rem}
+.conv-info{flex:1;min-width:0}
+.conv-row{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.conv-name{font-weight:600;font-size:0.9375rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-time{font-size:0.75rem;color:var(--mid);flex:none}
+.conv-preview{font-size:0.8125rem;color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.conv-item.unread .conv-name,.conv-item.unread .conv-preview{font-weight:800;color:var(--ink)}
+.conv-item.unread .conv-time{color:var(--blue-d);font-weight:700}
+.unread-badge{min-width:20px;height:20px;border-radius:999px;background:var(--blue);color:#fff;font-size:0.6875rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center;padding:0 6px;flex:none}
+.empty-conv{padding:28px 16px;text-align:center;color:var(--mid);font-size:0.875rem;line-height:1.6}
+.empty-conv a{color:var(--blue-d);font-weight:700;text-decoration:none}
+
+/* thread */
+.chat-area{display:flex;flex-direction:column;min-height:0;background:var(--white);position:relative}
+.no-conv{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--mid);padding:24px;text-align:center}
+.no-conv .bubble-ico{width:72px;height:72px;border-radius:50%;background:var(--tint);color:var(--navy);display:flex;align-items:center;justify-content:center}
+.no-conv .bubble-ico .ico{width:32px;height:32px}
+.no-conv h2{font-size:1.125rem;color:var(--ink)}
+.chat-header{height:68px;padding:0 16px;border-bottom:1px solid var(--line2);display:flex;align-items:center;gap:12px;flex:none;background:#fff}
+.back-to-list{display:none;width:40px;height:40px;border:0;background:none;border-radius:10px;align-items:center;justify-content:center;color:var(--ink);cursor:pointer;margin-left:-6px}
+.back-to-list:hover{background:var(--canvas)}
+.head-info{flex:1;min-width:0}
+#activeChatName{font-weight:800;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#activeChatSub{font-size:0.8125rem;color:var(--mid);min-height:1.1rem}
+#activeChatSub:empty{display:none}
+#activeChatSub.typing{color:var(--blue-d);font-weight:600}
+.head-actions{display:flex;gap:8px;flex:none}
+.hbtn{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:999px;font:700 0.8125rem 'Manrope',sans-serif;text-decoration:none;white-space:nowrap}
+.hbtn.primary{background:var(--blue);color:#fff}
+.hbtn.primary:hover{background:var(--blue-d)}
+.hbtn.ghost{background:var(--canvas);color:var(--ink)}
+.hbtn.ghost:hover{background:var(--tint);color:var(--navy)}
+#trustBanner{display:none;align-items:center;gap:8px;padding:8px 16px;background:#fffbeb;border-bottom:1px solid #f5d38a;font-size:0.8125rem;color:#7a4b00;line-height:1.45;flex:none}
+#trustBanner .ico{width:16px;height:16px;color:#92400e}
+
+.chat-messages{flex:1;min-height:0;overflow-y:auto;padding:20px 20px 8px;display:flex;flex-direction:column;background:#fff;scroll-behavior:smooth}
+.day-sep{align-self:center;margin:16px 0 10px;font-size:0.75rem;font-weight:700;color:var(--mid);background:var(--canvas);padding:4px 12px;border-radius:999px}
+.new-sep{display:flex;align-items:center;gap:10px;margin:12px 0;color:var(--blue-d);font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em}
+.new-sep::before,.new-sep::after{content:"";flex:1;height:1px;background:#b9cdf5}
+.row{display:flex;align-items:flex-end;gap:8px;margin-top:10px}
+.row.grouped{margin-top:2px}
+.row.me{justify-content:flex-end}
+.row .av{visibility:visible}
+.row.grouped .av,.row.next-same .av{visibility:hidden}
+.msg{max-width:min(72%,560px);padding:9px 12px 6px;border-radius:18px;font-size:0.9375rem;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;position:relative}
+.row.them .msg{background:#f0f2f5;color:var(--ink)}
+.row.me .msg{background:var(--blue);color:#fff}
+.row.me.grouped .msg{border-top-right-radius:6px}
+.row.me.next-same .msg{border-bottom-right-radius:6px}
+.row.them.grouped .msg{border-top-left-radius:6px}
+.row.them.next-same .msg{border-bottom-left-radius:6px}
+.msg a{color:inherit;text-decoration:underline;text-underline-offset:2px}
+.msg-time{display:block;font-size:0.6875rem;margin-top:2px;text-align:right;color:var(--mid)}
+.row.me .msg-time{color:#fff}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.row.pending .msg{opacity:.7}
+.row.failed .msg{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+.fail-note{font-size:0.75rem;color:var(--red);margin:4px 2px 0 0;text-align:right}
+.fail-note button{background:none;border:0;color:var(--blue-d);font:700 0.75rem 'Manrope',sans-serif;cursor:pointer;text-decoration:underline;padding:2px}
+.seen{align-self:flex-end;font-size:0.75rem;color:var(--mid);margin:4px 2px 0 0}
+.typing-row{display:none;align-items:flex-end;gap:8px;margin-top:10px}
+.typing-row.show{display:flex}
+.dots{background:#f0f2f5;border-radius:18px;padding:12px 14px;display:flex;gap:4px}
+.dots span{width:7px;height:7px;border-radius:50%;background:#8792a2;animation:blink 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+.thread-empty{margin:auto;text-align:center;color:var(--mid);display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px}
+.thread-empty h3{font-size:1.0625rem;color:var(--ink)}
+
+.jump{position:absolute;left:50%;transform:translateX(-50%);bottom:132px;display:none;align-items:center;gap:6px;background:var(--navy);color:#fff;border:0;border-radius:999px;padding:8px 14px;font:700 0.8125rem 'Manrope',sans-serif;cursor:pointer;box-shadow:0 8px 24px rgba(15,23,42,.2);z-index:5}
+.jump.show{display:inline-flex}
+
+#contactWarning{display:none;padding:10px 16px;background:#fef2f2;border-top:1px solid #fecaca;font-size:0.8125rem;color:var(--red);line-height:1.45;flex:none}
+.composer{flex:none;padding:8px 16px 14px;border-top:1px solid var(--line2);background:#fff}
+.quick{display:flex;gap:8px;overflow-x:auto;padding:4px 0 10px;scrollbar-width:none}
+.quick::-webkit-scrollbar{display:none}
+.quick button{flex:none;min-height:34px;padding:0 14px;border-radius:999px;border:1px solid #b9cdf5;background:var(--tint);color:var(--navy);font:600 0.8125rem 'Manrope',sans-serif;cursor:pointer;white-space:nowrap}
+.quick button:hover{background:#dbe7ff}
+.chat-input-area{display:flex;align-items:flex-end;gap:10px}
+.input-wrap{flex:1;background:var(--canvas);border-radius:22px;border:1px solid transparent;padding:4px 6px 4px 16px;display:flex;align-items:flex-end}
+.input-wrap:focus-within{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,107,255,.18)}
+.chat-input{flex:1;border:0;background:transparent;resize:none;font:500 0.9375rem/1.45 'Manrope',sans-serif;color:var(--ink);padding:8px 0;max-height:132px;outline:none}
+.chat-input:focus-visible{outline:none}
+.counter{font-size:0.6875rem;color:var(--mid);padding:0 6px 10px;display:none}
+.counter.show{display:block}
+.send-btn{width:44px;height:44px;border-radius:50%;border:0;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:background .15s,transform .1s}
+.send-btn:hover{background:var(--blue-d)}
+.send-btn:active{transform:scale(.94)}
+.send-btn:disabled{background:#c3cad5;cursor:not-allowed}
+.hint{font-size:0.6875rem;color:var(--mid);margin-top:6px}
+
+@media(max-width:900px){.chat-layout{grid-template-columns:300px minmax(0,1fr)}.hbtn .lbl-long{display:none}}
 @media(max-width:700px){
-  .chat-layout{grid-template-columns:1fr;}
-  .conv-list{display:block;}
-  .conv-list.hide-mobile{display:none;}
-  .chat-area{display:none;}
-  .chat-area.show-mobile{display:flex;}
-  .back-to-list{display:inline-flex!important;}
+  .chat-layout{grid-template-columns:minmax(0,1fr);border:0}
+  .conv-list{border-right:0}
+  .conv-list.hide-mobile{display:none}
+  .chat-area{display:none}
+  .chat-area.show-mobile{display:flex}
+  .back-to-list{display:inline-flex!important}
+  .chat-messages{padding:14px 12px 6px}
+  .composer{padding:6px 10px calc(10px + env(safe-area-inset-bottom))}
+  .chat-input{font-size:16px}
+  .hint{display:none}
+  .hbtn.ghost{display:none}
+  .jump{bottom:120px}
+  #trustBanner{font-size:0.75rem;padding:6px 12px}
 }
+
+/* replies, reactions, files */
+.bcol{max-width:min(72%,560px);display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.row.me .bcol{align-items:flex-end}
+.bcol .msg{max-width:100%}
+.acts{display:flex;gap:2px;align-self:center;opacity:0;transition:opacity .12s}
+.row.me .acts{order:-1}
+.row:hover .acts,.row:focus-within .acts,.row.show-acts .acts{opacity:1}
+.acts button{width:32px;height:32px;border-radius:50%;border:0;background:none;color:var(--mid);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.acts button:hover{background:var(--canvas);color:var(--ink)}
+.acts .ico{width:18px;height:18px}
+.row.pending .acts,.row.failed .acts{display:none}
+.quote{display:block;width:100%;text-align:left;border:0;border-left:3px solid var(--blue);background:rgba(15,23,42,.06);border-radius:8px;padding:5px 8px;margin:0 0 6px;font:500 0.8125rem/1.35 'Manrope',sans-serif;color:var(--ink2);cursor:pointer;white-space:normal}
+.quote b{display:block;font-weight:800;color:var(--ink);font-size:0.75rem}
+.quote span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.row.me .quote{background:rgba(0,0,0,.18);border-left-color:#fff;color:#fff}
+.row.me .quote b{color:#fff}
+.att-img{display:block;width:fit-content;max-width:100%;border:0;padding:0;background:#dfe5ee;border-radius:12px;overflow:hidden;cursor:zoom-in;margin:0 0 4px;min-width:120px;min-height:90px}
+.att-img img{display:block;max-width:260px;max-height:300px;width:auto;height:auto}
+.msg.media{padding:4px 4px 5px}
+.msg.media .msg-time{padding:0 6px}
+.msg.media .msg-text{display:block;padding:2px 8px 0}
+.att-file{display:flex;align-items:center;gap:10px;padding:8px 10px;margin:0 0 4px;border-radius:12px;background:rgba(15,23,42,.06);color:inherit;text-decoration:none;min-width:200px}
+.row.me .att-file{background:rgba(0,0,0,.18)}
+.att-file .fi{width:36px;height:36px;border-radius:8px;background:#fff;color:var(--navy);display:flex;align-items:center;justify-content:center;flex:none}
+.att-file .fn{font-weight:700;font-size:0.875rem;display:block;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.att-file .fs{font-size:0.75rem;opacity:.9}
+.msg .att-file{text-decoration:none}
+.msg .att-file:hover .fn{text-decoration:underline}
+.reacts{display:flex;gap:4px;margin:-6px 6px 0;position:relative;z-index:1}
+.reacts:empty{display:none}
+.react-pill{display:inline-flex;align-items:center;gap:3px;height:24px;padding:0 7px;border-radius:999px;border:1px solid var(--line);background:#fff;font:700 0.75rem 'Manrope',sans-serif;color:var(--ink2);cursor:pointer;box-shadow:0 1px 3px rgba(15,23,42,.1)}
+.react-pill.mine{border-color:#8fb0f0;background:var(--tint);color:var(--navy)}
+.picker{position:absolute;z-index:30;display:none;gap:2px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:0 10px 30px rgba(15,23,42,.18)}
+.picker.open{display:flex}
+.picker button{width:40px;height:40px;border:0;background:none;border-radius:50%;font-size:1.375rem;cursor:pointer;transition:transform .1s}
+.picker button:hover,.picker button:focus-visible{background:var(--canvas);transform:scale(1.15)}
+.picker button.mine{background:var(--tint)}
+.cbar{display:none;align-items:center;gap:10px;padding:8px 10px;margin:0 0 8px;background:var(--canvas);border-radius:12px;font-size:0.8125rem;color:var(--ink2)}
+.cbar.show{display:flex}
+.cbar .ctext{flex:1;min-width:0}
+.cbar .ctext b{display:block;color:var(--ink);font-size:0.8125rem}
+.cbar .ctext span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbar .x{width:32px;height:32px;border:0;border-radius:50%;background:none;color:var(--mid);cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none}
+.cbar .x:hover{background:#e3e8ef;color:var(--ink)}
+#replyBar{border-left:3px solid var(--blue)}
+.thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;flex:none;background:#dfe5ee}
+.thumb.file{display:flex;align-items:center;justify-content:center;color:var(--navy);background:#fff;border:1px solid var(--line)}
+.attach-btn{width:44px;height:44px;border-radius:50%;border:0;background:none;color:var(--mid);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.attach-btn:hover{background:var(--canvas);color:var(--blue-d)}
+.drop{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;background:rgba(238,244,255,.92);border:2px dashed var(--blue);border-radius:12px;margin:8px;font-weight:800;color:var(--navy);font-size:1rem;pointer-events:none}
+.drop.show{display:flex}
+.hl .msg{animation:hl 1.4s ease}
+@keyframes hl{0%,40%{box-shadow:0 0 0 3px rgba(26,107,255,.45)}100%{box-shadow:0 0 0 0 rgba(26,107,255,0)}}
+#lightbox{border:0;padding:0;background:transparent;max-width:96vw;max-height:94vh;margin:auto}
+#lightbox::backdrop{background:rgba(15,23,42,.85)}
+#lightbox img{display:block;max-width:96vw;max-height:84vh;border-radius:10px}
+#lightbox .lb-bar{display:flex;justify-content:flex-end;gap:8px;margin-bottom:8px}
+#lightbox .lb-bar a,#lightbox .lb-bar button{min-height:36px;padding:0 14px;border-radius:999px;border:0;background:#fff;color:var(--ink);font:700 0.8125rem 'Manrope',sans-serif;text-decoration:none;display:inline-flex;align-items:center;cursor:pointer}
+@media(max-width:700px){.bcol{max-width:82%}.acts{display:none}.row.show-acts .acts{display:flex}.att-file{min-width:0}.att-file .fn{max-width:160px}}
+@media (hover:none){.acts{opacity:1}}
+@media (prefers-reduced-motion:reduce){.dots span{animation:none}.chat-messages{scroll-behavior:auto}.hl .msg{animation:none}}
 </style>
 <style>
 @media(max-width:768px){
@@ -88,39 +236,81 @@ nav{height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);bor
   <a id="dashLinkMobile" href="student-dashboard.html" style="display:block;padding:0.75rem 1rem;font-weight:600;font-size:0.88rem;color:#111827;text-decoration:none;border-radius:10px;background:#f9fafb;">📊 Dashboard</a>
 </div>
 
-<div class="chat-layout">
-  <!-- Conversations list -->
-  <div class="conv-list" id="convList">
-    <div class="conv-header">Messages</div>
-    <div id="convItems"><div class="empty-conv">Loading...</div></div>
-  </div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M5 12h13"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m6 13 6 6 6-6"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+  <symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01M15 9h.01"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+</svg>
 
-  <!-- Chat area -->
-  <div class="chat-area" id="chatArea">
-    <div class="no-conv" id="noChatSelected">
-      <div style="font-size:2.5rem;">💬</div>
-      <div style="font-weight:700;">Select a conversation</div>
-      <div style="font-size:0.85rem;">Choose a conversation from the left to start messaging</div>
-    </div>
-    <div id="activeChatHeader" class="chat-header" style="display:none;">
-      <button class="back-to-list" onclick="backToConvList()">←</button>
-      <div class="conv-av" id="activeChatAv">?</div>
-      <div>
-        <div style="font-weight:700;" id="activeChatName"></div>
-        <div style="font-size:0.75rem;color:var(--mid);" id="activeChatSub"></div>
+<main class="chat-layout">
+<h1 class="sr-only">Messages</h1>
+  <!-- Conversations list -->
+  <section class="conv-list" id="convList" aria-labelledby="convHeading">
+    <div class="conv-top">
+      <h2 id="convHeading">Messages</h2>
+      <div class="conv-search">
+        <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
+        <input id="convSearch" type="search" placeholder="Search conversations" aria-label="Search conversations" autocomplete="off">
       </div>
     </div>
-    <div id="trustBanner" style="display:none;background:#fffbeb;border-bottom:1px solid #fcd34d;padding:0.6rem 1.5rem;font-size:0.76rem;color:#92400e;line-height:1.5;flex-shrink:0;">
-      🛡️ <strong>Payments through UniSkilled are protected</strong> — held safely and refundable. Payments made outside UniSkilled aren't covered by this guarantee — no refund protection, no dispute support.
+    <div id="convItems" role="list" aria-label="Conversations"><div class="empty-conv">Loading…</div></div>
+  </section>
+
+  <!-- Chat area -->
+  <section class="chat-area" id="chatArea" aria-label="Conversation">
+    <div class="no-conv" id="noChatSelected">
+      <div class="bubble-ico"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg></div>
+      <h2>Select a conversation</h2>
+      <div style="font-size:0.875rem;">Choose a conversation from the list to start messaging</div>
     </div>
-    <div class="chat-messages" id="chatMessages" style="display:none;"></div>
-    <div id="contactWarning" style="display:none;background:#fef2f2;border-top:1px solid #fecaca;padding:0.6rem 1.5rem;font-size:0.78rem;color:#b91c1c;line-height:1.4;flex-shrink:0;"></div>
-    <div class="chat-input-area" id="chatInputArea" style="display:none;">
-      <input class="chat-input" id="msgInput" placeholder="Type a message..." maxlength="1000">
-      <button class="send-btn" id="sendBtn">➤</button>
+    <div id="activeChatHeader" class="chat-header" style="display:none;">
+      <button type="button" class="back-to-list" onclick="backToConvList()" aria-label="Back to conversations"><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg></button>
+      <div class="av md" id="activeChatAv" aria-hidden="true">?</div>
+      <div class="head-info">
+        <h2 id="activeChatName"></h2>
+        <div id="activeChatSub" aria-live="polite"></div>
+      </div>
+      <div class="head-actions" id="headActions"></div>
     </div>
-  </div>
-</div>
+    <div id="trustBanner">
+      <svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>
+      <span><strong>Payments through UniSkilled are protected</strong> — held safely and refundable. Payments made outside UniSkilled aren't covered by this guarantee — no refund protection, no dispute support.</span>
+    </div>
+    <div class="chat-messages" id="chatMessages" style="display:none;" role="log" aria-live="polite" aria-label="Messages" tabindex="0"></div>
+    <button type="button" class="jump" id="jumpBtn" onclick="scrollToBottom(true)"><svg class="ico" style="width:16px;height:16px" aria-hidden="true"><use href="#i-down"/></svg><span id="jumpLbl">Latest messages</span></button>
+    <div id="contactWarning" role="alert"></div>
+    <div class="drop" id="dropZone">Drop a photo or file to send</div>
+    <div class="picker" id="reactPicker" role="group" aria-label="Choose a reaction"></div>
+    <div class="composer" id="chatInputArea" style="display:none;">
+      <div class="quick" id="quickReplies" aria-label="Quick replies"></div>
+      <div class="cbar" id="replyBar"><div class="ctext"><b id="replyWho"></b><span id="replySnippet"></span></div><button type="button" class="x" onclick="cancelReply()" aria-label="Cancel reply"><svg class="ico" style="width:18px;height:18px" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div class="cbar" id="attachBar"><span id="attachThumb"></span><div class="ctext"><b id="attachName"></b><span id="attachSize"></span></div><button type="button" class="x" onclick="clearAttachment()" aria-label="Remove attachment"><svg class="ico" style="width:18px;height:18px" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div class="chat-input-area">
+        <button type="button" class="attach-btn" id="attachBtn" aria-label="Attach a photo or file" title="Photo or file (JPG, PNG, WebP, PDF, Word · up to 10 MB)"><svg class="ico" aria-hidden="true"><use href="#i-clip"/></svg></button>
+        <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
+        <div class="input-wrap">
+          <textarea class="chat-input" id="msgInput" rows="1" placeholder="Type a message…" maxlength="1000" aria-label="Message"></textarea>
+          <span class="counter" id="charCount" aria-live="polite"></span>
+        </div>
+        <button type="button" class="send-btn" id="sendBtn" aria-label="Send message" disabled><svg class="ico" aria-hidden="true"><use href="#i-send"/></svg></button>
+      </div>
+      <div class="hint">Enter to send · Shift + Enter for a new line</div>
+    </div>
+  </section>
+</main>
+<dialog id="lightbox" aria-label="Photo">
+  <div class="lb-bar"><a id="lbOpen" href="#" target="_blank" rel="noopener noreferrer">Open full size</a><button type="button" onclick="document.getElementById('lightbox').close()">Close</button></div>
+  <img id="lbImg" alt="">
+</dialog>
 
 <script>
 // ── XSS protection (security review Oct 2026) ──
@@ -139,6 +329,61 @@ let currentUser=null;
 let currentConvId=null;
 let currentRole='student';
 let msgSubscription=null;
+let typingChannel=null;
+
+// UI state (display only — nothing here is stored)
+let allConvs=[];
+let unreadMap={};
+let tutorInfo={};          // id -> {avatar_url} for tutors (public_tutors)
+let currentOther=null;     // {id,name}
+let renderedIds=new Set();
+let lastMsg=null;          // last rendered message (for grouping)
+let myMsgs={};             // id -> {read, el}
+let firstUnreadId=null;
+let typingTimer=null, lastTypingSent=0;
+let pendingSends=[];       // optimistic bubbles waiting for the server
+let msgById={};            // id -> message (for reply previews)
+let rowById={};            // id -> row element
+let reactMap={};           // message id -> {user id: emoji}
+let replyTo=null;          // message being replied to
+let attachFile=null;       // File waiting to be sent
+let signedCache={};        // storage path -> {url, at}
+let pickerFor=null;
+const REACTIONS=['👍','❤️','😂','😮','😢','🙏'];
+const FILE_TYPES={'image/jpeg':1,'image/png':1,'image/webp':1,'application/pdf':1,'application/vnd.openxmlformats-officedocument.wordprocessingml.document':1};
+const MAX_FILE=10*1024*1024;
+
+function initialsOf(n){return (n||'?').trim().split(/\s+/).map(s=>s[0]||'').join('').slice(0,2).toUpperCase()||'?';}
+function avatarHtml(id,name,cls){
+  const t=tutorInfo[id];
+  const img=t&&t.avatar_url?__safeUrl(t.avatar_url):'';
+  return `<div class="av ${cls||''}" aria-hidden="true">${img&&img!=='#'?`<img src="${img}" alt="" loading="lazy" onerror="this.remove()">`:''}${img&&img!=='#'?'':__esc(initialsOf(name))}</div>`;
+}
+function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
+function timeStr(d){return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function relTime(iso){
+  if(!iso)return '';
+  const d=new Date(iso),now=new Date();
+  const diff=(now-d)/1000;
+  if(diff<60)return 'now';
+  if(diff<3600)return Math.floor(diff/60)+'m';
+  if(sameDay(d,now))return timeStr(d);
+  const y=new Date(now);y.setDate(now.getDate()-1);
+  if(sameDay(d,y))return 'Yesterday';
+  if(diff<6*86400)return d.toLocaleDateString([],{weekday:'short'});
+  return d.toLocaleDateString([],{day:'numeric',month:'short'});
+}
+function dayLabel(d){
+  const now=new Date();
+  if(sameDay(d,now))return 'Today';
+  const y=new Date(now);y.setDate(now.getDate()-1);
+  if(sameDay(d,y))return 'Yesterday';
+  return d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long',year:d.getFullYear()===now.getFullYear()?undefined:'numeric'});
+}
+// Escape first, then turn plain https links into safe links.
+function linkify(text){
+  return __esc(text).replace(/\bhttps?:\/\/[^\s<]+[^\s<.,;:!?)'"&]/gi,u=>`<a href="${u}" target="_blank" rel="noopener noreferrer nofollow">${u}</a>`);
+}
 
 async function init(){
   const {data:{session}}=await _sb.auth.getSession();
@@ -164,6 +409,8 @@ async function init(){
     // Open or create conversation with this user
     await openOrCreateConv(withUser);
   }
+  // keep relative times fresh
+  setInterval(()=>{const f=document.activeElement;if(!(f&&f.closest&&f.closest('#convItems')))renderConvList();},60000);
 }
 
 async function loadConversations(){
@@ -172,85 +419,164 @@ async function loadConversations(){
     .or(`participant_1.eq.${currentUser.id},participant_2.eq.${currentUser.id}`)
     .order('last_message_at',{ascending:false});
 
-  const convItems=document.getElementById('convItems');
-  if(!convs||convs.length===0){
-    convItems.innerHTML = currentRole==='tutor'
-      ? '<div class="empty-conv">No conversations yet.<br>Students who message you or book a session will appear here. <a href="tutor-profile.html" style="color:var(--blue,#1a6bff);font-weight:700;text-decoration:none;">Check your profile</a> is complete.</div>'
-      : '<div class="empty-conv">No conversations yet.<br><a href="find-tutors.html" style="color:var(--blue,#1a6bff);font-weight:700;text-decoration:none;">Find a tutor</a> and message them from their profile.</div>';
-    return;
-  }
+  allConvs=convs||[];
+  if(allConvs.length===0){renderConvList();return;}
 
   // Fetch unread counts for all conversations in one query
-  const convIds = convs.map(c => c.id);
+  const convIds = allConvs.map(c => c.id);
   const {data:unreadMsgs} = await _sb.from('messages')
     .select('conversation_id')
     .in('conversation_id', convIds)
     .eq('receiver_id', currentUser.id)
     .eq('read', false);
 
-  const unreadMap = {};
+  unreadMap = {};
   (unreadMsgs||[]).forEach(m => {
+    if(m.conversation_id===currentConvId)return; // open thread is being read
     unreadMap[m.conversation_id] = (unreadMap[m.conversation_id]||0) + 1;
   });
 
-  convItems.innerHTML=convs.map(c=>{
+  // Tutor photos (public view) — students show initials
+  const otherIds=[...new Set(allConvs.map(c=>c.participant_1===currentUser.id?c.participant_2:c.participant_1))].filter(id=>!(id in tutorInfo));
+  if(otherIds.length){
+    try{
+      const {data:tutors}=await _sb.from('public_tutors').select('id,avatar_url').in('id',otherIds);
+      otherIds.forEach(id=>{tutorInfo[id]=null;});
+      (tutors||[]).forEach(t=>{tutorInfo[t.id]={avatar_url:t.avatar_url||''};});
+    }catch(e){}
+  }
+  renderConvList();
+}
+
+function renderConvList(){
+  const convItems=document.getElementById('convItems');
+  if(!allConvs.length){
+    convItems.innerHTML = currentRole==='tutor'
+      ? '<div class="empty-conv">No conversations yet.<br>Students who message you or book a session will appear here. <a href="tutor-profile.html">Check your profile</a> is complete.</div>'
+      : '<div class="empty-conv">No conversations yet.<br><a href="find-tutors.html">Find a tutor</a> and message them from their profile.</div>';
+    return;
+  }
+  const q=(document.getElementById('convSearch').value||'').trim().toLowerCase();
+  const rows=allConvs.map(c=>{
     const otherId=c.participant_1===currentUser.id?c.participant_2:c.participant_1;
     const otherName=c.participant_1===currentUser.id?c.participant_2_name:c.participant_1_name;
-    const initials=(otherName||'?').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-    const time=c.last_message_at?new Date(c.last_message_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}):'';
+    return {c,otherId,otherName:otherName||'Unknown'};
+  }).filter(r=>!q||r.otherName.toLowerCase().includes(q)||String(r.c.last_message||'').toLowerCase().includes(q));
+  if(!rows.length){convItems.innerHTML='<div class="empty-conv">No conversations match “'+__esc(q)+'”.</div>';return;}
+  convItems.innerHTML=rows.map(({c,otherId,otherName})=>{
     const unread = unreadMap[c.id]||0;
-    const unreadBadge = unread>0 ? `<div class="unread-dot" title="${__esc(unread)} unread" style="min-width:18px;height:18px;border-radius:9px;padding:0 4px;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;">${__esc(unread)}</div>` : '';
-    const boldClass = unread>0 ? 'style="font-weight:800;"' : '';
-    return`<div class="conv-item ${__esc(unread>0?'unread-conv':'')}" id="conv-${__esc(c.id)}" onclick="openConv('${c.id}','${otherId}','${__jsStr(otherName||'')}')">
-      <div class="conv-av">${__esc(initials)}</div>
+    const preview = c.last_message ? c.last_message : 'No messages yet';
+    return`<div role="listitem"><button type="button" class="conv-item ${unread>0?'unread':''} ${c.id===currentConvId?'active':''}" id="conv-${__esc(c.id)}" ${c.id===currentConvId?'aria-current="true"':''} onclick="openConv('${__jsStr(c.id)}','${__jsStr(otherId)}','${__jsStr(otherName)}')">
+      ${avatarHtml(otherId,otherName)}
       <div class="conv-info">
-        <div class="conv-name" ${boldClass}>${__esc(otherName||'Unknown')}</div>
-        <div class="conv-preview" ${boldClass}>${__esc(c.last_message||'')}</div>
+        <div class="conv-row"><span class="conv-name">${__esc(otherName)}</span><span class="conv-time">${__esc(relTime(c.last_message_at))}</span></div>
+        <div class="conv-row"><span class="conv-preview">${__esc(preview)}</span>${unread>0?`<span class="unread-badge">${__esc(unread>99?'99+':unread)}<span class="sr-only"> unread</span></span>`:''}</div>
       </div>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
-        <div class="conv-time">${__esc(time)}</div>
-        ${unreadBadge}
-      </div>
-    </div>`;
+    </button></div>`;
   }).join('');
+}
+
+function setHeader(otherId,otherName){
+  const isTutor=!!tutorInfo[otherId];
+  document.getElementById('activeChatName').textContent=otherName;
+  document.getElementById('activeChatAv').outerHTML=avatarHtml(otherId,otherName,'md').replace('class="av md"','class="av md" id="activeChatAv"');
+  const sub=document.getElementById('activeChatSub');
+  sub.classList.remove('typing');
+  sub.dataset.base=isTutor?'Tutor':(currentRole==='tutor'?'Student':'');
+  sub.textContent=sub.dataset.base;
+  const acts=document.getElementById('headActions');
+  if(isTutor&&currentRole!=='tutor'){
+    acts.innerHTML=`<a class="hbtn ghost" href="tutor-profile.html?id=${encodeURIComponent(otherId)}">View profile</a>
+      <a class="hbtn primary" href="book-session.html?tutor=${encodeURIComponent(otherId)}"><svg class="ico" style="width:16px;height:16px" aria-hidden="true"><use href="#i-cal"/></svg><span>Book<span class="lbl-long"> a session</span></span></a>`;
+  }else acts.innerHTML='';
 }
 
 async function openConv(convId, otherId, otherName){
   currentConvId=convId;
-  document.querySelectorAll('.conv-item').forEach(el=>el.classList.remove('active'));
-  const convEl=document.getElementById('conv-'+convId);
-  if(convEl)convEl.classList.add('active');
+  currentOther={id:otherId,name:otherName};
+  if(unreadMap[convId]){delete unreadMap[convId];}
+  renderConvList();
 
   document.getElementById('noChatSelected').style.display='none';
   document.getElementById('activeChatHeader').style.display='flex';
-  document.getElementById('trustBanner').style.display='block';
+  document.getElementById('trustBanner').style.display='flex';
   document.getElementById('chatMessages').style.display='flex';
-  document.getElementById('chatInputArea').style.display='flex';
-  document.getElementById('activeChatName').textContent=otherName;
+  document.getElementById('chatInputArea').style.display='block';
+  document.getElementById('contactWarning').style.display='none';
+  if(!(otherId in tutorInfo)){
+    try{const {data:t}=await _sb.from('public_tutors').select('id,avatar_url').eq('id',otherId).maybeSingle();tutorInfo[otherId]=t?{avatar_url:t.avatar_url||''}:null;}catch(e){tutorInfo[otherId]=null;}
+  }
+  setHeader(otherId,otherName);
 
   // Mobile: switch from conversation list to chat view
   document.getElementById('convList').classList.add('hide-mobile');
   document.getElementById('chatArea').classList.add('show-mobile');
 
-  const initials=otherName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-  document.getElementById('activeChatAv').textContent=initials;
-
   await loadMessages(convId);
+  if(convId!==currentConvId)return; // user switched while loading
 
   // Mark messages as read
   await _sb.from('messages').update({read:true})
     .eq('conversation_id',convId)
     .eq('receiver_id',currentUser.id);
 
-  // Subscribe to new messages
+  // Subscribe to new messages (and read receipts)
   if(msgSubscription)msgSubscription.unsubscribe();
   msgSubscription=_sb.channel('messages-'+convId)
     .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`},
       payload=>{
-        appendMessage(payload.new);
+        if(convId!==currentConvId)return;
+        const m=payload.new;
+        if(renderedIds.has(m.id))return; // already shown (our own optimistic send)
+        if(m.sender_id===currentUser.id){
+          const p=pendingSends.find(x=>x.content===(m.content||'')&&(!x.hasFile||x.path===m.attachment_path));
+          if(p){adoptSaved(p,m);loadConversations();return;}
+        }
+        appendMessage(m);
+        if(m.sender_id!==currentUser.id){
+          showTyping(false);
+          _sb.from('messages').update({read:true}).eq('id',m.id).eq('receiver_id',currentUser.id).then(()=>{});
+        }
         loadConversations(); // refresh the list so last_message and unread counts update
       })
+    .on('postgres_changes',{event:'UPDATE',schema:'public',table:'messages',filter:`conversation_id=eq.${convId}`},
+      payload=>{
+        const m=payload.new;
+        if(m&&myMsgs[m.id]&&m.read&&!myMsgs[m.id].read){myMsgs[m.id].read=true;updateSeen();}
+      })
+    .on('postgres_changes',{event:'*',schema:'public',table:'message_reactions',filter:`conversation_id=eq.${convId}`},
+      payload=>{
+        const r=payload.new;
+        if(!r||!r.message_id||convId!==currentConvId)return;
+        setReaction(r.message_id,r.user_id,r.emoji);
+      })
     .subscribe();
+
+  // Typing indicator — ephemeral broadcast, nothing is stored
+  if(typingChannel)typingChannel.unsubscribe();
+  typingChannel=_sb.channel('typing-'+convId,{config:{broadcast:{self:false}}})
+    .on('broadcast',{event:'typing'},({payload})=>{
+      if(!payload||payload.user===currentUser.id||convId!==currentConvId)return;
+      showTyping(true);
+      clearTimeout(typingTimer);
+      typingTimer=setTimeout(()=>showTyping(false),4000);
+    })
+    .subscribe();
+
+  if(window.matchMedia('(min-width:701px)').matches)document.getElementById('msgInput').focus();
+}
+
+function showTyping(on){
+  const sub=document.getElementById('activeChatSub');
+  const row=document.getElementById('typingRow');
+  if(on){sub.textContent='typing…';sub.classList.add('typing');}
+  else{sub.textContent=sub.dataset.base||'';sub.classList.remove('typing');}
+  if(row){
+    const c=document.getElementById('chatMessages');
+    const near=c.scrollHeight-c.scrollTop-c.clientHeight<120;
+    row.classList.toggle('show',on);
+    if(on){c.appendChild(row);if(near)scrollToBottom();}
+  }
 }
 
 function backToConvList(){
@@ -290,22 +616,285 @@ async function loadMessages(convId){
   const {data:msgs}=await _sb.from('messages')
     .select('*').eq('conversation_id',convId)
     .order('created_at',{ascending:true});
+  if(convId!==currentConvId)return;
 
   const container=document.getElementById('chatMessages');
   container.innerHTML='';
-  (msgs||[]).forEach(m=>appendMessage(m,false));
-  container.scrollTop=container.scrollHeight;
+  renderedIds=new Set();myMsgs={};lastMsg=null;msgById={};rowById={};reactMap={};
+  cancelReply();closePicker();
+  const list=msgs||[];
+  const fu=list.find(m=>m.receiver_id===currentUser.id&&!m.read);
+  firstUnreadId=fu?fu.id:null;
+  if(!list.length){
+    container.innerHTML=`<div class="thread-empty" id="threadEmpty">${avatarHtml(currentOther.id,currentOther.name)}<h3>Say hello to ${__esc(currentOther.name)}</h3><div style="font-size:0.875rem;max-width:36ch">Start with what you need help with — a subject, a deadline or a time that suits you.</div></div>`;
+  }
+  list.forEach(m=>appendMessage(m,false));
+  ensureTypingRow();
+  updateSeen();
+  renderQuickReplies(list);
+  loadReactions(convId);
+  const sep=container.querySelector('.new-sep');
+  if(sep){container.style.scrollBehavior='auto';container.scrollTop=Math.max(0,sep.offsetTop-80);container.style.scrollBehavior='';}
+  else scrollToBottom(false,true);
 }
 
-function appendMessage(msg,scroll=true){
+function ensureTypingRow(){
+  const c=document.getElementById('chatMessages');
+  let row=document.getElementById('typingRow');
+  if(!row){row=document.createElement('div');row.id='typingRow';row.className='typing-row';}
+  row.innerHTML=`${currentOther?avatarHtml(currentOther.id,currentOther.name,'sm'):''}<div class="dots" aria-label="${__esc((currentOther&&currentOther.name)||'')} is typing"><span></span><span></span><span></span></div>`;
+  row.classList.remove('show');
+  c.appendChild(row);
+}
+
+function appendMessage(msg,scroll=true,opts){
   const container=document.getElementById('chatMessages');
+  const empty=document.getElementById('threadEmpty');if(empty)empty.remove();
   const isSent=msg.sender_id===currentUser.id;
-  const time=new Date(msg.created_at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  const div=document.createElement('div');
-  div.className='msg '+(isSent?'sent':'received');
-  div.innerHTML=`${__esc(msg.content)}<div class="msg-time">${__esc(isSent?'':msg.sender_name+' · ')}${__esc(time)}</div>`;
-  container.appendChild(div);
-  if(scroll)container.scrollTop=container.scrollHeight;
+  const d=new Date(msg.created_at);
+  const typingRow=document.getElementById('typingRow');
+  const ins=el=>{if(typingRow&&typingRow.parentNode===container)container.insertBefore(el,typingRow);else container.appendChild(el);};
+  const nearBottom=container.scrollHeight-container.scrollTop-container.clientHeight<150;
+
+  if(!lastMsg||!sameDay(new Date(lastMsg.created_at),d)){
+    const s=document.createElement('div');s.className='day-sep';s.textContent=dayLabel(d);ins(s);lastMsg=null;
+  }
+  if(firstUnreadId&&msg.id===firstUnreadId){
+    const s=document.createElement('div');s.className='new-sep';s.textContent='New messages';ins(s);lastMsg=null;
+  }
+  const grouped=lastMsg&&lastMsg.sender_id===msg.sender_id&&(d-new Date(lastMsg.created_at))<5*60*1000&&!msg.reply_to;
+  if(grouped&&lastMsg._row)lastMsg._row.classList.add('next-same');
+
+  const row=document.createElement('div');
+  row.className='row '+(isSent?'me':'them')+(grouped?' grouped':'')+(opts&&opts.pending?' pending':'');
+  const who=isSent?'You':(msg.sender_name||(currentOther&&currentOther.name)||'');
+  // quoted reply
+  let quote='';
+  if(msg.reply_to){
+    const o=msgById[msg.reply_to];
+    const qWho=o?(o.sender_id===currentUser.id?'You':(o.sender_name||(currentOther&&currentOther.name)||'')):'';
+    quote=`<button type="button" class="quote" data-goto="${__esc(msg.reply_to)}"><b>${o?__esc(qWho):'Original message'}</b><span>${o?__esc(previewOf(o)):'Not available'}</span></button>`;
+  }
+  // attachment
+  let att='';const hasImg=msg.attachment_path&&/^image\//.test(msg.attachment_type||'');
+  if(msg.attachment_path||(opts&&opts.localFile)){
+    const isImg=hasImg||(opts&&opts.localFile&&/^image\//.test(opts.localFile.type));
+    if(isImg)att=`<button type="button" class="att-img" aria-label="Open photo${msg.attachment_name?': '+__esc(msg.attachment_name):''}"><img alt="${__esc(msg.attachment_name||'Photo')}"></button>`;
+    else{const nm=msg.attachment_name||(opts&&opts.localFile&&opts.localFile.name)||'File';const sz=msg.attachment_size||(opts&&opts.localFile&&opts.localFile.size);
+      att=`<a class="att-file" href="#" ${msg.attachment_path?'':'aria-disabled="true"'}><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg></span><span><span class="fn">${__esc(nm)}</span><span class="fs">${__esc(fileKind(msg.attachment_type||(opts&&opts.localFile&&opts.localFile.type)))}${sz?' · '+__esc(fmtSize(sz)):''}</span></span></a>`;}
+  }
+  const text=msg.content?`<span class="msg-text">${linkify(msg.content)}</span>`:'';
+  const media=att&&/att-img/.test(att);
+  row.innerHTML=`${isSent?'':avatarHtml(msg.sender_id,who,'sm')}<div class="bcol"><div class="msg${media?' media':''}"><span class="sr-only">${__esc(who)}: </span>${quote}${att}${text}<time class="msg-time" datetime="${__esc(msg.created_at)}">${__esc(timeStr(d))}</time></div><div class="reacts"></div></div><div class="acts"><button type="button" class="a-react" aria-label="React to this message" title="React"><svg class="ico" aria-hidden="true"><use href="#i-smile"/></svg></button><button type="button" class="a-reply" aria-label="Reply to this message" title="Reply"><svg class="ico" aria-hidden="true"><use href="#i-reply"/></svg></button></div>`;
+  ins(row);
+  const rec=Object.assign({},msg,{_row:row});
+  lastMsg=rec;
+  if(msg.id){renderedIds.add(msg.id);msgById[msg.id]=msg;rowById[msg.id]=row;row.dataset.id=msg.id;}
+  if(isSent&&msg.id&&!(opts&&opts.pending))myMsgs[msg.id]={read:!!msg.read,el:row};
+  wireRow(row,msg);
+  // image source
+  const img=row.querySelector('.att-img img');
+  if(img){
+    img.addEventListener('load',()=>{if(nearBottom||isSent)scrollToBottom(false,true);});
+    if(opts&&opts.localFile){img.src=URL.createObjectURL(opts.localFile);}
+    else signedUrl(msg.attachment_path).then(u=>{if(u)img.src=u;});
+  }
+  if(msg.id&&reactMap[msg.id])renderReacts(msg.id);
+  if(scroll){
+    if(isSent||nearBottom)scrollToBottom();
+    else showJump(true);
+    updateSeen();
+  }
+  return row;
+}
+
+function wireRow(row,msg){
+  row.querySelector('.a-reply').addEventListener('click',()=>{const id=row.dataset.id;if(id)startReply(msgById[id]);});
+  row.querySelector('.a-react').addEventListener('click',e=>{const id=row.dataset.id;if(id)openPicker(id,e.currentTarget);});
+  const q=row.querySelector('.quote');
+  if(q)q.addEventListener('click',()=>goToMessage(q.dataset.goto));
+  const im=row.querySelector('.att-img');
+  if(im)im.addEventListener('click',()=>{const id=row.dataset.id;const m=id&&msgById[id];if(m&&m.attachment_path)openLightbox(m);});
+  const f=row.querySelector('.att-file');
+  if(f)f.addEventListener('click',e=>{e.preventDefault();const id=row.dataset.id;const m=id&&msgById[id];if(m&&m.attachment_path)openFile(m);});
+  // touch: tap bubble to show actions
+  row.querySelector('.msg').addEventListener('click',e=>{
+    if(!window.matchMedia('(hover:none)').matches)return;
+    if(e.target.closest('a,button'))return;
+    const on=!row.classList.contains('show-acts');
+    document.querySelectorAll('.row.show-acts').forEach(r=>r.classList.remove('show-acts'));
+    if(on)row.classList.add('show-acts');
+  });
+}
+
+function previewOf(m){
+  if(!m)return '';
+  if(m.content)return m.content;
+  if(m.attachment_path)return /^image\//.test(m.attachment_type||'')?'📷 Photo':'📎 '+(m.attachment_name||'File');
+  return '';
+}
+function fmtSize(n){n=Number(n)||0;if(n<1024)return n+' B';if(n<1048576)return Math.round(n/1024)+' KB';return (n/1048576).toFixed(1)+' MB';}
+function fileKind(t){return t==='application/pdf'?'PDF':(/wordprocessingml/.test(t||'')?'Word document':(/^image\//.test(t||'')?'Photo':'File'));}
+
+async function signedUrl(path){
+  if(!path)return '';
+  const c=signedCache[path];
+  if(c&&Date.now()-c.at<50*60*1000)return c.url;
+  try{
+    const {data,error}=await _sb.storage.from('messages').createSignedUrl(path,3600);
+    if(error||!data)return '';
+    signedCache[path]={url:data.signedUrl,at:Date.now()};
+    return data.signedUrl;
+  }catch(e){return '';}
+}
+async function openLightbox(m){
+  const lb=document.getElementById('lightbox');
+  const u=await signedUrl(m.attachment_path);if(!u)return;
+  document.getElementById('lbImg').src=u;
+  document.getElementById('lbImg').alt=m.attachment_name||'Photo';
+  document.getElementById('lbOpen').href=u;
+  if(lb.showModal)lb.showModal();else window.open(u,'_blank','noopener');
+}
+async function openFile(m){
+  const w=window.open('about:blank','_blank');
+  const u=await signedUrl(m.attachment_path);
+  if(w){if(u){try{w.opener=null;}catch(e){} w.location.href=u;}else w.close();}
+  else if(u)window.location.href=u;
+}
+
+function goToMessage(id){
+  const r=rowById[id];if(!r)return;
+  r.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion:reduce)').matches?'auto':'smooth',block:'center'});
+  r.classList.remove('hl');void r.offsetWidth;r.classList.add('hl');
+  setTimeout(()=>r.classList.remove('hl'),1600);
+}
+
+// ── Replies ──
+function startReply(m){
+  if(!m)return;
+  replyTo=m;
+  document.getElementById('replyWho').textContent='Replying to '+(m.sender_id===currentUser.id?'yourself':(m.sender_name||(currentOther&&currentOther.name)||''));
+  document.getElementById('replySnippet').textContent=previewOf(m);
+  document.getElementById('replyBar').classList.add('show');
+  document.querySelectorAll('.row.show-acts').forEach(r=>r.classList.remove('show-acts'));
+  document.getElementById('msgInput').focus();
+}
+function cancelReply(){replyTo=null;const b=document.getElementById('replyBar');if(b)b.classList.remove('show');}
+
+// ── Reactions ──
+async function loadReactions(convId){
+  try{
+    const {data}=await _sb.from('message_reactions').select('message_id,user_id,emoji').eq('conversation_id',convId);
+    if(convId!==currentConvId)return;
+    (data||[]).forEach(r=>setReaction(r.message_id,r.user_id,r.emoji));
+  }catch(e){}
+}
+function setReaction(msgId,userId,emoji){
+  reactMap[msgId]=reactMap[msgId]||{};
+  if(emoji)reactMap[msgId][userId]=emoji;else delete reactMap[msgId][userId];
+  renderReacts(msgId);
+}
+function renderReacts(msgId){
+  const row=rowById[msgId];if(!row)return;
+  const box=row.querySelector('.reacts');
+  const map=reactMap[msgId]||{};
+  const counts={};
+  Object.entries(map).forEach(([u,e])=>{counts[e]=counts[e]||{n:0,mine:false};counts[e].n++;if(u===currentUser.id)counts[e].mine=true;});
+  box.innerHTML=REACTIONS.filter(e=>counts[e]).map(e=>{
+    const c=counts[e];
+    const label=c.mine?(c.n>1?'You and '+(currentOther?currentOther.name:'1 other'):'You')+' reacted '+e+'. Tap to remove':((currentOther?currentOther.name:'Someone')+' reacted '+e);
+    return `<button type="button" class="react-pill${c.mine?' mine':''}" data-e="${__esc(e)}" aria-label="${__esc(label)}" title="${__esc(label)}"><span aria-hidden="true">${e}</span>${c.n>1?'<span aria-hidden="true">'+c.n+'</span>':''}</button>`;
+  }).join('');
+  box.querySelectorAll('.react-pill').forEach(b=>b.addEventListener('click',()=>react(msgId,b.dataset.e)));
+}
+async function react(msgId,emoji){
+  closePicker();
+  const prev=(reactMap[msgId]||{})[currentUser.id]||null;
+  const next=prev===emoji?null:emoji;
+  setReaction(msgId,currentUser.id,next);
+  const {error}=await _sb.from('message_reactions').upsert({message_id:msgId,user_id:currentUser.id,emoji:next},{onConflict:'message_id,user_id'});
+  if(error)setReaction(msgId,currentUser.id,prev);
+}
+function openPicker(msgId,anchor){
+  const pk=document.getElementById('reactPicker');
+  if(pickerFor===msgId&&pk.classList.contains('open')){closePicker();return;}
+  pickerFor=msgId;
+  const mine=(reactMap[msgId]||{})[currentUser.id];
+  pk.innerHTML=REACTIONS.map(e=>`<button type="button" data-e="${__esc(e)}" class="${mine===e?'mine':''}" aria-label="React ${e}" aria-pressed="${mine===e}">${e}</button>`).join('');
+  pk.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>react(msgId,b.dataset.e)));
+  pk.classList.add('open');
+  const area=document.getElementById('chatArea').getBoundingClientRect();
+  const a=anchor.getBoundingClientRect();
+  const w=pk.offsetWidth,h=pk.offsetHeight;
+  let left=a.left-area.left+a.width/2-w/2;left=Math.max(8,Math.min(left,area.width-w-8));
+  let top=a.top-area.top-h-6;if(top<70)top=a.bottom-area.top+6;
+  pk.style.left=left+'px';pk.style.top=top+'px';
+  pk.querySelector('button').focus();
+}
+function closePicker(){const pk=document.getElementById('reactPicker');if(pk)pk.classList.remove('open');pickerFor=null;}
+
+// ── Attachments ──
+function setAttachment(file){
+  const w=document.getElementById('contactWarning');
+  if(!file)return;
+  const t=file.type||(/\.docx$/i.test(file.name)?'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'');
+  if(!FILE_TYPES[t]){w.textContent='⚠️ You can send photos (JPG, PNG, WebP), PDFs and Word documents.';w.style.display='block';return;}
+  if(file.size>MAX_FILE){w.textContent='⚠️ That file is '+fmtSize(file.size)+'. Files can be up to 10 MB.';w.style.display='block';return;}
+  if(file.size===0){w.textContent='⚠️ That file is empty.';w.style.display='block';return;}
+  w.style.display='none';
+  attachFile=file;attachFile._type=t;
+  const th=document.getElementById('attachThumb');
+  if(/^image\//.test(t)){const u=URL.createObjectURL(file);th.innerHTML=`<img class="thumb" src="${__esc(u)}" alt="">`;}
+  else th.innerHTML='<span class="thumb file"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg></span>';
+  document.getElementById('attachName').textContent=file.name;
+  document.getElementById('attachSize').textContent=fileKind(t)+' · '+fmtSize(file.size);
+  document.getElementById('attachBar').classList.add('show');
+  onInput();
+  document.getElementById('msgInput').focus();
+}
+function clearAttachment(){
+  attachFile=null;
+  const b=document.getElementById('attachBar');if(b)b.classList.remove('show');
+  const fi=document.getElementById('fileInput');if(fi)fi.value='';
+  onInput();
+}
+function safeFileName(n){return String(n||'file').replace(/[^A-Za-z0-9._-]+/g,'_').replace(/_+/g,'_').slice(-80)||'file';}
+function newId(){try{return crypto.randomUUID();}catch(e){return Date.now().toString(36)+Math.random().toString(36).slice(2);}}
+
+// "Seen" / "Sent" under your latest message
+function updateSeen(){
+  const c=document.getElementById('chatMessages');
+  c.querySelectorAll('.seen').forEach(e=>e.remove());
+  if(!lastMsg||lastMsg.sender_id!==currentUser.id||!lastMsg.id||!myMsgs[lastMsg.id])return;
+  const s=document.createElement('div');s.className='seen';
+  s.textContent=myMsgs[lastMsg.id].read?'Seen':'Sent';
+  lastMsg._row.after(s);
+}
+
+function scrollToBottom(smooth,instant){
+  const c=document.getElementById('chatMessages');
+  if(instant)c.style.scrollBehavior='auto';
+  c.scrollTop=c.scrollHeight;
+  if(instant)c.style.scrollBehavior='';
+  showJump(false);
+}
+function showJump(on){
+  const b=document.getElementById('jumpBtn');
+  b.classList.toggle('show',on);
+}
+
+function renderQuickReplies(list){
+  const box=document.getElementById('quickReplies');
+  const iSpoke=(list||[]).some(m=>m.sender_id===currentUser.id);
+  if(iSpoke){box.innerHTML='';box.style.display='none';return;}
+  const opts=currentRole==='tutor'
+    ? ['Hi! Thanks for your message.','Which topic do you need help with?','You can book a session from my profile.']
+    : ['Hi! Are you available this week?','Could you help me prepare for an exam?','What would a first session look like?'];
+  box.style.display='flex';
+  box.innerHTML=opts.map(o=>`<button type="button" data-q="${__esc(o)}">${__esc(o)}</button>`).join('');
+  box.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    const i=document.getElementById('msgInput');i.value=b.dataset.q;onInput();i.focus();
+  }));
 }
 
 // ── OFF-PLATFORM CONTACT DETECTION ──
@@ -325,13 +914,17 @@ function detectContactInfo(text) {
   return null;
 }
 
-async function sendMessage(){
+async function sendMessage(retry){
   const input=document.getElementById('msgInput');
-  const content=input.value.trim();
-  if(!content||!currentConvId)return;
+  const isRetry=!!(retry&&retry.row);
+  const content=(isRetry?retry.content:input.value).trim();
+  const file=isRetry?retry.file:attachFile;
+  const reply=isRetry?retry.reply:replyTo;
+  if((!content&&!file)||!currentConvId)return;
+  const convId=currentConvId;
 
   const warningEl = document.getElementById('contactWarning');
-  const detected = detectContactInfo(content);
+  const detected = content?detectContactInfo(content):null;
   if (detected) {
     warningEl.textContent = `⚠️ It looks like your message may contain ${detected}. For your safety and to keep your booking protections active, contact details can't be shared in chat — you'll be able to exchange them once your session is confirmed. Please edit your message to send it.`;
     warningEl.style.display = 'block';
@@ -339,7 +932,28 @@ async function sendMessage(){
   }
   warningEl.style.display = 'none';
 
-  input.value='';
+  if(!isRetry){input.value='';cancelReply();if(file)clearAttachment();onInput();}
+  const qr=document.getElementById('quickReplies');qr.innerHTML='';qr.style.display='none';
+
+  // Show it straight away (optimistic), then confirm
+  if(isRetry){const n=retry.row.nextElementSibling;if(n&&n.classList.contains('fail-note'))n.remove();retry.row.remove();}
+  const fType=file?(file._type||file.type):null;
+  const pendingRow=appendMessage({id:null,sender_id:currentUser.id,content,reply_to:reply?reply.id:null,attachment_name:file?file.name:null,attachment_type:fType,attachment_size:file?file.size:null,created_at:new Date().toISOString()},true,{pending:true,localFile:file||null});
+  const path=file?`${currentUser.id}/${convId}/${newId()}-${safeFileName(file.name)}`:null;
+  const pend={content,row:pendingRow,hasFile:!!file,path};pendingSends.push(pend);
+
+  const fail=(err)=>{
+    pendingSends=pendingSends.filter(x=>x!==pend);
+    if(convId!==currentConvId)return;
+    pendingRow.classList.remove('pending');pendingRow.classList.add('failed');
+    const note=document.createElement('div');note.className='fail-note';
+    note.innerHTML='Not sent · <button type="button">Retry</button>';
+    note.querySelector('button').addEventListener('click',()=>sendMessage({content,file,reply,row:pendingRow}));
+    pendingRow.after(note);
+    warningEl.textContent = '⚠️ ' + __friendlyDbError(err, 'Your message could not be sent. Please try again.');
+    warningEl.style.display = 'block';
+    scrollToBottom(false,true);
+  };
 
   // Use the session's own metadata as the source of truth for the sender's name.
   // The public.users table can drift out of sync with auth signup data, which
@@ -347,42 +961,117 @@ async function sendMessage(){
   const myName=(currentUser.user_metadata&&currentUser.user_metadata.full_name)||'User';
 
   // Get receiver
-  const {data:conv}=await _sb.from('conversations').select('*').eq('id',currentConvId).maybeSingle();
-  const receiverId=conv.participant_1===currentUser.id?conv.participant_2:conv.participant_1;
+  const {data:conv}=await _sb.from('conversations').select('*').eq('id',convId).maybeSingle();
+  const receiverId=conv?(conv.participant_1===currentUser.id?conv.participant_2:conv.participant_1):null;
+  if(!receiverId){fail({message:''});return;}
 
-  const { error: sendErr } = await _sb.from('messages').insert({
-    conversation_id:currentConvId,
+  // Upload the file first (private folder; only the two of you can open it)
+  if(file){
+    const {error:upErr}=await _sb.storage.from('messages').upload(path,file,{contentType:fType,upsert:false});
+    if(upErr){fail({message:/size|large/i.test(upErr.message||'')?'That file is too large (max 10 MB).':''});return;}
+  }
+
+  const row={
+    conversation_id:convId,
     sender_id:currentUser.id,
     receiver_id:receiverId,
     sender_name:myName,
     content,read:false
-  });
+  };
+  if(reply&&reply.id)row.reply_to=reply.id;
+  if(file){row.attachment_path=path;row.attachment_name=String(file.name).slice(0,200);row.attachment_type=fType;row.attachment_size=file.size;}
+
+  const { data: saved, error: sendErr } = await _sb.from('messages').insert(row).select().single();
   if (sendErr) {
-    input.value = content;
-    warningEl.textContent = '⚠️ ' + __friendlyDbError(sendErr, 'Your message could not be sent. Please try again.');
-    warningEl.style.display = 'block';
-    return;
+    if(file)_sb.storage.from('messages').remove([path]).then(()=>{},()=>{});
+    fail(sendErr);return;
   }
+  if(saved&&saved.id){if(pendingSends.includes(pend))adoptSaved(pend,saved);}
+  else{pendingSends=pendingSends.filter(x=>x!==pend);pendingRow.classList.remove('pending');}
+
+  const preview=content||(file?(/^image\//.test(fType)?'📷 Photo':'📎 '+file.name):'');
 
   // Update conversation
   await _sb.from('conversations').update({
-    last_message:content,
+    last_message:preview,
     last_message_at:new Date().toISOString()
-  }).eq('id',currentConvId);
+  }).eq('id',convId);
 
   // Notify receiver
   await _sb.from('notifications').insert({
     user_id:receiverId,
     type:'new_message',
     title:'New message from '+myName,
-    body:content.slice(0,100),
+    body:preview.slice(0,100),
     link:'messages.html?with='+currentUser.id,
     read:false
   });
+  // refresh list order/preview locally
+  const c=allConvs.find(x=>x.id===convId);
+  if(c){c.last_message=preview;c.last_message_at=new Date().toISOString();allConvs=[c].concat(allConvs.filter(x=>x!==c));renderConvList();}
 }
 
-document.getElementById('sendBtn').addEventListener('click',sendMessage);
-document.getElementById('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}});
+function adoptSaved(pend,saved){
+  pendingSends=pendingSends.filter(x=>x!==pend);
+  renderedIds.add(saved.id);
+  msgById[saved.id]=saved;rowById[saved.id]=pend.row;pend.row.dataset.id=saved.id;
+  if(saved.attachment_path){const im=pend.row.querySelector('.att-file');if(im)im.removeAttribute('aria-disabled');}
+  pend.row.classList.remove('pending');
+  if(!myMsgs[saved.id])myMsgs[saved.id]={read:!!saved.read,el:pend.row};
+  if(lastMsg&&lastMsg._row===pend.row){lastMsg.id=saved.id;}
+  if(reactMap[saved.id])renderReacts(saved.id);
+  updateSeen();
+}
+
+function onInput(){
+  const i=document.getElementById('msgInput');
+  i.style.height='auto';i.style.height=Math.min(i.scrollHeight,132)+'px';
+  const len=i.value.length;
+  const cc=document.getElementById('charCount');
+  cc.textContent=len+'/1000';cc.classList.toggle('show',len>=800);
+  document.getElementById('sendBtn').disabled=!i.value.trim()&&!attachFile;
+  if(document.getElementById('contactWarning').style.display==='block'&&!detectContactInfo(i.value))document.getElementById('contactWarning').style.display='none';
+  // typing signal (throttled, never stored)
+  const now=Date.now();
+  if(typingChannel&&i.value.trim()&&now-lastTypingSent>2500){
+    lastTypingSent=now;
+    try{typingChannel.send({type:'broadcast',event:'typing',payload:{user:currentUser.id}});}catch(e){}
+  }
+}
+
+document.getElementById('sendBtn').addEventListener('click',()=>sendMessage());
+document.getElementById('msgInput').addEventListener('input',onInput);
+document.getElementById('msgInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();sendMessage();}});
+document.getElementById('convSearch').addEventListener('input',renderConvList);
+document.getElementById('chatMessages').addEventListener('scroll',function(){
+  if(this.scrollHeight-this.scrollTop-this.clientHeight<60)showJump(false);
+});
+document.getElementById('attachBtn').addEventListener('click',()=>document.getElementById('fileInput').click());
+document.getElementById('fileInput').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)setAttachment(f);});
+document.getElementById('msgInput').addEventListener('paste',e=>{
+  const f=e.clipboardData&&e.clipboardData.files&&e.clipboardData.files[0];
+  if(f){e.preventDefault();setAttachment(f);}
+});
+(function(){
+  const area=document.getElementById('chatArea'),dz=document.getElementById('dropZone');let depth=0;
+  const ok=e=>currentConvId&&e.dataTransfer&&[...(e.dataTransfer.types||[])].includes('Files');
+  area.addEventListener('dragenter',e=>{if(!ok(e))return;e.preventDefault();depth++;dz.classList.add('show');});
+  area.addEventListener('dragover',e=>{if(!ok(e))return;e.preventDefault();});
+  area.addEventListener('dragleave',e=>{if(!ok(e))return;depth=Math.max(0,depth-1);if(!depth)dz.classList.remove('show');});
+  area.addEventListener('drop',e=>{if(!ok(e))return;e.preventDefault();depth=0;dz.classList.remove('show');const f=e.dataTransfer.files[0];if(f)setAttachment(f);});
+})();
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#reactPicker,.a-react'))closePicker();
+  if(!e.target.closest('.row'))document.querySelectorAll('.row.show-acts').forEach(r=>r.classList.remove('show-acts'));
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    const pk=document.getElementById('reactPicker');
+    if(pk.classList.contains('open')){const id=pickerFor;closePicker();const r=id&&rowById[id];if(r){const b=r.querySelector('.a-react');if(b)b.focus();}return;}
+    if(replyTo&&document.activeElement&&document.activeElement.id==='msgInput')cancelReply();
+  }
+});
+document.getElementById('chatMessages').addEventListener('scroll',closePicker,{passive:true});
 document.addEventListener('DOMContentLoaded',init);
 </script>
 <script>
