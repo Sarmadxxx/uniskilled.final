@@ -166,6 +166,65 @@ a.profile-av{text-decoration:none;}
   .nav-burger{display:block;}
   .hero-stats{gap:1rem;}
 }
+/* ===== Redesign 11 Oct 2026 — scoped to the sidebar menu and the Overview page only ===== */
+.sidebar-nav{padding:8px;display:flex;flex-direction:column;gap:2px}
+.sidebar-nav .nav-group{font-size:0.75rem;line-height:1rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5b6474;padding:12px 12px 6px}
+.sidebar-nav .nav-group:first-child{padding-top:6px}
+.sidebar-nav .nav-item{gap:8px;min-height:40px;padding:0 12px;border-radius:10px;border-left:0;font-size:0.875rem;font-weight:600;color:#334155}
+.sidebar-nav .nav-item:hover{background:#eef4ff;color:#0f172a}
+.sidebar-nav .nav-item.active{background:#eef4ff;color:#01367c;box-shadow:inset 3px 0 0 #01367c}
+.sidebar-nav .nav-item-left{gap:12px}
+.sidebar-nav svg.ico{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sidebar-nav .nav-badge{background:#01367c;font-size:12px;line-height:22px;height:22px;padding:0 6px;min-width:22px}
+.sidebar-nav .nav-badge.green{background:#047857}
+
+#page-overview > * + *{margin-top:24px}
+#page-overview .ov-head .hero-title{font-size:1.75rem;line-height:2.25rem;font-weight:800;letter-spacing:-.02em;color:#0f172a;margin:0}
+#page-overview .ov-head .hero-sub{font-size:0.9375rem;line-height:1.5rem;color:#334155;margin:4px 0 0;opacity:1}
+#page-overview .ov-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+#page-overview .ov-stat{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between}
+#page-overview .ov-stat-l{font-size:0.8125rem;line-height:1.1875rem;font-weight:600;color:#5b6474}
+#page-overview .ov-stat-n{font-size:1.75rem;line-height:2.25rem;font-weight:800;color:#0f172a;margin-top:4px}
+#page-overview .ov-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;align-items:start}
+#page-overview .card{border-color:#e3e8ef}
+#page-overview .card-head{padding:16px 24px}
+#page-overview .card-title{font-size:1.125rem;line-height:1.625rem;font-weight:700;letter-spacing:0;text-transform:none;color:#0f172a}
+#page-overview .card-head a{font-size:0.875rem!important;font-weight:700!important;color:#1550d4!important;text-decoration:none}
+#page-overview .card-head a:hover{text-decoration:underline}
+#page-overview .card-body{padding:16px 24px}
+#page-overview .empty-state{padding:20px 8px}
+#page-overview .empty-icon{display:none}
+#page-overview .empty-text{font-size:0.875rem;color:#5b6474}
+#page-overview .request-row{background:none;border:0;border-bottom:1px solid #eef1f5;border-radius:0;padding:16px 0;margin:0}
+#page-overview .request-row:first-child{padding-top:4px}
+#page-overview .request-row:last-child{border-bottom:0;padding-bottom:4px}
+#page-overview .request-name{font-size:0.9375rem}
+#page-overview .request-subject{font-size:0.875rem;color:#334155}
+#page-overview .request-meta{font-size:0.8125rem;color:#5b6474;margin-bottom:12px}
+#page-overview .request-actions{justify-content:flex-end;gap:8px}
+#page-overview .btn-accept,#page-overview .btn-decline,#page-overview .btn-msg,#page-overview .btn-msg-wide,#page-overview .btn-join{flex:0 0 auto;min-width:0;display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:10px;font-size:0.875rem;font-weight:700;line-height:1;white-space:nowrap}
+#page-overview .btn-accept,#page-overview .btn-join{background:#1a6bff;color:#fff;border:1px solid #1a6bff}
+#page-overview .btn-accept:hover,#page-overview .btn-join:hover{background:#1550d4;border-color:#1550d4}
+#page-overview .btn-decline,#page-overview .btn-msg,#page-overview .btn-msg-wide{background:#fff;color:#0f172a;border:1px solid #c3cad5}
+#page-overview .btn-msg:hover,#page-overview .btn-msg-wide:hover{border-color:#1550d4;color:#1550d4}
+#page-overview .btn-decline:hover{border-color:#b91c1c;color:#b91c1c}
+#page-overview .session-row{gap:12px;padding:14px 0}
+#page-overview .session-av{width:40px;height:40px;background:#f1f5f9;color:#334155;font-size:13px}
+#page-overview .session-info{flex:1 1 180px;min-width:0}
+#page-overview .session-name{font-size:0.9375rem}
+#page-overview .session-sub{font-size:0.8125rem;color:#5b6474}
+#page-overview .session-row .btn-join{margin-left:0!important}
+#page-overview .badge{font-size:12px;padding:3px 10px;text-transform:capitalize}
+@media(max-width:1200px){#page-overview .ov-grid{grid-template-columns:1fr}}
+@media(max-width:900px){
+  #page-overview .ov-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  #page-overview .card-head,#page-overview .card-body{padding-left:16px;padding-right:16px}
+}
+@media(max-width:600px){
+  #page-overview .ov-head .hero-title,#page-overview .ov-stat-n{font-size:1.375rem;line-height:1.875rem}
+  #page-overview .request-actions > button{flex:1 1 auto}
+  #page-overview .btn-accept,#page-overview .btn-decline,#page-overview .btn-msg,#page-overview .btn-msg-wide,#page-overview .btn-join,.sidebar-nav .nav-item{min-height:44px}
+}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
@@ -225,45 +284,48 @@ a.profile-av{text-decoration:none;}
       </div>
     </div>
     <div class="sidebar-nav" role="navigation" aria-label="Dashboard sections">
+      <div class="nav-group">Teaching</div>
       <a class="nav-item active" href="tutor-dashboard.html?tab=overview">
-        <div class="nav-item-left"><span>🏠</span>Overview</div>
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Overview</div>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=requests">
-        <div class="nav-item-left"><span>📥</span>Booking Requests</div>
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>Booking requests</div>
         <span class="nav-badge" id="badgeRequests" style="display:none">0</span>
       </a>
-      <a class="nav-item" href="tutor-dashboard.html?tab=subjectRequests">
-        <div class="nav-item-left"><span>📋</span>Open Subject Requests</div>
-        <span class="nav-badge green" id="badgeSubjectRequests" style="display:none">0</span>
-      </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=sessions">
-        <div class="nav-item-left"><span>📅</span>Sessions</div>
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><path d="M2 6h14v12H2z"/></svg>Sessions</div>
       </a>
       <a class="nav-item" href="calendar.html">
-        <div class="nav-item-left"><span>🗓️</span>Calendar</div>
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</div>
       </a>
       <a class="nav-item" href="manage-availability.html">
-        <div class="nav-item-left"><span>🚫</span>Manage Availability</div>
-      </a>
-      <a class="nav-item" href="tutor-dashboard.html?tab=referrals">
-        <div class="nav-item-left"><span>🎁</span>Refer & Earn</div>
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 7v5l3 2"/></svg>Availability</div>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=groupSessions">
-        <div class="nav-item-left"><span>👥</span>Group Sessions</div>
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group sessions</div>
       </a>
-      <a class="nav-item" href="feed.html">
-        <div class="nav-item-left"><span>✨</span>Feeds</div>
+      <div class="nav-group">Grow</div>
+      <a class="nav-item" href="tutor-dashboard.html?tab=subjectRequests">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4H9z"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg>Open subject requests</div>
+        <span class="nav-badge green" id="badgeSubjectRequests" style="display:none">0</span>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=reviews">
-        <div class="nav-item-left"><span>⭐</span>Reviews</div>
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>Reviews</div>
+      </a>
+      <a class="nav-item" href="tutor-dashboard.html?tab=referrals">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v4H3z"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></svg>Refer & earn</div>
+      </a>
+      <a class="nav-item" href="feed.html">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Feeds</div>
+      </a>
+      <div class="nav-group">Inbox</div>
+      <a class="nav-item" href="messages.html">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</div>
+        <span class="nav-badge" id="badgeMessages" style="display:none">0</span>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=notifications">
-        <div class="nav-item-left"><span>🔔</span>Notifications</div>
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications</div>
         <span class="nav-badge" id="badgeNotifs" style="display:none">0</span>
-      </a>
-      <a class="nav-item" href="messages.html">
-        <div class="nav-item-left"><span>💬</span>Messages</div>
-        <span class="nav-badge" id="badgeMessages" style="display:none">0</span>
       </a>
     </div>
   </div>
@@ -273,50 +335,51 @@ a.profile-av{text-decoration:none;}
 
     <!-- OVERVIEW -->
     <div id="page-overview">
-      <div class="hero-card" style="margin-bottom:1.2rem;">
-        <div class="hero-eyebrow">TUTOR DASHBOARD</div>
-        <h1 class="hero-title" id="heroTitle">Welcome!</h1>
-        <div class="hero-sub" id="heroSub">Complete your profile to attract students.</div>
-        <div class="hero-stats">
-          <div><div class="hero-stat-n" id="statSessions">—</div><div class="hero-stat-l">Sessions</div></div>
-          <div><div class="hero-stat-n" id="statEarnings">—</div><div class="hero-stat-l">Earned</div></div>
-          <div><div class="hero-stat-n" id="statRating">—</div><div class="hero-stat-l">Rating</div></div>
-          <div><div class="hero-stat-n" id="statReviews">—</div><div class="hero-stat-l">Reviews</div></div>
-        </div>
+      <div class="ov-head">
+        <h1 class="hero-title" id="heroTitle">Welcome</h1>
+        <p class="hero-sub" id="heroSub">Complete your profile to attract students.</p>
+      </div>
+      <div class="ov-stats">
+        <div class="ov-stat"><div class="ov-stat-l">Sessions</div><div class="ov-stat-n" id="statSessions">0</div></div>
+        <div class="ov-stat"><div class="ov-stat-l">Completed sessions value</div><div class="ov-stat-n" id="statEarnings">€0</div></div>
+        <div class="ov-stat"><div class="ov-stat-l">Rating</div><div class="ov-stat-n" id="statRating">New</div></div>
+        <div class="ov-stat"><div class="ov-stat-l">Reviews</div><div class="ov-stat-n" id="statReviews">0</div></div>
       </div>
 
       <!-- University verification (shows until verified; reminder on every visit) -->
       <div id="uniVerifyMount"></div>
 
       <!-- Booking requests preview -->
-      <div class="card" style="margin-bottom:1.2rem;">
+      <div class="card">
         <div class="card-head">
-          <h2 class="card-title">Booking Requests</h2>
-          <a href="tutor-dashboard.html?tab=requests" class="hit" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
+          <h2 class="card-title">Needs your reply</h2>
+          <a href="tutor-dashboard.html?tab=requests" class="hit">All requests</a>
         </div>
         <div class="card-body" id="overviewRequests">
           <div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>
         </div>
       </div>
 
-      <!-- Open subject requests preview -->
-      <div class="card" style="margin-bottom:1.2rem;">
-        <div class="card-head">
-          <h2 class="card-title">Open Subject Requests</h2>
-          <a href="tutor-dashboard.html?tab=subjectRequests" class="hit" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
+      <div class="ov-grid">
+        <!-- Upcoming sessions preview -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title">Upcoming sessions</h2>
+            <a href="calendar.html" class="hit">Calendar</a>
+          </div>
+          <div class="card-body" id="overviewSessions">
+            <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No upcoming sessions yet</div></div>
+          </div>
         </div>
-        <div class="card-body" id="overviewSubjectRequests">
-          <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
-        </div>
-      </div>
-
-      <!-- Upcoming sessions preview -->
-      <div class="card">
-        <div class="card-head">
-          <h2 class="card-title">Upcoming Sessions</h2>
-        </div>
-        <div class="card-body" id="overviewSessions">
-          <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No upcoming sessions yet</div></div>
+        <!-- Open subject requests preview -->
+        <div class="card">
+          <div class="card-head">
+            <h2 class="card-title">Open subject requests</h2>
+            <a href="tutor-dashboard.html?tab=subjectRequests" class="hit">See all</a>
+          </div>
+          <div class="card-body" id="overviewSubjectRequests">
+            <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -471,6 +534,11 @@ let tutorCurrency = 'EUR';
 let tutorRate = 0;
 let _accessToken = null;
 
+// Overview cards show plain button labels; the full tabs keep their own wording.
+function __ovLabels(html){return String(html).replace(/>✓ Accept</g,'>Accept<').replace(/>✗ Decline</g,'>Decline<').replace(/>🎥 Join Session</g,'>Join session<').replace(/>⚠️ Report Issue</g,'>Report issue<').replace(/>✓ I can offer this</g,'>I can offer this<').replace(/>💬 Message first</g,'>Message first<').replace(/(<button class="btn-msg"[^>]*)>💬</g,'$1 aria-label="Message student">Message<')
+    // same order on screen and for keyboard users: Message, Decline, Accept
+    .replace(/(<button class="btn-accept"[\s\S]*?<\/button>)\s*(<button class="btn-decline"[\s\S]*?<\/button>)\s*(<button class="btn-msg"[\s\S]*?<\/button>)/g,'$3$2$1')
+    .replace(/(<button class="btn-accept"[\s\S]*?<\/button>)\s*(<button class="btn-msg-wide"[\s\S]*?<\/button>)/g,'$2$1');}
 // ── NAVIGATION ──
 function showPage(id, el) {
   document.querySelectorAll('.main > div[id^="page-"]').forEach(p => p.style.display = 'none');
@@ -536,7 +604,7 @@ async function init() {
   // Hero
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('heroTitle').textContent = greeting + ', ' + firstName + '!';
+  document.getElementById('heroTitle').textContent = greeting + ', ' + firstName;
   document.getElementById('heroSub').textContent = subjects.length > 0 ? 'Teaching: ' + subjects.join(', ') + (rate ? ' · ' + rate : '') : 'Complete your profile to attract students.';
   document.title = firstName + "'s Dashboard — UniSkilled";
 
@@ -763,7 +831,7 @@ async function loadRequests() {
   document.getElementById('requestsList').innerHTML = html;
   document.getElementById('overviewRequests').innerHTML = requests.length === 0
     ? '<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>'
-    : html;
+    : __ovLabels(html);
 }
 
 window.respond = async function(sessionId, status, studentId, studentName, subject) {
@@ -862,7 +930,7 @@ async function loadSubjectRequests() {
 
   document.getElementById('overviewSubjectRequests').innerHTML = reqs.length === 0
     ? emptyHtml
-    : reqs.slice(0, 3).map(renderSubjectRequestRow).join('');
+    : __ovLabels(reqs.slice(0, 3).map(renderSubjectRequestRow).join(''));
 
   renderClusteredDemand(reqs);
 }
@@ -978,7 +1046,7 @@ async function loadSessions() {
   const upcoming = sessions.filter(s => s.status === 'confirmed');
   const awaitingPayment = sessions.filter(s => s.status === 'awaiting_payment');
 
-  document.getElementById('statSessions').textContent = sessions.length || '—';
+  document.getElementById('statSessions').textContent = sessions.length;
   const earnings = sessions.filter(s => s.status === 'completed').reduce((a, s) => a + (s.price || 0), 0);
   document.getElementById('statEarnings').textContent = (tutorCurrency === 'USD' ? '$' : '€') + earnings;
 
@@ -1044,14 +1112,14 @@ async function loadSessions() {
 
   document.getElementById('overviewSessions').innerHTML = upcoming.length === 0
     ? '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No upcoming sessions</div></div>'
-    : upcoming.slice(0, 3).map(sessionHtml).join('');
+    : __ovLabels(upcoming.slice(0, 3).map(sessionHtml).join(''));
 }
 
 // ── REVIEWS ──
 async function loadReviews() {
   const { data } = await _sb.from('reviews').select('*').eq('tutor_id', userId).order('created_at', { ascending: false });
   const reviews = data || [];
-  document.getElementById('statReviews').textContent = reviews.length || '—';
+  document.getElementById('statReviews').textContent = reviews.length;
   if (reviews.length > 0) {
     const avg = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
     document.getElementById('statRating').textContent = avg;
