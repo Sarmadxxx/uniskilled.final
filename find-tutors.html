@@ -93,6 +93,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
 @media(max-width:768px){.nav-links{display:none;}.nav-burger{display:block;}.search-bar{flex-direction:column;}.grid{grid-template-columns:1fr;}}
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="analytics.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to results</a>
@@ -293,7 +294,9 @@ function renderTutors(tutors) {
       <div class="subjects">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>
       <div class="card-footer">
         <div class="tutor-rate">${rate ? `${__esc(rate)} <span>per hour</span>` : `<span style="font-size:0.8rem;">Rate on request</span>`}</div>
-        <a class="book-btn" href="book-session.html?tutor=${encodeURIComponent(t.user_id)}&name=${encodeURIComponent(t.fullName)}" style="text-decoration:none;" aria-label="Book a session with ${__esc(t.fullName)}">Book session</a>
+        ${t.user_id === currentUserId || currentUserRole === 'tutor'
+          ? `<a class="book-btn" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}" style="text-decoration:none;">${t.user_id === currentUserId ? 'Your profile' : 'View profile'}</a>`
+          : `<a class="book-btn" href="book-session.html?tutor=${encodeURIComponent(t.user_id)}&name=${encodeURIComponent(t.fullName)}" style="text-decoration:none;" aria-label="Book a session with ${__esc(t.fullName)}">Book session</a>`}
       </div>
     </article>`;
   }).join('');
@@ -307,6 +310,7 @@ function filterTutors() {
   const day = document.getElementById('filterDay').value;
   const uniFilter = document.getElementById('filterUniversity').value;
   const countryFilter = document.getElementById('filterCountry').value;
+  window.usTrack&&usTrack('tutor_search', { query: q.slice(0, 100), has_query: !!q, format: fmt || null, price: price || null, day: day || null, university: uniFilter || null, country: countryFilter || null });
 
   renderTutors(allTutors.filter(t => {
     const subjects = Array.isArray(t.subjects)?t.subjects:[];
@@ -408,8 +412,12 @@ window.submitRequest = async function(){
 document.addEventListener('DOMContentLoaded',async ()=>{
   const q0 = new URLSearchParams(location.search).get('q');
   if (q0) document.getElementById('searchInput').value = q0;
-  loadTutors().then(() => { if (q0) filterTutors(); });
-  await setNav();
+  const navReady = setNav();   // runs alongside the tutor fetch
+  loadTutors().then(async () => {
+    await navReady;            // so a tutor's own card shows "Your profile", not "Book session"
+    if (q0) filterTutors(); else if (currentUserId) renderTutors(allTutors);
+  });
+  await navReady;
   if (window.location.hash === '#request') {
     setTimeout(openRequestModal, 300); // small delay so currentUserId/role are set after setNav resolves
   }

@@ -9,12 +9,10 @@
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="description" id="metaDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
-<link rel="canonical" id="canonicalLink" href="https://uniskilled.com/find-tutors.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
 <meta property="og:title" id="ogTitle" content="Tutor Profile — UniSkilled">
 <meta property="og:description" id="ogDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
-<meta property="og:url" id="ogUrl" content="https://uniskilled.com/find-tutors.html">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:image:width" content="1200">
@@ -173,6 +171,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="analytics.js" defer></script>
 </head>
 <body>
 
@@ -197,7 +196,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       </div>
       <div class="identity-info">
         <div class="identity-name-row">
-          <div class="profile-name" id="profileName">Loading...</div>
+          <h1 class="profile-name" id="profileName">Loading...</h1>
           <div class="verified-badge" id="verifiedBadge" style="display:none;">✓ Verified Tutor</div>
         </div>
         <a id="verifyNudge" href="tutor-dashboard.html#verify" style="display:none;margin-top:0.35rem;font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;" class="hit">Get your Verified badge — verify your university email →</a>
@@ -591,6 +590,7 @@ const _supabase = window.supabase.createClient(
 let isOwner = false;
 let tutorId = null;
 let currentUserId = null;
+let viewerRole = null;   // tutors only teach — they never see booking buttons
 let subjects = [];
 let courses = [];
 let availability = [];
@@ -611,6 +611,7 @@ async function init() {
     currentUserId = session.user.id;
     const meta = session.user.user_metadata || {};
     const role = meta.role || 'student';
+    viewerRole = role;
     tutorId = urlId || (role === 'tutor' ? currentUserId : null);
     if (!tutorId) { window.location.href = 'find-tutors.html'; return; }
     isOwner = (tutorId === currentUserId && role === 'tutor');
@@ -686,6 +687,9 @@ function applyTutorSeo(fullName, p, tp, subjects) {
   const url = 'https://uniskilled.com/tutor-profile.html?id=' + encodeURIComponent(tutorId);
   document.title = title;
   const set = (id, attr, v) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, v); };
+  // Canonical + og:url are only added once the tutor is known, so the static HTML never points every profile at another page
+  if (!document.getElementById('canonicalLink')) { const l = document.createElement('link'); l.rel = 'canonical'; l.id = 'canonicalLink'; document.head.appendChild(l); }
+  if (!document.getElementById('ogUrl')) { const m = document.createElement('meta'); m.setAttribute('property', 'og:url'); m.id = 'ogUrl'; document.head.appendChild(m); }
   set('metaDesc', 'content', desc.slice(0, 300)); set('ogDesc', 'content', desc.slice(0, 300));
   set('ogTitle', 'content', title); set('ogUrl', 'content', url); set('canonicalLink', 'href', url);
   const ld = { '@context': 'https://schema.org', '@type': 'Person', name: fullName, url: url,
@@ -697,6 +701,15 @@ function applyTutorSeo(fullName, p, tp, subjects) {
   let tag = document.getElementById('tutorLd');
   if (!tag) { tag = document.createElement('script'); tag.type = 'application/ld+json'; tag.id = 'tutorLd'; document.head.appendChild(tag); }
   tag.textContent = JSON.stringify(ld);
+  // Thin profiles stay out of Google until the tutor has added subjects and a real bio.
+  // Same rule as scripts/build-sitemap.mjs (isCompleteProfile) — keep the two in sync.
+  const fullBio = ((tp?.bio || '').trim() || (p?.bio || '').trim());
+  const complete = (subjects || []).length > 0 && fullBio.length >= 50;
+  let rob = document.getElementById('tutorRobots');
+  if (!complete) {
+    if (!rob) { rob = document.createElement('meta'); rob.name = 'robots'; rob.id = 'tutorRobots'; document.head.appendChild(rob); }
+    rob.content = 'noindex';
+  } else if (rob) { rob.remove(); }
 }
 
 async function loadProfile() {
@@ -743,7 +756,7 @@ async function loadProfile() {
 
   // Cover
   if (tp?.cover_url) {
-    document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(tp.cover_url)}" style="width:100%;height:100%;object-fit:cover;">`;
+    document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(tp.cover_url)}" alt="Cover photo" style="width:100%;height:100%;object-fit:cover;">`;
   }
 
   // Header
@@ -771,6 +784,8 @@ async function loadProfile() {
   const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">🚫 Manage Availability</a>`;
   if (isOwner) {
     bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>` + availabilityLink + certLink;
+  } else if (currentUserId && viewerRole === 'tutor') {
+    bookDiv.innerHTML = `<a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">💬 Send message</a>` + certLink;
   } else if (currentUserId) {
     bookDiv.innerHTML = `<a href="book-session.html?tutor=${__safeUrl(tutorId)}&name=${__safeUrl(encodeURIComponent(fullName))}" class="book-btn">📅 Book a session</a><a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">💬 Send message</a>` + certLink;
   } else {
@@ -953,7 +968,7 @@ async function submitReview() {
 // AVATAR & COVER UPLOAD
 async function uploadAvatar() {
   const file = this.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${__safeUrl(e.target.result)}">`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${__safeUrl(e.target.result)}" alt="Preview">`; }; r.readAsDataURL(file);
 
   const fd = new FormData();
   fd.append('user_id', currentUserId);
@@ -974,7 +989,7 @@ async function uploadAvatar() {
 
 async function uploadCover() {
   const file = this.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(e.target.result)}" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(e.target.result)}" alt="Preview" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
 
   const fd = new FormData();
   fd.append('user_id', currentUserId);

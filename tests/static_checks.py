@@ -14,7 +14,7 @@ What it checks
   6. Payment page: card is the default and PayPal is hidden unless the server enables it.
   7. Tutor dashboard: PayPal payout picker is switched off.
   8. Legal page: Stripe is listed as a processor; Google Fonts is not.
-  9. A custom 404 page exists and uses absolute asset paths.
+  9. A custom 404 page exists and resolves assets from the site root.
 """
 import base64, glob, json, os, re, subprocess, sys, tempfile
 
@@ -133,7 +133,14 @@ check('Legal: payments not described as PayPal checkout', 'through PayPal or' no
 
 # 9. 404 page ------------------------------------------------------------------------------------
 nf = read('404.html') if os.path.exists('404.html') else ''
-check('404 page exists with absolute asset paths', bool(nf) and 'href="/fonts/fonts.css"' in nf and 'src="/uniskilled-logo-sm.png"' in nf, 'missing or relative paths')
+# Paths must work at any depth: either absolute (/fonts/...) or relative under <base href="/">.
+# The page must also load self-hosted fonts, never Google Fonts.
+nf_base_root = re.search(r'<base\s+href="/"\s*/?>', nf) is not None
+nf_fonts_ok = 'href="/fonts/fonts.css"' in nf or (nf_base_root and 'href="fonts/fonts.css"' in nf)
+nf_rel = re.findall(r'(?:href|src)="(?!/|https?:|mailto:|#|\./)([^"]+)"', nf)
+check('404 page exists and resolves assets from the site root',
+      bool(nf) and nf_fonts_ok and 'fonts.googleapis' not in nf and (nf_base_root or not nf_rel),
+      'missing, Google Fonts, or relative paths without <base href="/">')
 
 # Report -----------------------------------------------------------------------------------------
 for p in passes:

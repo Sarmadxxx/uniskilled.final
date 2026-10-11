@@ -53,6 +53,7 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
 }
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="analytics.js" defer></script>
 </head>
 <body>
 <nav style="position:sticky;top:0;z-index:200;height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;padding:0 5%;font-family:'Manrope',sans-serif;">
@@ -202,6 +203,12 @@ async function init(){
   }
   currentUser=session.user;
 
+  // Only students book: tutors (including booking themselves) are sent back to the profile
+  if(tutorId===currentUser.id || (currentUser.user_metadata||{}).role==='tutor'){
+    window.location.replace('tutor-profile.html?id='+encodeURIComponent(tutorId));
+    return;
+  }
+
   // Load tutor info
   // Public columns only — a student never needs (or gets) the tutor's payout details or meeting link
   const {data:tp}=await _sb.from('tutor_profiles').select('id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,is_active,session_length,availability,preferred_time,preferred_times,teaching_format,avatar_url,cover_url').eq('user_id',tutorId).maybeSingle();
@@ -348,6 +355,7 @@ async function submitBooking(){
   }).select().single();
 
   if(sessError){showAlert(__friendlyDbError(sessError,'Could not send your request. Please try again.'),'error');setLoading(false);return;}
+  window.usTrack&&usTrack('booking_requested',{subject,price:offerPrice,currency,duration_minutes:parseInt(duration),format});
 
   // Message to tutor
   const p1=currentUser.id<tutorId?currentUser.id:tutorId;

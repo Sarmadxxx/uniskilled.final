@@ -3,41 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Page not found · UniSkilled</title>
+<!-- GitHub Pages serves this file for any missing URL, at whatever path was requested.
+     <base> makes every relative link (including the shared navbar's) resolve from the site root. -->
+<base href="/">
 <meta name="robots" content="noindex">
-<link rel="icon" href="/favicon.ico">
-<!-- Absolute paths: GitHub Pages serves this page for missing URLs at any depth -->
-<link rel="stylesheet" href="/fonts/fonts.css">
+<title>Page not found — UniSkilled</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1a6bff">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="analytics.js" defer></script>
 <style>
-  :root { --navy:#0b1f4a; --blue:#1a6bff; --mid:#64748b; --bg:#f8fafc; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Manrope', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--navy);
-         min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px 16px; }
-  main { max-width: 460px; width: 100%; text-align: center; }
-  .logo { height: 44px; width: auto; margin-bottom: 2rem; }
-  .code { font-size: 4.5rem; font-weight: 800; line-height: 1; color: var(--blue); letter-spacing: -0.03em; }
-  h1 { font-size: 1.35rem; font-weight: 800; margin: 0.9rem 0 0.6rem; }
-  p { color: var(--mid); line-height: 1.6; font-size: 0.95rem; }
-  .actions { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: center; margin-top: 1.8rem; }
-  a.btn { display: inline-block; padding: 0.75rem 1.3rem; border-radius: 10px; font-weight: 700; font-size: 0.9rem; text-decoration: none; }
-  a.primary { background: var(--blue); color: #fff; }
-  a.secondary { background: #fff; color: var(--navy); border: 1.5px solid #e2e8f0; }
-  a.btn:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
-  .help { margin-top: 2rem; font-size: 0.82rem; }
-  .help a { color: var(--blue); }
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--blue-l:#e8f0ff;--ink:#0f172a;--ink2:#374151;--mid:#6b7280;--border:#e5e7eb;--off:#f8fafc;--yellow:#f7e049}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--off);color:var(--ink);min-height:100vh;display:flex;flex-direction:column}
+main{flex:1;display:flex;align-items:center;justify-content:center;padding:3rem 16px}
+.card{max-width:520px;width:100%;text-align:center}
+.code{display:inline-block;font-size:.8rem;font-weight:800;letter-spacing:.08em;color:var(--blue);background:var(--blue-l);padding:.35rem .8rem;border-radius:999px;margin-bottom:1.25rem}
+h1{font-size:clamp(1.7rem,4vw,2.3rem);font-weight:800;letter-spacing:-.03em;line-height:1.15;margin-bottom:.8rem}
+p{color:var(--mid);font-size:1rem;line-height:1.6;margin-bottom:2rem}
+.actions{display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 1.5rem;border-radius:8px;font-weight:800;font-size:.92rem;text-decoration:none;transition:background .18s,box-shadow .18s}
+.btn-primary{background:var(--yellow);color:var(--ink)}
+.btn-primary:hover{background:#f0d800;box-shadow:0 4px 14px rgba(247,224,73,.4)}
+.btn-ghost{background:#fff;color:var(--ink2);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:#cbd5e1}
+.more{margin-top:2.25rem;font-size:.88rem;color:var(--mid)}
+.more a{color:var(--blue);font-weight:700;text-decoration:none}
+.more a:hover{text-decoration:underline}
 </style>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
-<main>
-  <a href="/"><img class="logo" src="/uniskilled-logo-sm.png" alt="UniSkilled"></a>
-  <div class="code" aria-hidden="true">404</div>
-  <h1>We couldn't find that page</h1>
-  <p>The link may be old or mistyped. Your bookings and messages are safe — they're on your dashboard.</p>
-  <div class="actions">
-    <a class="btn primary" href="/find-tutors.html">Find a tutor</a>
-    <a class="btn secondary" href="/">Go to homepage</a>
+<!-- <base href="/"> would turn "#main" into a link to the homepage, so the jump is done in script -->
+<a class="skip-link" href="#main" onclick="event.preventDefault();var m=document.getElementById('main');m.tabIndex=-1;m.focus();">Skip to content</a>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
+
+<main id="main">
+  <div class="card">
+    <span class="code">404</span>
+    <h1>We couldn't find that page</h1>
+    <p>The link may be broken, or the page may have moved. Here are a few places to pick up from.</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="find-tutors.html">Find a tutor</a>
+      <a class="btn btn-ghost" href="./">Go to homepage</a>
+    </div>
+    <div class="more">
+      Want to teach? <a href="onboarding.html">Become a tutor</a> · Need help? <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>
+    </div>
   </div>
-  <p class="help">Still stuck? Email <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>.</p>
 </main>
 </body>
 </html>

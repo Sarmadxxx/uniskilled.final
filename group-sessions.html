@@ -53,6 +53,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="analytics.js" defer></script>
 </head>
 <body>
 <header id="site-nav"></header>
@@ -60,7 +61,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 
 <main class="page" id="main">
   <div class="page-head">
-    <div class="page-title">👥 Group Sessions</div>
+    <h1 class="page-title">👥 Group Sessions</h1>
     <div class="page-sub">Share one tutor with up to three classmates and split the cost. A session goes ahead once two students have paid.</div>
   </div>
   <div id="groupSessionsList" aria-live="polite"><div class="spinner"></div></div>
@@ -133,7 +134,11 @@ async function loadGroupSessions() {
     const date = new Date(gs.scheduled_date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 
     let btnHtml;
-    if (alreadyJoined) {
+    if (currentUser && gs.tutor_id === currentUser.id) {
+      btnHtml = `<span class="gs-spots">Your session</span>`;
+    } else if (currentUser && (currentUser.user_metadata || {}).role === 'tutor') {
+      btnHtml = `<span class="gs-spots">Students only</span>`;
+    } else if (alreadyJoined) {
       btnHtml = alreadyJoined.status === 'confirmed'
         ? `<span class="gs-spots">✓ You're in</span>`
         : `<a href="complete-payment.html?group_participant=${__safeUrl(alreadyJoined.id)}" class="join-btn" style="text-decoration:none;display:inline-block;">Complete Payment</a>`;
@@ -162,6 +167,9 @@ async function loadGroupSessions() {
 
 async function joinGroupSession(groupSessionId) {
   if (!currentUser) { window.location.href = 'signin.html?redirect=' + encodeURIComponent('group-sessions.html'); return; }
+  if ((currentUser.user_metadata || {}).role === 'tutor') { showToast('Only student accounts can join group sessions.', 'info'); return; }
+  const { data: own } = await _sb.from('group_sessions').select('tutor_id').eq('id', groupSessionId).maybeSingle();
+  if (own && own.tutor_id === currentUser.id) { showToast("You can't join your own group session.", 'info'); return; }
   const { data: sp } = await _sb.from('users').select('full_name').eq('id', currentUser.id).maybeSingle();
   const studentName = sp?.full_name || 'Student';
 
@@ -182,6 +190,7 @@ async function joinGroupSession(groupSessionId) {
     return;
   }
 
+  window.usTrack&&usTrack('group_session_joined', {}, { now: true });
   window.location.href = 'complete-payment.html?group_participant=' + participant.id;
 }
 

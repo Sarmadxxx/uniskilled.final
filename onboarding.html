@@ -111,6 +111,7 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 }
 </style>
 <link rel="stylesheet" href="site.css">
+<script src="analytics.js" defer></script>
 </head>
 <body>
 <div class="container">
@@ -552,6 +553,8 @@ document.addEventListener('DOMContentLoaded', function() {
       showAlert(error.message.includes('already registered') ? 'This email is already registered. Try signing in.' : error.message, 'error');
       setLoading(false); return;
     }
+
+    window.usTrack&&usTrack('signup_completed', { role: selectedRole });
 
     if (data.user && selectedRole === 'tutor' && certificates.some(c => c.file)) {
       // Profile rows were created server-side at signup. Certificate FILES need a logged-in
