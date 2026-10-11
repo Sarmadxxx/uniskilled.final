@@ -1,0 +1,58 @@
+/* UniSkilled — shared design tokens ("Calm Campus", approved 11 Oct 2026).
+   One source of truth for colour, type, spacing and shape on app pages.
+   Pages migrate to these one at a time; until a page is migrated it keeps its own
+   :root variables (--blue, --mid, …), which these names never collide with. */
+:root {
+  /* Colour — actions */
+  --brand-600: #1a6bff;   /* primary buttons, selected state (4.57:1 with white) */
+  --brand-700: #1550d4;   /* links, hover, text on tints (6.71:1) */
+  --brand-50:  #eef4ff;   /* active nav, hover rows */
+  --brand-100: #dbe7ff;   /* avatars, selected chips */
+
+  /* Colour — identity (kept neutral until the new logo; swap here only) */
+  --identity:  #01367c;
+
+  /* Colour — text and lines */
+  --ink:   #0f172a;
+  --ink-2: #334155;
+  --muted: #5b6474;       /* captions, metadata (5.97:1 on white, 5.51:1 on canvas) */
+  --line:  #e3e8ef;       /* card borders, dividers (decorative) */
+  --line-strong: #8792a2; /* input borders (3.15:1) */
+  --canvas:  #f4f6f9;
+  --surface: #ffffff;
+
+  /* Colour — status (each pair ≥ 4.8:1) */
+  --success: #047857; --success-bg: #ecfdf5;
+  --warning: #92400e; --warning-bg: #fef3c7;
+  --attention: #c2410c; --attention-bg: #fff7ed;
+  --danger: #b91c1c;  --danger-bg: #fef2f2;
+  --neutral-bg: #f1f5f9;
+  --star: #b45309;
+
+  /* Type — Manrope only in the app */
+  --font: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --fs-display: 2rem;      --lh-display: 2.5rem;    /* 32/40 · 800 */
+  --fs-h1: 1.75rem;        --lh-h1: 2.25rem;        /* 28/36 · 800 */
+  --fs-h2: 1.125rem;       --lh-h2: 1.625rem;       /* 18/26 · 700 */
+  --fs-h3: 1rem;           --lh-h3: 1.5rem;         /* 16/24 · 700 */
+  --fs-body: 0.9375rem;    --lh-body: 1.5rem;       /* 15/24 */
+  --fs-small: 0.875rem;    --lh-small: 1.3125rem;   /* 14/21 */
+  --fs-caption: 0.8125rem; --lh-caption: 1.1875rem; /* 13/19 */
+  --fs-overline: 0.75rem;  --lh-overline: 1rem;     /* 12/16 · 700 · uppercase · 0.06em */
+
+  /* Spacing — 4 px base */
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px;
+  --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px; --s-16: 64px;
+
+  /* Shape */
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(15, 23, 42, .06);
+  --shadow-2: 0 12px 32px rgba(15, 23, 42, .16);
+
+  /* Layout */
+  --w-app: 1240px; --w-profile: 1080px; --w-sidebar: 248px;
+
+  /* Motion */
+  --ease: cubic-bezier(.2, 0, 0, 1);
+  --t-fast: 150ms;
+}
