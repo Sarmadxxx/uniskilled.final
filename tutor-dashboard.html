@@ -14,7 +14,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#5b6474;--light:#5b6474;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#047857;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;}
 body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
 
 /* NAV */
@@ -41,9 +41,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .profile-av img{width:100%;height:100%;object-fit:cover;}
 .profile-name{font-weight:800;font-size:0.9rem;cursor:pointer;margin-bottom:0.15rem;}
 .profile-name:hover{color:var(--blue);}
+a.profile-name{display:block;color:var(--ink);text-decoration:none;}
+a.profile-av{text-decoration:none;}
 .profile-sub{font-size:0.72rem;color:var(--mid);line-height:1.4;margin-bottom:0.8rem;}
 .profile-btn{display:block;width:100%;padding:0.5rem;background:var(--blue);color:#fff;border:none;border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;text-decoration:none;text-align:center;}
-.switch-btn{display:none;width:100%;margin-top:0.5rem;padding:0.5rem;background:linear-gradient(135deg,#059669,#0ea5e9);color:#fff;border:none;border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all .18s;}
+.switch-btn{display:none;width:100%;margin-top:0.5rem;padding:0.5rem;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all .18s;}
 .switch-btn:hover{opacity:0.88;}
 .become-btn{display:none;width:100%;margin-top:0.5rem;padding:0.5rem;background:var(--off);border:1.5px dashed var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.78rem;font-weight:700;color:var(--mid);cursor:pointer;transition:all .18s;}
 .become-btn:hover{border-color:var(--blue);color:var(--blue);background:#eff6ff;}
@@ -61,7 +63,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .dual-modal-footer{padding:1rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:0.7rem;justify-content:flex-end;}
 .dm-form-group{margin-bottom:0.9rem;}
 .dm-label{display:block;font-size:0.8rem;font-weight:700;color:#374151;margin-bottom:0.35rem;}
-.dm-input,.dm-select{width:100%;padding:0.7rem 0.9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.87rem;outline:none;}
+.dm-input,.dm-select{width:100%;padding:0.7rem 0.9rem;border:1.5px solid #8792a2;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.87rem;outline:none;}
 .dm-input:focus,.dm-select:focus{border-color:var(--blue);}
 .dm-alert{padding:0.65rem 1rem;border-radius:8px;font-size:0.82rem;font-weight:600;margin-bottom:0.8rem;display:none;}
 .dm-alert.success{background:var(--green-bg);color:var(--green);display:block;}
@@ -71,7 +73,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .sidebar-nav{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
 .nav-item{display:flex;align-items:center;justify-content:space-between;padding:0.78rem 1.2rem;font-size:0.85rem;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;text-decoration:none;border-left:3px solid transparent;}
 .nav-item:hover{background:var(--off);color:var(--blue);}
-.nav-item.active{background:#eff6ff;color:var(--blue);border-left-color:var(--blue);}
+.nav-item.active{background:#eff6ff;color:#1550d4;border-left-color:var(--blue);}
 .nav-item-left{display:flex;align-items:center;gap:0.75rem;}
 .nav-badge{background:var(--red);color:#fff;font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:100px;min-width:18px;text-align:center;}
 .nav-badge.green{background:var(--green);}
@@ -84,12 +86,12 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 /* HERO */
 .hero-card{background:linear-gradient(135deg,#0b1f4a,#7c3aed,#1a6bff);border-radius:16px;padding:2rem;color:#fff;position:relative;overflow:hidden;}
 .hero-card::before{content:'';position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.05);top:-60px;right:-40px;}
-.hero-eyebrow{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;opacity:0.55;margin-bottom:0.3rem;}
+.hero-eyebrow{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.3rem;}
 .hero-title{font-size:1.5rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.25rem;}
-.hero-sub{font-size:0.85rem;opacity:0.65;margin-bottom:1.2rem;}
+.hero-sub{font-size:0.85rem;margin-bottom:1.2rem;}
 .hero-stats{display:flex;gap:2rem;}
 .hero-stat-n{font-size:1.4rem;font-weight:800;}
-.hero-stat-l{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.5;}
+.hero-stat-l{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;}
 
 /* CARDS */
 .card{background:#fff;border-radius:14px;border:1px solid var(--border);}
@@ -117,7 +119,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .session-row{display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .session-row:last-child{border-bottom:none;}
 .btn-join{display:inline-flex;align-items:center;gap:5px;padding:0.4rem 0.9rem;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:"Manrope",sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;margin-left:auto;white-space:nowrap;}
-.btn-join:hover{background:#047857;}
+.btn-join:hover{background:#065f46;}
 .btn-join:disabled{background:var(--light);cursor:not-allowed;}
 
 
@@ -133,7 +135,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .session-name{font-weight:700;font-size:0.85rem;}
 .session-sub{font-size:0.72rem;color:var(--mid);}
 .badge{font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px;white-space:nowrap;}
-.badge-pending{background:#fff7ed;color:#ea580c;}
+.badge-pending{background:#fff7ed;color:#c2410c;}
 .badge-confirmed{background:var(--green-bg);color:var(--green);}
 .badge-completed{background:var(--off);color:var(--mid);}
 .badge-awaiting-payment{background:#fef3c7;color:#92400e;}
@@ -197,8 +199,8 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <div class="profile-card">
       <div class="profile-cover"></div>
       <div class="profile-card-body">
-        <div class="profile-av" id="sideAv" onclick="window.location.href='tutor-profile.html'">?</div>
-        <div class="profile-name" id="sideName" onclick="window.location.href='tutor-profile.html'">Loading...</div>
+        <a class="profile-av" id="sideAv" href="tutor-profile.html" aria-label="Your profile">?</a>
+        <a class="profile-name" id="sideName" href="tutor-profile.html">Loading...</a>
         <div class="profile-sub" id="sideSub"></div>
         <a href="#verify" id="sideVerifyLink" class="hit" style="display:none;font-size:0.75rem;font-weight:700;color:var(--blue);text-decoration:none;margin-bottom:0.6rem;">○ Not verified yet — get your badge</a>
         <a href="tutor-profile.html" class="profile-btn">✏️ Edit Profile</a>
@@ -222,7 +224,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
         </div>
       </div>
     </div>
-    <div class="sidebar-nav">
+    <div class="sidebar-nav" role="navigation" aria-label="Dashboard sections">
       <a class="nav-item active" href="tutor-dashboard.html?tab=overview">
         <div class="nav-item-left"><span>🏠</span>Overview</div>
       </a>
@@ -267,13 +269,13 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
   </div>
 
   <!-- MAIN PAGES -->
-  <div class="main">
+  <main class="main">
 
     <!-- OVERVIEW -->
     <div id="page-overview">
       <div class="hero-card" style="margin-bottom:1.2rem;">
         <div class="hero-eyebrow">TUTOR DASHBOARD</div>
-        <div class="hero-title" id="heroTitle">Welcome!</div>
+        <h1 class="hero-title" id="heroTitle">Welcome!</h1>
         <div class="hero-sub" id="heroSub">Complete your profile to attract students.</div>
         <div class="hero-stats">
           <div><div class="hero-stat-n" id="statSessions">—</div><div class="hero-stat-l">Sessions</div></div>
@@ -289,7 +291,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <!-- Booking requests preview -->
       <div class="card" style="margin-bottom:1.2rem;">
         <div class="card-head">
-          <div class="card-title">Booking Requests</div>
+          <h2 class="card-title">Booking Requests</h2>
           <a href="tutor-dashboard.html?tab=requests" class="hit" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
         </div>
         <div class="card-body" id="overviewRequests">
@@ -300,7 +302,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <!-- Open subject requests preview -->
       <div class="card" style="margin-bottom:1.2rem;">
         <div class="card-head">
-          <div class="card-title">Open Subject Requests</div>
+          <h2 class="card-title">Open Subject Requests</h2>
           <a href="tutor-dashboard.html?tab=subjectRequests" class="hit" style="font-size:0.8rem;font-weight:600;color:var(--blue);cursor:pointer;">View all</a>
         </div>
         <div class="card-body" id="overviewSubjectRequests">
@@ -311,7 +313,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       <!-- Upcoming sessions preview -->
       <div class="card">
         <div class="card-head">
-          <div class="card-title">Upcoming Sessions</div>
+          <h2 class="card-title">Upcoming Sessions</h2>
         </div>
         <div class="card-body" id="overviewSessions">
           <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No upcoming sessions yet</div></div>
@@ -333,14 +335,14 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
           </div>
         </div>
         <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
-          <input id="referralLinkInput" readonly style="flex:1;min-width:220px;padding:0.7rem 1rem;border:1.5px solid #ddd6fe;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;color:var(--ink2);background:#fff;" value="Loading your link...">
+          <input id="referralLinkInput" readonly aria-label="Your referral link" style="flex:1;min-width:220px;padding:0.7rem 1rem;border:1.5px solid #ddd6fe;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;color:var(--ink2);background:#fff;" value="Loading your link...">
           <button id="copyReferralBtn" onclick="copyReferralLink()" style="padding:0.7rem 1.2rem;background:#7c3aed;color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copy link</button>
           <button id="shareReferralBtn" onclick="shareReferralLink()" style="padding:0.7rem 1.2rem;background:#fff;color:#7c3aed;border:1.5px solid #7c3aed;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;">↗ Share</button>
         </div>
         <div id="referralStats" style="font-size:0.8rem;color:var(--mid);margin-top:0.9rem;"></div>
       </div>
       <div class="card" style="margin-top:1rem;">
-        <div class="card-head"><div class="card-title">Your referrals</div></div>
+        <div class="card-head"><h2 class="card-title">Your referrals</h2></div>
         <div class="card-body" id="referralsList">
           <div class="empty-state"><div class="empty-icon">🎁</div><div class="empty-text">No referrals yet — share your link above to start earning credit.</div></div>
         </div>
@@ -350,7 +352,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <!-- BOOKING REQUESTS PAGE -->
     <div id="page-requests" style="display:none;">
       <div class="card">
-        <div class="card-head"><div class="card-title">Booking Requests</div></div>
+        <div class="card-head"><h2 class="card-title">Booking Requests</h2></div>
         <div class="card-body" id="requestsList">
           <div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>
         </div>
@@ -360,14 +362,14 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <!-- OPEN SUBJECT REQUESTS PAGE -->
     <div id="page-subjectRequests" style="display:none;">
       <div class="card" style="margin-bottom:1rem;">
-        <div class="card-head"><div class="card-title">Open Subject Requests</div></div>
+        <div class="card-head"><h2 class="card-title">Open Subject Requests</h2></div>
         <div class="card-body" style="font-size:0.83rem;color:var(--mid);line-height:1.6;">
           Students post subjects they need help with here. If you can teach one, click "I can offer this" — the student will be notified right away and you can confirm details by message.
         </div>
       </div>
       <div id="clusteredDemandSection" style="display:none;margin-bottom:1rem;">
         <div class="card">
-          <div class="card-head"><div class="card-title">🔥 Multiple Students Want the Same Thing</div></div>
+          <div class="card-head"><h2 class="card-title">🔥 Multiple Students Want the Same Thing</h2></div>
           <div class="card-body" id="clusteredDemandList"></div>
         </div>
       </div>
@@ -381,11 +383,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <!-- SESSIONS PAGE -->
     <div id="page-sessions" style="display:none;">
       <div class="card" id="awaitingPaymentCard" style="display:none;margin-bottom:1rem;background:#fffbeb;border:1.5px solid #fcd34d;">
-        <div class="card-head"><div class="card-title">⏳ Waiting for Student Payment</div></div>
+        <div class="card-head"><h2 class="card-title">⏳ Waiting for Student Payment</h2></div>
         <div class="card-body" id="awaitingPaymentList"></div>
       </div>
       <div class="card">
-        <div class="card-head"><div class="card-title">All Sessions</div></div>
+        <div class="card-head"><h2 class="card-title">All Sessions</h2></div>
         <div class="card-body" id="sessionsList">
           <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No sessions yet</div></div>
         </div>
@@ -396,7 +398,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <div id="page-groupSessions" style="display:none;">
       <div class="card">
         <div class="card-head">
-          <div class="card-title">👥 Group Sessions</div>
+          <h2 class="card-title">👥 Group Sessions</h2>
           <button class="edit-btn" onclick="openGroupSessionModal()" style="background:var(--blue);color:#fff;border:none;">+ Create Group Session</button>
         </div>
         <div class="card-body" id="groupSessionsList">
@@ -412,7 +414,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <div id="page-reviews" style="display:none;">
       <div class="card">
         <div class="card-head">
-          <div class="card-title">Ratings & Reviews</div>
+          <h2 class="card-title">Ratings & Reviews</h2>
           <div style="font-size:0.85rem;font-weight:700;" id="avgRatingDisplay"></div>
         </div>
         <div class="card-body" id="reviewsList">
@@ -424,14 +426,14 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <!-- NOTIFICATIONS PAGE -->
     <div id="page-notifications" style="display:none;">
       <div class="card">
-        <div class="card-head"><div class="card-title">Notifications</div></div>
+        <div class="card-head"><h2 class="card-title">Notifications</h2></div>
         <div class="card-body" id="notifsList">
           <div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-text">No notifications yet</div></div>
         </div>
       </div>
     </div>
 
-  </div>
+  </main>
 </div>
 
 <script>
@@ -1090,7 +1092,7 @@ async function loadNotifications() {
   const typeIcons = { booking_request: '📥', booking_confirmed: '✅', booking_declined: '❌', new_message: '💬', new_review: '⭐' };
 
   document.getElementById('notifsList').innerHTML = notifs.map(n => `
-    <div class="notif-row ${__esc(n.read ? '' : 'unread')}" onclick="if('${__jsStr(n.link||'')}')window.location.href='${__jsStr(n.link||'')}'">
+    <div class="notif-row ${__esc(n.read ? '' : 'unread')}" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" onclick="if('${__jsStr(n.link||'')}')window.location.href='${__jsStr(n.link||'')}'">
       <div class="notif-ico">${__esc(typeIcons[n.type] || '🔔')}</div>
       <div class="notif-info">
         <div class="notif-title">${__esc(n.title || '')}</div>
