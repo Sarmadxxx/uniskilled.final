@@ -109,6 +109,85 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
   .profile-actions{width:100%;flex-direction:column;padding-top:0.7rem;}
   .profile-actions .btn{width:100%;justify-content:center;}
 }
+/* ===== Redesign 11 Oct 2026 — matches the tutor profile and dashboards. The top navbar is unchanged. ===== */
+body{background:#f4f6f9}
+.cover-wrap{height:160px;background-color:#01367c;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.12) 1px,transparent 0);background-size:22px 22px}
+.cover-edit{display:inline-flex;align-items:center;gap:6px;border-radius:10px;padding:8px 14px;font-size:0.8125rem;min-height:36px}
+.cover-edit svg,.avatar-cam svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.profile-header{padding:0 24px}
+.profile-header-inner{max-width:1032px;padding-bottom:20px}
+.identity-row{gap:24px;padding-top:16px}
+.avatar{background:#dcfce7;color:#065f46;box-shadow:0 2px 10px rgba(15,23,42,.12);cursor:pointer}
+.avatar-cam{position:absolute;right:-2px;bottom:2px;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid #c3cad5;color:#0f172a;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 1px 3px rgba(15,23,42,.12)}
+.avatar-cam:hover{border-color:#1550d4;color:#1550d4}
+.profile-name{font-size:2rem;line-height:2.5rem;letter-spacing:-.02em}
+.profile-title{font-size:1rem;color:#334155;margin-bottom:6px}
+.profile-meta{font-size:0.875rem;color:#334155;gap:18px;margin-bottom:12px}
+.subject-tag{background:#f4f6f9;color:#334155;border:1px solid #e3e8ef;font-size:0.8125rem;font-weight:600;padding:5px 12px}
+.profile-actions .btn{min-height:40px;border-radius:10px;font-size:0.875rem}
+.btn-outline{border:1px solid #c3cad5;color:#0f172a}
+.btn-outline:hover{border-color:#1550d4;color:#1550d4}
+.btn-primary:hover{background:#1550d4}
+.progress-wrap{border-top:1px solid #e3e8ef;margin-top:12px;padding-top:16px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.progress-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:0.875rem;font-weight:700;color:#0f172a}
+.progress-head span:last-child{color:#5b6474;font-weight:600}
+.progress-bar{height:8px;background:#e3e8ef}
+.progress-fill{background:#01367c}
+.progress-label{font-size:0.875rem;color:#334155;margin:0;line-height:1.6}
+.todo-link{background:none;border:0;padding:0;font:inherit;font-weight:700;color:#1550d4;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.todo-link:hover{color:#01367c}
+.page-layout{max-width:1080px;padding:24px;grid-template-columns:minmax(0,1fr) 320px;gap:24px}
+.card{border-color:#e3e8ef;margin-bottom:20px}
+.card-head{padding:16px 24px;border-bottom-color:#e3e8ef}
+.card-title{font-size:1.125rem;line-height:1.625rem;font-weight:700;letter-spacing:0;text-transform:none;color:#0f172a}
+.card-body{padding:16px 24px 20px}
+#bioText{font-size:0.9375rem!important;line-height:1.7!important;color:#334155!important;max-width:68ch;white-space:pre-line}
+.edit-btn{min-height:36px;padding:0 14px;border-radius:10px;background:#fff;border:1px solid #c3cad5;color:#0f172a;font-size:0.8125rem}
+.edit-btn:hover{border-color:#1550d4;color:#1550d4}
+.info-row{padding:10px 0;border-bottom-color:#eef1f5;font-size:0.875rem}
+.info-label{color:#5b6474;font-weight:500}
+.info-value{color:#0f172a;font-weight:700}
+.empty{color:#5b6474;font-style:normal;font-size:0.875rem}
+.sidebar-widget{border-color:#e3e8ef;padding:20px 24px;margin-bottom:20px}
+.widget-title{font-size:1rem;line-height:1.5rem;font-weight:700;text-transform:none;letter-spacing:0;color:#0f172a;margin-bottom:8px}
+.help-item{font-size:0.875rem;color:#334155;gap:10px;align-items:flex-start;margin-bottom:10px}
+.help-item svg{flex:none;width:18px;height:18px;margin-top:2px;fill:none;stroke:#01367c;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* pop-ups */
+.modal-overlay{background:rgba(15,23,42,.5);padding:16px}
+.modal{border-radius:14px;box-shadow:0 12px 32px rgba(15,23,42,.16)}
+.modal-head{padding:16px 24px;border-bottom-color:#e3e8ef}
+.modal-title{font-size:1.125rem;font-weight:700}
+.modal-x{width:44px;height:44px;border-radius:10px;color:#334155;font-size:1.1rem}
+.modal-x:hover{background:#f4f6f9}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top-color:#e3e8ef;gap:8px}
+.modal-footer .btn{min-height:40px;border-radius:10px;font-size:0.875rem}
+.form-label{font-size:0.875rem;color:#0f172a}
+.form-input,.form-select{height:44px;padding:0 12px;border:1px solid #8792a2;border-radius:10px;font-size:0.9375rem}
+.form-textarea{padding:10px 12px;border:1px solid #8792a2;border-radius:10px;font-size:0.9375rem}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#1a6bff;box-shadow:0 0 0 3px rgba(26,107,255,.25)}
+.tag-input-wrap{border:1px solid #8792a2;border-radius:10px}
+.tag-input-wrap:focus-within{border-color:#1a6bff;box-shadow:0 0 0 3px rgba(26,107,255,.25)}
+.tag-chip{background:#eef4ff;color:#01367c;font-size:0.8125rem;padding:4px 6px 4px 12px}
+.tag-chip button{color:#01367c;min-width:24px;min-height:24px;border-radius:50%;font-size:1rem}
+.tag-chip button:hover{background:#dbe7ff}
+.alert-inline{border-radius:10px;font-size:0.875rem}
+.alert-inline.error{color:#b91c1c}
+.day-grid{gap:8px}
+.day-btn{width:48px;height:44px;border-radius:10px;border:1px solid #c3cad5;color:#334155;font-size:0.8125rem}
+.day-btn:hover{border-color:#1550d4;color:#1550d4}
+.day-btn.active{background:#eef4ff;color:#01367c;border-color:#01367c}
+@media(max-width:900px){.page-layout{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .profile-header{padding:0 16px}
+  .page-layout{padding:16px;gap:16px}
+  .profile-name{font-size:1.5rem;line-height:2rem}
+  .card-head,.card-body{padding-left:16px;padding-right:16px}
+  .modal-overlay{align-items:flex-end;padding:0}
+  .modal{max-width:none;border-radius:16px 16px 0 0;max-height:92vh}
+  .form-input,.form-select,.form-textarea,.tag-input{font-size:16px}
+  .modal-footer .btn{flex:1;justify-content:center;min-height:44px}
+}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
@@ -135,7 +214,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 
 <div class="cover-wrap" id="coverWrap">
   <img class="cover-img" id="coverImg" style="display:none;" alt="Cover">
-  <button class="cover-edit" onclick="document.getElementById('coverInput').click()">🖼 Change cover</button>
+  <button type="button" class="cover-edit" onclick="document.getElementById('coverInput').click()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>Change cover</button>
   <input type="file" id="coverInput" accept="image/*" style="display:none;" onchange="uploadCover(this)">
 </div>
 
@@ -144,6 +223,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     <div class="identity-row">
       <div class="avatar-wrap">
         <div class="avatar" id="avatarEl">?<div class="avatar-overlay">📷</div></div>
+        <button type="button" class="avatar-cam" aria-label="Change profile photo" onclick="document.getElementById('avatarInput').click()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg></button>
         <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
       </div>
       <div class="identity-info">
@@ -155,12 +235,13 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
         <div id="profileTags" style="display:flex;flex-wrap:wrap;gap:0.4rem;"></div>
       </div>
       <div class="profile-actions">
-        <button class="btn btn-outline" onclick="openModal('modalBio')">✏️ Edit profile</button>
+        <button type="button" class="btn btn-outline" onclick="openModal('modalBio')">Edit profile</button>
         <a href="student-dashboard.html" class="btn btn-primary">← Dashboard</a>
       </div>
     </div>
     <div class="progress-wrap">
-      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="progress-head"><span>Profile completeness</span><span id="progressPct"></span></div>
+      <div class="progress-bar" role="progressbar" aria-label="Profile completeness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
       <div class="progress-label" id="progressLabel">Calculating profile completeness...</div>
     </div>
   </div>
@@ -169,19 +250,19 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 <div class="page-layout">
   <div>
     <div class="card">
-      <div class="card-head"><h2 class="card-title">About me</h2><button class="edit-btn" onclick="openModal('modalBio')">✏️ Edit</button></div>
+      <div class="card-head"><h2 class="card-title">About me</h2><button type="button" class="edit-btn" aria-label="Edit About me" onclick="openModal('modalBio')">Edit</button></div>
       <div class="card-body"><p id="bioText" style="font-size:0.88rem;color:var(--ink2);line-height:1.7;" class="empty">Tell tutors about yourself — your goals, study style, and what you're looking for help with.</p></div>
     </div>
     <div class="card">
-      <div class="card-head"><h2 class="card-title">Academic Background</h2><button class="edit-btn" onclick="openModal('modalAcademic')">✏️ Edit</button></div>
+      <div class="card-head"><h2 class="card-title">Academic background</h2><button type="button" class="edit-btn" aria-label="Edit academic background" onclick="openModal('modalAcademic')">Edit</button></div>
       <div class="card-body" id="academicBody"><span class="empty">Not set yet.</span></div>
     </div>
     <div class="card">
-      <div class="card-head"><h2 class="card-title">Subjects I need help with</h2><button class="edit-btn" onclick="openModal('modalSubjects')">✏️ Edit</button></div>
+      <div class="card-head"><h2 class="card-title">Subjects I need help with</h2><button type="button" class="edit-btn" aria-label="Edit subjects" onclick="openModal('modalSubjects')">Edit</button></div>
       <div class="card-body"><div id="subjectsBody"><span class="empty">No subjects added yet.</span></div></div>
     </div>
     <div class="card">
-      <div class="card-head"><h2 class="card-title">Availability</h2><button class="edit-btn" onclick="openModal('modalAvailability')">✏️ Edit</button></div>
+      <div class="card-head"><h2 class="card-title">Availability</h2><button type="button" class="edit-btn" aria-label="Edit availability" onclick="openModal('modalAvailability')">Edit</button></div>
       <div class="card-body" id="availBody"><span class="empty">Not set yet.</span></div>
     </div>
   </div>
@@ -192,20 +273,20 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
     </div>
     <div class="sidebar-widget">
       <div class="widget-title">Profile tips</div>
-      <div class="help-item">📸 Add a photo — tutors accept bookings from students with photos more readily</div>
-      <div class="help-item">📚 List your subjects so tutors know what you need help with</div>
-      <div class="help-item">📅 Set your availability to make scheduling easier</div>
-      <div class="help-item">📝 A short bio helps tutors understand your learning style</div>
+      <div class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg><span>Add a photo so tutors recognise you</span></div>
+      <div class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/></svg><span>List your subjects so tutors know what you need help with</span></div>
+      <div class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>Set your availability to make scheduling easier</span></div>
+      <div class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>A short bio helps tutors understand your learning style</span></div>
     </div>
   </div>
 </div>
 
 <!-- MODALS -->
 <div class="modal-overlay" id="modalBio" onclick="if(event.target===this)closeModal('modalBio')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Edit Profile</div><button class="modal-x" onclick="closeModal('modalBio')">✕</button></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalBioTitle">
+    <div class="modal-head"><h2 class="modal-title" id="modalBioTitle">Edit Profile</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalBio')">✕</button></div>
     <div class="modal-body">
-      <div class="alert-inline" id="alertBio"></div>
+      <div class="alert-inline" id="alertBio" role="alert"></div>
       <div class="form-row">
         <div class="form-group"><label for="inputFirstName" class="form-label">First name</label><input type="text" class="form-input" id="inputFirstName" placeholder="First name"></div>
         <div class="form-group"><label for="inputLastName" class="form-label">Last name</label><input type="text" class="form-input" id="inputLastName" placeholder="Last name"></div>
@@ -229,10 +310,10 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 </div>
 
 <div class="modal-overlay" id="modalAcademic" onclick="if(event.target===this)closeModal('modalAcademic')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Academic Background</div><button class="modal-x" onclick="closeModal('modalAcademic')">✕</button></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAcademicTitle">
+    <div class="modal-head"><h2 class="modal-title" id="modalAcademicTitle">Academic Background</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalAcademic')">✕</button></div>
     <div class="modal-body">
-      <div class="alert-inline" id="alertAcademic"></div>
+      <div class="alert-inline" id="alertAcademic" role="alert"></div>
       <div class="form-group"><label for="inputUniversity" class="form-label">University / College</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
       <div class="form-row">
         <div class="form-group"><label for="inputDegree" class="form-label">Degree</label><input type="text" class="form-input" id="inputDegree" placeholder="e.g. Computer Science"></div>
@@ -250,10 +331,10 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 </div>
 
 <div class="modal-overlay" id="modalSubjects" onclick="if(event.target===this)closeModal('modalSubjects')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">Subjects I need help with</div><button class="modal-x" onclick="closeModal('modalSubjects')">✕</button></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalSubjectsTitle">
+    <div class="modal-head"><h2 class="modal-title" id="modalSubjectsTitle">Subjects I need help with</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalSubjects')">✕</button></div>
     <div class="modal-body">
-      <div class="alert-inline" id="alertSubjects"></div>
+      <div class="alert-inline" id="alertSubjects" role="alert"></div>
       <div class="form-group">
         <label for="subjectInput" class="form-label">Add subjects</label>
         <div class="tag-input-wrap" id="subjectTagWrap" onclick="document.getElementById('subjectInput').focus()">
@@ -267,13 +348,13 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 </div>
 
 <div class="modal-overlay" id="modalAvailability" onclick="if(event.target===this)closeModal('modalAvailability')">
-  <div class="modal">
-    <div class="modal-head"><div class="modal-title">My Availability</div><button class="modal-x" onclick="closeModal('modalAvailability')">✕</button></div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAvailabilityTitle">
+    <div class="modal-head"><h2 class="modal-title" id="modalAvailabilityTitle">My Availability</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalAvailability')">✕</button></div>
     <div class="modal-body">
       <div class="form-group">
-        <label class="form-label">Available days</label>
-        <div class="day-grid" id="dayGrid">
-          <button class="day-btn" data-day="mon">Mon</button><button class="day-btn" data-day="tue">Tue</button><button class="day-btn" data-day="wed">Wed</button><button class="day-btn" data-day="thu">Thu</button><button class="day-btn" data-day="fri">Fri</button><button class="day-btn" data-day="sat">Sat</button><button class="day-btn" data-day="sun">Sun</button>
+        <div class="form-label" id="availDaysLabel">Available days</div>
+        <div class="day-grid" id="dayGrid" role="group" aria-labelledby="availDaysLabel">
+          <button type="button" class="day-btn" aria-pressed="false" data-day="mon">Mon</button><button type="button" class="day-btn" aria-pressed="false" data-day="tue">Tue</button><button type="button" class="day-btn" aria-pressed="false" data-day="wed">Wed</button><button type="button" class="day-btn" aria-pressed="false" data-day="thu">Thu</button><button type="button" class="day-btn" aria-pressed="false" data-day="fri">Fri</button><button type="button" class="day-btn" aria-pressed="false" data-day="sat">Sat</button><button type="button" class="day-btn" aria-pressed="false" data-day="sun">Sun</button>
         </div>
       </div>
       <div class="form-group"><label for="inputPrefTime" class="form-label">Preferred time</label>
@@ -339,7 +420,7 @@ async function loadProfile(){
   const avail=Array.isArray(sp?.availability)?sp.availability:[];
   availDays=[...avail];
   const dayNames={mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
-  document.getElementById('availBody').innerHTML=avail.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${avail.map(d=>`<span style="background:#eff6ff;color:var(--blue);font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:100px;">${__esc(dayNames[d]||d)}</span>`).join('')}</div>${sp?.preferred_time?`<div style="font-size:0.82rem;color:var(--mid);margin-top:0.5rem;">Preferred: ${__esc(sp.preferred_time)}</div>`:''}`:'<span class="empty">Not set yet.</span>';
+  document.getElementById('availBody').innerHTML=avail.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${avail.map(d=>`<span style="background:#eef4ff;color:#01367c;font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:100px;">${__esc(dayNames[d]||d)}</span>`).join('')}</div>${sp?.preferred_time?`<div style="font-size:0.82rem;color:var(--mid);margin-top:0.5rem;">Preferred: ${__esc(sp.preferred_time)}</div>`:''}`:'<span class="empty">Not set yet.</span>';
   const personal=[];
   if(u?.country)personal.push(`<div class="info-row"><span class="info-label">Country</span><span class="info-value">${__esc(u.country)}</span></div>`);
   if(u?.gender)personal.push(`<div class="info-row"><span class="info-label">Gender</span><span class="info-value">${__esc(u.gender)}</span></div>`);
@@ -349,7 +430,15 @@ async function loadProfile(){
   const done=checks.filter(Boolean).length;
   const pct=Math.round((done/checks.length)*100);
   document.getElementById('progressFill').style.width=pct+'%';
-  document.getElementById('progressLabel').textContent=`Profile ${pct}% complete — ${done}/${checks.length} sections filled`;
+  document.getElementById('progressPct').textContent=pct+'%';
+  document.getElementById('progressBar').setAttribute('aria-valuenow',pct);
+  // Say exactly what is missing, each item opening the right place to fill it in
+  const todo=[[u?.full_name,'add your name',"openModal('modalBio')"],[u?.avatar_url,'add a photo',"document.getElementById('avatarInput').click()"],[sp?.bio,'write a short bio',"openModal('modalBio')"],
+    [sp?.university,'add your university',"openModal('modalAcademic')"],[sp?.degree,'add your degree',"openModal('modalAcademic')"],[subjects.length>0,'list your subjects',"openModal('modalSubjects')"],
+    [avail.length>0,'set your availability',"openModal('modalAvailability')"],[u?.country,'add your country',"openModal('modalBio')"]].filter(t=>!t[0]);
+  document.getElementById('progressLabel').innerHTML = todo.length
+    ? 'Still to do: '+todo.map(t=>`<button type="button" class="todo-link" onclick="${t[2]}">${t[1]}</button>`).join(' · ')
+    : 'Your profile is complete.';
 }
 
 async function saveBio(){
@@ -420,7 +509,7 @@ function renderSubjectTags(){
   const wrap=document.getElementById('subjectTagWrap');
   const input=document.getElementById('subjectInput');
   wrap.innerHTML='';
-  subjectTags.forEach((s,i)=>{const chip=document.createElement('span');chip.className='tag-chip';chip.innerHTML=`${__esc(s)} <button onclick="removeSubjectTag(${i})">×</button>`;wrap.appendChild(chip);});
+  subjectTags.forEach((s,i)=>{const chip=document.createElement('span');chip.className='tag-chip';chip.innerHTML=`${__esc(s)} <button type="button" aria-label="Remove ${__esc(s)}" onclick="removeSubjectTag(${i})">×</button>`;wrap.appendChild(chip);});
   wrap.appendChild(input);input.focus();
 }
 function removeSubjectTag(i){subjectTags.splice(i,1);renderSubjectTags();}
@@ -428,19 +517,32 @@ function addSubjectTag(){const input=document.getElementById('subjectInput');con
 
 function initDayGrid(){
   document.querySelectorAll('.day-btn').forEach(btn=>{
-    if(availDays.includes(btn.dataset.day))btn.classList.add('active');
-    btn.onclick=()=>{const d=btn.dataset.day;if(availDays.includes(d))availDays=availDays.filter(x=>x!==d);else availDays.push(d);btn.classList.toggle('active');};
+    const on=availDays.includes(btn.dataset.day);
+    btn.classList.toggle('active',on);btn.setAttribute('aria-pressed',on?'true':'false');
+    btn.onclick=()=>{const d=btn.dataset.day;if(availDays.includes(d))availDays=availDays.filter(x=>x!==d);else availDays.push(d);const now=btn.classList.toggle('active');btn.setAttribute('aria-pressed',now?'true':'false');};
   });
 }
 
+// Pop-ups: focus moves in, Tab stays inside, Esc closes, focus returns to the button that opened it
+let __lastFocus=null;
+function __focusables(el){return [...el.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter(x=>!x.disabled&&x.offsetParent!==null);}
+document.addEventListener('keydown',e=>{
+  const open=[...document.querySelectorAll('.modal-overlay.open')].pop(); if(!open)return;
+  if(e.key==='Escape'){e.preventDefault();closeModal(open.id);return;}
+  if(e.key==='Tab'){const f=__focusables(open);if(!f.length)return;const first=f[0],last=f[f.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
+});
 function openModal(id){
+  __lastFocus=document.activeElement;
   document.getElementById(id).classList.add('open');
+  setTimeout(()=>{const ov=document.getElementById(id);if(!ov.classList.contains('open'))return;const f=__focusables(ov.querySelector('.modal-body')||ov);(f[0]||ov.querySelector('.modal-x')).focus();},0);
   if(id==='modalBio'){const name=(userData?.full_name||'').split(' ');document.getElementById('inputFirstName').value=name[0]||'';document.getElementById('inputLastName').value=name.slice(1).join(' ')||'';document.getElementById('inputBio').value=profileData?.bio||'';document.getElementById('inputCountry').value=userData?.country||'';document.getElementById('inputGender').value=userData?.gender||'';document.getElementById('inputLanguage').value=userData?.language||'';document.getElementById('alertBio').style.display='none';}
   if(id==='modalAcademic'){document.getElementById('inputUniversity').value=profileData?.university||'';document.getElementById('inputDegree').value=profileData?.degree||'';document.getElementById('inputMajor').value=profileData?.major||'';document.getElementById('inputYear').value=profileData?.year_of_study||'';document.getElementById('inputGradYear').value=profileData?.graduation_year||'';document.getElementById('alertAcademic').style.display='none';}
   if(id==='modalSubjects'){renderSubjectTags();document.getElementById('alertSubjects').style.display='none';}
   if(id==='modalAvailability'){document.getElementById('inputPrefTime').value=profileData?.preferred_time||'';initDayGrid();}
 }
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');if(__lastFocus&&document.contains(__lastFocus)&&__lastFocus.offsetParent!==null)__lastFocus.focus();__lastFocus=null;}
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 function toggleNav(btn, force) {
   btn = btn || document.querySelector('.nav-burger');
