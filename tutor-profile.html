@@ -168,6 +168,76 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
   .form-row{grid-template-columns:1fr;}
 }
 body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!important;}
+/* ===== Redesign 11 Oct 2026 — matches the tutor and student dashboards. Pop-up windows and the top navbar are unchanged. ===== */
+body{background:#f4f6f9;--blue-pale:#eef4ff}
+.cover-wrap{height:160px;background:#01367c}
+.cover-default{width:100%;height:100%;background-color:#01367c;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.12) 1px,transparent 0);background-size:22px 22px}
+.cover-edit{border-radius:10px;padding:8px 14px;font-size:0.8125rem}
+.profile-header{padding:0 24px}
+.profile-header-inner{max-width:1032px;padding-bottom:20px}
+.identity-row{gap:24px;padding-top:16px}
+.avatar{background:#dbe7ff;color:#01367c;box-shadow:0 2px 10px rgba(15,23,42,.12)}
+.profile-name{font-size:2rem;line-height:2.5rem;letter-spacing:-.02em}
+.profile-title{font-size:1rem;color:#334155;margin-bottom:6px}
+.profile-meta{font-size:0.875rem;color:#334155;gap:18px;margin-bottom:12px}
+.profile-tags{gap:8px;margin-bottom:4px}
+.subject-tag{background:#f4f6f9;color:#334155;border:1px solid #e3e8ef;font-size:0.8125rem;font-weight:600;padding:5px 12px}
+.verified-badge{background:#ecfdf5;color:#047857;font-size:0.8125rem;padding:5px 11px}
+.profile-actions .btn{min-height:40px}
+.profile-stats{border-top:1px solid #e3e8ef;margin-top:12px}
+.stat-item{padding:16px 8px;border-right-color:#e3e8ef}
+.stat-num{font-size:1.25rem;line-height:1.75rem;color:#0f172a}
+.stat-lbl{font-size:0.8125rem;color:#5b6474;text-transform:none;letter-spacing:0;font-weight:600}
+.page-layout{max-width:1080px;padding:24px;grid-template-columns:minmax(0,1fr) 320px;gap:24px}
+.main-col,.side-col{gap:20px}
+.side-col{top:88px}
+.card{border-color:#e3e8ef;box-shadow:none}
+.card-head{padding:16px 24px;border-bottom-color:#e3e8ef}
+.card-title{font-size:1.125rem;line-height:1.625rem;font-weight:700;letter-spacing:0;text-transform:none;color:#0f172a}
+.card-body{padding:16px 24px 20px}
+.edit-btn{min-height:36px;padding:0 12px;border-radius:10px;background:#fff;border:1px solid #c3cad5;color:#0f172a;font-size:0.8125rem}
+.edit-btn:hover{border-color:#1550d4;color:#1550d4;background:#fff}
+.about-text{font-size:0.9375rem;line-height:1.7;color:#334155;max-width:68ch;white-space:pre-line}
+.info-row{padding:10px 0;border-bottom-color:#eef1f5}
+.info-label{font-size:0.875rem;color:#5b6474}
+.info-value{font-size:0.875rem;color:#0f172a}
+.empty{color:#5b6474;font-style:normal;font-size:0.875rem}
+.cert-icon{background:#eef4ff}
+.cert-icon.pdf{background:#eef4ff}
+.cert-grade{color:#047857}
+.cert-view-btn{background:#fff;border:1px solid #c3cad5;color:#0f172a;border-radius:10px;padding:8px 12px}
+.cert-view-btn:hover{border-color:#1550d4;color:#1550d4;background:#fff}
+.review-stars{color:#b45309}
+#avgRatingDisplay{color:#b45309!important}
+.review-text{color:#334155}
+.star-btn{color:#8792a2;min-width:44px;min-height:44px;font-size:1.6rem}
+.star-btn.on{color:#b45309}
+/* booking card */
+.rate-big{font-size:2rem;line-height:2.5rem;letter-spacing:-.02em;margin:0}
+.rate-sub{font-size:0.9375rem;color:#5b6474;margin-bottom:16px}
+.book-btn{display:flex;align-items:center;justify-content:center;min-height:48px;border-radius:10px;font-size:0.9375rem;background:#1a6bff}
+.book-btn:hover{background:#1550d4;box-shadow:none}
+.msg-btn{display:flex;align-items:center;justify-content:center;min-height:44px;border-radius:10px;font-size:0.9375rem;border:1px solid #c3cad5;color:#0f172a;margin-top:8px}
+.msg-btn:hover{border-color:#1550d4;color:#1550d4}
+.book-trust{display:none;gap:10px;align-items:flex-start;border-top:1px solid #e3e8ef;margin-top:16px;padding-top:14px;font-size:0.8125rem;line-height:1.5;color:#334155}
+.book-trust svg{flex:none;width:18px;height:18px;fill:none;stroke:#047857;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+#bookActions a[href^="tutor-certificate"],#bookActions a[href="manage-availability.html"]{color:#1550d4!important;font-size:0.875rem!important}
+/* availability */
+.avail-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.avail-chip{width:auto;height:44px;border-radius:8px;flex-direction:column;gap:2px;font-size:0.75rem}
+.avail-chip.on{background:#eef4ff;color:#01367c;border:1px solid #b9cdf5}
+.avail-chip.off{background:#fff;color:#5b6474;border:1px solid #e3e8ef}
+.avail-chip svg{width:10px;height:10px;fill:none;stroke:currentColor;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round}
+#prefTimeDisplay{font-size:0.875rem!important;color:#334155!important;margin-top:12px!important}
+.reviews-empty{display:flex;gap:12px;align-items:flex-start;background:#f4f6f9;border-radius:10px;padding:16px;margin:16px 24px 20px;font-size:0.875rem;line-height:1.55;color:#334155}
+.reviews-empty svg{flex:none;width:20px;height:20px;fill:none;stroke:#5b6474;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:768px){
+  .profile-header{padding:0 16px}
+  .page-layout{padding:16px;gap:16px;grid-template-columns:1fr}
+  .profile-name{font-size:1.5rem;line-height:2rem}
+  .card-head,.card-body{padding-left:16px;padding-right:16px}
+  .reviews-empty{margin:16px}
+}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
@@ -180,7 +250,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
 
 <!-- COVER -->
 <div class="cover-wrap" id="coverWrap">
-  <div id="coverContent" style="width:100%;height:100%;background:linear-gradient(135deg,#0b1f4a,#7c3aed,#1a6bff);"></div>
+  <div id="coverContent" class="cover-default"></div>
   <button class="cover-edit" id="coverEditBtn" style="display:none;" onclick="document.getElementById('coverInput').click()">📷 Change cover</button>
   <input type="file" id="coverInput" accept="image/*" style="display:none;">
 </div>
@@ -208,9 +278,9 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     </div>
     <div class="profile-stats" id="profileStats">
       <div class="stat-item"><div class="stat-num" id="statSessions">0</div><div class="stat-lbl">Sessions</div></div>
-      <div class="stat-item"><div class="stat-num" id="statRating">—</div><div class="stat-lbl">Rating</div></div>
+      <div class="stat-item"><div class="stat-num" id="statRating">New</div><div class="stat-lbl">Rating</div></div>
       <div class="stat-item"><div class="stat-num" id="statReviews">0</div><div class="stat-lbl">Reviews</div></div>
-      <div class="stat-item"><div class="stat-num" id="statMemberSince" style="font-size:0.95rem;">—</div><div class="stat-lbl">Member Since</div></div>
+      <div class="stat-item"><div class="stat-num" id="statMemberSince" style="font-size:0.95rem;">—</div><div class="stat-lbl">Member since</div></div>
     </div>
   </div>
 </div>
@@ -233,7 +303,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- SUBJECTS -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Subjects I Teach</h2>
+        <h2 class="card-title">Subjects I teach</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalSubjects')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="subjectsBody">
@@ -244,7 +314,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- COURSES -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">🎯 Specific Courses</h2>
+        <h2 class="card-title">Specific courses</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalCourses')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="coursesBody">
@@ -253,42 +323,10 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       <p class="owner-only" style="display:none;font-size:0.75rem;color:var(--mid);margin:0 1.4rem 1.2rem;">Add exact course codes so students searching for their specific class — not just the general subject — can find you.</p>
     </div>
 
-    <!-- TRACK RECORD -->
-    <div class="card">
-      <div class="card-head">
-        <h2 class="card-title">📊 Track Record</h2>
-      </div>
-      <div class="card-body" id="trackRecordBody">
-        <span class="empty">No completed sessions yet.</span>
-      </div>
-    </div>
-
-    <!-- TEACHING LEVELS & LANGUAGES -->
-    <div class="card">
-      <div class="card-head">
-        <h2 class="card-title">Levels & Languages</h2>
-        <button class="edit-btn owner-only" onclick="openModal('modalLevels')" style="display:none;">✏️ Edit</button>
-      </div>
-      <div class="card-body" id="levelsBody">
-        <span class="empty">Not set yet.</span>
-      </div>
-    </div>
-
-    <!-- MEETING LINK (owner only — never shown to visitors) -->
-    <div class="card owner-only" style="display:none;">
-      <div class="card-head">
-        <h2 class="card-title">Meeting Link</h2>
-        <button class="edit-btn owner-only" onclick="openMeetingLinkModal()" style="display:none;">✏️ Edit</button>
-      </div>
-      <div class="card-body" id="meetingLinkBody">
-        <span class="empty">Not set yet.</span>
-      </div>
-    </div>
-
     <!-- ACADEMIC -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Academic Background</h2>
+        <h2 class="card-title">Academic background</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalAcademic')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="academicBody">
@@ -299,7 +337,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- CERTIFICATES -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Certificates & Grades</h2>
+        <h2 class="card-title">Certificates &amp; grades</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalCerts')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="certsBody">
@@ -307,21 +345,53 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       </div>
     </div>
 
+    <!-- TEACHING LEVELS & LANGUAGES -->
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">Levels &amp; languages</h2>
+        <button class="edit-btn owner-only" onclick="openModal('modalLevels')" style="display:none;">✏️ Edit</button>
+      </div>
+      <div class="card-body" id="levelsBody">
+        <span class="empty">Not set yet.</span>
+      </div>
+    </div>
+
+    <!-- TRACK RECORD -->
+    <div class="card">
+      <div class="card-head">
+        <h2 class="card-title">Track record</h2>
+      </div>
+      <div class="card-body" id="trackRecordBody">
+        <span class="empty">No completed sessions yet.</span>
+      </div>
+    </div>
+
+    <!-- MEETING LINK (owner only — never shown to visitors) -->
+    <div class="card owner-only" style="display:none;">
+      <div class="card-head">
+        <h2 class="card-title">Meeting link</h2>
+        <button class="edit-btn owner-only" onclick="openMeetingLinkModal()" style="display:none;">✏️ Edit</button>
+      </div>
+      <div class="card-body" id="meetingLinkBody">
+        <span class="empty">Not set yet.</span>
+      </div>
+    </div>
+
     <!-- REVIEWS -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Student Reviews</h2>
+        <h2 class="card-title">Student reviews</h2>
         <div style="font-size:0.85rem;font-weight:700;color:var(--yellow);" id="avgRatingDisplay"></div>
       </div>
       <div id="reviewsBody">
-        <div style="padding:1.4rem;color:var(--light);font-size:0.85rem;text-align:center;">No reviews yet.</div>
+        <div class="reviews-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg><span><strong>No reviews yet.</strong> Only students who completed a paid session with this tutor on UniSkilled can leave a review.</span></div>
       </div>
       <div id="reviewFormWrap" style="display:none;border-top:1px solid var(--border);padding:1.4rem;">
         <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.8rem;">Leave a review</div>
         <div class="star-select" id="starSelect">
-          <button class="star-btn" data-v="1">★</button><button class="star-btn" data-v="2">★</button>
-          <button class="star-btn" data-v="3">★</button><button class="star-btn" data-v="4">★</button>
-          <button class="star-btn" data-v="5">★</button>
+          <button type="button" class="star-btn" data-v="1" aria-label="Rate 1 out of 5">★</button><button type="button" class="star-btn" data-v="2" aria-label="Rate 2 out of 5">★</button>
+          <button type="button" class="star-btn" data-v="3" aria-label="Rate 3 out of 5">★</button><button type="button" class="star-btn" data-v="4" aria-label="Rate 4 out of 5">★</button>
+          <button type="button" class="star-btn" data-v="5" aria-label="Rate 5 out of 5">★</button>
         </div>
         <textarea class="form-textarea" id="reviewText" placeholder="Share your experience..."></textarea>
         <button class="btn btn-primary" onclick="submitReview()" style="margin-top:0.7rem;width:100%;">Submit review</button>
@@ -340,6 +410,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
         <div class="rate-big" id="rateDisplay">—</div>
         <div class="rate-sub">per hour</div>
         <div id="bookActions"></div>
+        <div class="book-trust" id="bookTrust"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg><span>You're not charged until the tutor accepts. Payment is held for 48 hours after the session.</span></div>
       </div>
     </div>
 
@@ -351,8 +422,8 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       </div>
       <div class="card-body">
         <div class="avail-grid" id="availGrid">
-          <div class="avail-chip off">M</div><div class="avail-chip off">T</div><div class="avail-chip off">W</div>
-          <div class="avail-chip off">T</div><div class="avail-chip off">F</div><div class="avail-chip off">S</div><div class="avail-chip off">S</div>
+          <div class="avail-chip off">Mo</div><div class="avail-chip off">Tu</div><div class="avail-chip off">We</div>
+          <div class="avail-chip off">Th</div><div class="avail-chip off">Fr</div><div class="avail-chip off">Sa</div><div class="avail-chip off">Su</div>
         </div>
         <div style="font-size:0.78rem;color:var(--mid);margin-top:0.7rem;" id="prefTimeDisplay"></div>
       </div>
@@ -639,6 +710,17 @@ async function init() {
   await loadProfile();
   if (isOwner) await loadMeetingLink();
   await loadReviews();
+  if (!isOwner) hideEmptySectionsForVisitors();
+
+  // Review form only for students who actually finished a session with this tutor
+  // (the database already enforces this; this just avoids showing a form that can't be sent).
+  if (!isOwner && viewerRole === 'student' && currentUserId) {
+    try {
+      const { data: done, error: doneErr } = await _supabase.from('sessions').select('id')
+        .eq('tutor_id', tutorId).eq('student_id', currentUserId).eq('status', 'completed').limit(1);
+      if (!doneErr && Array.isArray(done) && done.length === 0) document.getElementById('reviewFormWrap').style.display = 'none';
+    } catch (e) { /* keep the form if the check fails */ }
+  }
 
   document.getElementById('avatarInput').addEventListener('change', uploadAvatar);
   document.getElementById('coverInput').addEventListener('change', uploadCover);
@@ -780,16 +862,20 @@ async function loadProfile() {
 
   // Book/Edit actions
   const bookDiv = document.getElementById('bookActions');
-  const certLink = `<a href="tutor-certificate.html?tutor=${__safeUrl(tutorId)}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">🏆 View Certificate</a>`;
-  const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">🚫 Manage Availability</a>`;
+  const certLink = `<a href="tutor-certificate.html?tutor=${__safeUrl(tutorId)}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">View teaching certificate</a>`;
+  const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">Manage availability</a>`;
   if (isOwner) {
-    bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">✏️ Edit rate & availability</button>` + availabilityLink + certLink;
+    bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">Edit rate &amp; availability</button>` + availabilityLink + certLink;
   } else if (currentUserId && viewerRole === 'tutor') {
-    bookDiv.innerHTML = `<a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">💬 Send message</a>` + certLink;
+    bookDiv.innerHTML = `<a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">Send message</a>` + certLink;
   } else if (currentUserId) {
-    bookDiv.innerHTML = `<a href="book-session.html?tutor=${__safeUrl(tutorId)}&name=${__safeUrl(encodeURIComponent(fullName))}" class="book-btn">📅 Book a session</a><a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">💬 Send message</a>` + certLink;
+    bookDiv.innerHTML = `<a href="book-session.html?tutor=${__safeUrl(tutorId)}&name=${__safeUrl(encodeURIComponent(fullName))}" class="book-btn">Book a session</a><a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">Send message</a>` + certLink;
   } else {
     bookDiv.innerHTML = `<a href="signin.html" class="book-btn">Sign in to book</a>` + certLink;
+  }
+  // Payment promise for people who can book (students and signed-out visitors)
+  if (!isOwner && viewerRole !== 'tutor') {
+    const bt = document.getElementById('bookTrust'); if (bt) bt.style.display = 'flex';
   }
 
   // Stats
@@ -889,8 +975,12 @@ async function loadProfile() {
 
   // Availability
   const days = ['mon','tue','wed','thu','fri','sat','sun'];
-  const labels = ['M','T','W','T','F','S','S'];
-  document.getElementById('availGrid').innerHTML = days.map((d, i) => `<div class="avail-chip ${availability.includes(d) ? 'on' : 'off'}">${__esc(labels[i])}</div>`).join('');
+  const labels = ['Mo','Tu','We','Th','Fr','Sa','Su'];
+  const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  document.getElementById('availGrid').innerHTML = days.map((d, i) => {
+    const on = availability.includes(d);
+    return `<div class="avail-chip ${on ? 'on' : 'off'}" role="img" aria-label="${dayNames[i]}: ${on ? 'available' : 'not available'}"><span aria-hidden="true">${__esc(labels[i])}</span>${on ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>' : ''}</div>`;
+  }).join('');
   if (tp?.preferred_time) document.getElementById('prefTimeDisplay').textContent = 'Preferred: ' + tp.preferred_time;
 
   // Teaching
@@ -1252,6 +1342,18 @@ function openModal(id) {
 
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function showAlert(id, msg, type) { const el = document.getElementById(id); el.textContent = msg; el.className = 'alert-bar ' + type; }
+function hideEmptySectionsForVisitors() {
+  ['subjectsBody','coursesBody','trackRecordBody','levelsBody','academicBody','certsBody','teachingBody'].forEach(id => {
+    const body = document.getElementById(id);
+    if (!body) return;
+    const only = body.children.length === 1 && body.firstElementChild.classList.contains('empty');
+    if (only) { const card = body.closest('.card'); if (card) card.style.display = 'none'; }
+  });
+  const bio = document.getElementById('bioText');
+  if (bio && bio.children.length === 1 && bio.firstElementChild.classList.contains('empty')) {
+    const card = bio.closest('.card'); if (card) card.style.display = 'none';
+  }
+}
 function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
 
 // Subjects modal add
