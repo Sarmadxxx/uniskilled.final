@@ -341,7 +341,7 @@ a.profile-av{text-decoration:none;}
       </div>
       <div class="ov-stats">
         <div class="ov-stat"><div class="ov-stat-l">Sessions</div><div class="ov-stat-n" id="statSessions">0</div></div>
-        <div class="ov-stat"><div class="ov-stat-l">Completed sessions value</div><div class="ov-stat-n" id="statEarnings">€0</div></div>
+        <div class="ov-stat"><div class="ov-stat-l">Earned</div><div class="ov-stat-n" id="statEarnings">€0</div></div>
         <div class="ov-stat"><div class="ov-stat-l">Rating</div><div class="ov-stat-n" id="statRating">New</div></div>
         <div class="ov-stat"><div class="ov-stat-l">Reviews</div><div class="ov-stat-n" id="statReviews">0</div></div>
       </div>
@@ -1047,8 +1047,17 @@ async function loadSessions() {
   const awaitingPayment = sessions.filter(s => s.status === 'awaiting_payment');
 
   document.getElementById('statSessions').textContent = sessions.length;
-  const earnings = sessions.filter(s => s.status === 'completed').reduce((a, s) => a + (s.price || 0), 0);
-  document.getElementById('statEarnings').textContent = (tutorCurrency === 'USD' ? '$' : '€') + earnings;
+  // Tutor's own share of completed sessions (price minus the platform fee, read from platform settings)
+  const gross = sessions.filter(s => s.status === 'completed').reduce((a, s) => a + (Number(s.price) || 0), 0);
+  let feeRate = 0.20;
+  try {
+    const { data: feeRow } = await _sb.from('platform_settings').select('value').eq('key', 'platform_fee_rate').maybeSingle();
+    const raw = feeRow ? feeRow.value : null;
+    const r = (raw === null || raw === undefined || raw === '') ? NaN : Number(raw);
+    if (isFinite(r) && r >= 0 && r < 1) feeRate = r;
+  } catch (e) { /* keep the default 20% */ }
+  const earnings = Math.round(gross * (1 - feeRate) * 100) / 100;
+  document.getElementById('statEarnings').textContent = (tutorCurrency === 'USD' ? '$' : '€') + (Number.isInteger(earnings) ? earnings : earnings.toFixed(2));
 
   const awaitingCard = document.getElementById('awaitingPaymentCard');
   if (awaitingPayment.length > 0) {
