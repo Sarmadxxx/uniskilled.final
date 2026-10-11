@@ -23,7 +23,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;--purple:#7c3aed;}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#5b6474;--light:#5b6474;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#047857;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;--purple:#7c3aed;}
 body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;}
 
 /* NAV */
@@ -132,7 +132,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 .modal-footer{padding:1rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:0.7rem;justify-content:flex-end;}
 .form-group{margin-bottom:1rem;}
 .form-label{display:block;font-size:0.8rem;font-weight:700;color:var(--ink2);margin-bottom:0.4rem;}
-.form-input,.form-select,.form-textarea{width:100%;padding:0.72rem 0.9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.88rem;color:var(--ink);background:#fff;outline:none;transition:border-color .18s;}
+.form-input,.form-select,.form-textarea{width:100%;padding:0.72rem 0.9rem;border:1.5px solid #8792a2;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.88rem;color:var(--ink);background:#fff;outline:none;transition:border-color .18s;}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,0.08);}
 .form-textarea{resize:vertical;min-height:90px;line-height:1.6;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
@@ -222,7 +222,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- ABOUT -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">About</div>
+        <h2 class="card-title">About</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalBio')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body">
@@ -233,7 +233,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- SUBJECTS -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Subjects I Teach</div>
+        <h2 class="card-title">Subjects I Teach</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalSubjects')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="subjectsBody">
@@ -244,7 +244,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- COURSES -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">🎯 Specific Courses</div>
+        <h2 class="card-title">🎯 Specific Courses</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalCourses')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="coursesBody">
@@ -256,7 +256,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- TRACK RECORD -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">📊 Track Record</div>
+        <h2 class="card-title">📊 Track Record</h2>
       </div>
       <div class="card-body" id="trackRecordBody">
         <span class="empty">No completed sessions yet.</span>
@@ -266,7 +266,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- TEACHING LEVELS & LANGUAGES -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Levels & Languages</div>
+        <h2 class="card-title">Levels & Languages</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalLevels')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="levelsBody">
@@ -274,10 +274,10 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       </div>
     </div>
 
-    <!-- MEETING LINK -->
-    <div class="card">
+    <!-- MEETING LINK (owner only — never shown to visitors) -->
+    <div class="card owner-only" style="display:none;">
       <div class="card-head">
-        <div class="card-title">Meeting Link</div>
+        <h2 class="card-title">Meeting Link</h2>
         <button class="edit-btn owner-only" onclick="openMeetingLinkModal()" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="meetingLinkBody">
@@ -288,7 +288,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- ACADEMIC -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Academic Background</div>
+        <h2 class="card-title">Academic Background</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalAcademic')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="academicBody">
@@ -299,7 +299,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- CERTIFICATES -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Certificates & Grades</div>
+        <h2 class="card-title">Certificates & Grades</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalCerts')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="certsBody">
@@ -310,7 +310,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- REVIEWS -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Student Reviews</div>
+        <h2 class="card-title">Student Reviews</h2>
         <div style="font-size:0.85rem;font-weight:700;color:var(--yellow);" id="avgRatingDisplay"></div>
       </div>
       <div id="reviewsBody">
@@ -346,7 +346,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- AVAILABILITY -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Availability</div>
+        <h2 class="card-title">Availability</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalTeaching')" style="display:none;">✏️</button>
       </div>
       <div class="card-body">
@@ -361,7 +361,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <!-- TEACHING -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">Teaching</div>
+        <h2 class="card-title">Teaching</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalTeaching')" style="display:none;">✏️</button>
       </div>
       <div class="card-body" id="teachingBody">
@@ -637,7 +637,7 @@ async function init() {
   }
 
   await loadProfile();
-  await loadMeetingLink();
+  if (isOwner) await loadMeetingLink();
   await loadReviews();
 
   document.getElementById('avatarInput').addEventListener('change', uploadAvatar);

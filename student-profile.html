@@ -14,7 +14,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#5b6474;--light:#5b6474;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#047857;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--yellow:#f59e0b;}
 body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;}
 nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;position:sticky;top:0;z-index:200;}
 .nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
@@ -80,11 +80,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 .modal-footer{padding:1rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:0.7rem;justify-content:flex-end;}
 .form-group{margin-bottom:1rem;}
 .form-label{display:block;font-size:0.8rem;font-weight:700;color:var(--ink2);margin-bottom:0.4rem;}
-.form-input,.form-select,.form-textarea{width:100%;padding:0.7rem 0.9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.87rem;outline:none;color:var(--ink);}
+.form-input,.form-select,.form-textarea{width:100%;padding:0.7rem 0.9rem;border:1.5px solid #8792a2;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.87rem;outline:none;color:var(--ink);}
 .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--blue);}
 .form-textarea{min-height:90px;resize:vertical;line-height:1.6;}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;}
-.tag-input-wrap{display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.5rem;border:1.5px solid var(--border);border-radius:9px;min-height:44px;cursor:text;}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:0.4rem;padding:0.5rem;border:1.5px solid #8792a2;border-radius:9px;min-height:44px;cursor:text;}
 .tag-input-wrap:focus-within{border-color:var(--blue);}
 .tag-chip{display:inline-flex;align-items:center;gap:4px;background:var(--green-bg);color:var(--green);font-size:0.78rem;font-weight:700;padding:3px 10px;border-radius:100px;}
 .tag-chip button{background:none;border:none;cursor:pointer;font-size:0.9rem;color:var(--green);padding:0;line-height:1;}
@@ -149,7 +149,6 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
       <div class="identity-info">
         <div class="identity-name-row">
           <h1 class="profile-name" id="profileName">Loading...</h1>
-          <span class="verified-badge">✓ Verified student</span>
         </div>
         <div class="profile-title" id="profileTitle"></div>
         <div class="profile-meta" id="profileMeta"></div>
@@ -170,19 +169,19 @@ nav{height:62px;background:rgba(255,255,255,0.97);backdrop-filter:blur(20px);bor
 <div class="page-layout">
   <div>
     <div class="card">
-      <div class="card-head"><div class="card-title">About me</div><button class="edit-btn" onclick="openModal('modalBio')">✏️ Edit</button></div>
+      <div class="card-head"><h2 class="card-title">About me</h2><button class="edit-btn" onclick="openModal('modalBio')">✏️ Edit</button></div>
       <div class="card-body"><p id="bioText" style="font-size:0.88rem;color:var(--ink2);line-height:1.7;" class="empty">Tell tutors about yourself — your goals, study style, and what you're looking for help with.</p></div>
     </div>
     <div class="card">
-      <div class="card-head"><div class="card-title">Academic Background</div><button class="edit-btn" onclick="openModal('modalAcademic')">✏️ Edit</button></div>
+      <div class="card-head"><h2 class="card-title">Academic Background</h2><button class="edit-btn" onclick="openModal('modalAcademic')">✏️ Edit</button></div>
       <div class="card-body" id="academicBody"><span class="empty">Not set yet.</span></div>
     </div>
     <div class="card">
-      <div class="card-head"><div class="card-title">Subjects I need help with</div><button class="edit-btn" onclick="openModal('modalSubjects')">✏️ Edit</button></div>
+      <div class="card-head"><h2 class="card-title">Subjects I need help with</h2><button class="edit-btn" onclick="openModal('modalSubjects')">✏️ Edit</button></div>
       <div class="card-body"><div id="subjectsBody"><span class="empty">No subjects added yet.</span></div></div>
     </div>
     <div class="card">
-      <div class="card-head"><div class="card-title">Availability</div><button class="edit-btn" onclick="openModal('modalAvailability')">✏️ Edit</button></div>
+      <div class="card-head"><h2 class="card-title">Availability</h2><button class="edit-btn" onclick="openModal('modalAvailability')">✏️ Edit</button></div>
       <div class="card-body" id="availBody"><span class="empty">Not set yet.</span></div>
     </div>
   </div>

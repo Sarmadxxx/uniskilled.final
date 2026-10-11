@@ -14,7 +14,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--yellow:#f59e0b;}
+:root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#5b6474;--light:#5b6474;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#047857;--green-bg:#ecfdf5;--red:#dc2626;--yellow:#f59e0b;}
 body{font-family:'Manrope',sans-serif;background:#f1f5f9;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;}
 
 /* NAV */
@@ -49,7 +49,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .dual-modal-footer{padding:1rem 1.4rem;border-top:1px solid var(--border);display:flex;gap:0.7rem;justify-content:flex-end;}
 .dm-form-group{margin-bottom:0.9rem;}
 .dm-label{display:block;font-size:0.8rem;font-weight:700;color:#374151;margin-bottom:0.35rem;}
-.dm-input,.dm-select,.dm-textarea{width:100%;padding:0.7rem 0.9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.87rem;outline:none;}
+.dm-input,.dm-select,.dm-textarea{width:100%;padding:0.7rem 0.9rem;border:1.5px solid #8792a2;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.87rem;outline:none;}
 .dm-input:focus,.dm-select:focus,.dm-textarea:focus{border-color:var(--blue);}
 .dm-textarea{min-height:80px;resize:vertical;line-height:1.6;}
 .dm-alert{padding:0.65rem 1rem;border-radius:8px;font-size:0.82rem;font-weight:600;margin-bottom:0.8rem;display:none;}
@@ -61,11 +61,13 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .profile-av img{width:100%;height:100%;object-fit:cover;}
 .profile-name{font-weight:800;font-size:0.95rem;margin-bottom:0.2rem;cursor:pointer;}
 .profile-name:hover{color:var(--blue);}
+a.profile-name{display:block;color:var(--ink);text-decoration:none;}
+a.profile-av{text-decoration:none;}
 .profile-sub{font-size:0.75rem;color:var(--mid);line-height:1.4;}
 .sidebar-nav{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
 .nav-item{display:flex;align-items:center;gap:0.75rem;padding:0.78rem 1.2rem;font-size:0.85rem;font-weight:600;color:var(--ink2);cursor:pointer;transition:all .15s;text-decoration:none;border-left:3px solid transparent;}
 .nav-item:hover{background:var(--off);color:var(--blue);}
-.nav-item.active{background:#eff6ff;color:var(--blue);border-left-color:var(--blue);}
+.nav-item.active{background:#eff6ff;color:#1550d4;border-left-color:var(--blue);}
 .nav-item .ico{font-size:1rem;width:20px;text-align:center;}
 .badge-count{background:var(--red);color:#fff;font-size:0.65rem;font-weight:700;padding:1px 6px;border-radius:100px;min-width:18px;text-align:center;}
 
@@ -86,7 +88,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .myreq-top{display:flex;justify-content:space-between;align-items:flex-start;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.3rem;}
 .myreq-subject{font-weight:700;font-size:0.88rem;}
 .myreq-status{font-size:0.68rem;font-weight:700;padding:2px 9px;border-radius:100px;white-space:nowrap;}
-.myreq-status.open{background:#fff7ed;color:#ea580c;}
+.myreq-status.open{background:#fff7ed;color:#c2410c;}
 .myreq-status.accepted{background:var(--green-bg);color:var(--green);}
 .myreq-meta{font-size:0.78rem;color:var(--mid);}
 
@@ -96,12 +98,12 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 /* HERO CARD */
 .hero-card{background:linear-gradient(135deg,#0b1f4a,#1a6bff);border-radius:16px;padding:2rem;color:#fff;position:relative;overflow:hidden;}
 .hero-card::before{content:'';position:absolute;width:250px;height:250px;border-radius:50%;background:rgba(255,255,255,0.05);top:-80px;right:-60px;}
-.hero-eyebrow{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;opacity:0.55;margin-bottom:0.4rem;}
+.hero-eyebrow{font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:0.4rem;}
 .hero-title{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.3rem;}
-.hero-sub{font-size:0.85rem;opacity:0.65;margin-bottom:1.2rem;}
+.hero-sub{font-size:0.85rem;margin-bottom:1.2rem;}
 .hero-stats{display:flex;gap:2rem;}
 .hero-stat-n{font-size:1.5rem;font-weight:800;}
-.hero-stat-l{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;opacity:0.5;}
+.hero-stat-l{font-size:0.62rem;text-transform:uppercase;letter-spacing:0.08em;}
 
 /* QUICK ACTIONS */
 .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;}
@@ -124,7 +126,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .session-row{display:flex;align-items:center;gap:1rem;padding:0.9rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .session-row:last-child{border-bottom:none;}
 .btn-join{display:inline-flex;align-items:center;gap:5px;padding:0.4rem 0.9rem;background:var(--green);color:#fff;border:none;border-radius:8px;font-family:"Manrope",sans-serif;font-weight:700;font-size:0.78rem;cursor:pointer;margin-left:auto;white-space:nowrap;}
-.btn-join:hover{background:#047857;}
+.btn-join:hover{background:#065f46;}
 .btn-join:disabled{background:var(--light);cursor:not-allowed;}
 
 
@@ -140,7 +142,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 .session-name{font-weight:700;font-size:0.88rem;}
 .session-sub{font-size:0.75rem;color:var(--mid);}
 .badge{display:inline-block;font-size:0.68rem;font-weight:700;padding:2px 8px;border-radius:100px;}
-.badge-pending{background:#fff7ed;color:#ea580c;}
+.badge-pending{background:#fff7ed;color:#c2410c;}
 .badge-confirmed{background:var(--green-bg);color:var(--green);}
 .badge-completed{background:var(--off);color:var(--mid);}
 .badge-awaiting-payment{background:#fef3c7;color:#92400e;}
@@ -191,13 +193,13 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
   <!-- SIDEBAR -->
   <div class="sidebar">
     <div class="profile-card">
-      <div class="profile-av" id="sideAv" onclick="window.location.href='student-profile.html'">?</div>
-      <div class="profile-name" onclick="window.location.href='student-profile.html'" id="sideName">Loading...</div>
+      <a class="profile-av" id="sideAv" href="student-profile.html" aria-label="Your profile">?</a>
+      <a class="profile-name" id="sideName" href="student-profile.html">Loading...</a>
       <div class="profile-sub" id="sideSub"></div>
       <button class="switch-btn" id="switchModeBtn" onclick="switchToTutor()">📚 Switch to Tutor mode</button>
       <button class="become-btn" id="becomeTutorBtn" onclick="openBecomeTutorModal()">+ Become a Tutor</button>
     </div>
-    <div class="sidebar-nav">
+    <div class="sidebar-nav" role="navigation" aria-label="Dashboard sections">
       <a href="student-dashboard.html" class="nav-item active"><span class="ico">🏠</span>Overview</a>
       <a href="find-tutors.html" class="nav-item"><span class="ico">🔍</span>Find a Tutor</a>
       <a href="group-sessions.html" class="nav-item"><span class="ico">👥</span>Group Sessions</a>
@@ -215,12 +217,12 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
   </div>
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
     <!-- HERO -->
     <div class="hero-card">
       <div class="hero-eyebrow">WELCOME BACK</div>
-      <div class="hero-title" id="heroTitle">Hello!</div>
+      <h1 class="hero-title" id="heroTitle">Hello!</h1>
       <div class="hero-sub" id="heroSub">Your dashboard is ready.</div>
       <div class="hero-stats">
         <div><div class="hero-stat-n" id="statSessions">—</div><div class="hero-stat-l">Sessions</div></div>
@@ -250,7 +252,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
         </div>
       </div>
       <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
-        <input id="referralLinkInput" readonly style="flex:1;min-width:200px;padding:0.65rem 0.9rem;border:1.5px solid #ddd6fe;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;color:var(--ink2);background:#fff;" value="Loading your link...">
+        <input id="referralLinkInput" readonly aria-label="Your referral link" style="flex:1;min-width:200px;padding:0.65rem 0.9rem;border:1.5px solid #ddd6fe;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;color:var(--ink2);background:#fff;" value="Loading your link...">
         <button id="copyReferralBtn" onclick="copyReferralLink()" style="padding:0.65rem 1.1rem;background:#7c3aed;color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copy link</button>
         <button id="shareReferralBtn" onclick="shareReferralLink()" style="padding:0.65rem 1.1rem;background:#fff;color:#7c3aed;border:1.5px solid #7c3aed;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">↗ Share</button>
       </div>
@@ -260,7 +262,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <!-- SESSIONS -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">My Sessions</div>
+        <h2 class="card-title">My Sessions</h2>
         <a href="find-tutors.html" class="btn-sm">+ Book session</a>
       </div>
       <div class="card-body" id="sessionsBody">
@@ -275,8 +277,8 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <!-- NOTIFICATIONS -->
     <div class="card" id="notifsCard">
       <div class="card-head">
-        <div class="card-title">Notifications</div>
-        <a id="markAllReadBtn" style="font-size:0.78rem;font-weight:600;color:var(--blue);cursor:pointer;display:none;" onclick="markAllNotifsRead()">Mark all read</a>
+        <h2 class="card-title">Notifications</h2>
+        <button type="button" id="markAllReadBtn" style="font-family:'Manrope',sans-serif;font-size:0.78rem;font-weight:600;color:var(--blue);cursor:pointer;display:none;background:none;border:0;padding:0.3rem 0;" onclick="markAllNotifsRead()">Mark all read</button>
       </div>
       <div class="card-body" id="notifsBody">
         <div class="empty-state">
@@ -289,7 +291,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <!-- MY SUBJECT REQUESTS -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">My Subject Requests</div>
+        <h2 class="card-title">My Subject Requests</h2>
         <a href="find-tutors.html#request" class="btn-sm">+ New request</a>
       </div>
       <div class="card-body" id="myRequestsBody">
@@ -304,7 +306,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
     <!-- SUBJECTS -->
     <div class="card">
       <div class="card-head">
-        <div class="card-title">My Subjects</div>
+        <h2 class="card-title">My Subjects</h2>
         <a href="student-profile.html" class="btn-sm">Edit</a>
       </div>
       <div class="card-body" id="subjectsBody">
@@ -316,7 +318,7 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       </div>
     </div>
 
-  </div>
+  </main>
 </div>
 
 <script>
@@ -507,7 +509,7 @@ async function loadNotifications() {
   };
 
   body.innerHTML = notifs.map(n => `
-    <div class="notif-row ${__esc(n.read ? '' : 'unread')}" onclick="openNotif('${n.id}','${__jsStr(n.link || '')}')">
+    <div class="notif-row ${__esc(n.read ? '' : 'unread')}" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" onclick="openNotif('${n.id}','${__jsStr(n.link || '')}')">
       <div class="notif-ico">${iconFor(n.type)}</div>
       <div style="flex:1;">
         <div class="notif-title">${__esc(n.title || 'Notification')}</div>
