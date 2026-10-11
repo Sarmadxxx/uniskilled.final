@@ -52,6 +52,74 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
   .nav-brand{display:none;}
 }
 </style>
+<style>
+/* ===== Redesign 11 Oct 2026 — matches the profiles and dashboards. Top navbar unchanged. ===== */
+body{background:#f4f6f9;color:#0f172a}
+.mobile-nav{display:none;position:fixed;top:60px;left:0;right:0;background:#fff;border-bottom:1px solid #e3e8ef;z-index:199;padding:12px 16px 16px;flex-direction:column;gap:4px;box-shadow:0 12px 32px rgba(15,23,42,.16);font-family:'Manrope',sans-serif}
+.mobile-nav a{display:flex;align-items:center;min-height:48px;padding:0 12px;font-weight:600;color:#0f172a;text-decoration:none;border-radius:10px}
+.mobile-nav a:hover{background:#eef4ff}
+.bk-wrap{max-width:1040px;margin:0 auto;padding:28px 24px 56px}
+.bk-head{margin-bottom:20px}
+.bk-head a{font-size:0.875rem;font-weight:700;color:#1550d4;text-decoration:none}
+.bk-head h1{font-size:1.75rem;line-height:2.25rem;font-weight:800;letter-spacing:-.02em;margin-top:6px}
+.bk-head p{font-size:0.9375rem;color:#334155;margin-top:4px}
+.bk-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+.bk-card{background:#fff;border:1px solid #e3e8ef;border-radius:14px}
+.bk-section{padding:20px 24px;border-bottom:1px solid #eef1f5}
+.bk-section:last-child{border-bottom:0}
+.bk-step{display:flex;align-items:center;gap:10px;font-size:1.0625rem;font-weight:700;margin-bottom:16px}
+.bk-step span{width:26px;height:26px;border-radius:50%;background:#eef4ff;color:#01367c;font-size:0.8125rem;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.form-group{margin-bottom:16px}
+.bk-section .form-group:last-child{margin-bottom:0}
+.form-label{font-size:0.875rem;font-weight:700;color:#0f172a;margin-bottom:6px}
+.form-input,.form-select,.form-textarea{border:1px solid #8792a2;border-radius:10px;font-size:0.9375rem;padding:0 12px;height:44px;background:#fff}
+.form-textarea{height:auto;min-height:96px;padding:10px 12px;line-height:1.55}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:#1a6bff;box-shadow:0 0 0 3px rgba(26,107,255,.25)}
+.form-row{gap:16px}
+.offer-row{display:flex;align-items:center;gap:8px}
+.offer-row .form-input{max-width:160px;font-size:1.125rem;font-weight:700}
+#currencySymbolLabel{font-size:1.125rem!important}
+.hint{font-size:0.8125rem;line-height:1.5;color:#5b6474}
+.price-breakdown{background:none;border:0;padding:0;margin:0;font-size:0.9375rem}
+.blocked{display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:10px;padding:10px 12px;font-size:0.875rem;margin-top:12px}
+/* summary */
+.bk-aside{position:sticky;top:84px;display:flex;flex-direction:column;gap:16px}
+.tutor-info{display:flex;align-items:center;gap:14px;padding:20px 24px;margin:0;border-bottom:1px solid #eef1f5}
+.tutor-av{width:52px;height:52px;flex:none;border-radius:50%;background:#dbe7ff;color:#01367c;display:flex;align-items:center;justify-content:center;font-size:1.0625rem;font-weight:800;overflow:hidden}
+#tutorName{font-size:1.0625rem!important}
+#tutorSubjects{font-size:0.8125rem!important;color:#5b6474!important}
+#tutorRate{color:#0f172a!important;font-size:0.875rem!important}
+.sum{padding:16px 24px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #eef1f5}
+.sum-row{display:flex;justify-content:space-between;gap:12px;font-size:0.875rem}
+.sum-row span:first-child{color:#5b6474}
+.sum-row span:last-child{font-weight:700;text-align:right}
+.sum-row.muted span{color:#5b6474;font-weight:500}
+.sum-row.total{font-size:1.0625rem;border-top:1px solid #eef1f5;padding-top:12px;margin-top:2px}
+.sum-row.total span:first-child{color:#0f172a;font-weight:700}
+.sum-row.total span:last-child{font-weight:800}
+.sum-act{padding:16px 24px 20px;display:flex;flex-direction:column;gap:12px}
+.btn-submit{display:flex;align-items:center;justify-content:center;gap:10px;min-height:48px;border-radius:10px;font-size:0.9375rem}
+.btn-submit:hover{background:#1550d4;box-shadow:none}
+.no-charge{display:flex;gap:10px;align-items:flex-start;background:#eef4ff;color:#01367c;border-radius:10px;padding:12px;font-size:0.8125rem;line-height:1.5}
+.terms{font-size:0.8125rem;color:#5b6474;text-align:center;line-height:1.5}
+.terms a{color:#1550d4}
+.trust{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.trust-item{display:flex;gap:10px;align-items:flex-start;font-size:0.8125rem;line-height:1.5;color:#334155}
+.trust-item strong{color:#0f172a}
+.ico{flex:none;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-top:1px}
+.trust-item .ico{color:#047857}
+.alert{border-radius:10px;font-size:0.875rem;margin:0}
+.alert.error{color:#b91c1c}
+.alert.success{color:#047857}
+@media(max-width:900px){.bk-grid{grid-template-columns:1fr}.bk-aside{position:static}}
+@media(max-width:600px){
+  .bk-wrap{padding:20px 16px 40px}
+  .bk-head h1{font-size:1.375rem;line-height:1.875rem}
+  .bk-section,.tutor-info,.sum,.sum-act{padding-left:16px;padding-right:16px}
+  .form-row{grid-template-columns:1fr;gap:0}
+  .form-input,.form-select,.form-textarea{font-size:16px}
+}
+</style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
 </head>
@@ -68,98 +136,119 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
   </div>
   <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleMobileNav(this)" style="display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;color:#111827;">☰</button>
 </nav>
-<div class="page">
-  <div class="card">
-    <div class="tutor-info" id="tutorInfo">
-      <div class="tutor-av" id="tutorAv">?</div>
-      <div>
-        <div style="font-weight:800;font-size:1.1rem;" id="tutorName">Loading...</div>
-        <div style="font-size:0.78rem;color:var(--mid);" id="tutorSubjects"></div>
-        <div style="font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:3px;" id="tutorRate"></div>
-      </div>
-    </div>
-    <!-- PRICE DISPLAY -->
-    <div id="priceDisplay" style="display:none;" class="price-breakdown">
-      <div class="form-group" style="margin-bottom:0.8rem;">
-        <label class="form-label" style="display:flex;justify-content:space-between;align-items:center;">
-          <span>Your offer</span>
-          <span style="font-weight:500;color:#6b7280;font-size:0.75rem;">Listed rate: <span id="listedRateHint"></span></span>
-        </label>
-        <div style="display:flex;align-items:center;gap:0.5rem;">
-          <span id="currencySymbolLabel" style="font-size:1rem;font-weight:700;color:var(--ink);">€</span>
-          <input type="number" id="offerPrice" class="form-input" style="max-width:140px;" step="0.5">
-        </div>
-        <div class="hint" id="priceHint" style="margin-top:0.3rem;"></div>
-      </div>
-      <div class="price-row"><span style="color:#6b7280;">Platform fee (included)</span><span id="priceFee" style="color:#6b7280;">—</span></div>
-      <div class="price-row"><span style="color:#6b7280;">Tutor receives</span><span id="priceTutor" style="color:#6b7280;">—</span></div>
-      <div class="price-row total"><span>Total if confirmed</span><span id="priceCharge">—</span></div>
-    </div>
-
-    <div id="blockedWarning" style="display:none;background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:8px;padding:0.7rem 0.9rem;font-size:0.8rem;margin-bottom:1rem;"></div>
-
-    <div class="no-charge-note">
-      <span>ℹ️</span>
-      <span><strong>You won't be charged yet.</strong> This just sends a request to the tutor. If they accept, you'll get 24 hours to complete payment via PayPal to lock in the session.</span>
-    </div>
-
-    <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#166534;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:0.7rem 0.9rem;margin-bottom:0.6rem;line-height:1.4;">
-      <span>🛡️</span>
-      <span><strong>Payment protected.</strong> Once you pay, your money is held safely for 48 hours after the session — full refund guaranteed if something goes wrong.</span>
-    </div>
-
-    <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#166534;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:0.7rem 0.9rem;margin-bottom:1rem;line-height:1.4;">
-      <span>✅</span>
-      <span><strong>Never lose money to a no-show.</strong> If your tutor cancels, you're refunded automatically. If they don't show up, report it from your dashboard within 48 hours for a full refund.</span>
-    </div>
-
-    <div id="alert" class="alert"></div>
-
-    <div class="form-group">
-      <label for="subject" class="form-label">Subject *</label>
-      <input type="text" id="subject" class="form-input" placeholder="e.g. Linear Algebra, Python basics...">
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label for="date" class="form-label">Date *</label>
-        <input type="date" id="date" class="form-input">
-      </div>
-      <div class="form-group">
-        <label for="time" class="form-label">Time *</label>
-        <input type="time" id="time" class="form-input">
-      </div>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label for="duration" class="form-label">Duration</label>
-        <select id="duration" class="form-select">
-          <option value="60">60 minutes</option>
-          <option value="90">90 minutes</option>
-          <option value="120">120 minutes</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="format" class="form-label">Format</label>
-        <select id="format" class="form-select">
-          <option value="online">Online</option>
-          <option value="inperson">In-person</option>
-        </select>
-      </div>
-    </div>
-    <div class="form-group">
-      <label for="notes" class="form-label">Notes for tutor (optional)</label>
-      <textarea id="notes" class="form-textarea" placeholder="What do you want to cover? Any specific topics or questions?"></textarea>
-    </div>
-
-    <p style="font-size:0.75rem;color:#9ca3af;text-align:center;margin-bottom:0.6rem;">
-      By requesting a session you agree to our <a href="legal.html" target="_blank" style="color:var(--blue);">Terms of Service</a> and <a href="legal.html#refund" target="_blank" style="color:var(--blue);">Refund Policy</a>.
-    </p>
-    <button class="btn-submit" id="submitBtn" onclick="submitBooking()">
-      <span id="btnText">Send Request</span>
-      <div class="spinner" id="spinner"></div>
-    </button>
-  </div>
+<div class="mobile-nav" id="mobileNav">
+  <a href="index.html">Home</a>
+  <a href="student-dashboard.html">Dashboard</a>
+  <a href="messages.html">Messages</a>
+  <a href="find-tutors.html">Find Tutors</a>
 </div>
+<main class="bk-wrap" id="main">
+  <div class="bk-head">
+    <a href="javascript:history.back()">← Back</a>
+    <h1>Request a session</h1>
+    <p>Choose a time and your price. The tutor accepts or declines — you only pay after they accept.</p>
+  </div>
+  <div class="bk-grid">
+    <div class="bk-card">
+      <section class="bk-section" aria-labelledby="stepWhat">
+        <h2 class="bk-step" id="stepWhat"><span>1</span>What and when</h2>
+        <div class="form-group">
+          <label for="subject" class="form-label">Subject *</label>
+          <input type="text" id="subject" class="form-input" placeholder="e.g. Linear Algebra, Python basics...">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="date" class="form-label">Date *</label>
+            <input type="date" id="date" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="time" class="form-label">Time *</label>
+            <input type="time" id="time" class="form-input">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="duration" class="form-label">Duration</label>
+            <select id="duration" class="form-select">
+              <option value="60">60 minutes</option>
+              <option value="90">90 minutes</option>
+              <option value="120">120 minutes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="format" class="form-label">Format</label>
+            <select id="format" class="form-select">
+              <option value="online">Online</option>
+              <option value="inperson">In-person</option>
+            </select>
+          </div>
+        </div>
+        <div id="blockedWarning" class="blocked" role="alert"></div>
+      </section>
+
+      <section class="bk-section" aria-labelledby="stepPrice">
+        <h2 class="bk-step" id="stepPrice"><span>2</span>Your price</h2>
+        <div id="priceDisplay" style="display:none;" class="price-breakdown">
+          <div class="form-group">
+            <label for="offerPrice" class="form-label" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+              <span>Your offer for this session</span>
+              <span style="font-weight:500;color:#5b6474;font-size:0.8125rem;">Listed rate: <span id="listedRateHint"></span></span>
+            </label>
+            <div class="offer-row">
+              <span id="currencySymbolLabel" style="font-weight:700;color:#0f172a;">€</span>
+              <input type="number" id="offerPrice" class="form-input" step="0.5" aria-describedby="priceHint">
+            </div>
+            <div class="hint" id="priceHint" style="margin-top:8px;"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bk-section" aria-labelledby="stepNotes">
+        <h2 class="bk-step" id="stepNotes"><span>3</span>Anything the tutor should know?</h2>
+        <div class="form-group">
+          <label for="notes" class="form-label">Notes for tutor (optional)</label>
+          <textarea id="notes" class="form-textarea" placeholder="What do you want to cover? Any specific topics or questions?"></textarea>
+        </div>
+      </section>
+    </div>
+
+    <aside class="bk-aside" aria-label="Booking summary">
+      <div class="bk-card">
+        <div class="tutor-info" id="tutorInfo">
+          <div class="tutor-av" id="tutorAv">?</div>
+          <div style="min-width:0">
+            <div style="font-weight:800;" id="tutorName">Loading...</div>
+            <div id="tutorSubjects"></div>
+            <div style="font-weight:700;margin-top:2px;" id="tutorRate"></div>
+          </div>
+        </div>
+        <div class="sum" id="bookingSummary">
+          <div class="sum-row"><span>Subject</span><span id="sumSubject">—</span></div>
+          <div class="sum-row"><span>When</span><span id="sumWhen">—</span></div>
+          <div class="sum-row"><span>Length</span><span id="sumLength">60 min · Online</span></div>
+          <div id="sumPrice" style="display:none;flex-direction:column;gap:10px;">
+            <div class="sum-row muted"><span>Platform fee (included)</span><span id="priceFee">—</span></div>
+            <div class="sum-row muted"><span>Tutor receives</span><span id="priceTutor">—</span></div>
+            <div class="sum-row total"><span>Total if accepted</span><span id="priceCharge">—</span></div>
+          </div>
+        </div>
+        <div class="sum-act">
+          <div id="alert" class="alert" role="alert"></div>
+          <button type="button" class="btn-submit" id="submitBtn" onclick="submitBooking()">
+            <span id="btnText">Send request</span>
+            <div class="spinner" id="spinner"></div>
+          </button>
+          <div class="no-charge"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 16v-4M12 8h.01"/></svg><span><strong>You won't be charged yet.</strong> This sends a request to the tutor. If they accept, you'll have 24 hours to pay and lock in the session.</span></div>
+          <p class="terms">By requesting a session you agree to our <a href="legal.html" target="_blank">Terms of Service</a> and <a href="legal.html#refund" target="_blank">Refund Policy</a>.</p>
+        </div>
+      </div>
+      <div class="bk-card trust">
+        <div class="trust-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg><span><strong>Payment protected.</strong> Once you pay, your money is held for 48 hours after the session — full refund if something goes wrong.</span></div>
+        <div class="trust-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span><strong>Never lose money to a no-show.</strong> If your tutor cancels, you're refunded automatically. If they don't show up, report it from your dashboard within 48 hours for a full refund.</span></div>
+      </div>
+    </aside>
+  </div>
+</main>
 
 <script>
 // ── XSS protection (security review Oct 2026) ──
@@ -244,6 +333,7 @@ async function init(){
     offerInput.addEventListener('input', updatePriceBreakdown);
     document.getElementById('duration').addEventListener('change', () => { applyDurationScaledPrice(); updatePriceBreakdown(); });
     document.getElementById('priceDisplay').style.display = 'block';
+    document.getElementById('sumPrice').style.display = 'flex';
   } else {
     // Without a valid rate there's no price to offer, so a request could never be sent
     showAlert(`${name} hasn't set an hourly rate yet, so this session can't be booked. Send them a message to ask when they'll be available.`, 'error');
@@ -265,6 +355,27 @@ async function init(){
 
   document.getElementById('date').addEventListener('change', checkBlockedSlot);
   document.getElementById('time').addEventListener('change', checkBlockedSlot);
+  ['subject','date','time','duration','format'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', updateSummary); el.addEventListener('change', updateSummary);
+  });
+  updateSummary();
+}
+
+// Live summary on the right (display only)
+function updateSummary() {
+  const subj = document.getElementById('subject').value.trim();
+  const d = document.getElementById('date').value, t = document.getElementById('time').value;
+  const dur = document.getElementById('duration').value;
+  const fmt = document.getElementById('format');
+  document.getElementById('sumSubject').textContent = subj || '—';
+  let when = '—';
+  if (d) {
+    const dt = new Date(d + 'T' + (t || '12:00'));
+    when = dt.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }) + (t ? ', ' + t : '');
+  }
+  document.getElementById('sumWhen').textContent = when;
+  document.getElementById('sumLength').textContent = dur + ' min · ' + fmt.options[fmt.selectedIndex].text;
 }
 
 function applyDurationScaledPrice() {
@@ -295,7 +406,7 @@ function checkBlockedSlot() {
   const fullBlock = blocks.find(b => b.all_day);
 
   if (fullBlock) {
-    warningBox.textContent = '⚠️ This tutor is fully unavailable on this date. Please pick a different day.';
+    warningBox.textContent = 'This tutor is fully unavailable on this date. Please pick a different day.';
     warningBox.style.display = 'block';
     return true;
   }
@@ -303,7 +414,7 @@ function checkBlockedSlot() {
   if (time) {
     const partialBlock = blocks.find(b => !b.all_day && time >= b.start_time && time < b.end_time);
     if (partialBlock) {
-      warningBox.textContent = `⚠️ This tutor is unavailable between ${partialBlock.start_time.slice(0,5)}–${partialBlock.end_time.slice(0,5)} on this date. Please pick a different time.`;
+      warningBox.textContent = `This tutor is unavailable between ${partialBlock.start_time.slice(0,5)}–${partialBlock.end_time.slice(0,5)} on this date. Please pick a different time.`;
       warningBox.style.display = 'block';
       return true;
     }
@@ -385,7 +496,7 @@ async function submitBooking(){
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);
-  showAlert('✅ Request sent! We\'ll notify you the moment '+tutorName+' responds. If they accept, you\'ll have 24 hours to complete payment via PayPal to lock in the session.','success');
+  showAlert('✅ Request sent! We\'ll notify you the moment '+tutorName+' responds. If they accept, you\'ll have 24 hours to pay and lock in the session.','success');
   document.getElementById('submitBtn').style.display='none';
   setTimeout(()=>window.location.href='student-dashboard.html',3500);
 }
@@ -397,7 +508,7 @@ function showAlert(msg,type){
 }
 function setLoading(loading){
   document.getElementById('submitBtn').disabled=loading;
-  document.getElementById('btnText').textContent=loading?'Sending request...':'Send Request';
+  document.getElementById('btnText').textContent=loading?'Sending request...':'Send request';
   document.getElementById('spinner').style.display=loading?'block':'none';
 }
 
