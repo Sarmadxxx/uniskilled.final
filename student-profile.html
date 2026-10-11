@@ -151,6 +151,8 @@ body{background:#f4f6f9}
 .sidebar-widget{border-color:#e3e8ef;padding:20px 24px;margin-bottom:20px}
 .widget-title{font-size:1rem;line-height:1.5rem;font-weight:700;text-transform:none;letter-spacing:0;color:#0f172a;margin-bottom:8px}
 .help-item{font-size:0.875rem;color:#334155;gap:10px;align-items:flex-start;margin-bottom:10px}
+.privacy-text{display:flex;gap:10px;align-items:flex-start;font-size:0.875rem;line-height:1.55;color:#334155;margin:0}
+.privacy-text svg{flex:none;width:18px;height:18px;margin-top:2px;fill:none;stroke:#01367c;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .help-item svg{flex:none;width:18px;height:18px;margin-top:2px;fill:none;stroke:#01367c;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* pop-ups */
 .modal-overlay{background:rgba(15,23,42,.5);padding:16px}
@@ -270,6 +272,10 @@ body{background:#f4f6f9}
     <div class="sidebar-widget">
       <div class="widget-title">Personal</div>
       <div id="personalBody"><span class="empty" style="font-size:0.82rem;">Not set yet.</span></div>
+    </div>
+    <div class="sidebar-widget privacy-note">
+      <div class="widget-title">Who sees this</div>
+      <p class="privacy-text"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v10H5z"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Only you can see this page. When you book a session or post a subject request, tutors see your name and what you write in it.</span></p>
     </div>
     <div class="sidebar-widget">
       <div class="widget-title">Profile tips</div>

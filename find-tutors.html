@@ -91,6 +91,93 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
 .empty{text-align:center;padding:4rem 2rem;color:var(--mid);grid-column:1/-1;}
 .loading-text{text-align:center;padding:3rem;color:var(--mid);grid-column:1/-1;}
 @media(max-width:768px){.nav-links{display:none;}.nav-burger{display:block;}.search-bar{flex-direction:column;}.grid{grid-template-columns:1fr;}}
+/* ===== Redesign 11 Oct 2026 — matches the profiles and dashboards. Navbar (site-nav.js) unchanged. ===== */
+body{background:#f4f6f9;color:#0f172a;--blue-pale:#eef4ff}
+.hero-search{background-color:#01367c;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.12) 1px,transparent 0);background-size:22px 22px;padding:48px 24px 40px}
+.hero-search h1{font-size:2.25rem;line-height:2.75rem;letter-spacing:-.02em;margin-bottom:8px}
+.hero-search p{color:#dbe7ff;font-size:1rem;margin-bottom:24px}
+.search-bar{max-width:640px;gap:8px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 12px 32px rgba(1,54,124,.35)}
+.search-field{position:relative;flex:1;display:flex;align-items:center}
+.search-field svg{position:absolute;left:14px;width:20px;height:20px;fill:none;stroke:#5b6474;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.search-input{width:100%;padding:0 12px 0 44px;height:48px;border-radius:10px;font-size:1rem;color:#0f172a}
+.search-input::placeholder{color:#5b6474}
+.search-btn{height:48px;padding:0 24px;background:#1a6bff;color:#fff;border-radius:10px;font-weight:700;font-size:0.9375rem}
+.search-btn:hover{background:#1550d4}
+.quick-subjects{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:760px;margin:18px auto 0}
+.quick-subjects:empty{display:none}
+.quick-label{color:#dbe7ff;font-size:0.875rem;font-weight:600;align-self:center;margin-right:2px}
+.qs-chip{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font-family:'Manrope',sans-serif;font-size:0.875rem;font-weight:600;cursor:pointer}
+.qs-chip:hover{background:rgba(255,255,255,.18)}
+.qs-chip[aria-pressed="true"]{background:#fff;color:#01367c;border-color:#fff}
+.post-req-btn{min-height:40px;border-radius:10px;font-size:0.875rem;border:1px solid rgba(255,255,255,.45);background:transparent}
+.filters{position:sticky;top:64px;z-index:50;padding:12px 24px;justify-content:center;align-items:center;gap:8px;border-bottom:1px solid #e3e8ef;box-shadow:0 1px 2px rgba(15,23,42,.04)}
+.filter-select{height:40px;padding:0 32px 0 12px;border:1px solid #8792a2;border-radius:10px;font-size:0.875rem;color:#0f172a;appearance:none;-webkit-appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b6474' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center}
+.filter-select.is-set{border-color:#01367c;background-color:#eef4ff;color:#01367c;font-weight:700}
+.clear-filters{height:40px;padding:0 12px;border:0;background:none;color:#1550d4;font-family:'Manrope',sans-serif;font-size:0.875rem;font-weight:700;cursor:pointer;display:none}
+.clear-filters.show{display:inline-flex;align-items:center}
+.main{max-width:1180px;padding:24px 24px 56px}
+.results-count{font-size:0.9375rem;color:#334155;margin-bottom:16px}
+.grid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.tutor-card{border:1px solid #e3e8ef;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:border-color .15s,box-shadow .15s}
+.tutor-card:hover{transform:none;border-color:#b9cdf5;box-shadow:0 8px 24px rgba(15,23,42,.08)}
+.tutor-link::after{border-radius:14px}
+.card-top{margin:0;gap:14px;align-items:flex-start}
+.tutor-av{width:56px;height:56px;background:#dbe7ff;color:#01367c;font-size:1.125rem}
+.tutor-name{font-size:1.0625rem;line-height:1.5rem;font-weight:800;margin:0}
+.tutor-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:4px;font-size:0.8125rem;color:#5b6474}
+.verified{font-size:0.75rem;padding:2px 8px;margin:0;color:#047857;background:#ecfdf5}
+.rating{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:#0f172a}
+.rating svg{width:14px;height:14px;fill:#b45309;stroke:none}
+.rating span{font-weight:500;color:#5b6474}
+.new-tutor{font-weight:600;color:#5b6474}
+.tutor-bio{font-size:0.875rem;line-height:1.55;color:#334155;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.subjects{margin:0;gap:6px}
+.subject-tag{background:#f4f6f9;color:#334155;border:1px solid #e3e8ef;font-size:0.8125rem;padding:4px 10px}
+.course-tag{background:#eef4ff;color:#01367c;font-size:0.8125rem;font-weight:700;padding:4px 10px;border-radius:999px}
+.more-tag{font-size:0.8125rem;color:#5b6474;align-self:center;font-weight:600}
+.card-footer{margin-top:auto;padding-top:14px;border-top:1px solid #eef1f5}
+.tutor-rate{font-size:1.25rem;font-weight:800}
+.tutor-rate span{font-size:0.8125rem;color:#5b6474;font-weight:500}
+.book-btn{display:inline-flex;align-items:center;min-height:40px;padding:0 18px;border-radius:10px;background:#1a6bff;font-size:0.875rem}
+.book-btn:hover{background:#1550d4}
+.book-btn.secondary{background:#fff;color:#0f172a;border:1px solid #c3cad5}
+.book-btn.secondary:hover{border-color:#1550d4;color:#1550d4}
+.skel{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.skel i{display:block;border-radius:8px;background:linear-gradient(90deg,#eef1f5 25%,#f6f8fb 50%,#eef1f5 75%);background-size:200% 100%;animation:skel 1.2s infinite linear;height:14px}
+@keyframes skel{to{background-position:-200% 0}}
+.empty{background:#fff;border:1px dashed #c3cad5;border-radius:14px;padding:40px 24px;color:#334155;display:flex;flex-direction:column;align-items:center;gap:8px}
+.empty h2{font-size:1.125rem;color:#0f172a;margin:0}
+.empty p{margin:0;font-size:0.9375rem;color:#5b6474;max-width:440px}
+.empty-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
+/* request pop-up */
+.req-modal-overlay{background:rgba(15,23,42,.5)}
+.req-modal{border-radius:14px;padding:24px;box-shadow:0 12px 32px rgba(15,23,42,.16);position:relative}
+.req-modal-title{font-size:1.25rem;font-weight:800;margin:0 40px 6px 0}
+.req-modal-sub{font-size:0.9375rem;color:#334155}
+.req-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border:0;background:none;border-radius:10px;font-size:1.2rem;color:#334155;cursor:pointer}
+.req-close:hover{background:#f4f6f9}
+.req-form-label{font-size:0.875rem;color:#0f172a}
+.req-form-input{border:1px solid #8792a2;border-radius:10px;font-size:0.9375rem;padding:10px 12px}
+select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
+.req-form-input:focus{border-color:#1a6bff;box-shadow:0 0 0 3px rgba(26,107,255,.25)}
+.req-submit-btn{min-height:48px;border-radius:10px;font-size:0.9375rem;background:#1a6bff}
+.req-submit-btn:hover{background:#1550d4}
+.req-alert.error{color:#b91c1c}
+@media(max-width:768px){
+  .hero-search{padding:32px 16px 28px}
+  .hero-search h1{font-size:1.75rem;line-height:2.25rem}
+  .search-bar{flex-direction:row}
+  .search-btn{padding:0 16px}
+  .filters{position:static;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:12px 16px}
+  .filter-select{flex:none}
+  .qs-chip:nth-of-type(n+6){display:none}
+  .main{padding:16px 16px 40px}
+  .req-modal-overlay{align-items:flex-end;padding:0}
+  .req-modal{border-radius:16px 16px 0 0;max-height:92vh}
+  .req-form-input{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){.skel i{animation:none}}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
@@ -104,29 +191,30 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
   <h1>Find your perfect tutor</h1>
   <p>Peer tutors for your exact courses — verified tutors first</p>
   <div class="search-bar">
-    <input type="search" class="search-input" id="searchInput" aria-label="Search tutors" enterkeyhint="search" placeholder="Search by subject, course code, professor, name...">
-    <button class="search-btn" onclick="filterTutors()">Search</button>
+    <div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m21 21-4.3-4.3"/></svg><input type="search" class="search-input" id="searchInput" aria-label="Search tutors" enterkeyhint="search" placeholder="Subject, course code, professor or name"></div>
+    <button type="button" class="search-btn" onclick="filterTutors()">Search</button>
   </div>
+  <div class="quick-subjects" id="quickSubjects" aria-label="Popular subjects"></div>
   <div id="postRequestBanner" style="display:none;margin-top:1.1rem;">
-    <button class="post-req-btn" onclick="openRequestModal()">📋 Can't find your subject? Post a request</button>
+    <button type="button" class="post-req-btn" onclick="openRequestModal()">Can't find your subject? Post a request</button>
   </div>
 </div>
 
 <div class="filters">
-  <select class="filter-select" id="filterFormat" onchange="filterTutors()">
+  <select class="filter-select" id="filterFormat" aria-label="Format" onchange="filterTutors()">
     <option value="">Any format</option>
     <option value="online">Online</option>
     <option value="inperson">In-person</option>
     <option value="both">Both</option>
   </select>
-  <select class="filter-select" id="filterPrice" onchange="filterTutors()">
+  <select class="filter-select" id="filterPrice" aria-label="Price" onchange="filterTutors()">
     <option value="">Any price</option>
     <option value="0-20">Up to €20/hr</option>
     <option value="20-40">€20–€40/hr</option>
     <option value="40-60">€40–€60/hr</option>
     <option value="60+">€60+/hr</option>
   </select>
-  <select class="filter-select" id="filterDay" onchange="filterTutors()">
+  <select class="filter-select" id="filterDay" aria-label="Day" onchange="filterTutors()">
     <option value="">Any day</option>
     <option value="mon">Monday</option>
     <option value="tue">Tuesday</option>
@@ -136,29 +224,31 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
     <option value="sat">Saturday</option>
     <option value="sun">Sunday</option>
   </select>
-  <select class="filter-select" id="filterUniversity" onchange="filterTutors()">
+  <select class="filter-select" id="filterUniversity" aria-label="University" onchange="filterTutors()">
     <option value="">Any university</option>
     <option value="same">Same as mine</option>
   </select>
-  <select class="filter-select" id="filterCountry" onchange="filterTutors()">
+  <select class="filter-select" id="filterCountry" aria-label="Country" onchange="filterTutors()">
     <option value="">Any country</option>
     <option>Afghanistan</option><option>Albania</option><option>Algeria</option><option>Andorra</option><option>Angola</option><option>Argentina</option><option>Armenia</option><option>Australia</option><option>Austria</option><option>Azerbaijan</option><option>Bahrain</option><option>Bangladesh</option><option>Belarus</option><option>Belgium</option><option>Bolivia</option><option>Bosnia and Herzegovina</option><option>Brazil</option><option>Bulgaria</option><option>Cambodia</option><option>Cameroon</option><option>Canada</option><option>Chile</option><option>China</option><option>Colombia</option><option>Costa Rica</option><option>Croatia</option><option>Cuba</option><option>Cyprus</option><option>Czech Republic</option><option>Denmark</option><option>Ecuador</option><option>Egypt</option><option>Estonia</option><option>Ethiopia</option><option>Finland</option><option>France</option><option>Georgia</option><option>Germany</option><option>Ghana</option><option>Greece</option><option>Guatemala</option><option>Hungary</option><option>India</option><option>Indonesia</option><option>Iran</option><option>Iraq</option><option>Ireland</option><option>Israel</option><option>Italy</option><option>Jamaica</option><option>Japan</option><option>Jordan</option><option>Kazakhstan</option><option>Kenya</option><option>Kosovo</option><option>Kuwait</option><option>Latvia</option><option>Lebanon</option><option>Libya</option><option>Lithuania</option><option>Luxembourg</option><option>Malaysia</option><option>Malta</option><option>Mexico</option><option>Moldova</option><option>Mongolia</option><option>Montenegro</option><option>Morocco</option><option>Mozambique</option><option>Myanmar</option><option>Nepal</option><option>Netherlands</option><option>New Zealand</option><option>Nigeria</option><option>North Macedonia</option><option>Norway</option><option>Oman</option><option>Pakistan</option><option>Palestine</option><option>Panama</option><option>Paraguay</option><option>Peru</option><option>Philippines</option><option>Poland</option><option>Portugal</option><option>Qatar</option><option>Romania</option><option>Russia</option><option>Rwanda</option><option>Saudi Arabia</option><option>Senegal</option><option>Serbia</option><option>Singapore</option><option>Slovakia</option><option>Slovenia</option><option>Somalia</option><option>South Africa</option><option>South Korea</option><option>Spain</option><option>Sri Lanka</option><option>Sudan</option><option>Sweden</option><option>Switzerland</option><option>Syria</option><option>Taiwan</option><option>Tanzania</option><option>Thailand</option><option>Tunisia</option><option>Turkey</option><option>Uganda</option><option>Ukraine</option><option>United Arab Emirates</option><option>United Kingdom</option><option>United States</option><option>Uruguay</option><option>Uzbekistan</option><option>Venezuela</option><option>Vietnam</option><option>Yemen</option><option>Zambia</option><option>Zimbabwe</option>
   </select>
+  <button type="button" class="clear-filters" id="clearFilters" onclick="clearFilters()">Clear filters</button>
 </div>
 
 <main class="main" id="main">
   <div class="results-count" id="resultsCount" role="status" aria-live="polite">Loading tutors...</div>
   <div class="grid" id="tutorGrid">
-    <div class="loading-text">⏳ Loading tutors...</div>
+    <div class="skel" aria-hidden="true"><div style="display:flex;gap:14px;align-items:center"><i style="width:56px;height:56px;border-radius:50%"></i><div style="flex:1;display:flex;flex-direction:column;gap:8px"><i style="width:60%"></i><i style="width:40%"></i></div></div><i></i><i style="width:80%"></i><i style="height:40px;margin-top:8px"></i></div><div class="skel" aria-hidden="true"><div style="display:flex;gap:14px;align-items:center"><i style="width:56px;height:56px;border-radius:50%"></i><div style="flex:1;display:flex;flex-direction:column;gap:8px"><i style="width:60%"></i><i style="width:40%"></i></div></div><i></i><i style="width:80%"></i><i style="height:40px;margin-top:8px"></i></div><div class="skel" aria-hidden="true"><div style="display:flex;gap:14px;align-items:center"><i style="width:56px;height:56px;border-radius:50%"></i><div style="flex:1;display:flex;flex-direction:column;gap:8px"><i style="width:60%"></i><i style="width:40%"></i></div></div><i></i><i style="width:80%"></i><i style="height:40px;margin-top:8px"></i></div>
   </div>
 </main>
 
 <!-- POST SUBJECT REQUEST MODAL -->
 <div class="req-modal-overlay" id="requestModal" onclick="if(event.target===this)closeRequestModal()">
-  <div class="req-modal">
-    <div class="req-modal-title">Request a subject</div>
+  <div class="req-modal" role="dialog" aria-modal="true" aria-labelledby="reqModalTitle">
+    <button type="button" class="req-close" aria-label="Close" onclick="closeRequestModal()">✕</button>
+    <h2 class="req-modal-title" id="reqModalTitle">Request a subject</h2>
     <div class="req-modal-sub">Can't find a tutor for what you need? Post a request and any tutor who can help will see it and reach out.</div>
-    <div class="req-alert" id="reqAlert"></div>
+    <div class="req-alert" id="reqAlert" role="alert"></div>
     <div class="req-form-group">
       <label for="reqSubject" class="req-form-label">Subject you need help with *</label>
       <input type="text" class="req-form-input" id="reqSubject" placeholder="e.g. Organic Chemistry, Arabic, Linear Algebra...">
@@ -182,7 +272,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       </div>
     </div>
     <div class="req-form-group"><label for="reqLanguage" class="req-form-label">Preferred language</label><input type="text" class="req-form-input" id="reqLanguage" placeholder="e.g. English, German"></div>
-    <button class="req-submit-btn" id="reqSubmitBtn" onclick="submitRequest()">Post request →</button>
+    <button type="button" class="req-submit-btn" id="reqSubmitBtn" onclick="submitRequest()">Post request →</button>
   </div>
 </div>
 
@@ -215,7 +305,7 @@ async function loadTutors() {
     // Public columns only — payout details and meeting links are never needed here
     const { data: profiles } = await _sb.from('tutor_profiles').select('id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url');
     if (!profiles || profiles.length === 0) {
-      grid.innerHTML = '<div class="empty"><div style="font-size:2.5rem;margin-bottom:1rem;">🎓</div><div style="font-weight:700;margin-bottom:0.5rem;">No tutors yet</div><p>Be the first to sign up as a tutor!</p></div>';
+      grid.innerHTML = '<div class="empty"><h2>No tutors yet</h2><p>Be the first to sign up as a tutor!</p></div>';
       document.getElementById('resultsCount').textContent = '0 tutors found';
       return;
     }
@@ -249,6 +339,7 @@ async function loadTutors() {
     // Verified tutors first (nobody is hidden); original order otherwise
     allTutors.sort((a, b) => (b.university_verified_at ? 1 : 0) - (a.university_verified_at ? 1 : 0));
     renderTutors(allTutors);
+    renderQuickSubjects();
 
     // Populate university filter from real tutor data (location field = their uni)
     const unis = [...new Set(allTutors.map(t => t.location).filter(Boolean))].sort();
@@ -261,7 +352,7 @@ async function loadTutors() {
 
   } catch(e) {
     console.error(e);
-    grid.innerHTML = '<div class="empty"><div style="font-size:2rem;margin-bottom:1rem;">⚠️</div><div style="font-weight:700;">Could not load tutors</div><p style="margin-top:0.5rem;">Please refresh the page or try again in a moment.</p></div>';
+    grid.innerHTML = '<div class="empty"><h2>Could not load tutors</h2><p>Please refresh the page or try again in a moment.</p></div>';
     document.getElementById('resultsCount').textContent = '';
   }
 }
@@ -270,7 +361,8 @@ function renderTutors(tutors) {
   document.getElementById('resultsCount').textContent = tutors.length + ' tutor' + (tutors.length !== 1 ? 's' : '') + ' found';
   const grid = document.getElementById('tutorGrid');
   if (!tutors.length) {
-    grid.innerHTML = '<div class="empty"><div style="font-size:2rem;margin-bottom:1rem;">🔍</div><div style="font-weight:700;">No tutors match</div><p>Try different filters</p></div>';
+    const canRequest = currentUserId && currentUserRole !== 'tutor';
+    grid.innerHTML = '<div class="empty"><h2>No tutors match yet</h2><p>Try another subject or fewer filters' + (canRequest ? ' — or post a request and tutors who can help will reach out.' : '.') + '</p><div class="empty-actions"><button type="button" class="book-btn secondary" onclick="clearFilters()">Clear search and filters</button>' + (canRequest ? '<button type="button" class="book-btn" onclick="openRequestModal()">Post a request</button>' : '') + '</div></div>';
     return;
   }
   grid.innerHTML = tutors.map(t => {
@@ -279,31 +371,61 @@ function renderTutors(tutors) {
     const sym = currSymbol(t.currency);
     const rate = t.hourly_rate ? sym+t.hourly_rate : '';
     const stars = t.avgRating ? '★'.repeat(Math.round(t.avgRating))+'☆'.repeat(5-Math.round(t.avgRating)) : '';
+    const extra = subjects.length > 4 ? subjects.length - 4 : 0;
     return `<article class="tutor-card">
       <div class="card-top">
-        <div class="tutor-av">${t.avatarUrl?`<img src="${__safeUrl(t.avatarUrl)}" alt="${__esc(t.fullName)}">`:initials}</div>
-        <div>
+        <div class="tutor-av">${t.avatarUrl?`<img src="${__safeUrl(t.avatarUrl)}" alt="">`:initials}</div>
+        <div style="min-width:0">
           <h2 class="tutor-name"><a class="tutor-link" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}">${__esc(t.fullName)}</a></h2>
-          <div class="tutor-uni">${__esc(t.location||t.country||'')}</div>
-          ${t.avgRating?`<div><span class="stars">${__esc(stars)}</span> <span style="font-size:0.72rem;color:var(--mid);">${__esc(t.avgRating)} (${__esc(t.reviewCount)})</span></div>`:''}
-          ${t.university_verified_at ? `<div class="verified" title="University email verified${t.verified_university ? ' — ' + __esc(t.verified_university) : ''}">✓ Verified</div>` : ''}
+          <div class="tutor-meta">
+            ${t.university_verified_at ? `<span class="verified" title="University email verified${t.verified_university ? ' — ' + __esc(t.verified_university) : ''}">✓ Verified</span>` : ''}
+            ${(t.location||t.country) ? `<span>${__esc(t.location||t.country)}</span>` : ''}
+            ${t.avgRating ? `<span class="rating" aria-label="Rated ${__esc(t.avgRating)} out of 5 from ${__esc(t.reviewCount)} review${t.reviewCount===1?'':'s'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>${__esc(t.avgRating)} <span>(${__esc(t.reviewCount)})</span></span>` : `<span class="new-tutor">New tutor</span>`}
+          </div>
         </div>
       </div>
-      ${t.bio?`<p style="font-size:0.82rem;color:var(--mid);line-height:1.5;margin-bottom:0.9rem;">${__esc(t.bio.slice(0,120))}${__esc(t.bio.length>120?'...':'')}</p>`:''}
-      ${(t.courses||[]).length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:0.6rem;">${t.courses.slice(0,3).map(c=>`<span style="background:var(--blue-pale);color:var(--blue);font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:100px;">🎯 ${__esc(c.course_code)}</span>`).join('')}</div>` : ''}
-      <div class="subjects">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>
+      ${t.bio?`<p class="tutor-bio">${__esc(t.bio)}</p>`:''}
+      ${(t.courses||[]).length > 0 ? `<div class="chips">${t.courses.slice(0,3).map(c=>`<span class="course-tag">${__esc(c.course_code)}</span>`).join('')}</div>` : ''}
+      ${subjects.length ? `<div class="subjects chips">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}${extra?`<span class="more-tag">+${extra} more</span>`:''}</div>` : ''}
       <div class="card-footer">
-        <div class="tutor-rate">${rate ? `${__esc(rate)} <span>per hour</span>` : `<span style="font-size:0.8rem;">Rate on request</span>`}</div>
+        <div class="tutor-rate">${rate ? `${__esc(rate)} <span>/ hour</span>` : `<span>Rate on request</span>`}</div>
         ${t.user_id === currentUserId || currentUserRole === 'tutor'
-          ? `<a class="book-btn" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}" style="text-decoration:none;">${t.user_id === currentUserId ? 'Your profile' : 'View profile'}</a>`
+          ? `<a class="book-btn secondary" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}" style="text-decoration:none;">${t.user_id === currentUserId ? 'Your profile' : 'View profile'}</a>`
           : `<a class="book-btn" href="book-session.html?tutor=${encodeURIComponent(t.user_id)}&name=${encodeURIComponent(t.fullName)}" style="text-decoration:none;" aria-label="Book a session with ${__esc(t.fullName)}">Book session</a>`}
       </div>
     </article>`;
   }).join('');
 }
 
+const FILTER_IDS = ['filterFormat','filterPrice','filterDay','filterUniversity','filterCountry'];
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  FILTER_IDS.forEach(id => { document.getElementById(id).value = ''; });
+  filterTutors();
+}
+function quickSubject(btn) {
+  const input = document.getElementById('searchInput');
+  input.value = btn.getAttribute('aria-pressed') === 'true' ? '' : btn.dataset.subject;
+  filterTutors();
+}
+function renderQuickSubjects() {
+  const counts = {};
+  allTutors.forEach(t => (Array.isArray(t.subjects) ? t.subjects : []).forEach(sub => {
+    const k = String(sub).trim(); if (k) counts[k] = (counts[k] || 0) + 1;
+  }));
+  const top = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8).map(e => e[0]);
+  const box = document.getElementById('quickSubjects');
+  box.innerHTML = top.length ? '<span class="quick-label">Popular:</span>' + top.map(sub => `<button type="button" class="qs-chip" aria-pressed="false" data-subject="${__esc(sub)}" onclick="quickSubject(this)">${__esc(sub)}</button>`).join('') : '';
+}
+function syncFilterUi(q) {
+  let any = !!q;
+  FILTER_IDS.forEach(id => { const el = document.getElementById(id); const on = !!el.value; el.classList.toggle('is-set', on); if (on) any = true; });
+  document.getElementById('clearFilters').classList.toggle('show', any);
+  document.querySelectorAll('.qs-chip').forEach(c => c.setAttribute('aria-pressed', q && c.dataset.subject.toLowerCase() === q ? 'true' : 'false'));
+}
 function filterTutors() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  syncFilterUi(q);
   try { const u = new URL(location.href); q ? u.searchParams.set('q', q) : u.searchParams.delete('q'); history.replaceState(null, '', u); } catch (e) {}
   const fmt = document.getElementById('filterFormat').value;
   const price = document.getElementById('filterPrice').value;
@@ -370,11 +492,27 @@ function openRequestModal(){
   if (!currentUserId) { window.location.href = 'signin.html'; return; }
   if (currentUserRole === 'tutor') return; // safety guard, button is hidden anyway
   document.getElementById('reqAlert').style.display = 'none';
+  __reqLastFocus = document.activeElement;
   document.getElementById('requestModal').classList.add('open');
+  setTimeout(() => { const f = document.getElementById('reqSubject'); if (f) f.focus(); }, 0);
 }
+let __reqLastFocus = null;
 function closeRequestModal(){
   document.getElementById('requestModal').classList.remove('open');
+  if (__reqLastFocus && document.contains(__reqLastFocus) && __reqLastFocus.offsetParent !== null) __reqLastFocus.focus();
+  __reqLastFocus = null;
 }
+document.addEventListener('keydown', e => {
+  const ov = document.getElementById('requestModal');
+  if (!ov || !ov.classList.contains('open')) return;
+  if (e.key === 'Escape') { e.preventDefault(); closeRequestModal(); return; }
+  if (e.key === 'Tab') {
+    const f = [...ov.querySelectorAll('button,input,select,textarea')].filter(x => !x.disabled && x.offsetParent !== null);
+    if (!f.length) return;
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
+  }
+});
 window.submitRequest = async function(){
   const subject = document.getElementById('reqSubject').value.trim();
   if (!subject) {
