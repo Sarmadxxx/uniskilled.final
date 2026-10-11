@@ -701,6 +701,15 @@ function applyTutorSeo(fullName, p, tp, subjects) {
   let tag = document.getElementById('tutorLd');
   if (!tag) { tag = document.createElement('script'); tag.type = 'application/ld+json'; tag.id = 'tutorLd'; document.head.appendChild(tag); }
   tag.textContent = JSON.stringify(ld);
+  // Thin profiles stay out of Google until the tutor has added subjects and a real bio.
+  // Same rule as scripts/build-sitemap.mjs (isCompleteProfile) — keep the two in sync.
+  const fullBio = ((tp?.bio || '').trim() || (p?.bio || '').trim());
+  const complete = (subjects || []).length > 0 && fullBio.length >= 50;
+  let rob = document.getElementById('tutorRobots');
+  if (!complete) {
+    if (!rob) { rob = document.createElement('meta'); rob.name = 'robots'; rob.id = 'tutorRobots'; document.head.appendChild(rob); }
+    rob.content = 'noindex';
+  } else if (rob) { rob.remove(); }
 }
 
 async function loadProfile() {
