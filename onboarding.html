@@ -193,9 +193,10 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
                 <option value="EUR" selected>€ EUR</option>
                 <option value="USD">$ USD</option>
               </select>
-              <input type="number" id="hourlyRate" class="form-input" inputmode="decimal" placeholder="10" min="10" max="200">
+              <input type="number" id="hourlyRate" class="form-input" inputmode="decimal" placeholder="20" min="10" max="200">
             </div>
             <div class="hint" id="rateHint">Minimum €10 per hour</div>
+            <div class="hint" id="rateGuide">Typical rates: €18–30/hr for university-student tutors, €30–50/hr for graduates and exam specialists.</div>
           </div>
           <div class="form-group"><label for="teachingFormat" class="form-label">Teaching format</label><select id="teachingFormat" class="form-select"><option value="online">Online only</option><option value="inperson">In-person only</option><option value="both">Both</option></select></div>
         </div>
@@ -489,6 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const isUsd = this.value === 'USD';
       document.getElementById('hourlyRate').min = isUsd ? 11 : 10;
       document.getElementById('rateHint').textContent = isUsd ? 'Minimum $11 per hour' : 'Minimum €10 per hour';
+      document.getElementById('rateGuide').textContent = isUsd ? 'Typical rates: $20–35/hr for university-student tutors, $35–55/hr for graduates and exam specialists.' : 'Typical rates: €18–30/hr for university-student tutors, €30–50/hr for graduates and exam specialists.';
     });
   }
 
