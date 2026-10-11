@@ -163,6 +163,88 @@ a.profile-av{text-decoration:none;}
   .quick-actions{grid-template-columns:1fr 1fr;}
   .hero-stats{gap:1rem;}
 }
+/* ===== Redesign 11 Oct 2026 — scoped to the sidebar menu and the main area only (matches tutor dashboard) ===== */
+.sidebar-nav{padding:8px;display:flex;flex-direction:column;gap:2px}
+.sidebar-nav .nav-group{font-size:0.75rem;line-height:1rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5b6474;padding:12px 12px 6px}
+.sidebar-nav .nav-group:first-child{padding-top:6px}
+.sidebar-nav .nav-item{gap:12px;min-height:40px;padding:0 12px;border-radius:10px;border-left:0;font-size:0.875rem;font-weight:600;color:#334155}
+.sidebar-nav .nav-item:hover{background:#eef4ff;color:#0f172a}
+.sidebar-nav .nav-item.active{background:#eef4ff;color:#01367c;box-shadow:inset 3px 0 0 #01367c}
+.sidebar-nav svg.ico{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sidebar-nav .badge-count{background:#01367c;font-size:12px;line-height:22px;height:22px;padding:0 6px;min-width:22px}
+
+main.main{gap:24px}
+main.main .ov-head .hero-title{font-size:1.75rem;line-height:2.25rem;font-weight:800;letter-spacing:-.02em;color:#0f172a;margin:0}
+main.main .ov-head .hero-sub{font-size:0.9375rem;line-height:1.5rem;color:#334155;margin:4px 0 0}
+main.main .ov-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+main.main .ov-stat{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;justify-content:space-between}
+main.main .ov-stat-l{font-size:0.8125rem;line-height:1.1875rem;font-weight:600;color:#5b6474}
+main.main .ov-stat-n{font-size:1.75rem;line-height:2.25rem;font-weight:800;color:#0f172a;margin-top:4px}
+main.main .quick-actions{gap:16px}
+main.main .qa{border:1px solid #e3e8ef;border-radius:14px;padding:18px 12px;gap:10px;transition:border-color .15s,background .15s}
+main.main .qa:hover{border-color:#1550d4;background:#f5f8ff;transform:none;box-shadow:none}
+main.main .qa-ico{width:40px;height:40px;border-radius:10px;background:#eef4ff;color:#01367c;display:flex;align-items:center;justify-content:center}
+main.main .qa-ico svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+main.main .qa-lbl{font-size:0.875rem;font-weight:700;color:#0f172a}
+main.main .card{border-color:#e3e8ef}
+main.main .card-head{padding:16px 24px}
+main.main .card-title{font-size:1.125rem;line-height:1.625rem;font-weight:700;letter-spacing:0;text-transform:none;color:#0f172a}
+main.main .card-body{padding:16px 24px}
+main.main .empty-state{padding:20px 8px;display:flex;flex-direction:column;align-items:center;gap:10px}
+main.main .empty-state-icon{display:none}
+main.main .empty-state-text{font-size:0.875rem;color:#5b6474;margin:0}
+main.main .btn-sm{min-height:36px;padding:0 14px;border-radius:10px;font-size:0.875rem;background:#fff;color:#0f172a;border:1px solid #c3cad5;justify-content:center}
+main.main .btn-sm:hover{border-color:#1550d4;color:#1550d4}
+main.main #markAllReadBtn{font-size:0.875rem!important;font-weight:700!important;color:#1550d4!important}
+main.main .ref-card{display:flex;flex-direction:column;gap:14px;padding:20px 24px}
+main.main .ref-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+main.main .ref-title{font-size:1.125rem;line-height:1.625rem;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:10px}
+main.main .ref-title svg{width:20px;height:20px;fill:none;stroke:#01367c;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+main.main .ref-sub{font-size:0.875rem;color:#334155;margin-top:2px}
+main.main .ref-bal-l{font-size:0.8125rem;font-weight:600;color:#5b6474;text-align:right}
+main.main #creditBalanceDisplay{font-size:1.375rem;font-weight:800;color:#0f172a;text-align:right}
+main.main .ref-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+main.main #referralLinkInput{flex:1;min-width:200px;height:40px;padding:0 12px;border:1px solid #8792a2;border-radius:10px;font-family:'Manrope',sans-serif;font-size:0.875rem;color:#334155;background:#f8fafc}
+main.main .ref-btn{min-height:40px;padding:0 16px;border-radius:10px;font-family:'Manrope',sans-serif;font-size:0.875rem;font-weight:700;cursor:pointer;white-space:nowrap}
+main.main #copyReferralBtn{background:#1a6bff;color:#fff;border:1px solid #1a6bff}
+main.main #copyReferralBtn:hover{background:#1550d4}
+main.main #shareReferralBtn{background:#fff;color:#0f172a;border:1px solid #c3cad5}
+main.main #shareReferralBtn:hover{border-color:#1550d4;color:#1550d4}
+main.main #referralStats{font-size:0.8125rem;color:#5b6474}
+main.main .session-row{gap:12px;padding:14px 0;border-bottom-color:#eef1f5}
+main.main .session-av{background:#f1f5f9;color:#334155;font-size:13px}
+main.main .session-info{flex:1 1 180px;min-width:0}
+main.main .session-name{font-size:0.9375rem}
+main.main .session-sub{font-size:0.8125rem;color:#5b6474}
+main.main .badge{font-size:12px;padding:3px 10px;text-transform:capitalize}
+main.main .btn-join,main.main .pay-now-btn{display:inline-flex;align-items:center;justify-content:center;min-height:40px;padding:0 16px;border-radius:10px;font-size:0.875rem;font-weight:700;line-height:1;margin-left:0!important}
+main.main .btn-join{background:#1a6bff;border:1px solid #1a6bff}
+main.main .btn-join:hover{background:#1550d4}
+main.main .pay-now-btn{background:#1a6bff;border:1px solid #1a6bff}
+main.main .pay-now-btn:hover{background:#1550d4}
+main.main .notif-row{gap:12px;padding:14px 0;border-bottom-color:#eef1f5}
+main.main .notif-row.unread{background:#f5f8ff;margin:0 -24px;padding:14px 24px}
+main.main .notif-row:hover{background:#eef4ff}
+main.main .notif-title{font-size:0.875rem}
+main.main .notif-body{font-size:0.8125rem;color:#334155}
+main.main .notif-time{font-size:12px;color:#5b6474}
+main.main .myreq-row{padding:14px 0;border-bottom-color:#eef1f5}
+main.main .myreq-subject{font-size:0.9375rem}
+main.main .myreq-status{font-size:12px;padding:3px 10px}
+main.main .myreq-meta{font-size:0.8125rem;color:#5b6474}
+main.main .subject-tag{background:#f4f6f9;color:#334155;border:1px solid #e3e8ef;font-size:0.8125rem;padding:5px 12px}
+@media(max-width:900px){
+  main.main .ov-stats{gap:12px}
+  main.main .card-head,main.main .card-body{padding-left:16px;padding-right:16px}
+  main.main .notif-row.unread{margin:0 -16px;padding:14px 16px}
+  main.main .ref-card{padding:16px}
+}
+@media(max-width:600px){
+  main.main .ov-head .hero-title,main.main .ov-stat-n{font-size:1.375rem;line-height:1.875rem}
+  main.main .ov-stat{padding:12px 14px}
+  main.main .ref-bal-l,main.main #creditBalanceDisplay{text-align:left}
+  main.main .btn-join,main.main .pay-now-btn,main.main .ref-btn,.sidebar-nav .nav-item{min-height:44px}
+}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
@@ -200,19 +282,22 @@ a.profile-av{text-decoration:none;}
       <button class="become-btn" id="becomeTutorBtn" onclick="openBecomeTutorModal()">+ Become a Tutor</button>
     </div>
     <div class="sidebar-nav" role="navigation" aria-label="Dashboard sections">
-      <a href="student-dashboard.html" class="nav-item active"><span class="ico">🏠</span>Overview</a>
-      <a href="find-tutors.html" class="nav-item"><span class="ico">🔍</span>Find a Tutor</a>
-      <a href="group-sessions.html" class="nav-item"><span class="ico">👥</span>Group Sessions</a>
-      <a href="feed.html" class="nav-item"><span class="ico">✨</span>Feeds</a>
-      <a href="calendar.html" class="nav-item"><span class="ico">🗓️</span>Calendar</a>
-      <a href="#referralCard" class="nav-item" onclick="document.getElementById('referralCard').scrollIntoView({behavior:'smooth'})"><span class="ico">🎁</span>Refer & Earn</a>
-      <a href="#notifsCard" class="nav-item" onclick="document.getElementById('notifsCard').scrollIntoView({behavior:'smooth'})"><span class="ico">🔔</span>Notifications
-        <span class="badge-count" id="badgeNotifs" style="display:none;margin-left:auto;">0</span>
-      </a>
-      <a href="messages.html" class="nav-item"><span class="ico">💬</span>Messages
+      <div class="nav-group">Learning</div>
+      <a href="student-dashboard.html" class="nav-item active"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Overview</a>
+      <a href="find-tutors.html" class="nav-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m21 21-4.3-4.3"/></svg>Find a tutor</a>
+      <a href="group-sessions.html" class="nav-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group sessions</a>
+      <a href="calendar.html" class="nav-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</a>
+      <div class="nav-group">Inbox</div>
+      <a href="messages.html" class="nav-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages
         <span class="badge-count" id="badgeMessages" style="display:none;margin-left:auto;">0</span>
       </a>
-      <a href="student-profile.html" class="nav-item"><span class="ico">👤</span>My Profile</a>
+      <a href="#notifsCard" class="nav-item" onclick="document.getElementById('notifsCard').scrollIntoView({behavior:'smooth'})"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications
+        <span class="badge-count" id="badgeNotifs" style="display:none;margin-left:auto;">0</span>
+      </a>
+      <div class="nav-group">More</div>
+      <a href="feed.html" class="nav-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Feeds</a>
+      <a href="#referralCard" class="nav-item" onclick="document.getElementById('referralCard').scrollIntoView({behavior:'smooth'})"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v4H3z"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></svg>Refer &amp; earn</a>
+      <a href="student-profile.html" class="nav-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg>My profile</a>
     </div>
   </div>
 
@@ -220,49 +305,47 @@ a.profile-av{text-decoration:none;}
   <main class="main">
 
     <!-- HERO -->
-    <div class="hero-card">
-      <div class="hero-eyebrow">WELCOME BACK</div>
-      <h1 class="hero-title" id="heroTitle">Hello!</h1>
-      <div class="hero-sub" id="heroSub">Your dashboard is ready.</div>
-      <div class="hero-stats">
-        <div><div class="hero-stat-n" id="statSessions">—</div><div class="hero-stat-l">Sessions</div></div>
-        <div><div class="hero-stat-n" id="statSubjects">—</div><div class="hero-stat-l">Subjects</div></div>
-        <div><div class="hero-stat-n" id="statMessages">—</div><div class="hero-stat-l">Messages</div></div>
-      </div>
+    <div class="ov-head">
+      <h1 class="hero-title" id="heroTitle">Hello</h1>
+      <p class="hero-sub" id="heroSub">Your dashboard is ready.</p>
+    </div>
+    <div class="ov-stats">
+      <div class="ov-stat"><div class="ov-stat-l">Sessions</div><div class="ov-stat-n" id="statSessions">0</div></div>
+      <div class="ov-stat"><div class="ov-stat-l">Subjects</div><div class="ov-stat-n" id="statSubjects">0</div></div>
+      <div class="ov-stat"><div class="ov-stat-l">Messages</div><div class="ov-stat-n" id="statMessages">0</div></div>
     </div>
 
     <!-- QUICK ACTIONS -->
     <div class="quick-actions">
-      <a href="find-tutors.html" class="qa"><div class="qa-ico">🔍</div><div class="qa-lbl">Find a Tutor</div></a>
-      <a href="find-tutors.html#request" class="qa"><div class="qa-ico">📋</div><div class="qa-lbl">Request a Subject</div></a>
-      <a href="messages.html" class="qa"><div class="qa-ico">💬</div><div class="qa-lbl">Messages</div></a>
-      <a href="student-profile.html" class="qa"><div class="qa-ico">👤</div><div class="qa-lbl">My Profile</div></a>
+      <a href="find-tutors.html" class="qa"><div class="qa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m21 21-4.3-4.3"/></svg></div><div class="qa-lbl">Find a Tutor</div></a>
+      <a href="find-tutors.html#request" class="qa"><div class="qa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4H9z"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg></div><div class="qa-lbl">Request a Subject</div></a>
+      <a href="messages.html" class="qa"><div class="qa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="qa-lbl">Messages</div></a>
+      <a href="student-profile.html" class="qa"><div class="qa-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><path d="M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/></svg></div><div class="qa-lbl">My Profile</div></a>
     </div>
 
     <!-- REFER & EARN -->
-    <div class="card" id="referralCard" style="padding:1.4rem 1.6rem;margin-top:1.2rem;background:linear-gradient(135deg,#f5f3ff,#eff6ff);border-color:#ddd6fe;">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.6rem;margin-bottom:0.9rem;">
+    <div class="card ref-card" id="referralCard">
+      <div class="ref-top">
         <div>
-          <div style="font-weight:800;font-size:1.05rem;color:var(--ink);">🎁 Refer & earn</div>
-          <div style="font-size:0.8rem;color:var(--ink2);margin-top:0.15rem;">Give €10, get €10 — for every friend who completes their first session.</div>
+          <h2 class="ref-title"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v4H3z"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></svg>Refer &amp; earn</h2>
+          <div class="ref-sub">Give €10, get €10 — for every friend who completes their first session.</div>
         </div>
-        <div style="text-align:right;">
-          <div style="font-size:0.7rem;color:var(--mid);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">Your credit balance</div>
-          <div id="creditBalanceDisplay" style="font-size:1.3rem;font-weight:800;color:#7c3aed;">—</div>
+        <div>
+          <div class="ref-bal-l">Your credit balance</div>
+          <div id="creditBalanceDisplay">—</div>
         </div>
       </div>
-      <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
-        <input id="referralLinkInput" readonly aria-label="Your referral link" style="flex:1;min-width:200px;padding:0.65rem 0.9rem;border:1.5px solid #ddd6fe;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;color:var(--ink2);background:#fff;" value="Loading your link...">
-        <button id="copyReferralBtn" onclick="copyReferralLink()" style="padding:0.65rem 1.1rem;background:#7c3aed;color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copy link</button>
-        <button id="shareReferralBtn" onclick="shareReferralLink()" style="padding:0.65rem 1.1rem;background:#fff;color:#7c3aed;border:1.5px solid #7c3aed;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;white-space:nowrap;">↗ Share</button>
+      <div class="ref-row">
+        <input id="referralLinkInput" readonly aria-label="Your referral link" value="Loading your link...">
+        <button id="copyReferralBtn" class="ref-btn" onclick="copyReferralLink()">Copy link</button>
+        <button id="shareReferralBtn" class="ref-btn" onclick="shareReferralLink()">Share</button>
       </div>
-      <div id="referralStats" style="font-size:0.76rem;color:var(--mid);margin-top:0.7rem;"></div>
+      <div id="referralStats"></div>
     </div>
-
     <!-- SESSIONS -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">My Sessions</h2>
+        <h2 class="card-title">My sessions</h2>
         <a href="find-tutors.html" class="btn-sm">+ Book session</a>
       </div>
       <div class="card-body" id="sessionsBody">
@@ -291,7 +374,7 @@ a.profile-av{text-decoration:none;}
     <!-- MY SUBJECT REQUESTS -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">My Subject Requests</h2>
+        <h2 class="card-title">My subject requests</h2>
         <a href="find-tutors.html#request" class="btn-sm">+ New request</a>
       </div>
       <div class="card-body" id="myRequestsBody">
@@ -306,7 +389,7 @@ a.profile-av{text-decoration:none;}
     <!-- SUBJECTS -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">My Subjects</h2>
+        <h2 class="card-title">My subjects</h2>
         <a href="student-profile.html" class="btn-sm">Edit</a>
       </div>
       <div class="card-body" id="subjectsBody">
@@ -385,13 +468,13 @@ async function init() {
   // Hero
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('heroTitle').textContent = greeting + ', ' + firstName + '!';
+  document.getElementById('heroTitle').textContent = greeting + ', ' + firstName;
   document.getElementById('heroSub').textContent = subLine || 'Complete your profile to get started.';
   document.title = firstName + "'s Dashboard — UniSkilled";
 
   // Subjects
   const subjects = Array.isArray(sp?.subjects) ? sp.subjects : [];
-  document.getElementById('statSubjects').textContent = subjects.length > 0 ? subjects.length : '—';
+  document.getElementById('statSubjects').textContent = subjects.length;
   if (subjects.length > 0) {
     document.getElementById('subjectsBody').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>`;
   }
@@ -399,7 +482,7 @@ async function init() {
   // Sessions
   const { data: sessions } = await _sb.from('sessions').select('*').eq('student_id', user.id).order('created_at', { ascending: false });
   const allSessions = sessions || [];
-  document.getElementById('statSessions').textContent = allSessions.length > 0 ? allSessions.length : '—';
+  document.getElementById('statSessions').textContent = allSessions.length;
 
   if (allSessions.length > 0) {
     document.getElementById('sessionsBody').innerHTML = allSessions.slice(0, 5).map(s => {
@@ -417,17 +500,17 @@ async function init() {
 
       let actionBtn = '';
       if (s.status === 'confirmed') {
-        actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.tutor_name||'Tutor')}')">🎥 Join Session</button>
+        actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.tutor_name||'Tutor')}')">Join session</button>
         <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>
-        <button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`;
+        <button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">Report issue</button>`;
       } else if (s.status === 'completed' && (!s.completed_at || Date.now() - new Date(s.completed_at).getTime() <= 48 * 3600 * 1000)) {
         // Issues can be reported until 48h after the session ended (same window open-dispute enforces)
-        actionBtn = `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`;
+        actionBtn = `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;" onclick="openReportModal('${s.id}')">Report issue</button>`;
       } else if (s.status === 'awaiting_payment') {
         const remaining = s.payment_due_at ? Math.max(0, new Date(s.payment_due_at).getTime() - Date.now()) : 0;
         const hoursLeft = Math.floor(remaining / 3600000);
         const minsLeft = Math.floor((remaining % 3600000) / 60000);
-        actionBtn = `<a href="complete-payment.html?session=${__safeUrl(s.id)}" class="pay-now-btn">💳 Pay now (${__esc(hoursLeft)}h ${__esc(minsLeft)}m left)</a>`;
+        actionBtn = `<a href="complete-payment.html?session=${__safeUrl(s.id)}" class="pay-now-btn">Pay now (${__esc(hoursLeft)}h ${__esc(minsLeft)}m left)</a>`;
       }
 
       return `<div class="session-row">
@@ -475,7 +558,7 @@ async function loadMessageCount() {
   const count = (msgs || []).length;
   // Update hero stat
   const statEl = document.getElementById('statMessages');
-  if (statEl) statEl.textContent = count > 0 ? count : '—';
+  if (statEl) statEl.textContent = count;
   // Update sidebar badge
   const badge = document.getElementById('badgeMessages');
   if (badge) {
@@ -733,11 +816,11 @@ async function joinSession(sessionId, subject, otherName) {
     }
 
     btn.disabled = false;
-    btn.textContent = '🎥 Join Session';
+    btn.textContent = 'Join session';
   } catch (err) {
     showToast('Couldn\'t open the session. Check your connection and try again.', 'error');
     btn.disabled = false;
-    btn.textContent = '🎥 Join Session';
+    btn.textContent = 'Join session';
   }
 }
 
