@@ -11,6 +11,14 @@ async function getPlatformFeeRate(supabase: any): Promise<number> {
   return isNaN(rate) ? 0.20 : rate;
 }
 
+// Group sessions use their own platform fee (default 25%), stored separately so it can be tuned
+// without touching the one-to-one rate. Checkout and webhook MUST use the same rate.
+async function getGroupFeeRate(supabase: any): Promise<number> {
+  const { data } = await supabase.from('platform_settings').select('value').eq('key', 'group_platform_fee_rate').maybeSingle();
+  const rate = parseFloat(data?.value);
+  return isNaN(rate) ? 0.25 : rate;
+}
+
 Deno.serve(async (req: Request) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
@@ -25,7 +33,7 @@ Deno.serve(async (req: Request) => {
     if (!session_id && !group_participant_id) return json({ error: 'session_id or group_participant_id required' }, 400);
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
-    const feeRate = await getPlatformFeeRate(supabase);
+    const feeRate = group_participant_id ? await getGroupFeeRate(supabase) : await getPlatformFeeRate(supabase);
 
     let price: number, subject: string, currency: string, referenceId: string, metadataKey: string, tutorId: string;
     let studentId: string | null = null;
@@ -109,7 +117,8 @@ Deno.serve(async (req: Request) => {
     const priceCents = Math.round(price * 100);
     const discountCents = Math.round(discount * 100);
     const chargeCents = priceCents - discountCents;
-    // Destination charge: the tutor's account receives charge − application fee = exactly 80% of the full price.
+    // Destination charge: the tutor's account receives charge − application fee = exactly (1 − feeRate) of the full price
+    // (80% for one-to-one, 75% for group seats).
     const applicationFeeCents = Math.max(0, Math.round(priceCents * feeRate) - discountCents);
 
     const siteUrl = 'https://uniskilled.com';

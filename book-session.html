@@ -229,7 +229,7 @@ async function init(){
   const currency = tp?.currency || 'EUR';
   const sym = currSymbol(currency);
   const rate = tp?.hourly_rate || 0;
-  const minPrice = currency === 'USD' ? 11 : 10;
+  const minPrice = currency === 'USD' ? 17 : 15;
   document.getElementById('tutorRate').textContent = rate ? sym + rate + '/hr' : 'Rate not set';
 
   // Editable price / negotiation
@@ -334,7 +334,7 @@ async function submitBooking(){
   }
 
   const currency = tutorData?.currency || 'EUR';
-  const minPrice = currency === 'USD' ? 11 : 10;
+  const minPrice = currency === 'USD' ? 17 : 15;
   const offerPrice = parseFloat(document.getElementById('offerPrice').value);
   if (!offerPrice || offerPrice < minPrice) {
     showAlert(`The minimum session price is ${currSymbol(currency)}${minPrice}.`,'error');

@@ -25,6 +25,14 @@ async function getPlatformFeeRate(supabase: any): Promise<number> {
   return isNaN(rate) ? 0.20 : rate;
 }
 
+// Group sessions use their own platform fee (default 25%), stored separately so it can be tuned
+// without touching the one-to-one rate. Checkout and webhook MUST use the same rate.
+async function getGroupFeeRate(supabase: any): Promise<number> {
+  const { data } = await supabase.from('platform_settings').select('value').eq('key', 'group_platform_fee_rate').maybeSingle();
+  const rate = parseFloat(data?.value);
+  return isNaN(rate) ? 0.25 : rate;
+}
+
 async function sendEmail(supabaseUrl: string, type: string, to: string, data: any) {
   try {
     await fetch(`${supabaseUrl}/functions/v1/send-email`, {
@@ -153,8 +161,9 @@ Deno.serve(async (req: Request) => {
         return json({ error: 'Payment amount did not match. Please contact support.' }, 500);
       }
 
-      const platformFee = parseFloat((price * feeRate).toFixed(2));
-      const tutorPayout = parseFloat((price * (1 - feeRate)).toFixed(2));
+      const groupFeeRate = await getGroupFeeRate(supabase);
+      const platformFee = parseFloat((price * groupFeeRate).toFixed(2));
+      const tutorPayout = parseFloat((price * (1 - groupFeeRate)).toFixed(2));
 
       await supabase.from('group_session_participants').update({
         status: 'confirmed', paypal_order_id: order_id, payment_due_at: null,

@@ -771,9 +771,9 @@ async function submitBecomeTutor() {
   const subjects = subject.split(',').map(s => s.trim()).filter(Boolean);
   const rate = document.getElementById('btRate').value;
   const currency = document.getElementById('btCurrency').value || 'EUR';
-  const minRate = currency === 'USD' ? 11 : 10;
+  const minRate = currency === 'USD' ? 17 : 15;
   if (rate && parseFloat(rate) < minRate) {
-    alertEl.textContent = `The minimum hourly rate on UniSkilled is ${currency === 'USD' ? '$11' : '€10'}.`;
+    alertEl.textContent = `The minimum hourly rate on UniSkilled is ${currency === 'USD' ? '$17' : '€15'}.`;
     alertEl.className = 'dm-alert error';
     return;
   }
