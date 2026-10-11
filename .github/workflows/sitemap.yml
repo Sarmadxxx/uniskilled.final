@@ -1,0 +1,42 @@
+name: Update sitemap
+
+# Rebuilds sitemap.xml once a day so newly completed tutor profiles get listed for Google.
+# Commits only when the sitemap actually changed. Can also be run by hand from the Actions tab.
+on:
+  schedule:
+    - cron: '17 3 * * *'   # 03:17 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sitemap
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history so each page's <lastmod> comes from its last commit
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate sitemap.xml
+        run: node scripts/build-sitemap.mjs
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- sitemap.xml; then
+            echo "Sitemap unchanged."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898729+github-actions[bot]@users.noreply.github.com"
+          git add sitemap.xml
+          git commit -m "Update sitemap.xml (automated)"
+          git push
