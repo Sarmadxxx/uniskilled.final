@@ -9,12 +9,10 @@
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="description" id="metaDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
-<link rel="canonical" id="canonicalLink" href="https://uniskilled.com/find-tutors.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
 <meta property="og:title" id="ogTitle" content="Tutor Profile — UniSkilled">
 <meta property="og:description" id="ogDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
-<meta property="og:url" id="ogUrl" content="https://uniskilled.com/find-tutors.html">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:image:width" content="1200">
@@ -198,7 +196,7 @@ body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!importan
       </div>
       <div class="identity-info">
         <div class="identity-name-row">
-          <div class="profile-name" id="profileName">Loading...</div>
+          <h1 class="profile-name" id="profileName">Loading...</h1>
           <div class="verified-badge" id="verifiedBadge" style="display:none;">✓ Verified Tutor</div>
         </div>
         <a id="verifyNudge" href="tutor-dashboard.html#verify" style="display:none;margin-top:0.35rem;font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;" class="hit">Get your Verified badge — verify your university email →</a>
@@ -689,6 +687,9 @@ function applyTutorSeo(fullName, p, tp, subjects) {
   const url = 'https://uniskilled.com/tutor-profile.html?id=' + encodeURIComponent(tutorId);
   document.title = title;
   const set = (id, attr, v) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, v); };
+  // Canonical + og:url are only added once the tutor is known, so the static HTML never points every profile at another page
+  if (!document.getElementById('canonicalLink')) { const l = document.createElement('link'); l.rel = 'canonical'; l.id = 'canonicalLink'; document.head.appendChild(l); }
+  if (!document.getElementById('ogUrl')) { const m = document.createElement('meta'); m.setAttribute('property', 'og:url'); m.id = 'ogUrl'; document.head.appendChild(m); }
   set('metaDesc', 'content', desc.slice(0, 300)); set('ogDesc', 'content', desc.slice(0, 300));
   set('ogTitle', 'content', title); set('ogUrl', 'content', url); set('canonicalLink', 'href', url);
   const ld = { '@context': 'https://schema.org', '@type': 'Person', name: fullName, url: url,
@@ -746,7 +747,7 @@ async function loadProfile() {
 
   // Cover
   if (tp?.cover_url) {
-    document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(tp.cover_url)}" style="width:100%;height:100%;object-fit:cover;">`;
+    document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(tp.cover_url)}" alt="Cover photo" style="width:100%;height:100%;object-fit:cover;">`;
   }
 
   // Header
@@ -958,7 +959,7 @@ async function submitReview() {
 // AVATAR & COVER UPLOAD
 async function uploadAvatar() {
   const file = this.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${__safeUrl(e.target.result)}">`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${__safeUrl(e.target.result)}" alt="Preview">`; }; r.readAsDataURL(file);
 
   const fd = new FormData();
   fd.append('user_id', currentUserId);
@@ -979,7 +980,7 @@ async function uploadAvatar() {
 
 async function uploadCover() {
   const file = this.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(e.target.result)}" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(e.target.result)}" alt="Preview" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
 
   const fd = new FormData();
   fd.append('user_id', currentUserId);
