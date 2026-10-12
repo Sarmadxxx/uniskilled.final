@@ -201,22 +201,39 @@ Deno.serve(async (req: Request) => {
       .lte('completed_at', cutoff);
     if (sessErr) throw new Error(`Failed to query sessions: ${sessErr.message}`);
 
-    const sessionIds = (sessions || []).map(s => s.id);
+    // Late student cancellations (no refund under the policy) are paid to the tutor as if the
+    // session took place, after the same 48-hour hold — counted from the cancellation.
+    const { data: lateCancelled, error: lcErr } = await supabase
+      .from('sessions')
+      .select('id, tutor_id, student_id, subject, completed_at, status, payment_status')
+      .eq('status', 'cancelled')
+      .eq('cancelled_by', 'student')
+      .eq('refund_outcome', 'no_refund')
+      .eq('payment_status', 'paid')
+      .lte('cancelled_at', cutoff);
+    if (lcErr) throw new Error(`Failed to query late-cancelled sessions: ${lcErr.message}`);
+    const lateCancelledIds = new Set<string>((lateCancelled || []).map(s => s.id));
+    const oneToOne = [...(sessions || []), ...(lateCancelled || [])];
+
+    const sessionIds = oneToOne.map(s => s.id);
     const disputed = new Set<string>();
     if (sessionIds.length > 0) {
       const { data: openDisputes } = await supabase.from('disputes').select('session_id').in('session_id', sessionIds).in('status', ['open', 'under_review']);
       for (const d of openDisputes || []) disputed.add(d.session_id);
     }
 
-    for (const session of sessions || []) {
+    for (const session of oneToOne) {
       if (disputed.has(session.id)) {
         results.push({ session_id: session.id, skipped: true, reason: 'open dispute — payout paused' });
         continue;
       }
-      try {
-        await qualifyReferralsForSession(supabase, supabaseUrl, session);
-      } catch (refErr) {
-        console.error(`Referral qualification error for session ${session.id}:`, String(refErr));
+      // A referral only qualifies when a session actually took place, not on a late cancellation.
+      if (!lateCancelledIds.has(session.id)) {
+        try {
+          await qualifyReferralsForSession(supabase, supabaseUrl, session);
+        } catch (refErr) {
+          console.error(`Referral qualification error for session ${session.id}:`, String(refErr));
+        }
       }
       const { data: payment, error: payErr } = await supabase
         .from('payments')
