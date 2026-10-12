@@ -238,7 +238,7 @@ body{background:#f4f6f9;color:#0f172a}
             <span id="btnText">Send request</span>
             <div class="spinner" id="spinner"></div>
           </button>
-          <div class="no-charge"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 16v-4M12 8h.01"/></svg><span><strong>You won't be charged yet.</strong> This sends a request to the tutor. If they accept, you'll have 24 hours to pay and lock in the session.</span></div>
+          <div class="no-charge"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 16v-4M12 8h.01"/></svg><span><strong>You won't be charged yet.</strong> This sends a request to the tutor. If they accept, you'll have up to 24 hours to pay and lock in the session (or until 1 hour before it starts, if that's sooner).</span></div>
           <p class="terms">By requesting a session you agree to our <a href="legal.html" target="_blank">Terms of Service</a> and <a href="legal.html#refund" target="_blank">Refund Policy</a>.</p>
         </div>
       </div>
@@ -437,7 +437,7 @@ async function submitBooking(){
   if(!time){showAlert('Please select a time.','error');return;}
 
   const sessionDate=new Date(date+'T'+time);
-  if(sessionDate<new Date()){showAlert('Please select a future date and time.','error');return;}
+  if(sessionDate<new Date(Date.now()+2*60*60*1000)){showAlert('Please choose a time at least 2 hours from now.','error');return;}
 
   if (checkBlockedSlot()) {
     showAlert('This tutor is not available at the selected date/time. Please choose a different slot.','error');
@@ -496,7 +496,7 @@ async function submitBooking(){
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);
-  showAlert('✅ Request sent! We\'ll notify you the moment '+tutorName+' responds. If they accept, you\'ll have 24 hours to pay and lock in the session.','success');
+  showAlert('✅ Request sent! We\'ll notify you the moment '+tutorName+' responds. If they accept, you\'ll have up to 24 hours to pay and lock in the session (or until 1 hour before it starts, if that\'s sooner).','success');
   document.getElementById('submitBtn').style.display='none';
   setTimeout(()=>window.location.href='student-dashboard.html',3500);
 }

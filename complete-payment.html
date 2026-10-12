@@ -90,6 +90,11 @@ renderSimpleNav();</script>
       <span><strong>Payment protected.</strong> Held safely for 48 hours after your session — full refund guaranteed if something goes wrong.</span>
     </div>
 
+    <div id="lateBookingNote" style="display:none;align-items:flex-start;gap:8px;font-size:0.78rem;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:8px;padding:0.7rem 0.9rem;margin-bottom:1rem;line-height:1.4;">
+      <span>⚠️</span>
+      <span><strong>This session starts in less than 24 hours.</strong> After you pay, you can cancel for a full refund only within the first 30 minutes. After that, cancelling won't be refunded, and the tutor is paid for the time they reserved for you.</span>
+    </div>
+
     <div class="error-box" id="errorBox"></div>
 
     <!-- Card (Stripe) is the default. The PayPal toggle only appears when the server reports
@@ -116,7 +121,7 @@ renderSimpleNav();</script>
     <div class="status-box">
       <div class="status-icon">⏰</div>
       <div class="status-title">Payment window expired</div>
-      <div class="status-sub">Your 24-hour window to complete payment has passed, so this booking was released.</div>
+      <div class="status-sub">The window to complete payment has passed, so this booking was released.</div>
       <a href="find-tutors.html" class="btn-link">Find a Tutor →</a>
     </div>
   </div>
@@ -338,6 +343,10 @@ async function init() {
     price = s.price;
     currency = s.currency || 'EUR';
     paymentDueAt = s.payment_due_at;
+    // Short-notice booking: the 24-hour full-refund window has already closed.
+    if (s.starts_at && new Date(s.starts_at).getTime() - Date.now() < 24 * 60 * 60 * 1000) {
+      document.getElementById('lateBookingNote').style.display = 'flex';
+    }
   }
 
   const currSym = currency === 'USD' ? '$' : '€';

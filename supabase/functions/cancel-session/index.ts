@@ -157,8 +157,13 @@ Deno.serve(async (req: Request) => {
       // Set by reschedule-session when the student moved a session that was already less than
       // 24 h away: the new, later date doesn't reopen the full-refund window.
       const lateRescheduled = !!session.late_reschedule_at;
+      // Set by reschedule-session when the TUTOR moved this session: the student didn't choose the
+      // new time, so they can always cancel it for a full refund.
+      const tutorMoved = !!session.tutor_rescheduled_at;
 
       if (paidMinutesAgo <= GRACE_PERIOD_MINUTES) {
+        outcome = 'full_refund';
+      } else if (tutorMoved) {
         outcome = 'full_refund';
       } else if (hoursUntilSession >= CUTOFF_HOURS_BEFORE_SESSION && !lateRescheduled) {
         outcome = 'full_refund';
@@ -198,6 +203,10 @@ Deno.serve(async (req: Request) => {
       cancellation_reason: reason || null,
       refund_outcome: outcome,
     }).eq('id', session_id);
+
+    // A cancelled session can't be rescheduled: close any request still waiting for a reply.
+    await supabase.from('reschedule_requests').update({ status: 'cancelled', responded_at: new Date().toISOString() })
+      .eq('session_id', session_id).eq('status', 'pending');
 
     const otherPartyId = isTutor ? session.student_id : session.tutor_id;
     const cancellerName = isTutor ? session.tutor_name : session.student_name;

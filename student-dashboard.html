@@ -248,6 +248,7 @@ main.main .subject-tag{background:#f4f6f9;color:#334155;border:1px solid #e3e8ef
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="reschedule.js"></script>
 <script src="analytics.js" defer></script>
 </head>
 <body>
@@ -484,6 +485,9 @@ async function init() {
   const allSessions = sessions || [];
   document.getElementById('statSessions').textContent = allSessions.length;
 
+  // Open reschedule requests for the sessions shown (accept / decline / withdraw).
+  const __rr = await UsResched.loadPending(allSessions.slice(0, 5).filter(s => s.status === 'confirmed').map(s => s.id));
+
   if (allSessions.length > 0) {
     document.getElementById('sessionsBody').innerHTML = allSessions.slice(0, 5).map(s => {
       const initials = (s.tutor_name || 'T').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
@@ -502,7 +506,8 @@ async function init() {
       if (s.status === 'confirmed') {
         actionBtn = `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.tutor_name||'Tutor')}')">Join session</button>
         <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>
-        <button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">Report issue</button>`;
+        <button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">Report issue</button>
+        ${UsResched.rowHtml(s, __rr[s.id], user.id)}`;
       } else if (s.status === 'completed' && (!s.completed_at || Date.now() - new Date(s.completed_at).getTime() <= 48 * 3600 * 1000)) {
         // Issues can be reported until 48h after the session ended (same window open-dispute enforces)
         actionBtn = `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;" onclick="openReportModal('${s.id}')">Report issue</button>`;
@@ -748,16 +753,18 @@ async function confirmCancel(confirmNoRefund) {
 
   if (data.success) {
     document.getElementById('cancelModalBody').innerHTML = data.refunded
-      ? '✅ Cancelled. A full refund has been issued to your PayPal account.'
+      ? '✅ Cancelled. A full refund has been issued to your original payment method.'
       : 'Session cancelled.';
     document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal(); location.reload();" style="background:#1a6bff;color:#fff;border:none;padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Done</button>`;
   }
 }
 
+// "Reschedule instead" opens the shared reschedule request dialog (reschedule.js):
+// the new time only applies once the tutor accepts it.
 function showRescheduleForm() {
-  document.getElementById('cancelModalBody').innerHTML = 'Pick a new date and time for this session — no new payment needed.';
-  document.getElementById('rescheduleForm').style.display = 'flex';
-  document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal()" style="background:none;border:none;color:var(--mid);padding:0.2rem;font-family:'Manrope',sans-serif;font-size:0.82rem;cursor:pointer;text-decoration:underline;">Cancel</button>`;
+  const sessionId = cancelTargetSessionId;
+  closeCancelModal();
+  UsResched.open(sessionId);
 }
 
 async function submitReschedule() {

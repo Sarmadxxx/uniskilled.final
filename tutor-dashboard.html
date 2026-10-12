@@ -228,6 +228,7 @@ a.profile-av{text-decoration:none;}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="reschedule.js"></script>
 <script src="university-verify.js"></script>
 <script src="analytics.js" defer></script>
 </head>
@@ -849,12 +850,22 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
   }
   window.usTrack&&usTrack('booking_responded', { decision: newStatus === 'awaiting_payment' ? 'accepted' : 'declined' });
 
+  // The database ends the payment window 1 hour before the session if that's sooner than 24 hours.
+  let payWindowText = '24 hours';
+  if (newStatus === 'awaiting_payment') {
+    try {
+      const { data: dueRow } = await _sb.from('sessions').select('payment_due_at').eq('id', sessionId).maybeSingle();
+      const mins = dueRow?.payment_due_at ? Math.floor((new Date(dueRow.payment_due_at).getTime() - Date.now()) / 60000) : null;
+      if (mins !== null && mins > 0) payWindowText = mins >= 90 ? Math.round(mins / 60) + ' hours' : mins + ' minutes';
+    } catch (e) { /* keep the default wording */ }
+  }
+
   await _sb.from('notifications').insert({
     user_id: studentId,
     type: newStatus === 'awaiting_payment' ? 'awaiting_payment' : 'booking_declined',
     title: newStatus === 'awaiting_payment' ? '🎉 Your tutor accepted!' : '❌ Session declined',
     body: newStatus === 'awaiting_payment'
-      ? tutorName + ' accepted your ' + subject + ' request. Complete payment within 24 hours to lock it in.'
+      ? tutorName + ' accepted your ' + subject + ' request. Complete payment within ' + payWindowText + ' to lock it in.'
       : 'Your ' + subject + ' session request was declined.',
     link: newStatus === 'awaiting_payment' ? ('complete-payment.html?session=' + sessionId) : 'student-dashboard.html',
     read: false
@@ -1048,7 +1059,10 @@ async function loadSessions() {
 
   document.getElementById('statSessions').textContent = sessions.length;
   // Tutor's own share of completed sessions (price minus the platform fee, read from platform settings)
-  const gross = sessions.filter(s => s.status === 'completed').reduce((a, s) => a + (Number(s.price) || 0), 0);
+  // Late student cancellations are paid to the tutor too (no refund under the policy).
+  const isEarning = s => s.status === 'completed'
+    || (s.status === 'cancelled' && s.cancelled_by === 'student' && s.refund_outcome === 'no_refund' && s.payment_status === 'paid');
+  const gross = sessions.filter(isEarning).reduce((a, s) => a + (Number(s.price) || 0), 0);
   let feeRate = 0.20;
   try {
     const { data: feeRow } = await _sb.from('platform_settings').select('value').eq('key', 'platform_fee_rate').maybeSingle();
@@ -1079,6 +1093,10 @@ async function loadSessions() {
   } else {
     awaitingCard.style.display = 'none';
   }
+
+  // Open reschedule requests for upcoming sessions (accept / decline / withdraw).
+  const __rr = await UsResched.loadPending(upcoming.map(s => s.id));
+  UsResched.onChange = () => loadAll();
 
   const sessionHtml = s => {
     const ini = (s.student_name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
@@ -1111,7 +1129,7 @@ async function loadSessions() {
         <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')}</div>
       </div>
       <span class="badge ${__esc(badgeClass)}">${__esc(badgeLabel)}</span>
-      ${joinBtn}${cancelBtn}${reportBtn}
+      ${joinBtn}${cancelBtn}${reportBtn}${UsResched.rowHtml(s, __rr[s.id], userId)}
     </div>`;
   };
 

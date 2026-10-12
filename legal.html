@@ -147,7 +147,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
 
   <!-- ── 2. TERMS OF SERVICE ── -->
   <div class="legal-section" id="terms">
-    <div class="section-label">Last updated: 11 July 2026</div>
+    <div class="section-label">Last updated: 12 October 2026</div>
     <h2>Terms of Service</h2>
 
     <h3>1. About UniSkilled</h3>
@@ -182,6 +182,14 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
       <li>Students must not attempt to circumvent the platform to arrange unpaid sessions with Tutors they found on UniSkilled</li>
     </ul>
 
+    <h3>5a. Bookings, Payment and Rescheduling</h3>
+    <ul>
+      <li>A booking is a request until the tutor accepts it. Bookings must start at least 2 hours after the request is made.</li>
+      <li>After the tutor accepts, the student pays through UniSkilled's checkout within the payment window described in the Payment Terms. The session is confirmed only once payment is received.</li>
+      <li>Either party can propose a new time for a confirmed session; the session only moves if the other party accepts. Limits and refund effects are set out in the Refund &amp; Cancellation Policy.</li>
+      <li>Cancellations, refunds and tutor payouts follow the Refund &amp; Cancellation Policy and Payment Terms below, which form part of these Terms.</li>
+    </ul>
+
     <h3>6. Platform Rules</h3>
     <p>The following are strictly prohibited on UniSkilled:</p>
     <ul>
@@ -211,7 +219,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
 
   <!-- ── 3. PRIVACY POLICY ── -->
   <div class="legal-section" id="privacy">
-    <div class="section-label">GDPR — Regulation (EU) 2016/679</div>
+    <div class="section-label">GDPR — Regulation (EU) 2016/679 · Last updated: 12 October 2026</div>
     <h2>Privacy Policy (Datenschutzerklärung)</h2>
 
     <div class="callout callout-blue">
@@ -226,11 +234,16 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     <div class="table-scroll"><table class="data-table">
       <thead><tr><th>Category</th><th>Examples</th><th>Legal Basis (GDPR Art. 6)</th></tr></thead>
       <tbody>
-        <tr><td>Account data</td><td>Name, email address, password (hashed), role (tutor/student)</td><td>Art. 6(1)(b) — contract performance</td></tr>
-        <tr><td>Profile data</td><td>University, degree, subjects, bio, photo, availability, hourly rate</td><td>Art. 6(1)(b) — contract performance</td></tr>
-        <tr><td>Transaction data</td><td>Booking history, session status, payment records</td><td>Art. 6(1)(b) — contract; Art. 6(1)(c) — legal obligation</td></tr>
-        <tr><td>Communication data</td><td>Messages sent via platform, notifications</td><td>Art. 6(1)(b) — contract performance</td></tr>
-        <tr><td>Technical data</td><td>IP address, browser type, session timestamps</td><td>Art. 6(1)(f) — legitimate interest (security, fraud prevention)</td></tr>
+        <tr><td>Account data</td><td>Name, email address, password (stored only as a secure hash), role (tutor/student), time zone</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>Profile data</td><td>University, degree, subjects, bio, photo, availability, hourly rate, certificates you choose to upload</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>University verification (tutors)</td><td>University email address and whether it was verified; one-time codes are stored only in hashed form</td><td>Art. 6(1)(b) — contract; Art. 6(1)(f) — legitimate interest (trust and safety)</td></tr>
+        <tr><td>Booking &amp; scheduling data</td><td>Booking requests, session times, reschedule requests and responses, cancellations and their refund outcome, payment deadlines</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>Payment &amp; payout data</td><td>Amounts, currency, payment and payout status, refunds, discounts and account credit, Stripe reference numbers. Card details are entered on Stripe's checkout and never reach UniSkilled. Tutors give their identity and bank details for payouts directly to Stripe.</td><td>Art. 6(1)(b) — contract; Art. 6(1)(c) — legal obligation (tax and accounting)</td></tr>
+        <tr><td>Communication data</td><td>Messages sent via the platform, attachments, notifications and emails we send you</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>Reports &amp; disputes</td><td>Issues you report about a session, our review notes and the outcome</td><td>Art. 6(1)(b) — contract; Art. 6(1)(f) — legitimate interest (resolving disputes)</td></tr>
+        <tr><td>Referral data</td><td>Who referred whom, referral rewards and credit balance</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>Technical data</td><td>IP address, browser type, session timestamps, error logs</td><td>Art. 6(1)(f) — legitimate interest (security, fraud prevention)</td></tr>
+        <tr><td>Usage analytics</td><td>Pages visited, clicks and booking steps; with your consent also session recordings (all form inputs are masked, and chats and admin pages are never recorded)</td><td>Art. 6(1)(a) — consent (see Cookie Policy); without consent only anonymous, cookieless counts — Art. 6(1)(f)</td></tr>
         <tr><td>Reviews &amp; ratings</td><td>Written reviews, star ratings</td><td>Art. 6(1)(b) — contract performance</td></tr>
       </tbody>
     </table></div>
@@ -238,12 +251,26 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     <h3>3. How We Use Your Data</h3>
     <ul>
       <li>To create and manage your account</li>
-      <li>To match students with tutors and facilitate bookings</li>
-      <li>To send transactional emails (booking confirmations, notifications)</li>
+      <li>To match students with tutors and facilitate bookings, payments, rescheduling and cancellations</li>
+      <li>To send transactional emails and notifications (booking requests, payment reminders, reschedule requests, confirmations, refunds)</li>
       <li>To display tutor profiles publicly on the platform</li>
-      <li>To process payments and maintain financial records</li>
-      <li>To detect, prevent, and investigate fraud and abuse</li>
+      <li>To process payments, refunds and tutor payouts, and maintain financial records</li>
+      <li>To detect, prevent, and investigate fraud and abuse, including payments arranged outside the platform</li>
+      <li>To understand how the platform is used and fix problems (analytics, only with your consent beyond anonymous counts)</li>
       <li>To comply with legal obligations (e.g. tax, regulatory)</li>
+    </ul>
+
+    <h3>3a. What Others Can See</h3>
+    <ul>
+      <li><strong>Tutor profiles</strong> — name, photo, university, subjects, rate, reviews, track record and any certificates the tutor uploads — are public.</li>
+      <li><strong>Student profiles are private.</strong> A tutor only sees a student's name and what the student writes in booking requests and messages.</li>
+      <li>Email addresses, phone numbers, payout details and payment references are never shown to other users.</li>
+    </ul>
+
+    <h3>3b. Automated Checks and Decisions</h3>
+    <ul>
+      <li><strong>Message screening:</strong> messages are automatically checked for phone numbers, email addresses and social media handles before they are sent, so that payments are not moved outside the platform (where buyers lose refund protection). A message containing them is not sent and not stored, and you are shown why. This is based on our legitimate interest and the Non-Circumvention Policy; no person reads your messages as part of this check.</li>
+      <li><strong>Refunds and payouts</strong> are decided automatically by the published Refund &amp; Cancellation Policy (for example, how far before the session a cancellation is made). If you disagree with an automatic outcome, contact <a href="mailto:info@uniskilled.com">info@uniskilled.com</a> or use "Report an Issue" and a person will review it (Art. 22(3) GDPR).</li>
     </ul>
 
     <h3>4. Third-Party Processors</h3>
@@ -251,20 +278,25 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     <div class="table-scroll"><table class="data-table">
       <thead><tr><th>Provider</th><th>Purpose</th><th>Location</th></tr></thead>
       <tbody>
-        <tr><td>Supabase (via AWS eu-north-1)</td><td>Database, authentication, file storage</td><td>EU (Stockholm)</td></tr>
-        <tr><td>Stripe (Stripe Payments Europe Ltd., Ireland)</td><td>Card payments, tutor payouts (Stripe Connect), fraud prevention; Klarna where offered at checkout</td><td>EU / USA (SCCs)</td></tr>
+        <tr><td>Supabase (via AWS eu-north-1)</td><td>Database, authentication, file storage, server functions</td><td>EU (Stockholm)</td></tr>
+        <tr><td>Stripe (Stripe Payments Europe Ltd., Ireland)</td><td>Card payments, refunds, tutor payouts and identity checks (Stripe Connect), fraud prevention</td><td>EU / USA (SCCs)</td></tr>
+        <tr><td>Klarna</td><td>Pay-later option, only if you choose Klarna at checkout (Klarna processes your data as its own controller)</td><td>EU (Sweden)</td></tr>
         <tr><td>Resend</td><td>Transactional email delivery</td><td>EU (based on sending region)</td></tr>
+        <tr><td>PostHog (EU Cloud)</td><td>Product analytics and session recordings — only with your consent, beyond anonymous counts</td><td>EU (Frankfurt)</td></tr>
+        <tr><td>jsDelivr</td><td>Delivers website code libraries (receives your IP address to serve the files)</td><td>Global CDN</td></tr>
         <tr><td>GitHub Pages</td><td>Static website hosting</td><td>Global CDN</td></tr>
         <tr><td>Zoom / Google Meet</td><td>Video call sessions (link only — not controlled by UniSkilled)</td><td>Global (user's own account)</td></tr>
       </tbody>
     </table></div>
-    <p>All EU-based processors operate under Data Processing Agreements (DPAs) compliant with GDPR Article 28. For transfers outside the EU/EEA, Standard Contractual Clauses (SCCs) are in place.</p>
+    <p>All EU-based processors operate under Data Processing Agreements (DPAs) compliant with GDPR Article 28. For transfers outside the EU/EEA, Standard Contractual Clauses (SCCs) are in place. Website fonts are hosted by UniSkilled itself, so no font provider receives your data.</p>
 
     <h3>5. Data Retention</h3>
     <ul>
       <li><strong>Account data:</strong> Retained for the duration of your account, plus 3 years after closure for legal purposes</li>
-      <li><strong>Financial records:</strong> 10 years (German tax law — § 147 AO)</li>
+      <li><strong>Financial records</strong> (payments, refunds, payouts and the bookings they belong to, including cancellations and reschedules): 10 years (German tax law — § 147 AO). After you close your account these are kept in anonymised or restricted form only.</li>
       <li><strong>Messages:</strong> 12 months after the last message, then deleted</li>
+      <li><strong>Reports &amp; disputes:</strong> 3 years after resolution</li>
+      <li><strong>Analytics:</strong> event data up to 12 months; session recordings up to 30 days</li>
       <li><strong>Technical logs:</strong> 90 days</li>
     </ul>
 
@@ -276,7 +308,8 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
       <li><strong>Right to restriction (Art. 18):</strong> Limit how we process your data</li>
       <li><strong>Right to portability (Art. 20):</strong> Receive your data in a machine-readable format</li>
       <li><strong>Right to object (Art. 21):</strong> Object to processing based on legitimate interest</li>
-      <li><strong>Right to withdraw consent:</strong> Where processing is consent-based, withdraw at any time</li>
+      <li><strong>Right to withdraw consent:</strong> Where processing is consent-based (analytics), withdraw at any time — see the Cookie Policy</li>
+      <li><strong>Automated decisions (Art. 22):</strong> Ask for a person to review an automatic refund or payout outcome</li>
     </ul>
     <p>To exercise any right, contact <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>. We will respond within 30 days. You also have the right to lodge a complaint with your national data protection authority. In Germany: <a href="https://www.bfdi.bund.de" target="_blank">Bundesbeauftragte für den Datenschutz und die Informationsfreiheit (BfDI)</a>.</p>
 
@@ -296,12 +329,15 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
       <tbody>
         <tr><td>Supabase auth token</td><td>Essential</td><td>Keeps you logged in — required for the platform to function</td><td>Session / 7 days (if "Keep me signed in")</td><td>No — strictly necessary</td></tr>
         <tr><td>localStorage (session data)</td><td>Essential</td><td>Stores authentication state in the browser</td><td>Session</td><td>No — strictly necessary</td></tr>
+        <tr><td>us_analytics_consent (localStorage)</td><td>Essential</td><td>Remembers whether you accepted or declined analytics</td><td>Until you clear it</td><td>No — strictly necessary</td></tr>
+        <tr><td>PostHog (cookie + localStorage, <code>ph_…</code>)</td><td>Analytics</td><td>Measures how pages and the booking flow are used, and records sessions (inputs masked) to find bugs</td><td>Up to 1 year</td><td><strong>Yes</strong> — only after you click "Accept"</td></tr>
       </tbody>
     </table></div>
 
     <div class="callout callout-green">
-      <strong>Good news</strong>
-      UniSkilled currently does not use advertising cookies, marketing trackers, or analytics tools (such as Google Analytics). This minimises your compliance burden significantly.
+      <strong>Your choice</strong>
+      UniSkilled does not use advertising or marketing cookies. Analytics cookies (PostHog, EU-hosted) are only set if you accept them in the banner. Until you choose, we only count anonymous page views in memory, without storing anything on your device. If you decline, the analytics tool is not loaded at all.
+      <div style="margin-top:0.7rem;"><button type="button" onclick="usResetAnalyticsChoice()" style="background:#fff;color:#047857;border:1.5px solid #6ee7b7;border-radius:8px;padding:0.45rem 0.9rem;font:600 0.85rem 'Manrope',sans-serif;cursor:pointer;">Change my analytics choice</button></div>
     </div>
 
     <p>You can manage or delete cookies through your browser settings at any time. Note that disabling essential cookies will prevent you from using the platform. Instructions for common browsers:</p>
@@ -313,6 +349,28 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
   </div>
 
   <!-- ── 5. REFUND & CANCELLATION ── -->
+  <script>
+// Withdraw or change analytics consent: forget the choice, stop PostHog and remove its storage,
+// then reload so the consent banner appears again.
+function usResetAnalyticsChoice() {
+  try { if (window.posthog && window.posthog.opt_out_capturing) window.posthog.opt_out_capturing(); } catch (e) {}
+  try {
+    localStorage.removeItem('us_analytics_consent');
+    Object.keys(localStorage).forEach(function (k) { if (/^ph_|posthog/i.test(k)) localStorage.removeItem(k); });
+  } catch (e) {}
+  try {
+    document.cookie.split(';').forEach(function (c) {
+      var name = c.split('=')[0].trim();
+      if (/^ph_|posthog/i.test(name)) {
+        document.cookie = name + '=; Max-Age=0; path=/';
+        document.cookie = name + '=; Max-Age=0; path=/; domain=.' + location.hostname.replace(/^www\./, '');
+      }
+    });
+  } catch (e) {}
+  location.reload();
+}
+</script>
+
   <div class="legal-section" id="refund">
     <div class="section-label">Consumer Rights Directive 2011/83/EU</div>
     <h2>Refund &amp; Cancellation Policy</h2>
@@ -326,7 +384,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     <ul>
       <li><strong>Within 30 minutes of paying:</strong> 100% refund, regardless of how soon the session is — this covers accidental bookings or an immediate change of mind.</li>
       <li><strong>More than 24 hours before the session:</strong> 100% refund.</li>
-      <li><strong>Less than 24 hours before the session (outside the 30-minute window above):</strong> No refund, but the student can reschedule the session to a new date/time at no extra cost instead of losing the payment.</li>
+      <li><strong>Less than 24 hours before the session (outside the 30-minute window above):</strong> No refund, but the student can propose a new date/time at no extra cost instead of losing the payment (see "Rescheduling" below).</li>
       <li><strong>No-show, without cancelling:</strong> No refund.</li>
       <li><strong>Student did not enjoy the lesson:</strong> No refund. See "Dissatisfaction with a Session" below.</li>
     </ul>
@@ -338,10 +396,19 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
       <li>Repeated last-minute cancellations or no-shows by tutors may result in account suspension.</li>
     </ul>
 
+    <h3>Rescheduling</h3>
+    <ul>
+      <li>Either the student or the tutor can propose a new date/time for a confirmed, paid session. The session only moves if the other person accepts; if they decline or don't answer before the session starts, it stays at its original time.</li>
+      <li>A session can be moved up to <strong>2 times</strong>, to a date within <strong>30 days</strong> of its original date, and at least <strong>2 hours</strong> ahead. New times can't be proposed in the last 2 hours before a session.</li>
+      <li>If the student proposes a new time when the session is less than 24 hours away, the session stays non-refundable after it is moved.</li>
+      <li>If the tutor moves a session, the student can cancel it at any time afterwards for a full refund.</li>
+    </ul>
+
     <h3>Tutor Payout Eligibility</h3>
     <ul>
       <li>After a session is marked complete, payment is held for <strong>48 hours</strong> before being released to the tutor.</li>
-      <li>If the session is cancelled before that release (by either party, under the terms above), no payout occurs and any refund due is issued automatically.</li>
+      <li>If the tutor cancels, or the student cancels in time for a refund, no payout occurs and the refund is issued automatically.</li>
+      <li>If the student cancels late (no refund under the terms above), the tutor is paid for the reserved time, after the same 48-hour hold counted from the cancellation.</li>
     </ul>
 
     <h3>Refund Process</h3>
@@ -379,11 +446,11 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     </ul>
 
     <h3>Session Fees</h3>
-    <p>UniSkilled enforces a minimum booking value of <strong>€15</strong> (or the equivalent in the tutor's listed currency) per session. Tutors set their own hourly rate, and the final price is calculated from the rate and the session duration the student selects; a booking cannot be confirmed below this minimum. For group sessions, the minimum is €10 (or the equivalent) per student.</p>
+    <p>UniSkilled enforces a minimum booking value of <strong>€15</strong> per session (<strong>$17</strong> for sessions priced in US dollars). Tutors set their own hourly rate, and the final price is calculated from the rate and the session duration the student selects; a booking cannot be confirmed below this minimum. For group sessions, the minimum is €10 per student ($11 in US dollars).</p>
     <p>Tutors set their own hourly rates, displayed in their chosen currency on their profile. The price shown when booking is the total the student pays — UniSkilled does not add a booking or service fee for students. UniSkilled's platform fee is taken from the tutor's side (see "Platform Fee" below).</p>
 
     <h3>Payment Methods</h3>
-    <p>All sessions booked on UniSkilled are paid through UniSkilled's checkout (card via Stripe; other methods may be offered at checkout). Students pay only after the tutor has accepted the booking request, and must complete payment within 24 hours of acceptance or the booking expires and the slot is released. UniSkilled holds the payment until the session is complete and the 48-hour hold has passed, then releases the tutor's payout.</p>
+    <p>All sessions booked on UniSkilled are paid through UniSkilled's checkout (card via Stripe; other methods may be offered at checkout). Bookings must start at least 2 hours after the request is made. Students pay only after the tutor has accepted the booking request, and must complete payment within 24 hours of acceptance (or by 1 hour before the session, if that is sooner) or the booking expires and the slot is released. UniSkilled holds the payment until the session is complete and the 48-hour hold has passed, then releases the tutor's payout.</p>
     <p>Tutors and students must not arrange or accept payment for sessions booked through UniSkilled by any other means (such as bank transfer, cash, cryptocurrency, or a direct PayPal payment between users). Payments made outside UniSkilled are not covered by the 48-hour hold, dispute resolution, or refund protections, and may breach the Non-Circumvention Policy.</p>
 
     <h3>Invoicing &amp; VAT</h3>
@@ -393,7 +460,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
     <p>Tutors price their sessions in euros (EUR) or US dollars (USD). The currency shown on the tutor's profile is the currency the student is charged in. Any currency conversion by the student's bank or card issuer, and its cost, is the student's responsibility.</p>
 
     <h3>Unpaid Bookings</h3>
-    <p>A session is only confirmed once payment has been received. If a student does not pay within 24 hours of the tutor accepting, the booking expires automatically and both sides are notified. Repeatedly letting accepted bookings expire may result in account restrictions.</p>
+    <p>A session is only confirmed once payment has been received. If a student does not pay within this payment window, the booking expires automatically and both sides are notified. Repeatedly letting accepted bookings expire may result in account restrictions.</p>
 
     <h3>Platform Fee</h3>
     <p>UniSkilled charges a platform fee of <strong>20%</strong> of each one-to-one session's price, deducted from the tutor's payout; the tutor receives the remaining 80%. For group sessions, the platform fee is <strong>25%</strong> of each student's payment, and the tutor receives the remaining 75%. Students are not charged a separate fee. If UniSkilled changes the fee, users will be notified at least 14 days in advance, and the change will apply only to bookings made after it takes effect.</p>
