@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<meta name="robots" content="noindex, nofollow">
+<title>Complete Payment — UniSkilled</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--ink:#111827;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#fff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;--amber:#92400e;--amber-bg:#fffbeb;}
+body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;}
+nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
+.logo-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;}
+.page{max-width:520px;margin:2rem auto;padding:0 5%;}
+.card{background:var(--white);border-radius:16px;border:1px solid var(--border);padding:2rem;margin-bottom:1.2rem;}
+.session-info{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.session-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.3rem;font-weight:800;flex-shrink:0;}
+.countdown-box{background:var(--amber-bg);border:1.5px solid #fcd34d;border-radius:10px;padding:1rem 1.2rem;margin-bottom:1.5rem;text-align:center;}
+.countdown-label{font-size:0.75rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.3rem;}
+.countdown-time{font-size:1.4rem;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums;}
+.price-breakdown{background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:0.9rem 1rem;margin-bottom:1.5rem;font-size:0.85rem;}
+.price-row{display:flex;justify-content:space-between;margin-bottom:0.3rem;color:#374151;}
+.price-row.total{font-weight:800;font-size:1.05rem;color:#111827;border-top:1px solid #bae6fd;padding-top:0.5rem;margin-top:0.3rem;}
+#paypal-button-container{min-height:45px;}
+.status-box{text-align:center;padding:2rem 1rem;}
+.status-icon{font-size:2.5rem;margin-bottom:0.8rem;}
+.status-title{font-size:1.15rem;font-weight:800;margin-bottom:0.4rem;}
+.status-sub{font-size:0.85rem;color:var(--mid);margin-bottom:1.2rem;}
+.btn-link{display:inline-block;background:var(--blue);color:#fff;padding:0.75rem 1.5rem;border-radius:9px;text-decoration:none;font-weight:700;font-size:0.88rem;}
+.spinner-lg{width:32px;height:32px;border:3px solid rgba(26,107,255,0.2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1rem;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-box{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;border-radius:9px;padding:0.9rem 1rem;font-size:0.85rem;margin-bottom:1rem;display:none;}
+</style>
+<link rel="stylesheet" href="site.css">
+<script src="analytics.js" defer></script>
+</head>
+<body>
+<nav>
+  <div id="nav-root"></div>
+</nav>
+<script src="nav.js"></script>
+<script>
+// ── XSS protection (security review Oct 2026) ──
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
+function __viewerTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Berlin';}catch(e){return 'Europe/Berlin';}}
+function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').pop().replace(/_/g,' ')+' time)':'';}
+var __sessTz = null;
+renderSimpleNav();</script>
+<div class="page">
+  <div class="card" id="loadingCard">
+    <div class="status-box">
+      <div class="spinner-lg"></div>
+      <div class="status-sub">Loading your booking…</div>
+    </div>
+  </div>
+
+  <div class="card" id="paymentCard" style="display:none;">
+    <div class="session-info">
+      <div class="session-av" id="tutorAv">?</div>
+      <div>
+        <div style="font-weight:800;font-size:1.1rem;" id="tutorName">—</div>
+        <div style="font-size:0.82rem;color:var(--mid);" id="sessionSubject"></div>
+        <div style="font-size:0.8rem;color:var(--mid);" id="sessionDateTime"></div>
+      </div>
+    </div>
+
+    <div class="countdown-box">
+      <div class="countdown-label">Time remaining to pay</div>
+      <div class="countdown-time" id="countdown">—</div>
+    </div>
+
+    <div class="price-breakdown">
+      <div class="price-row"><span>Session price</span><span id="priceAmount">—</span></div>
+      <div class="price-row" id="discountRow" style="display:none;color:#059669;"><span id="discountLabel">Discount</span><span id="discountAmount">—</span></div>
+      <div class="price-row total"><span>Total due now</span><span id="priceTotal">—</span></div>
+    </div>
+
+    <div style="display:flex;align-items:flex-start;gap:8px;font-size:0.78rem;color:#166534;background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:0.7rem 0.9rem;margin-bottom:1rem;line-height:1.4;">
+      <span>🛡️</span>
+      <span><strong>Payment protected.</strong> Held safely for 48 hours after your session — full refund guaranteed if something goes wrong.</span>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- Card (Stripe) is the default. The PayPal toggle only appears when the server reports
+         PayPal checkout as enabled (paypal-config → checkout_enabled). -->
+    <div id="methodToggle" style="display:none;gap:0.5rem;margin-bottom:1rem;">
+      <button id="btnUseCard" onclick="setPaymentMethod('card')" style="flex:1;padding:0.7rem;border-radius:9px;border:2px solid var(--blue);background:#eff6ff;color:var(--blue);font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">💳 Card</button>
+      <button id="btnUsePaypal" onclick="setPaymentMethod('paypal')" style="flex:1;padding:0.7rem;border-radius:9px;border:2px solid var(--border);background:#fff;color:var(--ink2,#374151);font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;">PayPal</button>
+    </div>
+
+    <div id="paypal-button-container" style="display:none;"></div>
+
+    <div id="cardPayContainer">
+      <button id="btnPayWithCard" onclick="payWithCard()" style="width:100%;background:#0b1f4a;color:#fff;border:none;padding:0.85rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;">💳 Pay with Card</button>
+      <div style="font-size:0.72rem;color:var(--mid);text-align:center;margin-top:0.6rem;">You'll be taken to a secure Stripe checkout page.</div>
+    </div>
+
+    <div id="cardProcessing" style="display:none;text-align:center;padding:1.5rem 0;">
+      <div class="spinner-lg"></div>
+      <p style="font-size:0.85rem;color:var(--mid);">Confirming your payment...</p>
+    </div>
+  </div>
+
+  <div class="card" id="expiredCard" style="display:none;">
+    <div class="status-box">
+      <div class="status-icon">⏰</div>
+      <div class="status-title">Payment window expired</div>
+      <div class="status-sub">Your 24-hour window to complete payment has passed, so this booking was released.</div>
+      <a href="find-tutors.html" class="btn-link">Find a Tutor →</a>
+    </div>
+  </div>
+
+  <div class="card" id="doneCard" style="display:none;">
+    <div class="status-box">
+      <div class="status-icon">✅</div>
+      <div class="status-title">Payment confirmed!</div>
+      <div class="status-sub">Your session is booked and confirmed.</div>
+      <a href="student-dashboard.html" class="btn-link">Go to Dashboard →</a>
+    </div>
+  </div>
+
+  <div class="card" id="notFoundCard" style="display:none;">
+    <div class="status-box">
+      <div class="status-icon">❓</div>
+      <div class="status-title">Booking not found</div>
+      <div class="status-sub">This session doesn't exist or you don't have access to it.</div>
+      <a href="student-dashboard.html" class="btn-link">Go to Dashboard →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL='https://orghkbbohnabcietidiv.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const sessionId = params.get('session');
+const groupParticipantId = params.get('group_participant');
+const isGroup = !!groupParticipantId;
+let countdownInterval = null;
+let currentUser = null;
+
+function showCard(id) {
+  ['loadingCard','paymentCard','expiredCard','doneCard','notFoundCard'].forEach(c => {
+    document.getElementById(c).style.display = c === id ? 'block' : 'none';
+  });
+}
+
+// Is PayPal checkout switched on? Asked from the server so the page always matches the backend.
+async function paypalCheckoutOffered() {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/paypal-config`, { cache: 'no-store' });
+    const cfg = await res.json();
+    return res.ok && cfg.checkout_enabled === true && !!cfg.client_id;
+  } catch (e) {
+    return false;
+  }
+}
+
+// The PayPal Client ID comes from the server, so this page always matches the backend.
+async function getPayPalClientId() {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/paypal-config`, { cache: 'no-store' });
+  const cfg = await res.json();
+  if (!res.ok || !cfg.client_id) throw new Error(cfg.error || 'PayPal is not available right now');
+  return cfg.client_id;
+}
+
+async function loadPayPalScript(currency) {
+  if (window.paypal) return;
+  const clientId = await getPayPalClientId();
+  await new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=${encodeURIComponent(currency || 'EUR')}`;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.appendChild(script);
+  });
+}
+
+function startCountdown(dueAtISO) {
+  const dueAt = new Date(dueAtISO).getTime();
+  function tick() {
+    const remaining = dueAt - Date.now();
+    if (remaining <= 0) {
+      clearInterval(countdownInterval);
+      showCard('expiredCard');
+      return;
+    }
+    const h = Math.floor(remaining / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    const s = Math.floor((remaining % 60000) / 1000);
+    document.getElementById('countdown').textContent = `${h}h ${m}m ${s}s`;
+  }
+  tick();
+  countdownInterval = setInterval(tick, 1000);
+}
+
+function setPaymentMethod(method) {
+  const paypalBtn = document.getElementById('btnUsePaypal');
+  const cardBtn = document.getElementById('btnUseCard');
+  const paypalContainer = document.getElementById('paypal-button-container');
+  const cardContainer = document.getElementById('cardPayContainer');
+
+  if (method === 'paypal') {
+    paypalBtn.style.background = '#eff6ff'; paypalBtn.style.color = '#1a6bff'; paypalBtn.style.borderColor = '#1a6bff';
+    cardBtn.style.background = '#fff'; cardBtn.style.color = '#374151'; cardBtn.style.borderColor = '#e5e7eb';
+    paypalContainer.style.display = 'block';
+    cardContainer.style.display = 'none';
+  } else {
+    cardBtn.style.background = '#eff6ff'; cardBtn.style.color = '#1a6bff'; cardBtn.style.borderColor = '#1a6bff';
+    paypalBtn.style.background = '#fff'; paypalBtn.style.color = '#374151'; paypalBtn.style.borderColor = '#e5e7eb';
+    cardContainer.style.display = 'block';
+    paypalContainer.style.display = 'none';
+  }
+}
+
+async function payWithCard() {
+  const errBox = document.getElementById('errorBox');
+  errBox.style.display = 'none';
+  const btn = document.getElementById('btnPayWithCard');
+  btn.disabled = true;
+  btn.textContent = 'Redirecting to checkout...';
+
+  const body = isGroup ? { group_participant_id: groupParticipantId } : { session_id: sessionId };
+  try {
+    // The server only starts checkout for the signed-in student who owns this booking.
+    const { data: { session: authSession } } = await _sb.auth.getSession();
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/create-stripe-checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authSession?.access_token || ''}` },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok || !data.checkout_url) {
+      errBox.textContent = data.error || 'Could not start card checkout. Please try again.';
+      errBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '💳 Pay with Card';
+      return;
+    }
+    window.usTrack&&usTrack('checkout_started', { type: isGroup ? 'group' : 'individual' }, { now: true });
+    window.location.href = data.checkout_url;
+  } catch (e) {
+    errBox.textContent = 'Something went wrong starting checkout. Please try again.';
+    errBox.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = '💳 Pay with Card';
+  }
+}
+
+// After a card payment, Stripe redirects back here before the webhook may
+// have finished confirming it — poll briefly rather than assume it's done.
+async function pollForCardConfirmation() {
+  showCard('paymentCard');
+  document.getElementById('methodToggle').style.display = 'none';
+  document.getElementById('paypal-button-container').style.display = 'none';
+  document.getElementById('cardPayContainer').style.display = 'none';
+  document.getElementById('cardProcessing').style.display = 'block';
+
+  const table = isGroup ? 'group_session_participants' : 'sessions';
+  const id = isGroup ? groupParticipantId : sessionId;
+  const statusField = isGroup ? 'status' : 'payment_status';
+  const confirmedValue = isGroup ? 'confirmed' : 'paid';
+
+  for (let i = 0; i < 10; i++) {
+    const { data } = await _sb.from(table).select(statusField).eq('id', id).maybeSingle();
+    if (data && data[statusField] === confirmedValue) {
+      window.usTrack&&usTrack('payment_completed', { type: isGroup ? 'group' : 'individual' });
+      showCard('doneCard');
+      return;
+    }
+    await new Promise(r => setTimeout(r, 2000));
+  }
+  document.getElementById('cardProcessing').innerHTML = '<p style="font-size:0.85rem;color:var(--mid);">This is taking longer than expected. If your card was charged, this will confirm shortly — refresh this page in a minute, or check your dashboard.</p>';
+}
+
+async function init() {
+  const { data: { session: authSession } } = await _sb.auth.getSession();
+  if (!authSession) {
+    window.location.href = 'signin.html?redirect=' + encodeURIComponent(window.location.href);
+    return;
+  }
+  currentUser = authSession.user;
+
+  if (params.get('stripe_success') === '1') {
+    await pollForCardConfirmation();
+    return;
+  }
+
+  if (!sessionId && !groupParticipantId) { showCard('notFoundCard'); return; }
+
+  let displayName, subject, date, time, price, status, paymentDueAt, currency;
+
+  if (isGroup) {
+    const { data: p, error } = await _sb.from('group_session_participants')
+      .select('*, group_sessions(*)').eq('id', groupParticipantId).maybeSingle();
+    if (error || !p || p.student_id !== currentUser.id) { showCard('notFoundCard'); return; }
+
+    const gs = p.group_sessions;
+    if (p.status === 'confirmed') { showCard('doneCard'); return; }
+    if (p.status === 'payment_expired' || p.status === 'cancelled') { showCard('expiredCard'); return; }
+    if (p.status !== 'awaiting_payment') { showCard('notFoundCard'); return; }
+    if (p.payment_due_at && new Date(p.payment_due_at).getTime() < Date.now()) { showCard('expiredCard'); return; }
+
+    displayName = gs.tutor_name || 'Tutor';
+    subject = gs.subject || '';
+    date = gs.scheduled_date;
+    time = gs.scheduled_time; __sessTz = gs.timezone;
+    price = gs.price_per_student;
+    currency = gs.currency || 'EUR';
+    paymentDueAt = p.payment_due_at;
+
+  } else {
+    const { data: s, error } = await _sb.from('sessions').select('*').eq('id', sessionId).maybeSingle();
+    if (error || !s || s.student_id !== currentUser.id) { showCard('notFoundCard'); return; }
+
+    if (s.status === 'confirmed' && s.payment_status === 'paid') { showCard('doneCard'); return; }
+    if (s.status === 'payment_expired') { showCard('expiredCard'); return; }
+    if (s.status !== 'awaiting_payment') { showCard('notFoundCard'); return; }
+    if (s.payment_due_at && new Date(s.payment_due_at).getTime() < Date.now()) { showCard('expiredCard'); return; }
+
+    displayName = s.tutor_name || 'Tutor';
+    subject = s.subject || '';
+    date = s.scheduled_date;
+    time = s.scheduled_time; __sessTz = s.timezone;
+    price = s.price;
+    currency = s.currency || 'EUR';
+    paymentDueAt = s.payment_due_at;
+  }
+
+  const currSym = currency === 'USD' ? '$' : '€';
+  const initials = displayName.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('tutorAv').textContent = initials;
+  document.getElementById('tutorName').textContent = displayName;
+  document.getElementById('sessionSubject').textContent = subject + (isGroup ? ' (Group Session)' : '');
+  const dateStr = date ? new Date(date).toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' }) : '';
+  document.getElementById('sessionDateTime').textContent = [dateStr, time ? time.slice(0,5) + __tzNote(__sessTz) : ''].filter(Boolean).join(' · ');
+  document.getElementById('priceAmount').textContent = currSym + price;
+  document.getElementById('priceTotal').textContent = currSym + price;
+
+  // Preview an applicable discount before the student even clicks Pay — the real
+  // decision is always made server-side (create-stripe-checkout), this is just so
+  // they see the incentive up front rather than as a surprise mid-checkout.
+  // Uses the same cap as the server: a discount never exceeds UniSkilled's 20% platform fee
+  // on the booking (so the tutor's 80% is untouched), and never takes the charge below €1.
+  if (!isGroup) {
+    try {
+      const PREVIEW_FEE_RATE = 0.20; // keep in line with platform_settings.platform_fee_rate
+      const maxPreview = Math.max(0, Math.min(Math.floor(Number(price) * PREVIEW_FEE_RATE * 100) / 100, Number(price) - 1));
+      const { data: referral } = await _sb.from('referrals')
+        .select('invitee_discount_amount').eq('invitee_id', currentUser.id).eq('invitee_discount_applied', false).maybeSingle();
+      let previewDiscount = 0, previewLabel = '';
+      if (referral) {
+        previewDiscount = Math.min(Number(referral.invitee_discount_amount), maxPreview);
+        previewLabel = '🎉 Welcome discount';
+      } else {
+        const { data: userRow } = await _sb.rpc('get_my_account').maybeSingle();
+        const balance = Number(userRow?.credit_balance || 0);
+        if (balance > 0) {
+          previewDiscount = Math.min(balance, maxPreview);
+          previewLabel = '💳 Account credit applied';
+        }
+      }
+      if (previewDiscount > 0) {
+        previewDiscount = Math.round(previewDiscount * 100) / 100;
+        document.getElementById('discountLabel').textContent = previewLabel;
+        document.getElementById('discountAmount').textContent = '−' + currSym + previewDiscount.toFixed(2);
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('priceTotal').textContent = currSym + (price - previewDiscount).toFixed(2);
+      }
+    } catch (e) {
+      console.error('Discount preview failed (non-critical):', e);
+    }
+  }
+
+  showCard('paymentCard');
+  startCountdown(paymentDueAt);
+
+  // Card (Stripe) is the default. PayPal is only offered when the server reports it as enabled
+  // (it is off unless it is switched on AND running on live PayPal — see paypal-config).
+  setPaymentMethod('card');
+  if (!(await paypalCheckoutOffered())) return;
+  document.getElementById('methodToggle').style.display = 'flex';
+
+  try {
+    await loadPayPalScript(currency);
+  } catch (e) {
+    console.error('PayPal failed to load:', e);
+    // Card payment still works — just hide the PayPal option.
+    document.getElementById('methodToggle').style.display = 'none';
+    setPaymentMethod('card');
+    return;
+  }
+
+  window.paypal.Buttons({
+    style: { layout: 'vertical', color: 'gold', shape: 'rect', label: 'paypal' },
+
+    createOrder: async () => {
+      document.getElementById('errorBox').style.display = 'none';
+      const body = isGroup ? { group_participant_id: groupParticipantId } : { session_id: sessionId };
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/create-paypal-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.order_id) {
+        document.getElementById('errorBox').textContent = data.error || 'Could not start payment. Please try again.';
+        document.getElementById('errorBox').style.display = 'block';
+        throw new Error(data.error || 'Order creation failed');
+      }
+      // Reconcile the displayed price with what was actually charged server-side —
+      // this is the authoritative number, the preview above was only an estimate.
+      if (typeof data.discount_applied === 'number' && data.discount_applied > 0) {
+        const label = data.discount_source === 'referral_welcome' ? '🎉 Welcome discount' : '💳 Account credit applied';
+        document.getElementById('discountLabel').textContent = label;
+        document.getElementById('discountAmount').textContent = '−' + currSym + data.discount_applied.toFixed(2);
+        document.getElementById('discountRow').style.display = 'flex';
+        document.getElementById('priceTotal').textContent = currSym + Number(data.charge_amount).toFixed(2);
+      } else {
+        document.getElementById('discountRow').style.display = 'none';
+        document.getElementById('priceTotal').textContent = currSym + price;
+      }
+      return data.order_id;
+    },
+
+    onApprove: async (data) => {
+      const body = isGroup
+        ? { order_id: data.orderID, group_participant_id: groupParticipantId }
+        : { order_id: data.orderID, session_id: sessionId };
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/capture-paypal-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const result = await res.json();
+      if (!res.ok || !result.success) {
+        document.getElementById('errorBox').textContent = result.error || 'Payment could not be completed. Please contact support.';
+        document.getElementById('errorBox').style.display = 'block';
+        return;
+      }
+      clearInterval(countdownInterval);
+      showCard('doneCard');
+    },
+
+    onError: (err) => {
+      console.error('PayPal error:', err);
+      document.getElementById('errorBox').textContent = 'Something went wrong with PayPal. Please try again.';
+      document.getElementById('errorBox').style.display = 'block';
+    },
+  }).render('#paypal-button-container');
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
