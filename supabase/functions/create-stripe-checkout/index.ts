@@ -33,6 +33,15 @@ Deno.serve(async (req: Request) => {
     if (!session_id && !group_participant_id) return json({ error: 'session_id or group_participant_id required' }, 400);
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
+
+    // Only the signed-in student who owns this booking (or group seat) may start its checkout.
+    const authHeader = req.headers.get('Authorization') || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+    if (!token) return json({ error: 'Not signed in. Please log in again.' }, 401);
+    const { data: authData, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !authData?.user) return json({ error: 'Not signed in. Please log in again.' }, 401);
+    const callerId = authData.user.id;
+
     const feeRate = group_participant_id ? await getGroupFeeRate(supabase) : await getPlatformFeeRate(supabase);
 
     let price: number, subject: string, currency: string, referenceId: string, metadataKey: string, tutorId: string;
@@ -41,10 +50,11 @@ Deno.serve(async (req: Request) => {
 
     if (group_participant_id) {
       const { data: participant, error: pErr } = await supabase.from('group_session_participants')
-        .select('id, status, payment_due_at, group_sessions(price_per_student, subject, currency, tutor_id)')
+        .select('id, status, payment_due_at, student_id, group_sessions(price_per_student, subject, currency, tutor_id)')
         .eq('id', group_participant_id).single();
 
       if (pErr || !participant) return json({ error: 'Group session spot not found' }, 404);
+      if (participant.student_id !== callerId) return json({ error: 'This booking belongs to a different account.' }, 403);
       if (participant.status !== 'awaiting_payment') return json({ error: 'This spot is not currently awaiting payment.' }, 400);
       if (participant.payment_due_at && new Date(participant.payment_due_at).getTime() < Date.now()) {
         return json({ error: 'The 24-hour payment window for this spot has expired.' }, 400);
@@ -64,6 +74,7 @@ Deno.serve(async (req: Request) => {
         .eq('id', session_id).single();
 
       if (sessErr || !session) return json({ error: 'Session not found' }, 404);
+      if (session.student_id !== callerId) return json({ error: 'This booking belongs to a different account.' }, 403);
       if (session.status !== 'awaiting_payment') return json({ error: 'This booking is not currently awaiting payment.' }, 400);
       if (session.payment_due_at && new Date(session.payment_due_at).getTime() < Date.now()) {
         return json({ error: 'The 24-hour payment window for this booking has expired.' }, 400);

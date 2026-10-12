@@ -1,0 +1,124 @@
+-- 12 Oct 2026 — post-audit fixes
+-- 1. Reschedule loophole: a student who reschedules a session that is less than 24 h away is
+--    marked (late_reschedule_at). A later cancellation by that student is then treated as a
+--    late cancellation (no refund), so "reschedule, then cancel" no longer gets a full refund.
+--    Set only by the reschedule-session Edge Function; users cannot set or clear it.
+-- 2. Booking-request minimum message now matches the real minimum (€15 / $17).
+-- 3. Student profiles are private: only the student themself (and admins) can read them.
+
+ALTER TABLE public.sessions ADD COLUMN IF NOT EXISTS late_reschedule_at timestamptz;
+
+CREATE OR REPLACE FUNCTION public.a_guard_sessions()
+ RETURNS trigger
+ LANGUAGE plpgsql
+ SECURITY DEFINER
+ SET search_path TO 'public'
+AS $function$
+DECLARE tcur text; minp numeric;
+BEGIN
+  IF NOT public._is_plain_end_user() THEN RETURN NEW; END IF;
+
+  IF TG_OP = 'INSERT' THEN
+    IF NEW.status IS DISTINCT FROM 'pending'
+       OR COALESCE(NEW.payment_status,'unpaid') <> 'unpaid'
+       OR NEW.payment_id IS NOT NULL OR NEW.stripe_payment_intent_id IS NOT NULL
+       OR NEW.paypal_order_id IS NOT NULL OR NEW.daily_room_url IS NOT NULL
+       OR NEW.completed_at IS NOT NULL OR NEW.cancelled_at IS NOT NULL OR NEW.refund_outcome IS NOT NULL
+       OR NEW.payment_due_at IS NOT NULL
+       OR NEW.pending_discount_amount IS NOT NULL OR NEW.pending_discount_source IS NOT NULL
+       OR NEW.late_reschedule_at IS NOT NULL
+       OR NEW.student_id IS DISTINCT FROM auth.uid() THEN
+      RAISE EXCEPTION 'Not allowed' USING ERRCODE = '42501';
+    END IF;
+    IF NEW.tutor_id = NEW.student_id THEN
+      RAISE EXCEPTION 'You can''t book a session with yourself.' USING ERRCODE = '42501';
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM tutor_profiles WHERE user_id = NEW.tutor_id AND COALESCE(is_active, true)) THEN
+      RAISE EXCEPTION 'This tutor isn''t available for booking.' USING ERRCODE = '42501';
+    END IF;
+    IF NEW.starts_at IS NULL OR NEW.starts_at < now() + interval '15 minutes' THEN
+      RAISE EXCEPTION 'Please choose a date and time in the future.' USING ERRCODE = '42501';
+    END IF;
+    IF COALESCE(NEW.duration_minutes, 0) NOT BETWEEN 15 AND 480 THEN
+      RAISE EXCEPTION 'Session length must be between 15 minutes and 8 hours.' USING ERRCODE = '42501';
+    END IF;
+    SELECT COALESCE(currency,'EUR') INTO tcur FROM tutor_profiles WHERE user_id = NEW.tutor_id;
+    tcur := COALESCE(tcur,'EUR');
+    IF COALESCE(NEW.currency,'EUR') IS DISTINCT FROM tcur THEN
+      RAISE EXCEPTION 'Not allowed' USING ERRCODE = '42501';
+    END IF;
+    minp := CASE WHEN tcur = 'USD' THEN 17 ELSE 15 END;
+    IF NEW.price IS NULL OR NEW.price < minp THEN
+      RAISE EXCEPTION 'Minimum booking value is %', minp USING ERRCODE = '42501';
+    END IF;
+    IF NEW.price > 5000 THEN
+      RAISE EXCEPTION 'That price looks too high — please check it.' USING ERRCODE = '42501';
+    END IF;
+    RETURN NEW;
+  END IF;
+
+  -- UPDATE: money, identity and SCHEDULE fields are server-only (reschedule-session does schedule changes).
+  IF NEW.price IS DISTINCT FROM OLD.price
+     OR NEW.currency IS DISTINCT FROM OLD.currency
+     OR NEW.tutor_id IS DISTINCT FROM OLD.tutor_id
+     OR NEW.student_id IS DISTINCT FROM OLD.student_id
+     OR NEW.payment_id IS DISTINCT FROM OLD.payment_id
+     OR NEW.payment_status IS DISTINCT FROM OLD.payment_status
+     OR NEW.stripe_payment_intent_id IS DISTINCT FROM OLD.stripe_payment_intent_id
+     OR NEW.paypal_order_id IS DISTINCT FROM OLD.paypal_order_id
+     OR NEW.daily_room_url IS DISTINCT FROM OLD.daily_room_url
+     OR NEW.completed_at IS DISTINCT FROM OLD.completed_at
+     OR NEW.cancelled_by IS DISTINCT FROM OLD.cancelled_by
+     OR NEW.cancelled_at IS DISTINCT FROM OLD.cancelled_at
+     OR NEW.cancellation_reason IS DISTINCT FROM OLD.cancellation_reason
+     OR NEW.refund_outcome IS DISTINCT FROM OLD.refund_outcome
+     OR NEW.pending_discount_amount IS DISTINCT FROM OLD.pending_discount_amount
+     OR NEW.pending_discount_source IS DISTINCT FROM OLD.pending_discount_source
+     OR NEW.late_reschedule_at IS DISTINCT FROM OLD.late_reschedule_at
+     OR NEW.scheduled_date IS DISTINCT FROM OLD.scheduled_date
+     OR NEW.scheduled_time IS DISTINCT FROM OLD.scheduled_time
+     OR NEW.duration_minutes IS DISTINCT FROM OLD.duration_minutes
+     OR NEW.timezone IS DISTINCT FROM OLD.timezone
+     OR NEW.subject IS DISTINCT FROM OLD.subject
+     OR NEW.format IS DISTINCT FROM OLD.format
+     OR NEW.tutor_name IS DISTINCT FROM OLD.tutor_name
+     OR NEW.student_name IS DISTINCT FROM OLD.student_name
+     OR NEW.notes IS DISTINCT FROM OLD.notes
+     OR NEW.created_at IS DISTINCT FROM OLD.created_at THEN
+    RAISE EXCEPTION 'Not allowed' USING ERRCODE = '42501';
+  END IF;
+
+  IF NEW.status IS DISTINCT FROM OLD.status AND NOT
+     (OLD.status = 'pending' AND NEW.status IN ('awaiting_payment','declined') AND OLD.tutor_id = auth.uid()) THEN
+    RAISE EXCEPTION 'Not allowed' USING ERRCODE = '42501';
+  END IF;
+
+  -- The payment deadline is set only when the tutor accepts, and only to ~24h from now.
+  IF NEW.payment_due_at IS DISTINCT FROM OLD.payment_due_at THEN
+    IF NOT (OLD.status = 'pending' AND NEW.status = 'awaiting_payment'
+            AND NEW.payment_due_at > now() AND NEW.payment_due_at <= now() + interval '25 hours') THEN
+      RAISE EXCEPTION 'Not allowed' USING ERRCODE = '42501';
+    END IF;
+  END IF;
+
+  IF OLD.status = 'pending' AND NEW.status = 'awaiting_payment' THEN
+    IF NEW.payment_due_at IS NULL THEN
+      NEW.payment_due_at := now() + interval '24 hours';
+    END IF;
+    IF NEW.starts_at IS NOT NULL AND NEW.starts_at <= now() THEN
+      RAISE EXCEPTION 'This session''s time has already passed — ask the student to book a new time.' USING ERRCODE = '42501';
+    END IF;
+    IF EXISTS (SELECT 1 FROM sessions o
+               WHERE o.tutor_id = NEW.tutor_id AND o.id <> NEW.id
+                 AND o.status IN ('awaiting_payment', 'confirmed')
+                 AND o.starts_at < NEW.ends_at AND o.ends_at > NEW.starts_at) THEN
+      RAISE EXCEPTION 'You already have a session booked at that time.' USING ERRCODE = '42501';
+    END IF;
+  END IF;
+
+  RETURN NEW;
+END $function$;
+
+-- Student profiles: own row + admins only (the "own" and "admin" policies already exist).
+DROP POLICY IF EXISTS "student_profiles_select_authenticated" ON public.student_profiles;
+DROP POLICY IF EXISTS "Student profiles: public read" ON public.student_profiles;
