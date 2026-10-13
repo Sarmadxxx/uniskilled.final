@@ -132,14 +132,56 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'Session not found' }), { status: 404, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
-    if (session.status !== 'confirmed') {
-      return new Response(JSON.stringify({ error: 'Only confirmed, paid sessions can be cancelled this way.' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
+    if (session.status !== 'confirmed' && session.status !== 'awaiting_payment') {
+      return new Response(JSON.stringify({ error: 'This session can no longer be cancelled.' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
     const isStudent = requester_id === session.student_id;
     const isTutor = requester_id === session.tutor_id;
     if (!isStudent && !isTutor) {
       return new Response(JSON.stringify({ error: 'You are not part of this session.' }), { status: 403, headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
+
+    // ── Accepted but not paid yet: nothing was charged, so cancelling just releases the booking. ──
+    if (session.status === 'awaiting_payment') {
+      // Only cancel if it is still unpaid (a payment may be confirming at this very moment).
+      const { data: released } = await supabase.from('sessions').update({
+        status: 'cancelled',
+        cancelled_by: isTutor ? 'tutor' : 'student',
+        cancelled_at: new Date().toISOString(),
+        cancellation_reason: reason || null,
+        payment_due_at: null,
+      }).eq('id', session_id).eq('status', 'awaiting_payment').or('payment_status.is.null,payment_status.neq.paid').select('id');
+      if (!released || released.length === 0) {
+        return new Response(JSON.stringify({ error: 'This booking was just paid, so it can\'t be cancelled this way. Please refresh the page and cancel the confirmed session.' }), { status: 409, headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
+      await supabase.from('reschedule_requests').update({ status: 'cancelled', responded_at: new Date().toISOString() })
+        .eq('session_id', session_id).eq('status', 'pending');
+
+      const otherId = isTutor ? session.student_id : session.tutor_id;
+      const cancellerName = isTutor ? session.tutor_name : session.student_name;
+      await supabase.from('notifications').insert([
+        {
+          user_id: otherId, type: 'session_cancelled', title: '❌ Booking cancelled',
+          body: `${cancellerName} cancelled the ${session.subject} booking before it was paid. Nothing was charged.`,
+          link: isTutor ? 'find-tutors.html' : 'tutor-dashboard.html', read: false,
+        },
+        {
+          user_id: requester_id, type: 'session_cancelled', title: 'Booking cancelled',
+          body: `You cancelled the ${session.subject} booking. Nothing was charged.`,
+          link: isTutor ? 'tutor-dashboard.html' : 'student-dashboard.html', read: false,
+        },
+      ]);
+      try {
+        const { data: studentUser } = await supabase.from('users').select('email').eq('id', session.student_id).single();
+        const { data: tutorUser } = await supabase.from('users').select('email').eq('id', session.tutor_id).single();
+        const emailData = { studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, refunded: false, unpaid: true, cancelledBy: isTutor ? 'tutor' : 'student' };
+        if (studentUser?.email) await sendEmail(supabaseUrl, 'session_cancelled', studentUser.email, emailData);
+        if (tutorUser?.email) await sendEmail(supabaseUrl, 'session_cancelled', tutorUser.email, emailData);
+      } catch (e) {
+        console.error('Email dispatch failed (non-critical):', e);
+      }
+      return new Response(JSON.stringify({ success: true, outcome: 'not_paid', refunded: false }), { headers: { ...cors, 'Content-Type': 'application/json' } });
     }
 
     const { data: payment } = await supabase.from('payments')

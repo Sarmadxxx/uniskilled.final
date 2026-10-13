@@ -39,6 +39,11 @@ async function sendEmail(supabaseUrl: string, type: string, to: string, data: an
   }
 }
 
+// Confirmed (paid) sessions and accepted-but-unpaid bookings can both be moved.
+function canMove(s: any): boolean {
+  return (s.status === 'confirmed' && s.payment_status === 'paid') || (s.status === 'awaiting_payment' && s.payment_status !== 'paid');
+}
+
 function sessionStart(s: any): Date {
   return s.starts_at ? new Date(s.starts_at) : new Date(s.scheduled_date + 'T' + s.scheduled_time);
 }
@@ -121,7 +126,7 @@ Deno.serve(async (req: Request) => {
       const { data: session } = await supabase.from('sessions').select('*').eq('id', session_id).maybeSingle();
       if (!session) return json({ error: 'Session not found' }, 404);
       if (userId !== session.student_id && userId !== session.tutor_id) return json({ error: 'You are not part of this session.' }, 403);
-      if (session.status !== 'confirmed' || session.payment_status !== 'paid') return json({ error: 'Only confirmed, paid sessions can be rescheduled.' }, 400);
+      if (!canMove(session)) return json({ error: 'This session can no longer be rescheduled.' }, 400);
       if ((session.reschedule_count || 0) >= MAX_RESCHEDULES) {
         return json({ error: `This session has already been moved ${MAX_RESCHEDULES} times, which is the limit. You can still cancel it under the usual refund rules.` }, 400);
       }
@@ -143,7 +148,8 @@ Deno.serve(async (req: Request) => {
       if (!check.ok) return json({ error: check.error }, 400);
 
       const isTutor = userId === session.tutor_id;
-      const isLate = !isTutor && (currentStart.getTime() - Date.now()) < LATE_RESCHEDULE_HOURS * HOUR;
+      // Only a paid session can be locked as non-refundable (nothing to refund before payment).
+      const isLate = !isTutor && session.payment_status === 'paid' && (currentStart.getTime() - Date.now()) < LATE_RESCHEDULE_HOURS * HOUR;
       const expiresAt = new Date(Math.min(Date.now() + REQUEST_TTL_HOURS * HOUR, currentStart.getTime()));
 
       const { data: created, error: insErr } = await supabase.from('reschedule_requests').insert({
@@ -210,7 +216,7 @@ Deno.serve(async (req: Request) => {
     const when = prettyWhen(String(rr.new_date), String(rr.new_time), session.timezone);
 
     const expired = new Date(rr.expires_at).getTime() <= Date.now();
-    if (expired || session.status !== 'confirmed' || session.payment_status !== 'paid') {
+    if (expired || !canMove(session)) {
       await close('cancelled');
       return json({ error: expired ? 'This request has expired, so the session stays at its current time.' : 'This session can no longer be rescheduled.' }, 400);
     }
@@ -255,11 +261,17 @@ Deno.serve(async (req: Request) => {
       reschedule_count: (session.reschedule_count || 0) + 1,
       original_starts_at: session.original_starts_at || sessionStart(session).toISOString(),
     };
-    if (rr.is_late && !session.late_reschedule_at) update.late_reschedule_at = rr.created_at;
-    if (requesterIsTutor && !session.tutor_rescheduled_at) update.tutor_rescheduled_at = nowIso;
+    const isPaid = session.status === 'confirmed';
+    if (isPaid && rr.is_late && !session.late_reschedule_at) update.late_reschedule_at = rr.created_at;
+    if (isPaid && requesterIsTutor && !session.tutor_rescheduled_at) update.tutor_rescheduled_at = nowIso;
+    if (!isPaid) {
+      // Unpaid booking: the payment deadline can never be later than 1 hour before the new start.
+      const due = Math.min(new Date(session.payment_due_at || Date.now() + 24 * HOUR).getTime(), check.start.getTime() - HOUR);
+      update.payment_due_at = new Date(due).toISOString();
+    }
 
     const { data: moved, error: updErr } = await supabase.from('sessions').update(update)
-      .eq('id', session.id).eq('status', 'confirmed').eq('reschedule_count', session.reschedule_count || 0).select('id');
+      .eq('id', session.id).eq('status', session.status).eq('reschedule_count', session.reschedule_count || 0).select('id');
     if (updErr || !moved || moved.length === 0) {
       await supabase.from('reschedule_requests').update({ status: 'cancelled' }).eq('id', rr.id);
       console.error('reschedule apply failed:', updErr?.message);
@@ -281,7 +293,7 @@ Deno.serve(async (req: Request) => {
     try {
       const { data: studentUser } = await supabase.from('users').select('email').eq('id', session.student_id).single();
       const { data: tutorUser } = await supabase.from('users').select('email').eq('id', session.tutor_id).single();
-      const emailData = { studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, date: when.date, time: when.time };
+      const emailData = { studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, date: when.date, time: when.time, unpaid: !isPaid };
       if (studentUser?.email) await sendEmail(supabaseUrl, 'session_rescheduled', studentUser.email, emailData);
       if (tutorUser?.email) await sendEmail(supabaseUrl, 'session_rescheduled', tutorUser.email, emailData);
     } catch (e) { console.error('Email dispatch failed (non-critical):', e); }

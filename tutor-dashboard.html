@@ -1095,6 +1095,10 @@ async function loadSessions() {
   const earnings = Math.round(gross * (1 - feeRate) * 100) / 100;
   document.getElementById('statEarnings').textContent = (tutorCurrency === 'USD' ? '$' : '€') + (Number.isInteger(earnings) ? earnings : earnings.toFixed(2));
 
+  // Open reschedule requests for upcoming and awaiting-payment sessions (accept / decline / withdraw).
+  const __rr = await UsResched.loadPending(upcoming.concat(awaitingPayment).map(s => s.id));
+  UsResched.onChange = () => loadAll();
+
   const awaitingCard = document.getElementById('awaitingPaymentCard');
   if (awaitingPayment.length > 0) {
     awaitingCard.style.display = 'block';
@@ -1107,18 +1111,16 @@ async function loadSessions() {
         <div class="session-av">${__esc(ini)}</div>
         <div class="session-info">
           <div class="session-name">${__esc(s.student_name || 'Student')}</div>
-          <div class="session-sub">${__esc(s.subject || '—')} — you accepted this, now waiting on the student to pay</div>
+          <div class="session-sub">${__esc(s.subject || '—')} ${__esc(s.scheduled_date ? '· ' + new Date(s.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')} — you accepted this, now waiting on the student to pay</div>
         </div>
         <span class="badge badge-awaiting-payment" style="white-space:nowrap;">${__esc(timeLeftText)}</span>
+        <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}', 'awaiting_payment')">Cancel booking</button>
+        ${UsResched.rowHtml(s, __rr[s.id], userId)}
       </div>`;
     }).join('');
   } else {
     awaitingCard.style.display = 'none';
   }
-
-  // Open reschedule requests for upcoming sessions (accept / decline / withdraw).
-  const __rr = await UsResched.loadPending(upcoming.map(s => s.id));
-  UsResched.onChange = () => loadAll();
 
   const sessionHtml = s => {
     const ini = (s.student_name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
@@ -1135,8 +1137,8 @@ async function loadSessions() {
     const joinBtn = s.status === 'confirmed'
       ? `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.student_name||'Student')}')">🎥 Join Session</button>`
       : '';
-    const cancelBtn = s.status === 'confirmed'
-      ? `<button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>`
+    const cancelBtn = (s.status === 'confirmed' || s.status === 'awaiting_payment')
+      ? `<button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}', '${s.status}')">Cancel</button>`
       : '';
     // Issues can be reported until 48h after the session ended (same window open-dispute enforces)
     const reportOpen = s.status === 'confirmed'
@@ -1598,11 +1600,14 @@ async function submitReport() {
   location.reload();
 }
 
-function openCancelModal(sessionId) {
+function openCancelModal(sessionId, status) {
   cancelTargetSessionId = sessionId;
-  document.getElementById('cancelModalBody').innerHTML = 'As the tutor, cancelling this session will always issue the student a full refund, regardless of timing.';
+  const unpaid = status === 'awaiting_payment';
+  document.getElementById('cancelModalBody').innerHTML = unpaid
+    ? 'The student hasn\'t paid yet, so nothing is charged. They\'ll be told the booking is cancelled and can book another time. If you only need a different time, use <strong>Reschedule</strong> instead.'
+    : 'As the tutor, cancelling this session will always issue the student a full refund, regardless of timing. If you only need a different time, use <strong>Reschedule</strong> instead.';
   document.getElementById('cancelModalActions').innerHTML = `
-    <button onclick="confirmCancel(false)" style="background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Yes, cancel and refund</button>
+    <button onclick="confirmCancel(false, this)" style="background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">${unpaid ? 'Yes, cancel booking' : 'Yes, cancel and refund'}</button>
     <button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Never mind</button>
   `;
   document.getElementById('cancelModalOverlay').style.display = 'flex';
@@ -1613,7 +1618,8 @@ function closeCancelModal() {
   cancelTargetSessionId = null;
 }
 
-async function confirmCancel(confirmNoRefund) {
+async function confirmCancel(confirmNoRefund, btn) {
+  if (btn) { btn.disabled = true; btn.textContent = 'Cancelling…'; }
   const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/cancel-session', {
     method: 'POST', headers: await authedHeaders(),
     body: JSON.stringify({ session_id: cancelTargetSessionId, requester_id: userId, confirm_no_refund: confirmNoRefund }),
@@ -1636,6 +1642,9 @@ async function confirmCancel(confirmNoRefund) {
   }
 
   closeCancelModal();
+  showToast(data.outcome === 'not_paid'
+    ? 'Booking cancelled. The student has been notified — nothing was charged.'
+    : 'Session cancelled. The student has been notified and fully refunded.', 'success');
   await loadAll();
 }
 

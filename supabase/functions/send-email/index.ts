@@ -226,7 +226,7 @@ Deno.serve(async (req) => {
         <div style="background:#f8fafc;padding:2rem;border-radius:0 0 12px 12px;">
           <p style="color:#374151;">The <strong>${data.subject}</strong> session between <strong>${data.studentName}</strong> and <strong>${data.tutorName}</strong> has been cancelled by ${cancellerLabel}.</p>
           <div style="background:#fff;border-radius:10px;padding:1.2rem;margin:1rem 0;border:1px solid #e5e7eb;">
-            <p style="margin:0;font-weight:700;color:${data.refunded ? '#059669' : '#b91c1c'};">${data.refunded ? '✅ A full refund has been issued.' : '⚠️ No refund applies to this cancellation.'}</p>
+            <p style="margin:0;font-weight:700;color:${data.refunded || data.unpaid ? '#059669' : '#b91c1c'};">${data.unpaid ? '✅ The booking hadn\'t been paid yet, so nothing was charged.' : data.refunded ? '✅ A full refund has been issued.' : '⚠️ No refund applies to this cancellation.'}</p>
           </div>
           <a href="https://uniskilled.com/find-tutors.html" style="display:inline-block;background:#1a6bff;color:#fff;padding:0.8rem 1.6rem;border-radius:8px;text-decoration:none;font-weight:700;">Browse Tutors →</a>
         </div>`;
@@ -244,7 +244,7 @@ Deno.serve(async (req) => {
             <p style="margin:0.3rem 0;"><strong>New date:</strong> ${data.date}</p>
             <p style="margin:0.3rem 0;"><strong>New time:</strong> ${data.time}</p>
           </div>
-          <p style="color:#6b7280;font-size:0.85rem;">No new payment is needed — your original payment carries over to the new time.</p>
+          <p style="color:#6b7280;font-size:0.85rem;">${data.unpaid ? 'The booking still needs to be paid before it is confirmed — check your dashboard for the payment deadline.' : 'No new payment is needed — your original payment carries over to the new time.'}</p>
           <a href="https://uniskilled.com/student-dashboard.html" style="display:inline-block;background:#1a6bff;color:#fff;padding:0.8rem 1.6rem;border-radius:8px;text-decoration:none;font-weight:700;">View Details →</a>
         </div>`;
     }

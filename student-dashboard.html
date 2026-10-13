@@ -488,7 +488,7 @@ async function init() {
   document.getElementById('statSessions').textContent = allSessions.length;
 
   // Open reschedule requests for the sessions shown (accept / decline / withdraw).
-  const __rr = await UsResched.loadPending(allSessions.slice(0, 5).filter(s => s.status === 'confirmed').map(s => s.id));
+  const __rr = await UsResched.loadPending(allSessions.slice(0, 5).filter(s => s.status === 'confirmed' || s.status === 'awaiting_payment').map(s => s.id));
 
   if (allSessions.length > 0) {
     document.getElementById('sessionsBody').innerHTML = allSessions.slice(0, 5).map(s => {
@@ -517,7 +517,9 @@ async function init() {
         const remaining = s.payment_due_at ? Math.max(0, new Date(s.payment_due_at).getTime() - Date.now()) : 0;
         const hoursLeft = Math.floor(remaining / 3600000);
         const minsLeft = Math.floor((remaining % 3600000) / 60000);
-        actionBtn = `<a href="complete-payment.html?session=${__safeUrl(s.id)}" class="pay-now-btn">Pay now (${__esc(hoursLeft)}h ${__esc(minsLeft)}m left)</a>`;
+        actionBtn = `<a href="complete-payment.html?session=${__safeUrl(s.id)}" class="pay-now-btn">Pay now (${__esc(hoursLeft)}h ${__esc(minsLeft)}m left)</a>
+        <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}')">Cancel</button>
+        ${UsResched.rowHtml(s, __rr[s.id], user.id)}`;
       }
 
       return `<div class="session-row">
@@ -754,7 +756,9 @@ async function confirmCancel(confirmNoRefund) {
   }
 
   if (data.success) {
-    document.getElementById('cancelModalBody').innerHTML = data.refunded
+    document.getElementById('cancelModalBody').innerHTML = data.outcome === 'not_paid'
+      ? '✅ Booking cancelled. Nothing was charged, and your tutor has been notified.'
+      : data.refunded
       ? '✅ Cancelled. A full refund has been issued to your original payment method.'
       : 'Session cancelled.';
     document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal(); location.reload();" style="background:#1a6bff;color:#fff;border:none;padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Done</button>`;

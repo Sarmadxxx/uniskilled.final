@@ -109,10 +109,10 @@
       return map;
     },
 
-    // Button or status note for one confirmed session row.
+    // Button or status note for one session row (paid, or accepted and waiting for payment).
     rowHtml: function (s, req, myId) {
       injectStyles();
-      if (!s || s.status !== 'confirmed') return '';
+      if (!s || (s.status !== 'confirmed' && s.status !== 'awaiting_payment')) return '';
       var otherName = (s.student_id === myId) ? (s.tutor_name || 'your tutor') : (s.student_name || 'the student');
       if (!req) {
         var startsIn = s.starts_at ? new Date(s.starts_at).getTime() - Date.now() : Infinity;
@@ -139,10 +139,10 @@
       var sess = await _sb.auth.getSession();
       state.myId = sess && sess.data && sess.data.session ? sess.data.session.user.id : null;
       var r = await _sb.from('sessions')
-        .select('id, student_id, tutor_id, student_name, tutor_name, subject, scheduled_date, scheduled_time, timezone, duration_minutes, starts_at, original_starts_at, reschedule_count, status')
+        .select('id, student_id, tutor_id, student_name, tutor_name, subject, scheduled_date, scheduled_time, timezone, duration_minutes, starts_at, original_starts_at, reschedule_count, status, payment_status')
         .eq('id', sessionId).maybeSingle();
       var s = r.data;
-      if (!s || s.status !== 'confirmed') {
+      if (!s || (s.status !== 'confirmed' && s.status !== 'awaiting_payment')) {
         body.innerHTML = '<p style="font-size:0.86rem;color:#dc2626;">This session can no longer be rescheduled.</p>';
         return;
       }
@@ -154,14 +154,16 @@
       var maxDate = new Date(original.getTime() + MAX_DAYS * 24 * 3600 * 1000);
       var startsIn = s.starts_at ? new Date(s.starts_at).getTime() - Date.now() : Infinity;
 
+      var paid = s.status === 'confirmed';
       var warn = '';
-      if (isStudent && startsIn < 24 * 3600 * 1000) {
+      if (paid && isStudent && startsIn < 24 * 3600 * 1000) {
         warn = '<div class="us-rs-warn">⚠️ This session is less than 24 hours away. If ' + esc(otherName) + ' accepts the new time, the session stays non-refundable — cancelling it later won\'t be refunded.</div>';
       }
 
       body.innerHTML = ''
         + '<p style="font-size:0.86rem;color:#334155;line-height:1.5;margin:0;">Currently: <strong>' + esc(fmtWhen(s.scheduled_date, s.scheduled_time, s.timezone)) + '</strong>.<br>'
-        + 'Your session stays at this time until ' + esc(otherName) + ' accepts the new one. No new payment is needed.</p>'
+        + 'Your session stays at this time until ' + esc(otherName) + ' accepts the new one. '
+        + (paid ? 'No new payment is needed.' : 'The booking still needs to be paid; if the new time is sooner, the payment deadline moves earlier with it.') + '</p>'
         + '<div class="us-rs-rules">Times are in <strong>' + esc(tzCity(s.timezone)) + ' time</strong>. A session can be moved up to ' + MAX_MOVES + ' times (' + movesLeft + ' left), to a date within ' + MAX_DAYS + ' days of the original, and at least 2 hours from now.</div>'
         + warn
         + '<div style="display:flex;gap:0.6rem;">'
