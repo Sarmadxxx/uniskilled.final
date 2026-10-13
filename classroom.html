@@ -260,9 +260,20 @@ button{font-family:inherit;cursor:pointer}
     try { cfg = await loadConfig(); }
     catch (e) {
       if (e.message === 'redirect') return;
+      // Show a clean message instead of an empty camera box and a disabled button.
+      document.querySelector('.pj-video').classList.add('hidden');
+      document.querySelector('.pj-card').style.gridTemplateColumns = '1fr';
+      document.querySelector('.pj-card').style.maxWidth = '520px';
+      $('pjMeta').classList.add('hidden');
+      $('joinBtn').classList.add('hidden');
+      document.querySelector('.pj-info .note').classList.add('hidden');
       $('pjTitle').textContent = 'Classroom unavailable';
       $('pjLead').textContent = e.message;
-      $('meter').classList.add('hidden');
+      $('pjLead').insertAdjacentHTML('afterend',
+        '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px">' +
+        '<a class="btn btn-primary" style="text-decoration:none" href="student-dashboard.html">Student dashboard</a>' +
+        '<a class="btn" style="text-decoration:none;background:var(--panel2);color:var(--ink)" href="tutor-dashboard.html?tab=sessions">Tutor dashboard</a></div>');
+      setPill('bad', 'Unavailable');
       return;
     }
     const L = cfg.lesson || {};
