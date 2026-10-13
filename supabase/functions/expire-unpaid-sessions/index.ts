@@ -125,6 +125,41 @@ Deno.serve(async (req: Request) => {
       results.push({ session_id: session.id, reminded: true });
     }
 
+    // ── RATING REMINDERS: one email the day after a lesson, only if it wasn't rated yet ──
+    const { data: toRate } = await supabase.from('sessions')
+      .select('id, student_id, subject, tutor_name, ends_at, status')
+      .in('status', ['completed', 'confirmed'])
+      .gte('ends_at', new Date(now - 26 * HOUR).toISOString())
+      .lte('ends_at', new Date(now - 20 * HOUR).toISOString());
+
+    for (const session of toRate || []) {
+      const link = `rate-lesson.html?session=${session.id}`;
+      const { data: reviewed } = await supabase.from('reviews').select('id').eq('session_id', session.id).limit(1);
+      if (reviewed && reviewed.length > 0) continue;
+      const { data: sent } = await supabase.from('notifications').select('id')
+        .eq('user_id', session.student_id).eq('type', 'rate_reminder').eq('link', link).limit(1);
+      if (sent && sent.length > 0) continue;
+      // Only lessons that actually took place: marked completed, or both were in the classroom.
+      if (session.status !== 'completed') {
+        const { data: att } = await supabase.from('classroom_attendance').select('connected_seconds').eq('session_id', session.id);
+        const connected = (att || []).reduce((a: number, r: any) => a + (r.connected_seconds || 0), 0);
+        if (connected < 300) continue;
+      }
+      await supabase.from('notifications').insert({
+        user_id: session.student_id, type: 'rate_reminder',
+        title: '⭐ How was your lesson?',
+        body: `Rate your ${session.subject} lesson with ${session.tutor_name}. It takes 20 seconds.`,
+        link, read: false,
+      });
+      try {
+        const { data: studentUser } = await supabase.from('users').select('email').eq('id', session.student_id).single();
+        if (studentUser?.email) await sendEmail('rate_lesson', studentUser.email, { sessionId: session.id });
+      } catch (e) {
+        console.error('Rating reminder email failed (non-critical):', e);
+      }
+      results.push({ session_id: session.id, rate_reminder: true });
+    }
+
     // ── GROUP SESSION SPOTS: same 24h unpaid-spot expiry, independent of the
     // 12h minimum-headcount check handled by check-group-session-minimums ──
     const { data: expiredSpots } = await supabase.from('group_session_participants')
@@ -161,6 +196,19 @@ Deno.serve(async (req: Request) => {
 
       results.push({ group_participant_id: spot.id, success: true });
     }
+
+    // ── HOUSEKEEPING: classroom attendance is kept 12 months (Privacy Policy), unless a dispute is open ──
+    try {
+      const cutoff = new Date(now - 365 * 24 * HOUR).toISOString();
+      const { data: old } = await supabase.from('classroom_attendance').select('id, session_id').lt('joined_at', cutoff).limit(500);
+      if (old && old.length) {
+        const sids = [...new Set(old.map((r: any) => r.session_id))];
+        const { data: open } = await supabase.from('disputes').select('session_id').in('session_id', sids).eq('status', 'open');
+        const keep = new Set((open || []).map((d: any) => d.session_id));
+        const ids = old.filter((r: any) => !keep.has(r.session_id)).map((r: any) => r.id);
+        if (ids.length) await supabase.from('classroom_attendance').delete().in('id', ids);
+      }
+    } catch (e) { console.error('Attendance cleanup failed (non-critical):', e); }
 
     return new Response(JSON.stringify({ processed: results.length, results }), { headers: { ...cors, 'Content-Type': 'application/json' } });
 

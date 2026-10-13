@@ -318,6 +318,12 @@ async function loadTutors() {
       reviewMap[r.tutor_id].total += r.rating;
       reviewMap[r.tutor_id].count++;
     });
+    // Fair ranking: a tutor's average is blended with the platform average, weighted like 3 extra
+    // reviews. One 5-star review can't outrank many great reviews, and ratings settle as reviews grow.
+    // Stars are only shown from 3 reviews; before that the tutor is labelled "New tutor".
+    const MIN_REVIEWS_SHOWN = 3, PRIOR_WEIGHT = 3;
+    const allRatings = (reviews || []).map(r => r.rating);
+    const globalMean = allRatings.length ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length : 4.5;
     const courseMap = {};
     (courseRows || []).forEach(c => {
       if (!courseMap[c.tutor_id]) courseMap[c.tutor_id] = [];
@@ -327,11 +333,11 @@ async function loadTutors() {
     allTutors = profiles.map(tp => {
       const u = userMap[tp.user_id] || {};
       const rv = reviewMap[tp.user_id] || { total: 0, count: 0 };
-      return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || '', currency: tp.currency || 'GBP', avgRating: rv.count > 0 ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count, courses: courseMap[tp.user_id] || [] };
+      return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || '', currency: tp.currency || 'GBP', avgRating: rv.count >= MIN_REVIEWS_SHOWN ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count, rankScore: (PRIOR_WEIGHT * globalMean + rv.total) / (PRIOR_WEIGHT + rv.count), courses: courseMap[tp.user_id] || [] };
     });
 
     // Verified tutors first (nobody is hidden); original order otherwise
-    allTutors.sort((a, b) => (b.university_verified_at ? 1 : 0) - (a.university_verified_at ? 1 : 0));
+    allTutors.sort((a, b) => ((b.university_verified_at ? 1 : 0) - (a.university_verified_at ? 1 : 0)) || (b.rankScore - a.rankScore) || (b.reviewCount - a.reviewCount));
     renderTutors(allTutors);
     renderQuickSubjects();
 
@@ -374,7 +380,7 @@ function renderTutors(tutors) {
           <div class="tutor-meta">
             ${t.university_verified_at ? `<span class="verified" title="University email verified${t.verified_university ? ' — ' + __esc(t.verified_university) : ''}">✓ Verified</span>` : ''}
             ${(t.location||t.country) ? `<span>${__esc(t.location||t.country)}</span>` : ''}
-            ${t.avgRating ? `<span class="rating" aria-label="Rated ${__esc(t.avgRating)} out of 5 from ${__esc(t.reviewCount)} review${t.reviewCount===1?'':'s'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>${__esc(t.avgRating)} <span>(${__esc(t.reviewCount)})</span></span>` : `<span class="new-tutor">New tutor</span>`}
+            ${t.avgRating ? `<span class="rating" aria-label="Rated ${__esc(t.avgRating)} out of 5 from ${__esc(t.reviewCount)} review${t.reviewCount===1?'':'s'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>${__esc(t.avgRating)} <span>(${__esc(t.reviewCount)})</span></span>` : `<span class="new-tutor" title="Fewer than 3 reviews so far">New tutor${t.reviewCount ? ' · ' + __esc(t.reviewCount) + ' review' + (t.reviewCount === 1 ? '' : 's') : ''}</span>`}
           </div>
         </div>
       </div>

@@ -96,7 +96,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
 <script src="site-nav.js"></script>
 
 <div class="hero">
-  <div class="hero-updated">Last updated: 9 October 2026</div>
+  <div class="hero-updated">Last updated: 13 October 2026</div>
   <h1>Legal Information</h1>
   <p>Terms of Service · Privacy Policy · Cookie Policy · Refund Policy · Impressum</p>
 </div>
@@ -220,7 +220,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
 
   <!-- ── 3. PRIVACY POLICY ── -->
   <div class="legal-section" id="privacy">
-    <div class="section-label">GDPR — Regulation (EU) 2016/679 · Last updated: 12 October 2026</div>
+    <div class="section-label">GDPR — Regulation (EU) 2016/679 · Last updated: 13 October 2026</div>
     <h2>Privacy Policy (Datenschutzerklärung)</h2>
 
     <div class="callout callout-blue">
@@ -245,7 +245,8 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
         <tr><td>Referral data</td><td>Who referred whom, referral rewards and credit balance</td><td>Art. 6(1)(b) — contract performance</td></tr>
         <tr><td>Technical data</td><td>IP address, browser type, session timestamps, error logs</td><td>Art. 6(1)(f) — legitimate interest (security, fraud prevention)</td></tr>
         <tr><td>Usage analytics</td><td>Pages visited, clicks and booking steps; with your consent also session recordings (all form inputs are masked, and chats and admin pages are never recorded)</td><td>Art. 6(1)(a) — consent (see Cookie Policy); without consent only anonymous, cookieless counts — Art. 6(1)(f)</td></tr>
-        <tr><td>Reviews &amp; ratings</td><td>Written reviews, star ratings</td><td>Art. 6(1)(b) — contract performance</td></tr>
+        <tr><td>Reviews &amp; ratings</td><td>Star rating, quick tags and written review for a lesson; the tutor's public reply; optional private feedback to UniSkilled (never shown to the tutor)</td><td>Art. 6(1)(b) — contract performance; Art. 6(1)(f) — legitimate interest (quality and safety of lessons)</td></tr>
+        <tr><td>Lesson classroom</td><td>When you entered and left the lesson room and how long you were connected to the other person (attendance record). Video, audio, chat and files are <strong>not recorded or stored</strong> by UniSkilled — they go directly between the two participants</td><td>Art. 6(1)(b) — contract (providing the lesson); Art. 6(1)(f) — legitimate interest (resolving disputes, e.g. no-shows)</td></tr>
       </tbody>
     </table></div>
 
@@ -286,7 +287,8 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
         <tr><td>PostHog (EU Cloud)</td><td>Product analytics and session recordings — only with your consent, beyond anonymous counts</td><td>EU (Frankfurt)</td></tr>
         <tr><td>jsDelivr</td><td>Delivers website code libraries (receives your IP address to serve the files)</td><td>Global CDN</td></tr>
         <tr><td>GitHub Pages</td><td>Static website hosting</td><td>Global CDN</td></tr>
-        <tr><td>Zoom / Google Meet</td><td>Video call sessions (link only — not controlled by UniSkilled)</td><td>Global (user's own account)</td></tr>
+        <tr><td>Cloudflare (Realtime)</td><td>Helps the two devices in a lesson find each other and, if a network blocks direct connections, relays the encrypted call. Lessons are not recorded</td><td>Global network (SCCs)</td></tr>
+        <tr><td>Zoom / Google Meet</td><td>Only if a tutor adds a backup meeting link and you choose to use it (not controlled by UniSkilled)</td><td>Global (user's own account)</td></tr>
       </tbody>
     </table></div>
     <p>All EU-based processors operate under Data Processing Agreements (DPAs) compliant with GDPR Article 28. For transfers outside the EU/EEA, Standard Contractual Clauses (SCCs) are in place. Website fonts are hosted by UniSkilled itself, so no font provider receives your data.</p>
@@ -297,6 +299,8 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
       <li><strong>Financial records</strong> (payments, refunds, payouts and the bookings they belong to, including cancellations and reschedules): 10 years (German tax law — § 147 AO). After you close your account these are kept in anonymised or restricted form only.</li>
       <li><strong>Messages:</strong> 12 months after the last message, then deleted</li>
       <li><strong>Reports &amp; disputes:</strong> 3 years after resolution</li>
+      <li><strong>Lesson attendance records:</strong> 12 months after the lesson (longer only if a dispute about that lesson is open)</li>
+      <li><strong>Reviews:</strong> public for as long as the tutor's profile exists; private feedback to UniSkilled 3 years</li>
       <li><strong>Analytics:</strong> event data up to 12 months; session recordings up to 30 days</li>
       <li><strong>Technical logs:</strong> 90 days</li>
     </ul>
@@ -527,6 +531,9 @@ function usResetAnalyticsChoice() {
     </ul>
 
     <h3>Reviews &amp; Ratings</h3>
+    <p><strong>How we make sure reviews come from real students.</strong> A lesson can only be rated by the student who booked and paid for it on UniSkilled, only after the lesson has taken place, and only once per lesson (the student can edit their rating for 14 days). Such reviews are marked “Verified lesson”. We do not pay or otherwise reward students for reviews, and we publish positive and negative reviews alike. Tutors cannot remove reviews; they can publish one public reply. We remove a review only if it breaks the rules below or is subject to a valid legal complaint.</p>
+    <p><strong>How ratings are shown.</strong> A tutor's average rating is shown once they have at least 3 reviews; before that they are shown as “New tutor”.</p>
+    <p><strong>How tutors are ordered in search results.</strong> By default, tutors with a verified university email are listed first. Within that, tutors are ordered by a weighted rating that combines their average rating with the number of reviews (so a single review does not outweigh many), and then by number of reviews. Tutors cannot pay for a better position.</p>
     <p>Reviews must be honest and based on your direct experience. Fake reviews, incentivised reviews, or reviews submitted by someone other than the session participant are prohibited and will be removed. UniSkilled reserves the right to remove reviews that violate these guidelines or that are subject to a valid legal complaint.</p>
 
     <h3>Reporting</h3>

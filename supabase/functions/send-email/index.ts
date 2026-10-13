@@ -285,7 +285,7 @@ function sessionRows(f: Facts, opts: { who?: 'tutor' | 'student' | 'both'; amoun
   const rows: [string, string][] = [['Subject', f.subject]];
   if ((who === 'tutor' || who === 'both') && f.tutorName) rows.push(['Tutor', f.tutorName]);
   if ((who === 'student' || who === 'both') && f.studentName) rows.push(['Student', f.studentName]);
-  rows.push(['Date', f.date], ['Time', f.time], ['Duration', f.duration], ['Format', 'Online video call (join from your dashboard)']);
+  rows.push(['Date', f.date], ['Time', f.time], ['Duration', f.duration], ['Format', 'Online lesson in the UniSkilled classroom']);
   if (!opts.noAmount && f.amount) rows.push([opts.amountLabel || 'Price', f.amount]);
   (opts.extra || []).forEach(r => rows.push(r));
   if (f.ref) rows.push(['Booking reference', `#${f.ref}`]);
@@ -298,6 +298,11 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
   const tutorDash = `${SITE}/tutor-dashboard.html`;
   const sessionsLink = role === 'tutor' ? `${tutorDash}?tab=sessions` : studentDash;
   const payLink = `${SITE}/complete-payment.html?session=${encodeURIComponent(String(raw?.sessionId || ''))}`;
+  const roomLink = raw?.sessionId ? `${SITE}/classroom.html?session=${encodeURIComponent(String(raw.sessionId))}` : '';
+  const roomStep = roomLink
+    ? `At the lesson time, open your <a href="${roomLink}" style="color:#1a6bff;font-weight:700;">lesson room</a>. It opens 10 minutes before the start, and you can also join from your dashboard.`
+    : 'At the lesson time, join the lesson from your dashboard.';
+  const rateLink = raw?.sessionId ? `${SITE}/rate-lesson.html?session=${encodeURIComponent(String(raw.sessionId))}` : `${SITE}/student-dashboard.html`;
   const when = f.date ? `${f.date}${f.time ? ', ' + f.time : ''}` : 'the agreed time';
   const shortDate = f.date ? f.date.replace(/, \d{4}$/, '').replace(/ \d{4}$/, '') : '';
 
@@ -363,7 +368,7 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         steps: [
           'Click the button below and pay securely by card (processed by Stripe).',
           'You receive a confirmation email with your receipt straight away.',
-          'At the session time, join the video call from your dashboard.',
+          'At the lesson time, join the lesson room from your dashboard.',
         ],
         cta: { label: `Pay ${f.amount || 'now'} and confirm`, url: payLink },
         secondary: [POLICY_SHORT],
@@ -378,7 +383,7 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         intro: [`You accepted <strong>${f.studentName}</strong>’s request for <strong>${f.subject}</strong>. We have sent them a secure payment link.`],
         callout: { tone: 'info', title: f.due ? `Payment deadline: ${f.due}` : 'Waiting for payment', text: 'The session is only confirmed once the student pays. If they don’t pay in time, the slot is released automatically and we let you know.' },
         details: sessionRows(f, { who: 'student' }),
-        steps: ['We email you as soon as the student pays.', 'At the session time, start the video call from your dashboard.', PAYOUT_SHORT],
+        steps: ['We email you as soon as the student pays.', 'At the lesson time, join the lesson room from your dashboard.', PAYOUT_SHORT],
         cta: { label: 'View my sessions', url: `${tutorDash}?tab=sessions` },
         secondary: ['If something urgent comes up, you can cancel or ask to move the booking from your dashboard. The student is notified immediately.'],
         ref: f.ref,
@@ -409,7 +414,7 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         details: sessionRows(f, { who: f.kind === 'group' ? 'tutor' : 'tutor', amountLabel: 'Amount paid' }),
         steps: [
           'Add the session to your calendar.',
-          'At the session time, open your dashboard and join the video call. Your tutor will be there.',
+          roomStep,
           'After the session you can leave a review. If something went wrong, report it within 48 hours.',
         ],
         cta: { label: 'View my session', url: studentDash },
@@ -424,7 +429,7 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         greeting: first(f.tutorName),
         intro: [`<strong>${f.studentName}</strong> has completed payment for your <strong>${f.subject}</strong> session on <strong>${when}</strong>. It is now confirmed on both sides.`],
         details: sessionRows(f, { who: 'student', amountLabel: 'Session price' }),
-        steps: ['Prepare any materials you need for the session.', 'At the session time, start the video call from your dashboard.', PAYOUT_SHORT],
+        steps: ['Prepare any materials you need for the lesson. You can share files in the lesson chat.', roomStep, PAYOUT_SHORT],
         cta: { label: 'View session', url: `${tutorDash}?tab=sessions` },
         secondary: ['If something urgent comes up, ask to move the session or cancel it from your dashboard. If you cancel, the student is refunded in full.'],
         ref: f.ref,
@@ -573,9 +578,9 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         detailsTitle: 'Updated session details',
         steps: unpaid
           ? (role === 'student'
-              ? [`The booking still needs to be paid to be confirmed${f.due ? `. Please pay by <strong>${f.due}</strong>` : ''}.`, 'Join the video call from your dashboard at the new time.']
+              ? [`The booking still needs to be paid to be confirmed${f.due ? `. Please pay by <strong>${f.due}</strong>` : ''}.`, 'Join the lesson room from your dashboard at the new time.']
               : ['The student still needs to pay before the session is confirmed. We email you when they do.'])
-          : [role === 'student' ? 'No new payment is needed. Your original payment covers the new time.' : 'No action needed. The payment carries over to the new time.', 'Join the video call from your dashboard at the new time.'],
+          : [role === 'student' ? 'No new payment is needed. Your original payment covers the new time.' : 'No action needed. The payment carries over to the new time.', 'Join the lesson room from your dashboard at the new time.'],
         cta: unpaid && role === 'student' ? { label: 'Complete payment', url: payLink } : { label: 'View session', url: sessionsLink },
         secondary: [RESCHEDULE_SHORT],
         ref: f.ref,
@@ -657,6 +662,29 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         secondary: ['If you have new information about this case, reply to this email within 7 days.'],
         ref: f.ref,
       };
+
+    // ── Rating reminder (day after the lesson) ─────────────────────────────
+    case 'rate_lesson': {
+      const stars = [1, 2, 3, 4, 5].map((n) =>
+        `<a href="${rateLink}&stars=${n}" style="display:inline-block;margin:0 3px;font-size:34px;line-height:1;color:#f59e0b;text-decoration:none;" aria-label="${n} star${n > 1 ? 's' : ''}">&#9733;</a>`).join('');
+      return {
+        subject: `How was your ${f.subject} lesson with ${f.tutorName}?`,
+        preheader: 'Rate your lesson in 20 seconds. It helps other students choose the right tutor.',
+        tone: 'info', label: 'Rate your lesson', title: `How was your lesson with ${f.tutorName}?`,
+        greeting: first(f.studentName),
+        intro: [
+          `We hope your <strong>${f.subject}</strong> lesson went well. Tap a star to rate it. It takes about 20 seconds and helps other students find the right tutor.`,
+          `<div style="text-align:center;margin:6px 0 4px;">${stars}</div><div style="text-align:center;font-size:12px;color:#64748b;">1 = poor &nbsp;·&nbsp; 5 = excellent</div>`,
+        ],
+        details: sessionRows(f, { who: 'tutor', noAmount: true }),
+        detailsTitle: 'Your lesson',
+        cta: { label: 'Rate your lesson', url: rateLink },
+        secondary: [
+          'You can also leave private feedback that only UniSkilled sees. If something went wrong, you can report an issue from your dashboard within 48 hours of the lesson.',
+        ],
+        ref: f.ref,
+      };
+    }
 
     // ── Referral ───────────────────────────────────────────────────────────
     case 'referral_qualified':
@@ -803,7 +831,7 @@ Deno.serve(async (req) => {
     if (!role && session && recipientId) role = recipientId === session.tutor_id ? 'tutor' : recipientId === session.student_id ? 'student' : null;
     if (!role) {
       if (['booking_request', 'payment_received', 'payment_expired_tutor', 'group_session_cancelled_tutor', 'booking_accepted_tutor'].includes(type)) role = 'tutor';
-      else if (['booking_request_sent', 'awaiting_payment', 'booking_confirmed', 'booking_declined', 'payment_expired', 'payment_reminder', 'group_session_cancelled'].includes(type)) role = 'student';
+      else if (['booking_request_sent', 'awaiting_payment', 'booking_confirmed', 'booking_declined', 'payment_expired', 'payment_reminder', 'group_session_cancelled', 'rate_lesson'].includes(type)) role = 'student';
     }
 
     // What the student actually paid (after any credit or discount). Tutors keep seeing the session price.

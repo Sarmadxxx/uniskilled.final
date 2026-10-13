@@ -241,6 +241,7 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="reviews-ui.js?v=1"></script>
 <script src="analytics.js" defer></script>
 </head>
 <body>
@@ -369,7 +370,7 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- MEETING LINK (owner only — never shown to visitors) -->
     <div class="card owner-only" style="display:none;">
       <div class="card-head">
-        <h2 class="card-title">Meeting link</h2>
+        <h2 class="card-title">Backup meeting link</h2>
         <button class="edit-btn owner-only" onclick="openMeetingLinkModal()" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="meetingLinkBody">
@@ -387,15 +388,9 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
         <div class="reviews-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg><span><strong>No reviews yet.</strong> Only students who completed a paid session with this tutor on UniSkilled can leave a review.</span></div>
       </div>
       <div id="reviewFormWrap" style="display:none;border-top:1px solid var(--border);padding:1.4rem;">
-        <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.8rem;">Leave a review</div>
-        <div class="star-select" id="starSelect">
-          <button type="button" class="star-btn" data-v="1" aria-label="Rate 1 out of 5">★</button><button type="button" class="star-btn" data-v="2" aria-label="Rate 2 out of 5">★</button>
-          <button type="button" class="star-btn" data-v="3" aria-label="Rate 3 out of 5">★</button><button type="button" class="star-btn" data-v="4" aria-label="Rate 4 out of 5">★</button>
-          <button type="button" class="star-btn" data-v="5" aria-label="Rate 5 out of 5">★</button>
-        </div>
-        <textarea class="form-textarea" id="reviewText" placeholder="Share your experience..."></textarea>
-        <button class="btn btn-primary" onclick="submitReview()" style="margin-top:0.7rem;width:100%;">Submit review</button>
-        <div class="alert-bar" id="reviewAlert" style="margin-top:0.6rem;"></div>
+        <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.4rem;">Had a lesson with this tutor?</div>
+        <p style="font-size:0.83rem;color:var(--mid);line-height:1.55;margin-bottom:0.8rem;">Each lesson can be rated once, by the student who had it. Rate your finished lessons from your dashboard.</p>
+        <a class="btn btn-primary" href="student-dashboard.html" style="width:100%;text-align:center;text-decoration:none;display:block;">Rate my lessons</a>
       </div>
     </div>
 
@@ -999,7 +994,7 @@ async function loadMeetingLink() {
     const display = tp.meeting_link.replace('https://','').slice(0,50) + (tp.meeting_link.length > 53 ? '…' : '');
     body.innerHTML = `<div class="info-row"><span class="info-label">Link</span><span class="info-value"><a href="${__safeUrl(tp.meeting_link)}" target="_blank" style="color:var(--blue);word-break:break-all;">🔗 ${__esc(display)}</a></span></div><div style="font-size:0.78rem;color:var(--mid);margin-top:0.5rem;">Students use this link to join confirmed sessions with you.</div>`;
   } else {
-    body.innerHTML = '<span class="empty">No meeting link added yet. Click Edit to add your Zoom or Google Meet link.</span>';
+    body.innerHTML = '<span class="empty">Optional. Lessons take place in the UniSkilled classroom. You can add a Zoom or Google Meet link as a backup in case of connection problems.</span>';
   }
 }
 
@@ -1021,20 +1016,14 @@ async function openMeetingLinkModal() {
 async function loadReviews() {
   const { data } = await _supabase.from('reviews').select('*').eq('tutor_id', tutorId).order('created_at', { ascending: false });
   const reviews = data || [];
+  const sum = UsReviews.summary(reviews);
   document.getElementById('statReviews').textContent = reviews.length;
+  document.getElementById('statRating').textContent = reviews.length ? sum.rating : '—';
+  document.getElementById('avgRatingDisplay').textContent = reviews.length ? sum.label : '';
   if (reviews.length > 0) {
-    const avg = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
-    document.getElementById('statRating').textContent = avg;
-    document.getElementById('avgRatingDisplay').textContent = '⭐ ' + avg + ' (' + reviews.length + ')';
-    document.getElementById('reviewsBody').innerHTML = reviews.map(r => `
-      <div class="review-item" style="padding:1rem 1.4rem;border-bottom:1px solid var(--border);">
-        <div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;">
-          <span class="reviewer-name">${__esc(r.student_name || 'Student')}</span>
-          <span style="font-size:0.7rem;color:var(--light);">${__esc(new Date(r.created_at).toLocaleDateString())}</span>
-        </div>
-        <div class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</div>
-        <div class="review-text">${__esc(r.comment || '')}</div>
-      </div>`).join('');
+    const body = document.getElementById('reviewsBody');
+    body.innerHTML = UsReviews.listHtml(reviews, { replyable: isOwner });
+    if (isOwner) UsReviews.bindReplies(body, _supabase, loadReviews);
   }
 }
 
@@ -1394,11 +1383,11 @@ function profileSignOut() {
       <button class="modal-x" onclick="closeModal('modalMeetingLink')">✕</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:0.83rem;color:var(--mid);line-height:1.6;margin-bottom:1.2rem;">Add your Zoom or Google Meet personal link. Students will use this to join confirmed sessions with you.</p>
+      <p style="font-size:0.83rem;color:var(--mid);line-height:1.6;margin-bottom:1.2rem;">Lessons take place in the built-in UniSkilled classroom, so no link is needed. Optionally add a Zoom or Google Meet link: it is only shown inside the classroom as a backup if the connection has problems.</p>
       <div class="form-group">
         <label for="inputMeetingLink" class="form-label">Your meeting link</label>
         <input type="url" class="form-input" id="inputMeetingLink" placeholder="https://zoom.us/j/your-personal-room">
-        <div style="font-size:0.75rem;color:var(--mid);margin-top:0.4rem;">💡 Use your free Zoom personal room link — no time limits for 1-on-1 sessions.</div>
+        <div style="font-size:0.75rem;color:var(--mid);margin-top:0.4rem;">💡 Test the link in a private browser window after saving, so you know it opens your room.</div>
       </div>
     </div>
     <div class="modal-footer">

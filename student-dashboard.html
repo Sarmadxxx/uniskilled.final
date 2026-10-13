@@ -812,43 +812,23 @@ async function submitReschedule() {
 }
 
 async function joinSession(sessionId, subject, otherName) {
-  const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = '⏳ Opening…';
+  // Lessons take place in the UniSkilled classroom. Open it immediately (inside the click,
+  // so phones don't block the new tab), then let the tutor know you're there.
+  const w = window.open('classroom.html?session=' + encodeURIComponent(sessionId), '_blank');
+  if (!w) location.href = 'classroom.html?session=' + encodeURIComponent(sessionId);
   try {
-    const { data: sessionData } = await _sb.from('sessions')
-      .select('tutor_id, tutor_name')
-      .eq('id', sessionId).maybeSingle();
-
-    // Get the tutor's meeting link — only released for a confirmed, paid session you're part of
-    const { data: meetingLink } = await _sb.rpc('get_session_meeting_link', { p_session_id: sessionId });
-    const tp = { meeting_link: meetingLink || null };
-
-    // Notify tutor that student has joined
+    const { data: sessionData } = await _sb.from('sessions').select('tutor_id').eq('id', sessionId).maybeSingle();
     if (sessionData?.tutor_id) {
       await _sb.from('notifications').insert({
         user_id: sessionData.tutor_id,
         type: 'call_started',
-        title: '📹 ' + (currentUserName || 'Your student') + ' has joined the session!',
-        body: 'Your ' + subject + ' session is live.',
-        link: 'tutor-dashboard.html',
+        title: '📹 ' + (currentUserName || 'Your student') + ' is in the classroom',
+        body: 'Your ' + subject + ' lesson is ready. Click to join.',
+        link: 'classroom.html?session=' + sessionId,
         read: false
       });
     }
-
-    if (tp?.meeting_link) {
-      window.open(tp.meeting_link, '_blank');
-    } else {
-      showToast('Your tutor hasn\'t added a meeting link yet. Message them for the call details.', 'info');
-    }
-
-    btn.disabled = false;
-    btn.textContent = 'Join session';
-  } catch (err) {
-    showToast('Couldn\'t open the session. Check your connection and try again.', 'error');
-    btn.disabled = false;
-    btn.textContent = 'Join session';
-  }
+  } catch (err) { /* the classroom is already open; the notification is a courtesy */ }
 }
 
 

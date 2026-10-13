@@ -230,6 +230,7 @@ a.profile-av{text-decoration:none;}
 <script src="ui.js"></script>
 <script src="auth-guard.js"></script>
 <script src="reschedule.js"></script>
+<script src="reviews-ui.js?v=1"></script>
 <script src="university-verify.js"></script>
 <script src="analytics.js" defer></script>
 </head>
@@ -1166,24 +1167,19 @@ async function loadSessions() {
     : __ovLabels(upcoming.slice(0, 3).map(sessionHtml).join(''));
 }
 
-// ── REVIEWS ──
+// ── REVIEWS ── (display + public replies: reviews-ui.js)
 async function loadReviews() {
   const { data } = await _sb.from('reviews').select('*').eq('tutor_id', userId).order('created_at', { ascending: false });
   const reviews = data || [];
+  const sum = UsReviews.summary(reviews);
   document.getElementById('statReviews').textContent = reviews.length;
   if (reviews.length > 0) {
-    const avg = (reviews.reduce((a, r) => a + r.rating, 0) / reviews.length).toFixed(1);
-    document.getElementById('statRating').textContent = avg;
-    document.getElementById('avgRatingDisplay').textContent = '⭐ ' + avg + ' (' + reviews.length + ')';
-    document.getElementById('reviewsList').innerHTML = reviews.map(r => `
-      <div class="review-row">
-        <div class="review-header">
-          <span class="review-name">${__esc(r.student_name || 'Student')}</span>
-          <span class="review-stars">${'★'.repeat(r.rating)}${'☆'.repeat(5 - r.rating)}</span>
-        </div>
-        <div style="font-size:0.7rem;color:var(--light);margin-bottom:0.4rem;">${__esc(new Date(r.created_at).toLocaleDateString())}</div>
-        <div class="review-text">${__esc(r.comment || '')}</div>
-      </div>`).join('');
+    document.getElementById('statRating').textContent = sum.rating;
+    document.getElementById('avgRatingDisplay').textContent = sum.label;
+    const list = document.getElementById('reviewsList');
+    list.innerHTML = (sum.isNew ? '<div style="padding:0.8rem 1.4rem;font-size:0.8rem;color:var(--mid);background:#f8fafc;border-bottom:1px solid var(--border)">Students see you as a <b>New tutor</b> until you have 3 reviews. Then your average rating is shown.</div>' : '')
+      + UsReviews.listHtml(reviews, { replyable: true });
+    UsReviews.bindReplies(list, _sb, loadReviews);
   }
 }
 
@@ -1649,44 +1645,23 @@ async function confirmCancel(confirmNoRefund, btn) {
 }
 
 async function joinSession(sessionId, subject, otherName) {
-  const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = '⏳ Opening…';
+  // Lessons take place in the UniSkilled classroom. Open it immediately (inside the click,
+  // so phones don't block the new tab), then let the student know the lesson has started.
+  const w = window.open('classroom.html?session=' + encodeURIComponent(sessionId), '_blank');
+  if (!w) location.href = 'classroom.html?session=' + encodeURIComponent(sessionId);
   try {
-    const { data: sessionData } = await _sb.from('sessions')
-      .select('student_id, tutor_id')
-      .eq('id', sessionId).maybeSingle();
-
-    // Get the tutor's meeting link
-    const { data: tp } = await _sb.rpc('get_my_tutor_private').maybeSingle();
-
-    // Notify student that session is starting
+    const { data: sessionData } = await _sb.from('sessions').select('student_id').eq('id', sessionId).maybeSingle();
     if (sessionData?.student_id) {
       await _sb.from('notifications').insert({
         user_id: sessionData.student_id,
         type: 'call_started',
-        title: '📹 ' + tutorName + ' has started the session!',
-        body: 'Your ' + subject + ' session is ready. Click to join now.',
-        link: 'student-dashboard.html',
+        title: '📹 ' + tutorName + ' has started the lesson',
+        body: 'Your ' + subject + ' lesson is ready. Click to join the classroom.',
+        link: 'classroom.html?session=' + sessionId,
         read: false
       });
     }
-
-    if (tp?.meeting_link) {
-      // Use the tutor's personal Zoom/Meet link
-      window.open(tp.meeting_link, '_blank');
-    } else {
-      // No meeting link set — prompt tutor to add one
-      showToast('Add your Zoom or Google Meet link first: Edit Profile → Levels & Languages → Meeting link.', 'info');
-    }
-
-    btn.disabled = false;
-    btn.textContent = '🎥 Join Session';
-  } catch (err) {
-    showToast('Couldn\'t open the session. Check your connection and try again.', 'error');
-    btn.disabled = false;
-    btn.textContent = '🎥 Join Session';
-  }
+  } catch (err) { /* the classroom is already open; the notification is a courtesy */ }
 }
 
 

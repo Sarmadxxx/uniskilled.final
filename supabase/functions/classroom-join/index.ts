@@ -23,7 +23,7 @@ async function roomKey(sessionId: string): Promise<string> {
 // Connection helpers: STUN finds a direct route; TURN relays the call when networks block
 // direct connections (university, office and some mobile networks).
 async function iceServers(): Promise<any[]> {
-  const servers: any[] = [{ urls: ['stun:stun.cloudflare.com:3478', 'stun:stun.l.google.com:19302'] }];
+  const servers: any[] = [{ urls: ['stun:stun.cloudflare.com:3478'] }];
   try {
     const cfKey = Deno.env.get('CF_TURN_KEY_ID'), cfToken = Deno.env.get('CF_TURN_API_TOKEN');
     if (cfKey && cfToken) {

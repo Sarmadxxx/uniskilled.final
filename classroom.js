@@ -63,7 +63,7 @@
       this.me = { ...opts.me, peerId: opts.me.peerId || rid() };
       this.transport = opts.transport || null;
       this.makeTransport = opts.makeTransport || null; // (me) => transport
-      this.iceServers = opts.iceServers || [{ urls: 'stun:stun.l.google.com:19302' }];
+      this.iceServers = opts.iceServers || [{ urls: 'stun:stun.cloudflare.com:3478' }];
       this.onEvent = opts.onEvent || (() => {});
       this.local = null;          // MediaStream from camera/mic
       this.screen = null;         // MediaStream from screen share
@@ -180,9 +180,11 @@
       // Keep-alive so each side notices if the other closes the tab without saying goodbye.
       this.heartbeat = setInterval(() => {
         this.say({ type: 'ping' });
-        if (this.peer && Date.now() - this.lastPeerSeen > 20000 && this.state !== 'connected') this.peerGone();
-      }, 5000);
-      window.addEventListener('beforeunload', this._bye = () => this.say({ type: 'bye' }));
+        if (this.peer && Date.now() - this.lastPeerSeen > 45000 && this.state !== 'connected') this.peerGone();
+      }, 15000); // every 15 s keeps free-plan message use low (~1,000 per lesson-hour)
+      this._bye = () => this.say({ type: 'bye' });
+      window.addEventListener('beforeunload', this._bye);
+      window.addEventListener('pagehide', this._bye); // iPhones don't always fire beforeunload
     }
 
     say(m) { try { this.transport && this.transport.send(m); } catch (e) { console.warn('send failed', e); } }
@@ -466,7 +468,7 @@
       this.say({ type: 'bye' });
       clearInterval(this.heartbeat);
       clearTimeout(this.restartTimer);
-      if (this._bye) window.removeEventListener('beforeunload', this._bye);
+      if (this._bye) { window.removeEventListener('beforeunload', this._bye); window.removeEventListener('pagehide', this._bye); }
       try { this.pc && this.pc.close(); } catch (e) {}
       [this.local, this.screen].forEach((s) => s && s.getTracks().forEach((t) => t.stop()));
       try { this.transport && this.transport.close(); } catch (e) {}
