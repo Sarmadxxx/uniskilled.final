@@ -191,7 +191,8 @@ button{font-family:inherit;cursor:pointer}
   </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="auth-guard.js"></script>
 <script src="classroom.js"></script>
 <script>
 (function () {
@@ -242,9 +243,15 @@ button{font-family:inherit;cursor:pointer}
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8');
     const { data: s } = await sb.auth.getSession();
     if (!s.session) { location.href = 'signin.html?redirect=' + encodeURIComponent('classroom.html' + location.search); throw new Error('redirect'); }
-    const { data, error } = await sb.functions.invoke('classroom-join', { body: { session_id: sessionId } });
-    if (error || !data || data.error) throw new Error((data && data.error) || 'The classroom could not be opened. Please try again.');
-    await sb.realtime.setAuth(s.session.access_token);
+    // Confirms the login is still active (renews it if needed, or sends you to sign in).
+    const token = await window.usFreshToken(sb);
+    const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/classroom-join', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ session_id: sessionId }),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok || !data || data.error) throw new Error((data && data.error) || 'The classroom could not be opened. Please try again.');
+    sb.realtime.setAuth(token);
     return { mode: 'supabase', sb, ...data };
   }
 
@@ -319,6 +326,7 @@ button{font-family:inherit;cursor:pointer}
       return;
     }
     cancelAnimationFrame(meterRaf);
+    startAttendance();
     $('prejoin').classList.add('hidden'); $('ended').classList.add('hidden'); $('stage').classList.remove('hidden');
     $('selfVideo').srcObject = room.local;
     $('ovText').textContent = cfg.other?.name ? 'We\'ll connect you as soon as ' + cfg.other.name + ' joins. Keep this page open.' : 'Keep this page open.';
@@ -395,6 +403,20 @@ button{font-family:inherit;cursor:pointer}
     renderRemote();
   }
 
+  // Attendance: records that you were in the lesson room and how long you were connected
+  // to the other person (used if there is ever a dispute about a lesson).
+  let attInt = null;
+  function beat() {
+    if (cfg.mode !== 'supabase') return;
+    cfg.sb.rpc('classroom_heartbeat', { p_session_id: cfg.sessionId, p_connected: room.state === 'connected' })
+      .then(({ error }) => { if (error) console.warn('attendance:', error.message); });
+  }
+  function startAttendance() { beat(); clearInterval(attInt); attInt = setInterval(beat, 30000); }
+  function stopAttendance(left) {
+    clearInterval(attInt); attInt = null;
+    if (left && cfg.mode === 'supabase') { beat(); cfg.sb.rpc('classroom_leave', { p_session_id: cfg.sessionId }); }
+  }
+
   function tick() {
     const s = Math.floor((Date.now() - joinedAt) / 1000);
     const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
@@ -428,7 +450,7 @@ button{font-family:inherit;cursor:pointer}
     else if (v.trim()) toast('Chat is available once you\'re connected.');
   };
   $('leaveBtn').onclick = () => {
-    room.leave(); clearInterval(timerInt);
+    room.leave(); clearInterval(timerInt); stopAttendance(true);
     $('stage').classList.add('hidden'); $('ended').classList.remove('hidden');
   };
   $('rejoinBtn').onclick = () => location.reload();
