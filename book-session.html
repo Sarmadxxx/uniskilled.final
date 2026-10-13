@@ -488,7 +488,7 @@ async function submitBooking(){
 
   try {
     const __tok=(await _sb.auth.getSession()).data.session?.access_token;
-    if(tutorId&&__tok) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+__tok},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time:time+' ('+__viewerTz().split('/').pop().replace(/_/g,' ')+' time)',duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
+    if(tutorId&&__tok) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+__tok},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{sessionId:sess?.id,tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time:time+' ('+__viewerTz().split('/').pop().replace(/_/g,' ')+' time)',duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);

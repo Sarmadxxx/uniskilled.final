@@ -175,7 +175,7 @@ Deno.serve(async (req: Request) => {
       try {
         const { data: studentUser } = await supabase.from('users').select('email').eq('id', session.student_id).single();
         const { data: tutorUser } = await supabase.from('users').select('email').eq('id', session.tutor_id).single();
-        const emailData = { studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, refunded: false, unpaid: true, cancelledBy: isTutor ? 'tutor' : 'student' };
+        const emailData = { sessionId: session.id, reason: reason || '', studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, refunded: false, unpaid: true, cancelledBy: isTutor ? 'tutor' : 'student' };
         if (studentUser?.email) await sendEmail(supabaseUrl, 'session_cancelled', studentUser.email, emailData);
         if (tutorUser?.email) await sendEmail(supabaseUrl, 'session_cancelled', tutorUser.email, emailData);
       } catch (e) {
@@ -272,7 +272,7 @@ Deno.serve(async (req: Request) => {
     try {
       const { data: studentUser } = await supabase.from('users').select('email').eq('id', session.student_id).single();
       const { data: tutorUser } = await supabase.from('users').select('email').eq('id', session.tutor_id).single();
-      const emailData = { studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, refunded: outcome === 'full_refund', cancelledBy: isTutor ? 'tutor' : 'student' };
+      const emailData = { sessionId: session.id, reason: reason || '', studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, refunded: outcome === 'full_refund', cancelledBy: isTutor ? 'tutor' : 'student' };
       if (studentUser?.email) await sendEmail(supabaseUrl, 'session_cancelled', studentUser.email, emailData);
       if (tutorUser?.email) await sendEmail(supabaseUrl, 'session_cancelled', tutorUser.email, emailData);
     } catch (e) {

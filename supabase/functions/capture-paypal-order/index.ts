@@ -203,6 +203,7 @@ Deno.serve(async (req: Request) => {
         const { data: studentUser } = await supabase.from('users').select('email').eq('id', participant.student_id).single();
         const { data: tutorUser } = await supabase.from('users').select('email').eq('id', gs.tutor_id).single();
         const emailData = {
+          groupSessionId: gs.id,
           studentName: participant.student_name, tutorName: gs.tutor_name, subject: gs.subject,
           date: gs.scheduled_date ? new Date(gs.scheduled_date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'TBD',
           time: gs.scheduled_time || '', duration: gs.duration_minutes || 60,
@@ -345,6 +346,7 @@ Deno.serve(async (req: Request) => {
       const { data: studentUser } = await supabase.from('users').select('email').eq('id', session.student_id).single();
       const { data: tutorUser } = await supabase.from('users').select('email').eq('id', session.tutor_id).single();
       const emailData = {
+        sessionId: session.id, amountPaid: expectedCharge,
         studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject,
         date: session.scheduled_date ? new Date(session.scheduled_date).toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : 'TBD',
         time: session.scheduled_time || '', duration: session.duration_minutes || 60,

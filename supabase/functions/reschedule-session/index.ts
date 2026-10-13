@@ -177,9 +177,18 @@ Deno.serve(async (req: Request) => {
         const { data: other } = await supabase.from('users').select('email').eq('id', otherId).single();
         if (other?.email) {
           await sendEmail(supabaseUrl, 'reschedule_requested', other.email, {
+            sessionId: session.id, requesterRole: isTutor ? 'tutor' : 'student',
             recipientName: otherName, requesterName, subject: session.subject,
             date: when.date, time: when.time,
             dashboard: isTutor ? 'student-dashboard.html' : 'tutor-dashboard.html',
+          });
+        }
+        // Confirmation for the person who asked, so they have a record of the request.
+        const { data: me } = await supabase.from('users').select('email').eq('id', userId).single();
+        if (me?.email) {
+          await sendEmail(supabaseUrl, 'reschedule_request_sent', me.email, {
+            sessionId: session.id, isLate, recipientName: otherName, requesterName, subject: session.subject,
+            date: when.date, time: when.time,
           });
         }
       } catch (e) { console.error('Email failed (non-critical):', e); }
@@ -233,7 +242,7 @@ Deno.serve(async (req: Request) => {
       try {
         const { data: ru } = await supabase.from('users').select('email').eq('id', requesterId).single();
         if (ru?.email) await sendEmail(supabaseUrl, 'reschedule_declined', ru.email, {
-          recipientName: requesterName, responderName, subject: session.subject, date: when.date, time: when.time,
+          sessionId: session.id, recipientName: requesterName, responderName, subject: session.subject, date: when.date, time: when.time,
           dashboard: requesterIsTutor ? 'tutor-dashboard.html' : 'student-dashboard.html',
         });
       } catch (e) { console.error('Email failed (non-critical):', e); }
@@ -293,7 +302,8 @@ Deno.serve(async (req: Request) => {
     try {
       const { data: studentUser } = await supabase.from('users').select('email').eq('id', session.student_id).single();
       const { data: tutorUser } = await supabase.from('users').select('email').eq('id', session.tutor_id).single();
-      const emailData = { studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, date: when.date, time: when.time, unpaid: !isPaid };
+      const prev = prettyWhen(String(session.scheduled_date), String(session.scheduled_time), session.timezone);
+      const emailData = { sessionId: session.id, prevWhen: `${prev.date}, ${prev.time}`, studentName: session.student_name, tutorName: session.tutor_name, subject: session.subject, date: when.date, time: when.time, unpaid: !isPaid };
       if (studentUser?.email) await sendEmail(supabaseUrl, 'session_rescheduled', studentUser.email, emailData);
       if (tutorUser?.email) await sendEmail(supabaseUrl, 'session_rescheduled', tutorUser.email, emailData);
     } catch (e) { console.error('Email dispatch failed (non-critical):', e); }
