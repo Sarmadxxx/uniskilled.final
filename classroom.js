@@ -17,6 +17,10 @@
 (function () {
   'use strict';
 
+  const VIDEO = { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' };
+  const AUDIO = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+  const MAX_FILE = 25 * 1024 * 1024; // 25 MB per file
+  const CHUNK = 16 * 1024;
   const rid = () => (crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2) + Date.now());
 
   // ── Transports ──────────────────────────────────────────────────────────────
@@ -86,24 +90,78 @@
     get polite() { return this.me.role !== 'tutor'; }
 
     async startMedia() {
-      const tries = [
-        { video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }, audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } },
-        { video: false, audio: { echoCancellation: true, noiseSuppression: true } },
-      ];
-      let lastErr = null;
-      for (const c of tries) {
-        try { this.local = await navigator.mediaDevices.getUserMedia(c); break; }
-        catch (e) { lastErr = e; }
+      const md = navigator.mediaDevices;
+      this.local = new MediaStream();
+      this.mediaErrors = { cam: null, mic: null };
+      if (!md || !md.getUserMedia) {
+        this.mediaErrors.cam = this.mediaErrors.mic = { name: 'Unsupported' };
+      } else {
+        // Ask for both at once (one permission prompt). If that fails, try each separately so
+        // one broken or busy device doesn't block the other, and keep the exact reason.
+        try {
+          const s = await md.getUserMedia({ video: VIDEO, audio: AUDIO });
+          s.getTracks().forEach((t) => this.local.addTrack(t));
+        } catch (both) {
+          try { (await md.getUserMedia({ audio: AUDIO })).getTracks().forEach((t) => this.local.addTrack(t)); }
+          catch (e) { this.mediaErrors.mic = e; }
+          try { (await md.getUserMedia({ video: VIDEO })).getTracks().forEach((t) => this.local.addTrack(t)); }
+          catch (e) { this.mediaErrors.cam = e; }
+        }
       }
-      if (!this.local) {
-        this.local = new MediaStream();
-        this.emit('error', { code: 'no-media', message: mediaErrorText(lastErr) });
-      }
+      this.watchTracks();
       this.camOn = this.local.getVideoTracks().length > 0;
       this.micOn = this.local.getAudioTracks().length > 0;
+      if (!this.camOn || !this.micOn) {
+        this.emit('error', { code: 'no-media', message: mediaErrorText(this.mediaErrors.cam || this.mediaErrors.mic, !this.camOn, !this.micOn) });
+      }
       this.emit('local-stream', this.local);
       this.emit('media', { mic: this.micOn, cam: this.camOn, hasCam: this.camOn, hasMic: this.micOn });
       return this.local;
+    }
+
+    // If the phone takes the camera away (e.g. an incoming call), show it as off and let the
+    // person turn it back on with the camera button.
+    watchTracks() {
+      this.local.getTracks().forEach((t) => {
+        t.onended = () => {
+          this.local.removeTrack(t);
+          if (t.kind === 'video') this.camOn = false; else this.micOn = false;
+          this.emit('media', { mic: this.micOn, cam: this.camOn, screen: !!this.screen });
+          this.sendMediaState();
+        };
+      });
+    }
+
+    hasCam() { return this.local && this.local.getVideoTracks().length > 0; }
+    hasMic() { return this.local && this.local.getAudioTracks().length > 0; }
+
+    // Turn on a camera or microphone that wasn't available at the start (or was taken away).
+    async enableDevice(kind) {
+      const md = navigator.mediaDevices;
+      if (!md || !md.getUserMedia) throw { name: 'Unsupported' };
+      const s = await md.getUserMedia(kind === 'video' ? { video: VIDEO } : { audio: AUDIO });
+      const track = s.getTracks()[0];
+      this.local.addTrack(track);
+      this.watchTracks();
+      if (kind === 'video') this.camOn = true; else this.micOn = true;
+      if (this.pc && !(kind === 'video' && this.screen)) await this.attachTrack(track);
+      this.emit('local-stream', this.local);
+      this.emit('media', { mic: this.micOn, cam: this.camOn, screen: !!this.screen });
+      this.sendMediaState();
+      return true;
+    }
+
+    // Put a new track on the existing connection (the other side is updated automatically).
+    async attachTrack(track) {
+      const cands = this.pc.getTransceivers().filter((t) => t.receiver && t.receiver.track && t.receiver.track.kind === track.kind && !t.stopped && !(t.sender.track));
+      const tr = cands.find((t) => t.mid !== null) || cands[0];
+      if (tr) {
+        await tr.sender.replaceTrack(track);
+        try { tr.sender.setStreams && tr.sender.setStreams(this.local); } catch (e) {}
+        if (tr.direction === 'recvonly' || tr.direction === 'inactive') tr.direction = 'sendrecv';
+      } else {
+        this.pc.addTrack(track, this.local);
+      }
     }
 
     async join() {
@@ -147,11 +205,26 @@
 
       // Chat runs over a pre-agreed data channel, so both sides create it independently.
       this.chat = pc.createDataChannel('chat', { negotiated: true, id: 0 });
+      this.chat.binaryType = 'arraybuffer';
+      this.chat.bufferedAmountLowThreshold = 256 * 1024;
+      this.incoming = null;
       this.chat.onmessage = (e) => {
+        if (typeof e.data !== 'string') { this.onFileChunk(e.data); return; }
         try {
           const m = JSON.parse(e.data);
           if (m.t === 'chat') this.emit('chat', { from: this.peer?.name || 'Them', text: String(m.text).slice(0, 2000), at: Date.now(), mine: false });
           if (m.t === 'media') this.emit('peer-media', { mic: !!m.mic, cam: !!m.cam, screen: !!m.screen });
+          if (m.t === 'file') {
+            const size = Number(m.size);
+            if (!(size > 0 && size <= MAX_FILE)) { this.incoming = null; return; }
+            this.incoming = { id: String(m.id), name: String(m.name || 'file').slice(0, 200), size, mime: String(m.mime || ''), parts: [], got: 0, lastPct: 0 };
+            this.emit('file-progress', { id: this.incoming.id, name: this.incoming.name, size, done: 0, mine: false, from: this.peer?.name || 'Them' });
+          }
+          if (m.t === 'file-end' && this.incoming && this.incoming.id === String(m.id)) {
+            const f = this.incoming; this.incoming = null;
+            if (f.got !== f.size) { this.emit('file-failed', { id: f.id, mine: false }); return; }
+            this.emit('file', { id: f.id, name: f.name, size: f.size, mime: f.mime, blob: new Blob(f.parts, { type: safeMime(f.mime) }), mine: false, from: this.peer?.name || 'Them' });
+          }
         } catch (err) {}
       };
       this.chat.onopen = () => this.sendMediaState();
@@ -276,7 +349,7 @@
 
     toggleMic() {
       const t = this.local && this.local.getAudioTracks()[0];
-      if (!t) return false;
+      if (!t) return this.enableDevice('audio');
       this.micOn = !this.micOn; t.enabled = this.micOn;
       this.emit('media', { mic: this.micOn, cam: this.camOn, screen: !!this.screen });
       this.sendMediaState();
@@ -285,7 +358,7 @@
 
     toggleCam() {
       const t = this.local && this.local.getVideoTracks()[0];
-      if (!t) return false;
+      if (!t) return this.enableDevice('video');
       this.camOn = !this.camOn; t.enabled = this.camOn;
       this.emit('media', { mic: this.micOn, cam: this.camOn, screen: !!this.screen });
       this.sendMediaState();
@@ -320,6 +393,47 @@
       this.emit('media', { mic: this.micOn, cam: this.camOn, screen: false });
       this.emit('screen', null);
       this.sendMediaState();
+    }
+
+    onFileChunk(buf) {
+      const f = this.incoming;
+      if (!f) return;
+      f.parts.push(buf); f.got += buf.byteLength;
+      if (f.got > f.size) { this.incoming = null; this.emit('file-failed', { id: f.id, mine: false }); return; }
+      const pct = Math.floor((f.got / f.size) * 100);
+      if (pct >= f.lastPct + 5) { f.lastPct = pct; this.emit('file-progress', { id: f.id, done: f.got, size: f.size, mine: false }); }
+    }
+
+    // Send a file directly to the other person (nothing is stored on a server).
+    sendFile(file) {
+      if (!file) return { ok: false, error: 'No file selected.' };
+      if (file.size > MAX_FILE) return { ok: false, error: 'Files can be up to 25 MB.' };
+      if (file.size === 0) return { ok: false, error: 'That file is empty.' };
+      if (!this.chat || this.chat.readyState !== 'open') return { ok: false, error: 'You can share files once you\'re connected.' };
+      const id = rid();
+      this.sendQueue = (this.sendQueue || Promise.resolve()).then(() => this._sendFile(id, file)).catch((e) => {
+        console.error('file send failed', e); this.emit('file-failed', { id, mine: true });
+      });
+      this.emit('file-progress', { id, name: file.name, size: file.size, done: 0, mine: true, from: this.me.name });
+      return { ok: true, id };
+    }
+
+    async _sendFile(id, file) {
+      const ch = this.chat;
+      const buf = await file.arrayBuffer();
+      ch.send(JSON.stringify({ t: 'file', id, name: file.name, size: file.size, mime: file.type }));
+      let lastPct = 0;
+      for (let off = 0; off < buf.byteLength; off += CHUNK) {
+        if (ch.readyState !== 'open') throw new Error('connection closed');
+        if (ch.bufferedAmount > 1024 * 1024) {
+          await new Promise((res) => { const h = () => { ch.removeEventListener('bufferedamountlow', h); res(); }; ch.addEventListener('bufferedamountlow', h); });
+        }
+        ch.send(buf.slice(off, off + CHUNK));
+        const pct = Math.floor(((off + CHUNK) / buf.byteLength) * 100);
+        if (pct >= lastPct + 5) { lastPct = pct; this.emit('file-progress', { id, done: Math.min(off + CHUNK, buf.byteLength), size: buf.byteLength, mine: true }); }
+      }
+      ch.send(JSON.stringify({ t: 'file-end', id }));
+      this.emit('file', { id, name: file.name, size: file.size, mime: file.type, blob: file, mine: true, from: this.me.name });
     }
 
     sendChat(text) {
@@ -360,16 +474,25 @@
     }
   }
 
-  function mediaErrorText(e) {
+  // Only common, harmless types keep their type; everything else downloads as a plain file.
+  function safeMime(m) {
+    m = String(m || '').toLowerCase();
+    return /^(image\/(png|jpeg|gif|webp)|application\/pdf|text\/plain)$/.test(m) ? m : 'application/octet-stream';
+  }
+
+  function mediaErrorText(e, noCam, noMic) {
     const n = e && e.name;
-    if (n === 'NotAllowedError' || n === 'SecurityError') return 'Camera and microphone access is blocked. Allow access in your browser\'s address bar, then reload.';
-    if (n === 'NotFoundError' || n === 'OverconstrainedError') return 'No camera or microphone was found on this device.';
-    if (n === 'NotReadableError') return 'Your camera or microphone is being used by another app. Close it and reload.';
-    return 'Camera and microphone are not available. You can still join and see and hear the other person.';
+    const what = noCam && noMic ? 'camera and microphone' : noCam ? 'camera' : 'microphone';
+    if (n === 'Unsupported') return 'This browser can\'t use a camera or microphone here. Please open the lesson in Safari or Chrome (not inside another app).';
+    if (n === 'NotAllowedError' || n === 'SecurityError') return 'Access to your ' + what + ' is blocked. Allow it in your browser settings for uniskilled.com, then tap the ' + (noCam ? 'camera' : 'microphone') + ' button to try again.';
+    if (n === 'NotReadableError' || n === 'AbortError') return 'Your ' + what + ' is busy (for example a phone call or another app is using it). End the call or close the other app, then tap the ' + (noCam ? 'camera' : 'microphone') + ' button to try again.';
+    if (n === 'NotFoundError' || n === 'OverconstrainedError') return 'No ' + what + ' was found on this device. You can still join and see and hear the other person.';
+    return 'Your ' + what + ' couldn\'t be started. Tap the ' + (noCam ? 'camera' : 'microphone') + ' button to try again. You can also join without it.';
   }
 
   UsClassroom.localTransport = localTransport;
   UsClassroom.supabaseTransport = supabaseTransport;
   UsClassroom.mediaErrorText = mediaErrorText;
+  UsClassroom.MAX_FILE = MAX_FILE;
   window.UsClassroom = UsClassroom;
 })();

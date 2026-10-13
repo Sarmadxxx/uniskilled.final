@@ -40,7 +40,9 @@ button{font-family:inherit;cursor:pointer}
 .pj-card{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;max-width:920px;width:100%;align-items:center}
 .pj-video{position:relative;aspect-ratio:16/10;background:#000;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
 .pj-video video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
-.pj-video .novid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--mid);font-size:14px;text-align:center;padding:20px}
+.pj-video .novid{position:absolute;inset:0 0 76px 0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--mid);font-size:14px;line-height:1.45;text-align:center;padding:16px 20px 0}
+.pj-video .novid svg{width:34px;height:34px;opacity:.7}
+.cbtn.busy{opacity:.55;pointer-events:none}
 .pj-controls{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:10px}
 .meter{position:absolute;top:14px;left:14px;display:flex;align-items:flex-end;gap:3px;height:18px;padding:4px 8px;background:rgba(0,0,0,.55);border-radius:8px}
 .meter i{display:block;width:4px;background:var(--green);border-radius:2px;height:3px;transition:height .08s}
@@ -91,9 +93,19 @@ button{font-family:inherit;cursor:pointer}
 .msg .who{display:block;font-size:11px;font-weight:700;opacity:.7;margin-bottom:2px}
 .msg.sys{align-self:center;background:none;color:var(--dim);font-size:12px;text-align:center}
 .compose{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
-.compose input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font:inherit;font-size:14px;outline:none}
+.compose input{flex:1;min-width:0;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font:inherit;font-size:14px;outline:none}
 .compose input:focus{border-color:var(--blue)}
-.compose button{background:var(--blue);border:0;color:#fff;border-radius:10px;padding:0 14px;font-weight:800}
+.compose button{background:var(--blue);border:0;color:#fff;border-radius:10px;padding:0 14px;font-weight:800;flex-shrink:0}
+.compose .attach{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:0 11px;display:flex;align-items:center}
+.compose .attach svg{width:20px;height:20px}
+.file{display:flex;flex-direction:column;gap:6px;min-width:200px}
+.file .fname{font-weight:700;word-break:break-all}
+.file .fmeta{font-size:12px;opacity:.75}
+.file .prog{height:4px;border-radius:2px;background:rgba(255,255,255,.18);overflow:hidden}
+.file .prog i{display:block;height:100%;width:0;background:#fff;transition:width .2s}
+.file img{max-width:220px;max-height:180px;border-radius:8px;display:block}
+.file a.dl{display:inline-block;margin-top:2px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.14);color:inherit;text-decoration:none;font-weight:700;font-size:13px;align-self:flex-start}
+.chat.drag{outline:2px dashed var(--blue);outline-offset:-8px}
 
 /* ── Overlays ── */
 .overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;padding:24px;background:rgba(5,8,15,.6);z-index:2}
@@ -134,7 +146,7 @@ button{font-family:inherit;cursor:pointer}
   <div class="pj-card">
     <div class="pj-video">
       <video id="pjVideo" autoplay playsinline muted></video>
-      <div class="novid hidden" id="pjNoVid"><div style="font-size:34px">📷</div><div id="pjNoVidText">Camera is off</div></div>
+      <div class="novid hidden" id="pjNoVid"><span id="pjNoVidIcon"></span><div id="pjNoVidText">Camera is off</div></div>
       <div class="meter" id="meter" title="Microphone level"><i></i><i></i><i></i><i></i><i></i></div>
       <div class="pj-controls">
         <button class="cbtn" id="pjMic" data-tip="Microphone"></button>
@@ -169,8 +181,8 @@ button{font-family:inherit;cursor:pointer}
   </div>
   <aside class="chat hidden" id="chat">
     <h3>Lesson chat <button id="chatClose" aria-label="Close chat">×</button></h3>
-    <div class="msgs" id="msgs"><div class="msg sys">Messages are only visible during this lesson.</div></div>
-    <form class="compose" id="compose"><input id="chatInput" maxlength="2000" placeholder="Type a message…" autocomplete="off"><button type="submit">Send</button></form>
+    <div class="msgs" id="msgs"><div class="msg sys">Messages and files go directly between you two and are not saved. Download any file you want to keep.</div></div>
+    <form class="compose" id="compose"><button type="button" class="attach" id="attachBtn" aria-label="Share a file" title="Share a file (up to 25 MB)"></button><input type="file" id="fileInput" class="hidden"><input id="chatInput" maxlength="2000" placeholder="Type a message…" autocomplete="off"><button type="submit">Send</button></form>
   </aside>
   <nav class="bar">
     <button class="cbtn" id="micBtn" data-tip="Mute"></button>
@@ -208,6 +220,7 @@ button{font-family:inherit;cursor:pointer}
     camOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m4 0h4a2 2 0 0 1 2 2v3.3l6-3.3v10M3 3l18 18"/></svg>',
     screen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M9 10l3-3 3 3M12 7v6"/></svg>',
     chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    clip: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="m21 11-8.6 8.6a5.5 5.5 0 0 1-7.8-7.8l8.6-8.6a3.7 3.7 0 0 1 5.2 5.2l-8.6 8.6a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9"/></svg>',
     leave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.7 13.3a16 16 0 0 0 3.3 2.4l1.3-1.3a1.5 1.5 0 0 1 1.6-.3 11 11 0 0 0 3.2.8A1.5 1.5 0 0 1 21.5 16.4v2.9a1.5 1.5 0 0 1-1.6 1.5A18.5 18.5 0 0 1 3.2 4.1 1.5 1.5 0 0 1 4.7 2.5h2.9a1.5 1.5 0 0 1 1.5 1.3c.1 1.1.4 2.2.8 3.2a1.5 1.5 0 0 1-.3 1.6L8.3 9.9" transform="rotate(135 12 12)"/></svg>',
   };
 
@@ -302,10 +315,14 @@ button{font-family:inherit;cursor:pointer}
 
   function renderPrejoinButtons() {
     const hasMic = room.local.getAudioTracks().length > 0, hasCam = room.local.getVideoTracks().length > 0;
-    $('pjMic').innerHTML = room.micOn ? ICON.mic : ICON.micOff; $('pjMic').classList.toggle('off', !room.micOn); $('pjMic').disabled = !hasMic;
-    $('pjCam').innerHTML = room.camOn ? ICON.cam : ICON.camOff; $('pjCam').classList.toggle('off', !room.camOn); $('pjCam').disabled = !hasCam;
+    $('pjMic').innerHTML = room.micOn ? ICON.mic : ICON.micOff; $('pjMic').classList.toggle('off', !room.micOn);
+    $('pjMic').dataset.tip = hasMic ? (room.micOn ? 'Mute' : 'Unmute') : 'Turn on microphone';
+    $('pjCam').innerHTML = room.camOn ? ICON.cam : ICON.camOff; $('pjCam').classList.toggle('off', !room.camOn);
+    $('pjCam').dataset.tip = hasCam ? (room.camOn ? 'Stop video' : 'Start video') : 'Turn on camera';
     $('pjNoVid').classList.toggle('hidden', room.camOn);
-    $('pjNoVidText').textContent = hasCam ? 'Camera is off' : 'No camera found — you can still join with audio';
+    $('pjNoVidIcon').innerHTML = ICON.camOff;
+    $('pjNoVidText').textContent = hasCam ? 'Your camera is off' : 'Camera not available. Tap the camera button to try again, or join with audio only.';
+    $('pjVideo').srcObject = room.local;
     $('meter').classList.toggle('hidden', !hasMic);
   }
 
@@ -347,9 +364,9 @@ button{font-family:inherit;cursor:pointer}
 
   function renderControls() {
     $('micBtn').innerHTML = room.micOn ? ICON.mic : ICON.micOff; $('micBtn').classList.toggle('off', !room.micOn);
-    $('micBtn').dataset.tip = room.micOn ? 'Mute' : 'Unmute'; $('micBtn').disabled = !room.local.getAudioTracks().length;
+    $('micBtn').dataset.tip = room.hasMic() ? (room.micOn ? 'Mute' : 'Unmute') : 'Turn on microphone';
     $('camBtn').innerHTML = room.camOn ? ICON.cam : ICON.camOff; $('camBtn').classList.toggle('off', !room.camOn);
-    $('camBtn').dataset.tip = room.camOn ? 'Stop video' : 'Start video'; $('camBtn').disabled = !room.local.getVideoTracks().length;
+    $('camBtn').dataset.tip = room.hasCam() ? (room.camOn ? 'Stop video' : 'Start video') : 'Turn on camera';
     $('screenBtn').innerHTML = ICON.screen; $('screenBtn').classList.toggle('on', !!room.screen);
     $('screenBtn').dataset.tip = room.screen ? 'Stop sharing' : 'Share screen';
     if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) $('screenBtn').classList.add('hidden');
@@ -384,11 +401,15 @@ button{font-family:inherit;cursor:pointer}
         $('remoteVideo').play && $('remoteVideo').play().catch(() => {});
         renderRemote(); break;
       case 'media': if (!$('stage').classList.contains('hidden')) renderControls(); else renderPrejoinButtons(); break;
+      case 'local-stream': if (!room.screen) { $('selfVideo').srcObject = null; $('selfVideo').srcObject = room.local; } $('pjVideo').srcObject = null; $('pjVideo').srcObject = room.local; break;
       case 'screen': renderControls(); break;
       case 'peer-media': peerMedia = data; renderRemote(); break;
       case 'peer-joined': sys((data.name || 'The other person') + ' joined'); peerMedia = { mic: true, cam: true, screen: false }; renderRemote(); break;
       case 'peer-left': sys((data.name || 'The other person') + ' left'); renderRemote(); break;
       case 'chat': addMsg(data); break;
+      case 'file-progress': fileCard(data); break;
+      case 'file': fileDone(data); break;
+      case 'file-failed': fileFailed(data); break;
       case 'error': $('pjAlert').textContent = data.message; $('pjAlert').classList.remove('hidden'); if (data.code !== 'no-media') toast(data.message); break;
       case 'state': onState(data); break;
     }
@@ -435,6 +456,46 @@ button{font-family:inherit;cursor:pointer}
   }
 
   function sys(text) { const d = document.createElement('div'); d.className = 'msg sys'; d.textContent = text; $('msgs').appendChild(d); $('msgs').scrollTop = 1e9; }
+  // ── Files ──
+  const fileUrls = [];
+  const fmtSize = (n) => n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+  function fileCard(d) {
+    let el = document.getElementById('f-' + d.id);
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'msg' + (d.mine ? ' mine' : ''); el.id = 'f-' + d.id;
+      el.innerHTML = (d.mine ? '' : '<span class="who">' + esc(d.from) + '</span>') +
+        '<div class="file"><span class="fname">📎 ' + esc(d.name || 'File') + '</span><span class="fmeta">' + fmtSize(d.size) + ' · ' + (d.mine ? 'sending…' : 'receiving…') + '</span><div class="prog"><i></i></div></div>';
+      $('msgs').appendChild(el); $('msgs').scrollTop = 1e9;
+      if (!d.mine) bumpUnread();
+    }
+    const bar = el.querySelector('.prog i'); if (bar && d.size) bar.style.width = Math.min(100, Math.round((d.done / d.size) * 100)) + '%';
+  }
+  function fileDone(d) {
+    fileCard({ ...d, done: d.size });
+    const el = document.getElementById('f-' + d.id); if (!el) return;
+    const url = URL.createObjectURL(d.blob); fileUrls.push(url);
+    const isImg = /^image\/(png|jpeg|gif|webp)$/.test(d.blob.type);
+    el.querySelector('.file').innerHTML =
+      (isImg ? '<img alt="" src="' + url + '">' : '') +
+      '<span class="fname">📎 ' + esc(d.name) + '</span><span class="fmeta">' + fmtSize(d.size) + (d.mine ? ' · sent' : '') + '</span>' +
+      '<a class="dl" href="' + url + '" download="' + esc(d.name) + '">Download</a>';
+    $('msgs').scrollTop = 1e9;
+  }
+  function fileFailed(d) {
+    const el = document.getElementById('f-' + d.id);
+    if (el) el.querySelector('.fmeta').textContent = 'Couldn\'t be ' + (d.mine ? 'sent' : 'received') + ' — the connection dropped. Please try again.';
+  }
+  function bumpUnread() {
+    if ($('chat').classList.contains('hidden')) { unread++; $('chatBadge').textContent = unread; $('chatBadge').classList.remove('hidden'); }
+  }
+  function shareFiles(list) {
+    for (const f of Array.from(list || [])) {
+      const r = room.sendFile(f);
+      if (!r.ok) toast(r.error, 5000);
+    }
+  }
+
   function addMsg(m) {
     const d = document.createElement('div'); d.className = 'msg' + (m.mine ? ' mine' : '');
     d.innerHTML = (m.mine ? '' : '<span class="who">' + esc(m.from) + '</span>') + esc(m.text);
@@ -443,17 +504,44 @@ button{font-family:inherit;cursor:pointer}
   }
 
   // ── Wiring ──────────────────────────────────────────────────────────────────
-  $('pjMic').onclick = () => { room.toggleMic(); renderPrejoinButtons(); };
-  $('pjCam').onclick = () => { room.toggleCam(); renderPrejoinButtons(); };
+  // Mute/unmute, or — if the device wasn't available — ask for it again and explain any problem.
+  async function deviceButton(btn, kind) {
+    const hadIt = kind === 'video' ? room.hasCam() : room.hasMic();
+    btn.classList.add('busy');
+    try {
+      await (kind === 'video' ? room.toggleCam() : room.toggleMic());
+      if (!hadIt) {
+        $('pjAlert').classList.add('hidden');
+        if (kind === 'audio') startMeter(room.local);
+        toast(kind === 'video' ? 'Camera is on' : 'Microphone is on');
+      }
+    } catch (e) {
+      const msg = UsClassroom.mediaErrorText(e, kind === 'video', kind === 'audio');
+      if ($('stage').classList.contains('hidden')) { $('pjAlert').textContent = msg; $('pjAlert').classList.remove('hidden'); }
+      toast(msg, 6000);
+    } finally {
+      btn.classList.remove('busy');
+      if ($('stage').classList.contains('hidden')) renderPrejoinButtons(); else renderControls();
+    }
+  }
+  $('pjMic').onclick = () => deviceButton($('pjMic'), 'audio');
+  $('pjCam').onclick = () => deviceButton($('pjCam'), 'video');
   $('joinBtn').onclick = join;
-  $('micBtn').onclick = () => { room.toggleMic(); renderControls(); };
-  $('camBtn').onclick = () => { room.toggleCam(); renderControls(); };
+  $('micBtn').onclick = () => deviceButton($('micBtn'), 'audio');
+  $('camBtn').onclick = () => deviceButton($('camBtn'), 'video');
   $('screenBtn').onclick = async () => { await room.toggleScreen(); renderControls(); };
   $('chatBtn').onclick = () => {
     const open = $('chat').classList.toggle('hidden') === false;
     if (open) { unread = 0; $('chatBadge').classList.add('hidden'); setTimeout(() => $('chatInput').focus(), 50); }
   };
   $('chatClose').onclick = () => $('chat').classList.add('hidden');
+  $('attachBtn').innerHTML = ICON.clip;
+  $('attachBtn').onclick = () => $('fileInput').click();
+  $('fileInput').onchange = () => { shareFiles($('fileInput').files); $('fileInput').value = ''; };
+  ['dragover', 'dragenter'].forEach((ev) => $('chat').addEventListener(ev, (e) => { e.preventDefault(); $('chat').classList.add('drag'); }));
+  ['dragleave', 'drop'].forEach((ev) => $('chat').addEventListener(ev, (e) => { e.preventDefault(); $('chat').classList.remove('drag'); }));
+  $('chat').addEventListener('drop', (e) => shareFiles(e.dataTransfer && e.dataTransfer.files));
+  window.addEventListener('pagehide', () => fileUrls.forEach((u) => URL.revokeObjectURL(u)));
   $('compose').onsubmit = (e) => {
     e.preventDefault();
     const v = $('chatInput').value;
