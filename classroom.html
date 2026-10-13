@@ -197,6 +197,11 @@ button{font-family:inherit;cursor:pointer}
   <div style="font-size:44px">👋</div>
   <h1>You left the lesson</h1>
   <p id="endedText">You can rejoin at any time while the lesson is open.</p>
+  <div id="rateBox" class="hidden" style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 22px;margin:4px 0 6px">
+    <div style="font-weight:800;margin-bottom:8px" id="rateQ">How was your lesson?</div>
+    <div id="rateStars" style="display:flex;gap:6px;justify-content:center"></div>
+    <div style="font-size:12.5px;color:var(--mid);margin-top:8px">Tap a star to rate. It takes 20 seconds and helps other students.</div>
+  </div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
     <button class="btn btn-primary" id="rejoinBtn">Rejoin</button>
     <a class="btn" style="background:var(--panel2);color:var(--ink);text-decoration:none" id="dashLink" href="student-dashboard.html">Back to dashboard</a>
@@ -204,8 +209,8 @@ button{font-family:inherit;cursor:pointer}
 </section>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="auth-guard.js"></script>
-<script src="classroom.js"></script>
+<script src="auth-guard.js?v=2"></script>
+<script src="classroom.js?v=4"></script>
 <script>
 (function () {
   'use strict';
@@ -224,6 +229,10 @@ button{font-family:inherit;cursor:pointer}
     leave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.7 13.3a16 16 0 0 0 3.3 2.4l1.3-1.3a1.5 1.5 0 0 1 1.6-.3 11 11 0 0 0 3.2.8A1.5 1.5 0 0 1 21.5 16.4v2.9a1.5 1.5 0 0 1-1.6 1.5A18.5 18.5 0 0 1 3.2 4.1 1.5 1.5 0 0 1 4.7 2.5h2.9a1.5 1.5 0 0 1 1.5 1.3c.1 1.1.4 2.2.8 3.2a1.5 1.5 0 0 1-.3 1.6L8.3 9.9" transform="rotate(135 12 12)"/></svg>',
   };
 
+  if (typeof UsClassroom === 'undefined' || typeof UsClassroom.prototype.hasMic !== 'function') {
+    if (!sessionStorage.getItem('usClassroomReloaded')) { sessionStorage.setItem('usClassroomReloaded', '1'); location.reload(); return; }
+  }
+  sessionStorage.removeItem('usClassroomReloaded');
   let room = null, cfg = null, timerInt = null, joinedAt = null, unread = 0, meterRaf = null;
 
   function toast(msg, ms) {
@@ -551,7 +560,21 @@ button{font-family:inherit;cursor:pointer}
   $('leaveBtn').onclick = () => {
     room.leave(); clearInterval(timerInt); stopAttendance(true);
     $('stage').classList.add('hidden'); $('ended').classList.remove('hidden');
+    showRatePrompt();
   };
+  // Students are asked to rate the lesson as soon as they leave (if they were connected for a while).
+  function showRatePrompt() {
+    if (cfg.mode !== 'supabase' || cfg.me.role !== 'student' || !joinedAt) return;
+    if (Date.now() - joinedAt < 5 * 60 * 1000) return;
+    $('rateQ').textContent = 'How was your lesson with ' + (cfg.other?.name || 'your tutor') + '?';
+    $('rateStars').innerHTML = [1, 2, 3, 4, 5].map((n) =>
+      '<a aria-label="' + n + ' star' + (n > 1 ? 's' : '') + '" href="rate-lesson.html?session=' + encodeURIComponent(cfg.sessionId) + '&stars=' + n + '" style="font-size:34px;text-decoration:none;color:#f59e0b;line-height:1">☆</a>').join('');
+    $('rateStars').querySelectorAll('a').forEach((a, i, all) => {
+      a.onmouseenter = () => all.forEach((x, j) => { x.textContent = j <= i ? '★' : '☆'; });
+      a.onmouseleave = () => all.forEach((x) => { x.textContent = '☆'; });
+    });
+    $('rateBox').classList.remove('hidden');
+  }
   $('rejoinBtn').onclick = () => location.reload();
 
   prejoin();

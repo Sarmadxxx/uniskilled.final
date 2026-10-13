@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Rate your lesson · UniSkilled</title>
+<link rel="icon" href="favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0f172a;--mid:#64748b;--line:#e2e8f0;--off:#f1f5f9;--blue:#1a6bff;--blue2:#0f57e0;--gold:#f59e0b;--green:#059669;--red:#b91c1c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--off);color:var(--ink);min-height:100vh}
+header{display:flex;align-items:center;gap:10px;padding:16px 20px;background:#fff;border-bottom:1px solid var(--line)}
+header img{height:28px} header a{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-weight:800}
+main{max-width:620px;margin:32px auto;padding:0 16px 48px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:28px}
+.who{display:flex;gap:14px;align-items:center;margin-bottom:22px}
+.av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;flex-shrink:0}
+h1{font-size:22px;line-height:1.3} .sub{color:var(--mid);font-size:14px;margin-top:3px}
+.stars{display:flex;gap:6px;justify-content:center;margin:8px 0 4px}
+.star{background:none;border:0;cursor:pointer;padding:4px;line-height:0;border-radius:8px}
+.star svg{width:44px;height:44px;fill:#e2e8f0;transition:fill .12s,transform .12s}
+.star.on svg{fill:var(--gold)} .star:hover svg{transform:scale(1.08)}
+.star:focus-visible{outline:2px solid var(--blue)}
+.starlabel{text-align:center;font-weight:700;color:var(--mid);min-height:22px;margin-bottom:18px}
+label.h{display:block;font-weight:800;font-size:14px;margin:18px 0 8px}
+.hint{font-weight:600;color:var(--mid);font-size:12.5px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font:inherit;font-size:13.5px;font-weight:700;color:var(--ink);cursor:pointer}
+.chip.on{border-color:var(--blue);background:#eef4ff;color:var(--blue)}
+textarea{width:100%;min-height:96px;border:1.5px solid var(--line);border-radius:12px;padding:12px;font:inherit;font-size:14.5px;resize:vertical;outline:none}
+textarea:focus{border-color:var(--blue)}
+.count{text-align:right;font-size:12px;color:var(--mid);margin-top:4px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:10px;padding:13px 24px;font:inherit;font-weight:800;font-size:15px;cursor:pointer;text-decoration:none}
+.btn-primary{background:var(--blue);color:#fff} .btn-primary:hover{background:var(--blue2)} .btn-primary:disabled{opacity:.5;cursor:default}
+.btn-light{background:var(--off);color:var(--ink)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.msg{padding:12px 14px;border-radius:10px;font-size:14px;line-height:1.5;margin-top:14px}
+.msg.err{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+.msg.info{background:#eff6ff;color:#1e3a8a;border:1px solid #bfdbfe}
+.note{font-size:12.5px;color:var(--mid);line-height:1.55;margin-top:14px}
+.done{text-align:center} .done .big{font-size:46px;margin-bottom:8px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<header><a href="index.html"><img src="uniskilled-logo-icon.png" alt="" onerror="this.style.display='none'"><span>UniSkilled</span></a></header>
+<main>
+  <div class="card" id="card">
+    <p class="sub" id="loading">Loading your lesson…</p>
+
+    <form id="form" class="hidden" novalidate>
+      <div class="who">
+        <div class="av" id="av">?</div>
+        <div><h1 id="title">How was your lesson?</h1><div class="sub" id="lessonInfo"></div></div>
+      </div>
+
+      <div class="stars" id="stars" role="radiogroup" aria-label="Rating"></div>
+      <div class="starlabel" id="starLabel">Tap a star to rate</div>
+
+      <label class="h">What stood out? <span class="hint">(optional, up to 5)</span></label>
+      <div class="chips" id="chips"></div>
+
+      <label class="h" for="comment">Your review <span class="hint">(optional, shown on the tutor's profile with your first name)</span></label>
+      <textarea id="comment" maxlength="1000" placeholder="What did you learn? How did the tutor help you?"></textarea>
+      <div class="count"><span id="cc">0</span>/1000</div>
+
+      <label class="h" for="privateNote">Private feedback to UniSkilled <span class="hint">(optional, never shown to the tutor)</span></label>
+      <textarea id="privateNote" maxlength="2000" placeholder="Anything we should know? For example connection problems, punctuality, or anything that made you uncomfortable."></textarea>
+
+      <div class="msg err hidden" id="err"></div>
+      <div class="actions">
+        <button class="btn btn-primary" type="submit" id="submitBtn" disabled>Submit rating</button>
+        <a class="btn btn-light" href="student-dashboard.html">Not now</a>
+      </div>
+      <p class="note">Only students who had the lesson can rate it, and each lesson can be rated once. You can change your rating for 14 days. If something went wrong in the lesson, you can also <a href="student-dashboard.html">report an issue</a> within 48 hours.</p>
+    </form>
+
+    <div class="done hidden" id="done">
+      <div class="big">🎉</div>
+      <h1>Thank you for your feedback!</h1>
+      <p class="sub" id="doneText" style="margin-top:8px">Your rating helps other students choose the right tutor.</p>
+      <div class="actions" style="justify-content:center">
+        <a class="btn btn-primary" id="bookAgain" href="find-tutors.html">Book another lesson</a>
+        <a class="btn btn-light" href="student-dashboard.html">Go to dashboard</a>
+      </div>
+    </div>
+
+    <div class="hidden" id="blocked">
+      <h1>Rating unavailable</h1>
+      <div class="msg info" id="blockedText"></div>
+      <div class="actions"><a class="btn btn-primary" href="student-dashboard.html">Go to dashboard</a></div>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="auth-guard.js?v=2"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const TAGS = ['Clear explanations', 'Patient', 'Well prepared', 'Helpful materials', 'Encouraging', 'On time', 'Great for exams', 'Knows the subject'];
+  const LABELS = ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'];
+  const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6-4.9-4.5 6.6-.8z"/></svg>';
+  const sb = window.supabase.createClient('https://orghkbbohnabcietidiv.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8');
+  const q = new URLSearchParams(location.search);
+  const sessionId = q.get('session') || '';
+  let rating = Math.max(0, Math.min(5, parseInt(q.get('stars') || '0', 10) || 0));
+  const chosen = new Set();
+
+  function block(text) { $('loading').classList.add('hidden'); $('form').classList.add('hidden'); $('blockedText').textContent = text; $('blocked').classList.remove('hidden'); }
+
+  function renderStars() {
+    $('stars').innerHTML = [1, 2, 3, 4, 5].map((n) =>
+      `<button type="button" class="star${n <= rating ? ' on' : ''}" role="radio" aria-checked="${n === rating}" aria-label="${n} star${n > 1 ? 's' : ''}" data-n="${n}">${STAR}</button>`).join('');
+    $('starLabel').textContent = rating ? LABELS[rating] : 'Tap a star to rate';
+    $('submitBtn').disabled = !rating;
+    $('stars').querySelectorAll('.star').forEach((b) => {
+      b.onclick = () => { rating = +b.dataset.n; renderStars(); };
+      b.onmouseenter = () => $('stars').querySelectorAll('.star').forEach((x) => x.classList.toggle('on', +x.dataset.n <= +b.dataset.n));
+      b.onmouseleave = () => renderStars();
+    });
+  }
+  function renderChips() {
+    $('chips').innerHTML = TAGS.map((t) => `<button type="button" class="chip${chosen.has(t) ? ' on' : ''}" data-t="${esc(t)}">${esc(t)}</button>`).join('');
+    $('chips').querySelectorAll('.chip').forEach((c) => c.onclick = () => {
+      const t = c.dataset.t;
+      if (chosen.has(t)) chosen.delete(t); else if (chosen.size < 5) chosen.add(t);
+      renderChips();
+    });
+  }
+
+  async function init() {
+    if (!/^[0-9a-f-]{36}$/i.test(sessionId)) return block('This rating link is not valid. Open it from your dashboard.');
+    const { data: s0 } = await sb.auth.getSession();
+    if (!s0.session) { location.href = 'signin.html?redirect=' + encodeURIComponent('rate-lesson.html' + location.search); return; }
+    await window.usFreshToken(sb);
+    const uid = s0.session.user.id;
+    const { data: s } = await sb.from('sessions').select('id, student_id, tutor_id, tutor_name, subject, scheduled_date, scheduled_time, timezone, duration_minutes, status').eq('id', sessionId).maybeSingle();
+    if (!s) return block('This lesson could not be found.');
+    if (s.student_id !== uid) return block('Only the student who had this lesson can rate it.');
+    if (!['confirmed', 'completed'].includes(s.status)) return block('This lesson didn\'t take place, so it can\'t be rated.');
+
+    const tutor = s.tutor_name || 'your tutor';
+    $('av').textContent = tutor.split(/\s+/).map((w) => w[0] || '').join('').slice(0, 2).toUpperCase();
+    $('title').textContent = 'How was your lesson with ' + tutor + '?';
+    const d = s.scheduled_date ? new Date(s.scheduled_date + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }) : '';
+    $('lessonInfo').textContent = [s.subject, d, s.scheduled_time ? String(s.scheduled_time).slice(0, 5) : ''].filter(Boolean).join(' · ');
+    $('bookAgain').href = 'book-session.html?tutor=' + encodeURIComponent(s.tutor_id);
+    $('bookAgain').textContent = 'Book again with ' + tutor.split(' ')[0];
+
+    const { data: existing } = await sb.from('reviews').select('rating, comment, tags').eq('session_id', sessionId).maybeSingle();
+    if (existing) {
+      if (!q.get('stars')) rating = existing.rating;
+      (existing.tags || []).forEach((t) => chosen.add(t));
+      $('comment').value = existing.comment || '';
+      $('submitBtn').textContent = 'Update rating';
+    }
+    $('cc').textContent = $('comment').value.length;
+    renderStars(); renderChips();
+    $('loading').classList.add('hidden'); $('form').classList.remove('hidden');
+  }
+
+  $('comment').oninput = () => { $('cc').textContent = $('comment').value.length; };
+  $('form').onsubmit = async (e) => {
+    e.preventDefault();
+    if (!rating) return;
+    $('err').classList.add('hidden');
+    $('submitBtn').disabled = true; $('submitBtn').textContent = 'Saving…';
+    await window.usFreshToken(sb);
+    const { error } = await sb.rpc('submit_lesson_review', {
+      p_session_id: sessionId, p_rating: rating, p_comment: $('comment').value,
+      p_tags: Array.from(chosen), p_private_note: $('privateNote').value,
+    });
+    if (error) {
+      const m = String(error.message || '');
+      $('err').textContent = /lesson|rate|stars|Reviews|sign in/i.test(m) && !/permission|violates|JWT/i.test(m) ? m : 'Your rating couldn\'t be saved. Please try again.';
+      $('err').classList.remove('hidden');
+      $('submitBtn').disabled = false; $('submitBtn').textContent = 'Submit rating';
+      return;
+    }
+    $('form').classList.add('hidden'); $('done').classList.remove('hidden');
+    if (rating <= 2) $('doneText').textContent = 'We\'re sorry the lesson didn\'t go well. Our team reads every low rating, and if something went wrong you can report an issue from your dashboard within 48 hours.';
+  };
+
+  init().catch(() => block('Something went wrong loading this page. Please refresh and try again.'));
+})();
+</script>
+</body>
+</html>
