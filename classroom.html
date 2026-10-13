@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Classroom · UniSkilled</title>
+<link rel="icon" href="favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1220; --panel:#111a2e; --panel2:#17223a; --line:#24314d; --ink:#e8eefc; --mid:#9fb0d0; --dim:#6b7c9e;
+  --blue:#1a6bff; --blue2:#3b82f6; --green:#10b981; --amber:#f59e0b; --red:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow:hidden}
+button{font-family:inherit;cursor:pointer}
+.hidden{display:none!important}
+
+/* ── Top bar ── */
+.top{position:fixed;top:0;left:0;right:0;height:60px;display:flex;align-items:center;gap:12px;padding:0 18px;z-index:5;
+  background:linear-gradient(to bottom,rgba(11,18,32,.95),rgba(11,18,32,0))}
+.brand{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-weight:800;font-size:16px;flex-shrink:0}
+.brand img{height:26px;width:auto}
+.sep{width:1px;height:26px;background:var(--line);flex-shrink:0}
+@media (max-width:860px){.brand span,.sep{display:none}}
+.top .title{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .sub{font-size:12px;color:var(--mid)}
+.top .spacer{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:700;background:var(--panel2);border:1px solid var(--line);white-space:nowrap}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:var(--dim)}
+.pill.ok .dot{background:var(--green)} .pill.warn .dot{background:var(--amber);animation:blink 1s infinite} .pill.bad .dot{background:var(--red)}
+@keyframes blink{50%{opacity:.3}}
+.timer{font-variant-numeric:tabular-nums}
+
+/* ── Pre-join ── */
+.prejoin{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:80px 16px 24px;overflow:auto}
+.pj-card{display:grid;grid-template-columns:1.3fr 1fr;gap:28px;max-width:920px;width:100%;align-items:center}
+.pj-video{position:relative;aspect-ratio:16/10;background:#000;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+.pj-video video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.pj-video .novid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--mid);font-size:14px;text-align:center;padding:20px}
+.pj-controls{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:10px}
+.meter{position:absolute;top:14px;left:14px;display:flex;align-items:flex-end;gap:3px;height:18px;padding:4px 8px;background:rgba(0,0,0,.55);border-radius:8px}
+.meter i{display:block;width:4px;background:var(--green);border-radius:2px;height:3px;transition:height .08s}
+.pj-info h1{font-size:26px;line-height:1.25;margin-bottom:8px}
+.pj-info p{color:var(--mid);font-size:14px;line-height:1.6;margin-bottom:6px}
+.pj-info .meta{margin:16px 0 22px;padding:14px 16px;background:var(--panel);border:1px solid var(--line);border-radius:12px;font-size:14px;line-height:1.8}
+.pj-info .meta b{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;border-radius:10px;border:0;font-weight:800;font-size:15px}
+.btn-primary{background:var(--blue);color:#fff} .btn-primary:hover{background:var(--blue2)}
+.btn-primary:disabled{opacity:.5;cursor:default}
+.note{font-size:12.5px;color:var(--dim);margin-top:12px;line-height:1.5}
+.alert{margin-top:12px;padding:10px 12px;border-radius:10px;font-size:13px;line-height:1.5;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#fcd34d}
+
+/* ── Stage ── */
+.stage{position:fixed;inset:0;display:flex}
+.main{position:relative;flex:1;display:flex;align-items:center;justify-content:center;padding:64px 16px 96px}
+.remote-wrap{position:relative;width:100%;height:100%;border-radius:16px;overflow:hidden;background:#05080f;border:1px solid var(--line)}
+.remote-wrap video{width:100%;height:100%;object-fit:contain;background:#05080f}
+.avatar-big{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:var(--mid);font-size:15px;text-align:center;padding:20px}
+.avatar-big .av{width:112px;height:112px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:800;color:#fff}
+.name-tag{position:absolute;left:14px;bottom:14px;padding:6px 10px;border-radius:8px;background:rgba(0,0,0,.6);font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center}
+.muted-ico{color:var(--red)}
+.self{position:absolute;right:28px;bottom:108px;width:220px;aspect-ratio:16/10;border-radius:12px;overflow:hidden;background:#000;border:2px solid var(--line);box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:3}
+.self video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.self.screen video{transform:none;object-fit:contain}
+.self .avatar-sm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:28px;color:#fff;background:linear-gradient(135deg,#334155,#1e293b)}
+.self .name-tag{left:8px;bottom:8px;font-size:11px;padding:4px 7px}
+
+/* ── Controls ── */
+.bar{position:fixed;left:0;right:0;bottom:0;height:88px;display:flex;align-items:center;justify-content:center;gap:12px;z-index:4;
+  background:linear-gradient(to top,rgba(11,18,32,.97),rgba(11,18,32,0))}
+.cbtn{width:54px;height:54px;border-radius:50%;border:1px solid var(--line);background:var(--panel2);color:var(--ink);display:flex;align-items:center;justify-content:center;position:relative}
+.cbtn:hover{background:#22304d}
+.cbtn.off{background:#3b1d24;border-color:#7f1d1d;color:#fca5a5}
+.cbtn.on{background:var(--blue);border-color:var(--blue)}
+.cbtn.leave{background:var(--red);border-color:var(--red);width:66px;border-radius:28px}
+.cbtn svg{width:24px;height:24px}
+.cbtn .badge{position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--red);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.cbtn[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:64px;white-space:nowrap;font-size:12px;font-weight:700;background:#000;color:#fff;padding:5px 9px;border-radius:6px}
+
+/* ── Chat ── */
+.chat{width:340px;background:var(--panel);border-left:1px solid var(--line);display:flex;flex-direction:column;padding-top:60px;padding-bottom:88px}
+.chat h3{font-size:14px;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.chat h3 button{background:none;border:0;color:var(--mid);font-size:20px;line-height:1}
+.msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.msg{max-width:85%;padding:8px 11px;border-radius:12px;font-size:14px;line-height:1.45;background:var(--panel2);align-self:flex-start;word-wrap:break-word;white-space:pre-wrap}
+.msg.mine{background:var(--blue);align-self:flex-end}
+.msg .who{display:block;font-size:11px;font-weight:700;opacity:.7;margin-bottom:2px}
+.msg.sys{align-self:center;background:none;color:var(--dim);font-size:12px;text-align:center}
+.compose{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.compose input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:11px 12px;color:var(--ink);font:inherit;font-size:14px;outline:none}
+.compose input:focus{border-color:var(--blue)}
+.compose button{background:var(--blue);border:0;color:#fff;border-radius:10px;padding:0 14px;font-weight:800}
+
+/* ── Overlays ── */
+.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;text-align:center;padding:24px;background:rgba(5,8,15,.6);z-index:2}
+.spinner{width:34px;height:34px;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.overlay h2{font-size:20px} .overlay p{color:var(--mid);font-size:14px;max-width:420px;line-height:1.55}
+.ended{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;text-align:center;padding:24px}
+.ended h1{font-size:26px} .ended p{color:var(--mid);max-width:440px;line-height:1.6}
+.backup{font-size:12.5px;color:var(--mid)} .backup a{color:#93c5fd}
+.toast{position:fixed;top:72px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;font-weight:600;z-index:20;max-width:90vw;text-align:center}
+
+@media (max-width:860px){
+  .pj-card{grid-template-columns:1fr}
+  .chat{position:fixed;inset:0;width:auto;z-index:6;padding-bottom:0}
+  .self{width:120px;right:14px;bottom:100px}
+  .main{padding:60px 8px 92px}
+  .top .sub{display:none}
+  .cbtn{width:48px;height:48px} .cbtn.leave{width:58px}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a href="index.html" class="brand" aria-label="UniSkilled home"><img src="uniskilled-logo-icon.png" alt="" onerror="this.style.display='none'"><span>UniSkilled</span></a>
+  <span class="sep"></span>
+  <div style="min-width:0">
+    <div class="title" id="topTitle">Classroom</div>
+    <div class="sub" id="topSub"></div>
+  </div>
+  <div class="spacer"></div>
+  <span class="pill hidden" id="timerPill"><span class="timer" id="timer">00:00</span></span>
+  <span class="pill" id="statePill"><span class="dot"></span><span id="stateText">Not connected</span></span>
+</header>
+
+<!-- Pre-join: check camera & mic before entering -->
+<section class="prejoin" id="prejoin">
+  <div class="pj-card">
+    <div class="pj-video">
+      <video id="pjVideo" autoplay playsinline muted></video>
+      <div class="novid hidden" id="pjNoVid"><div style="font-size:34px">📷</div><div id="pjNoVidText">Camera is off</div></div>
+      <div class="meter" id="meter" title="Microphone level"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="pj-controls">
+        <button class="cbtn" id="pjMic" data-tip="Microphone"></button>
+        <button class="cbtn" id="pjCam" data-tip="Camera"></button>
+      </div>
+    </div>
+    <div class="pj-info">
+      <h1 id="pjTitle">Ready to join?</h1>
+      <p id="pjLead">Check your camera and microphone, then join your lesson.</p>
+      <div class="meta" id="pjMeta"></div>
+      <button class="btn btn-primary" id="joinBtn" disabled>Join lesson</button>
+      <div class="alert hidden" id="pjAlert"></div>
+      <p class="note">Your video and audio go directly between you and the other person. UniSkilled does not record lessons.</p>
+    </div>
+  </div>
+</section>
+
+<!-- In-lesson -->
+<section class="stage hidden" id="stage">
+  <div class="main">
+    <div class="remote-wrap">
+      <video id="remoteVideo" autoplay playsinline></video>
+      <div class="avatar-big hidden" id="remoteAvatar"><div class="av" id="remoteInitials">?</div><div id="remoteAvatarText">Camera is off</div></div>
+      <div class="name-tag hidden" id="remoteTag"><span id="remoteName"></span><span class="muted-ico hidden" id="remoteMuted">🔇</span></div>
+      <div class="overlay" id="overlay"><div class="spinner"></div><h2 id="ovTitle">Waiting for the other person…</h2><p id="ovText"></p><p class="backup hidden" id="backupLink"></p></div>
+    </div>
+    <div class="self" id="self">
+      <video id="selfVideo" autoplay playsinline muted></video>
+      <div class="avatar-sm hidden" id="selfAvatar"></div>
+      <div class="name-tag"><span>You</span><span class="muted-ico hidden" id="selfMuted">🔇</span></div>
+    </div>
+  </div>
+  <aside class="chat hidden" id="chat">
+    <h3>Lesson chat <button id="chatClose" aria-label="Close chat">×</button></h3>
+    <div class="msgs" id="msgs"><div class="msg sys">Messages are only visible during this lesson.</div></div>
+    <form class="compose" id="compose"><input id="chatInput" maxlength="2000" placeholder="Type a message…" autocomplete="off"><button type="submit">Send</button></form>
+  </aside>
+  <nav class="bar">
+    <button class="cbtn" id="micBtn" data-tip="Mute"></button>
+    <button class="cbtn" id="camBtn" data-tip="Stop video"></button>
+    <button class="cbtn" id="screenBtn" data-tip="Share screen"></button>
+    <button class="cbtn" id="chatBtn" data-tip="Chat"><span class="badge hidden" id="chatBadge">0</span></button>
+    <button class="cbtn leave" id="leaveBtn" data-tip="Leave lesson"></button>
+  </nav>
+</section>
+
+<section class="ended hidden" id="ended">
+  <div style="font-size:44px">👋</div>
+  <h1>You left the lesson</h1>
+  <p id="endedText">You can rejoin at any time while the lesson is open.</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+    <button class="btn btn-primary" id="rejoinBtn">Rejoin</button>
+    <a class="btn" style="background:var(--panel2);color:var(--ink);text-decoration:none" id="dashLink" href="student-dashboard.html">Back to dashboard</a>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="classroom.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const initials = (n) => String(n || '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0] || '').join('').toUpperCase() || '?';
+
+  const ICON = {
+    mic: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 19v3"/></svg>',
+    micOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 9.3V5a3 3 0 0 0-5.7-1.3M9 9v3a3 3 0 0 0 4.9 2.3M19 10a7 7 0 0 1-1.1 3.8M5 10a7 7 0 0 0 11.2 5.6M12 19v3M3 3l18 18"/></svg>',
+    cam: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="6" width="14" height="12" rx="2"/><path d="m16 10 6-3v10l-6-3"/></svg>',
+    camOff: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 16v1a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2m4 0h4a2 2 0 0 1 2 2v3.3l6-3.3v10M3 3l18 18"/></svg>',
+    screen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4M9 10l3-3 3 3M12 7v6"/></svg>',
+    chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+    leave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10.7 13.3a16 16 0 0 0 3.3 2.4l1.3-1.3a1.5 1.5 0 0 1 1.6-.3 11 11 0 0 0 3.2.8A1.5 1.5 0 0 1 21.5 16.4v2.9a1.5 1.5 0 0 1-1.6 1.5A18.5 18.5 0 0 1 3.2 4.1 1.5 1.5 0 0 1 4.7 2.5h2.9a1.5 1.5 0 0 1 1.5 1.3c.1 1.1.4 2.2.8 3.2a1.5 1.5 0 0 1-.3 1.6L8.3 9.9" transform="rotate(135 12 12)"/></svg>',
+  };
+
+  let room = null, cfg = null, timerInt = null, joinedAt = null, unread = 0, meterRaf = null;
+
+  function toast(msg, ms) {
+    const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg;
+    document.body.appendChild(t); setTimeout(() => t.remove(), ms || 3500);
+  }
+
+  function setPill(kind, text) {
+    const p = $('statePill'); p.className = 'pill ' + (kind || ''); $('stateText').textContent = text;
+  }
+
+  // ── Configuration: who am I, which lesson, how to connect ─────────────────────
+  // Local test mode only works on localhost: two tabs of the same browser talk to each other.
+  async function loadConfig() {
+    const q = new URLSearchParams(location.search);
+    const isLocal = ['localhost', '127.0.0.1'].includes(location.hostname) || location.protocol === 'file:';
+    if (q.get('test') && isLocal) {
+      return {
+        mode: 'local', room: q.get('test'),
+        me: { id: q.get('role') || 'student', name: q.get('name') || 'Test user', role: q.get('role') || 'student' },
+        other: { name: q.get('other') || '', role: q.get('role') === 'tutor' ? 'student' : 'tutor' },
+        lesson: { subject: q.get('subject') || 'Test lesson', startsAt: null, endsAt: null },
+        iceServers: [], dashboard: '#',
+      };
+    }
+    // Production: the server checks the login, that you belong to this lesson, and that it's open.
+    const sessionId = q.get('session');
+    if (!sessionId) throw new Error('This classroom link is missing the lesson. Open it from your dashboard.');
+    const sb = window.supabase.createClient('https://orghkbbohnabcietidiv.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8');
+    const { data: s } = await sb.auth.getSession();
+    if (!s.session) { location.href = 'signin.html?redirect=' + encodeURIComponent('classroom.html' + location.search); throw new Error('redirect'); }
+    const { data, error } = await sb.functions.invoke('classroom-join', { body: { session_id: sessionId } });
+    if (error || !data || data.error) throw new Error((data && data.error) || 'The classroom could not be opened. Please try again.');
+    await sb.realtime.setAuth(s.session.access_token);
+    return { mode: 'supabase', sb, ...data };
+  }
+
+  // ── Pre-join ────────────────────────────────────────────────────────────────
+  async function prejoin() {
+    try { cfg = await loadConfig(); }
+    catch (e) {
+      if (e.message === 'redirect') return;
+      $('pjTitle').textContent = 'Classroom unavailable';
+      $('pjLead').textContent = e.message;
+      $('meter').classList.add('hidden');
+      return;
+    }
+    const L = cfg.lesson || {};
+    $('topTitle').textContent = L.subject || 'Lesson';
+    $('topSub').textContent = cfg.other?.name ? 'with ' + cfg.other.name : '';
+    $('pjTitle').textContent = cfg.other?.name ? 'Your lesson with ' + cfg.other.name : 'Ready to join?';
+    $('pjMeta').innerHTML = [
+      ['Subject', L.subject], ['With', cfg.other?.name], ['Time', L.when], ['You join as', cfg.me.role === 'tutor' ? 'Tutor' : 'Student'],
+    ].filter(([, v]) => v).map(([k, v]) => `<div><span style="color:var(--mid)">${esc(k)}:</span> <b>${esc(v)}</b></div>`).join('');
+    $('dashLink').href = cfg.dashboard || (cfg.me.role === 'tutor' ? 'tutor-dashboard.html?tab=sessions' : 'student-dashboard.html');
+
+    room = new UsClassroom({
+      me: cfg.me, iceServers: cfg.iceServers && cfg.iceServers.length ? cfg.iceServers : undefined,
+      makeTransport: (me) => cfg.mode === 'local' ? UsClassroom.localTransport(cfg.room, me) : UsClassroom.supabaseTransport(cfg.sb, cfg.room, me),
+      onEvent,
+    });
+    if (cfg.mode === 'local') window.__usRoom = room; // test hook (localhost only)
+    setPill('warn', 'Checking devices…');
+    await room.startMedia();
+    $('pjVideo').srcObject = room.local;
+    startMeter(room.local);
+    renderPrejoinButtons();
+    setPill('', 'Ready');
+    $('joinBtn').disabled = false;
+  }
+
+  function renderPrejoinButtons() {
+    const hasMic = room.local.getAudioTracks().length > 0, hasCam = room.local.getVideoTracks().length > 0;
+    $('pjMic').innerHTML = room.micOn ? ICON.mic : ICON.micOff; $('pjMic').classList.toggle('off', !room.micOn); $('pjMic').disabled = !hasMic;
+    $('pjCam').innerHTML = room.camOn ? ICON.cam : ICON.camOff; $('pjCam').classList.toggle('off', !room.camOn); $('pjCam').disabled = !hasCam;
+    $('pjNoVid').classList.toggle('hidden', room.camOn);
+    $('pjNoVidText').textContent = hasCam ? 'Camera is off' : 'No camera found — you can still join with audio';
+    $('meter').classList.toggle('hidden', !hasMic);
+  }
+
+  function startMeter(stream) {
+    const t = stream.getAudioTracks()[0]; if (!t) return;
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const an = ctx.createAnalyser(); an.fftSize = 256;
+      ctx.createMediaStreamSource(new MediaStream([t])).connect(an);
+      const buf = new Uint8Array(an.frequencyBinCount); const bars = $('meter').querySelectorAll('i');
+      const loop = () => {
+        an.getByteFrequencyData(buf);
+        const lvl = (t.enabled ? buf.reduce((a, b) => a + b, 0) / buf.length : 0) / 60;
+        bars.forEach((b, i) => { b.style.height = Math.max(3, Math.min(14, (lvl - i * 0.18) * 30)) + 'px'; });
+        meterRaf = requestAnimationFrame(loop);
+      };
+      loop();
+    } catch (e) {}
+  }
+
+  // ── In lesson ───────────────────────────────────────────────────────────────
+  async function join() {
+    $('joinBtn').disabled = true; $('joinBtn').textContent = 'Joining…';
+    try { await room.join(); }
+    catch (e) {
+      $('joinBtn').disabled = false; $('joinBtn').textContent = 'Join lesson';
+      $('pjAlert').textContent = 'Could not connect to the classroom. Check your internet connection and try again.';
+      $('pjAlert').classList.remove('hidden');
+      return;
+    }
+    cancelAnimationFrame(meterRaf);
+    $('prejoin').classList.add('hidden'); $('ended').classList.add('hidden'); $('stage').classList.remove('hidden');
+    $('selfVideo').srcObject = room.local;
+    $('ovText').textContent = cfg.other?.name ? 'We\'ll connect you as soon as ' + cfg.other.name + ' joins. Keep this page open.' : 'Keep this page open.';
+    if (cfg.backupLink) { $('backupLink').innerHTML = 'Connection problems? <a target="_blank" rel="noopener" href="' + esc(cfg.backupLink) + '">Use the backup meeting link</a>'; $('backupLink').classList.remove('hidden'); }
+    renderControls();
+  }
+
+  function renderControls() {
+    $('micBtn').innerHTML = room.micOn ? ICON.mic : ICON.micOff; $('micBtn').classList.toggle('off', !room.micOn);
+    $('micBtn').dataset.tip = room.micOn ? 'Mute' : 'Unmute'; $('micBtn').disabled = !room.local.getAudioTracks().length;
+    $('camBtn').innerHTML = room.camOn ? ICON.cam : ICON.camOff; $('camBtn').classList.toggle('off', !room.camOn);
+    $('camBtn').dataset.tip = room.camOn ? 'Stop video' : 'Start video'; $('camBtn').disabled = !room.local.getVideoTracks().length;
+    $('screenBtn').innerHTML = ICON.screen; $('screenBtn').classList.toggle('on', !!room.screen);
+    $('screenBtn').dataset.tip = room.screen ? 'Stop sharing' : 'Share screen';
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) $('screenBtn').classList.add('hidden');
+    $('chatBtn').firstChild && $('chatBtn').firstChild.nodeType === 3 && $('chatBtn').firstChild.remove();
+    if (!$('chatBtn').querySelector('svg')) $('chatBtn').insertAdjacentHTML('afterbegin', ICON.chat);
+    $('leaveBtn').innerHTML = ICON.leave;
+    $('selfMuted').classList.toggle('hidden', room.micOn);
+    const showCam = room.camOn || !!room.screen;
+    $('selfAvatar').textContent = initials(cfg.me.name); $('selfAvatar').classList.toggle('hidden', showCam);
+    $('self').classList.toggle('screen', !!room.screen);
+    $('selfVideo').srcObject = room.screen || room.local;
+  }
+
+  let peerMedia = { mic: true, cam: true, screen: false };
+  function renderRemote() {
+    const p = room.peer;
+    const hasVideo = room.remote && room.remote.getVideoTracks().some((t) => t.readyState === 'live' && !t.muted);
+    const camOn = peerMedia.cam || peerMedia.screen;
+    $('remoteTag').classList.toggle('hidden', !p);
+    $('remoteName').textContent = p ? p.name : '';
+    $('remoteMuted').classList.toggle('hidden', !p || peerMedia.mic);
+    $('remoteInitials').textContent = initials(p ? p.name : cfg.other?.name);
+    $('remoteAvatar').classList.toggle('hidden', !p || (camOn && hasVideo) || room.state !== 'connected');
+    $('remoteAvatarText').textContent = camOn ? 'Connecting video…' : (p ? p.name + '\'s camera is off' : '');
+    $('remoteVideo').style.objectFit = peerMedia.screen ? 'contain' : 'cover';
+  }
+
+  function onEvent(type, data) {
+    switch (type) {
+      case 'remote-stream':
+        if ($('remoteVideo').srcObject !== data) $('remoteVideo').srcObject = data;
+        $('remoteVideo').play && $('remoteVideo').play().catch(() => {});
+        renderRemote(); break;
+      case 'media': if (!$('stage').classList.contains('hidden')) renderControls(); else renderPrejoinButtons(); break;
+      case 'screen': renderControls(); break;
+      case 'peer-media': peerMedia = data; renderRemote(); break;
+      case 'peer-joined': sys((data.name || 'The other person') + ' joined'); peerMedia = { mic: true, cam: true, screen: false }; renderRemote(); break;
+      case 'peer-left': sys((data.name || 'The other person') + ' left'); renderRemote(); break;
+      case 'chat': addMsg(data); break;
+      case 'error': $('pjAlert').textContent = data.message; $('pjAlert').classList.remove('hidden'); if (data.code !== 'no-media') toast(data.message); break;
+      case 'state': onState(data); break;
+    }
+  }
+
+  function onState(s) {
+    const ov = $('overlay');
+    if (s === 'waiting') {
+      setPill('warn', 'Waiting'); ov.classList.remove('hidden');
+      $('ovTitle').textContent = cfg.other?.name ? 'Waiting for ' + cfg.other.name + '…' : 'Waiting for the other person…';
+    } else if (s === 'connecting') {
+      setPill('warn', 'Connecting…'); ov.classList.remove('hidden'); $('ovTitle').textContent = 'Connecting…';
+      $('ovText').textContent = (room.peer?.name || 'The other person') + ' is here. Setting up the call…';
+    } else if (s === 'connected') {
+      setPill('ok', 'Connected'); ov.classList.add('hidden');
+      if (!joinedAt) { joinedAt = Date.now(); $('timerPill').classList.remove('hidden'); timerInt = setInterval(tick, 1000); tick(); }
+    } else if (s === 'reconnecting') {
+      setPill('warn', 'Reconnecting…'); ov.classList.remove('hidden'); $('ovTitle').textContent = 'Reconnecting…';
+      $('ovText').textContent = 'The connection dropped. We\'re reconnecting you automatically.';
+    } else if (s === 'left') {
+      setPill('', 'Left');
+    }
+    renderRemote();
+  }
+
+  function tick() {
+    const s = Math.floor((Date.now() - joinedAt) / 1000);
+    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+    $('timer').textContent = (h ? h + ':' : '') + String(m).padStart(2, '0') + ':' + String(sec).padStart(2, '0');
+  }
+
+  function sys(text) { const d = document.createElement('div'); d.className = 'msg sys'; d.textContent = text; $('msgs').appendChild(d); $('msgs').scrollTop = 1e9; }
+  function addMsg(m) {
+    const d = document.createElement('div'); d.className = 'msg' + (m.mine ? ' mine' : '');
+    d.innerHTML = (m.mine ? '' : '<span class="who">' + esc(m.from) + '</span>') + esc(m.text);
+    $('msgs').appendChild(d); $('msgs').scrollTop = 1e9;
+    if (!m.mine && $('chat').classList.contains('hidden')) { unread++; $('chatBadge').textContent = unread; $('chatBadge').classList.remove('hidden'); }
+  }
+
+  // ── Wiring ──────────────────────────────────────────────────────────────────
+  $('pjMic').onclick = () => { room.toggleMic(); renderPrejoinButtons(); };
+  $('pjCam').onclick = () => { room.toggleCam(); renderPrejoinButtons(); };
+  $('joinBtn').onclick = join;
+  $('micBtn').onclick = () => { room.toggleMic(); renderControls(); };
+  $('camBtn').onclick = () => { room.toggleCam(); renderControls(); };
+  $('screenBtn').onclick = async () => { await room.toggleScreen(); renderControls(); };
+  $('chatBtn').onclick = () => {
+    const open = $('chat').classList.toggle('hidden') === false;
+    if (open) { unread = 0; $('chatBadge').classList.add('hidden'); setTimeout(() => $('chatInput').focus(), 50); }
+  };
+  $('chatClose').onclick = () => $('chat').classList.add('hidden');
+  $('compose').onsubmit = (e) => {
+    e.preventDefault();
+    const v = $('chatInput').value;
+    if (room.sendChat(v)) $('chatInput').value = '';
+    else if (v.trim()) toast('Chat is available once you\'re connected.');
+  };
+  $('leaveBtn').onclick = () => {
+    room.leave(); clearInterval(timerInt);
+    $('stage').classList.add('hidden'); $('ended').classList.remove('hidden');
+  };
+  $('rejoinBtn').onclick = () => location.reload();
+
+  prejoin();
+})();
+</script>
+</body>
+</html>
