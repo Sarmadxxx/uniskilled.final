@@ -587,9 +587,6 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
           <select class="form-select" id="inputSessionLen"><option value="60">60 min</option><option value="90">90 min</option><option value="120">120 min</option><option value="flexible">Flexible</option></select>
         </div>
       </div>
-      <div class="form-group"><label for="inputFormat" class="form-label">Teaching format</label>
-        <select class="form-select" id="inputFormat"><option value="online">Online only</option><option value="inperson">In-person only</option><option value="both">Online & In-person</option></select>
-      </div>
       <div class="form-group"><label for="inputPrefTime" class="form-label">Preferred time</label>
         <select class="form-select" id="inputPrefTime"><option value="">Any time</option><option value="morning">Morning (8am–12pm)</option><option value="afternoon">Afternoon (12pm–5pm)</option><option value="evening">Evening (5pm–10pm)</option><option value="flexible">Flexible</option></select>
       </div>
@@ -849,7 +846,7 @@ async function loadProfile() {
   const metaParts = [];
   if (p?.country) metaParts.push(`📍 ${p.country}`);
   if (p?.language) metaParts.push(`🌐 ${p.language}`);
-  if (tp?.teaching_format) metaParts.push(`💻 ${tp.teaching_format === 'both' ? 'Online & In-person' : cap(tp.teaching_format)}`);
+  metaParts.push('💻 Online sessions'); // all sessions are online
   document.getElementById('profileMeta').innerHTML = metaParts.map(m => `<span>${__esc(m)}</span>`).join('');
 
   document.getElementById('profileTags').innerHTML = subjects.map(s => `<span class="subject-tag">${__esc(s)}</span>`).join('');
@@ -985,7 +982,7 @@ async function loadProfile() {
 
   // Teaching
   const teachItems = [
-    tp?.teaching_format ? ['Format', tp.teaching_format === 'both' ? 'Online & In-person' : cap(tp.teaching_format)] : null,
+    ['Format', 'Online'],
     tp?.session_length ? ['Session', tp.session_length === 'flexible' ? 'Flexible' : tp.session_length + ' min'] : null,
     tp?.max_students ? ['Max students/week', tp.max_students] : null,
   ].filter(Boolean);
@@ -1183,7 +1180,7 @@ async function saveTeaching() {
     showToast(`The minimum hourly rate on UniSkilled is ${selectedCurrency === 'USD' ? '$17' : '€15'} (so a 60-minute session meets the ${selectedCurrency === 'USD' ? '$17' : '€15'} minimum booking value). Please update your rate.`, 'error');
     return;
   }
-  const data = { user_id: currentUserId, hourly_rate: rateVal, currency: selectedCurrency, session_length: document.getElementById('inputSessionLen').value || null, teaching_format: document.getElementById('inputFormat').value || null, preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
+  const data = { user_id: currentUserId, hourly_rate: rateVal, currency: selectedCurrency, session_length: document.getElementById('inputSessionLen').value || null, teaching_format: 'online', preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
   const { error } = await _supabase.from('tutor_profiles').upsert(data, { onConflict: 'user_id' });
   if (error) { showAlert('alertTeaching', 'Error: ' + error.message, 'error'); return; }
   showAlert('alertTeaching', 'Saved!', 'success');
@@ -1327,7 +1324,6 @@ function openModal(id) {
     document.getElementById('inputCurrency').value = tutorData?.currency || 'EUR';
     updateRateMinHint();
     document.getElementById('inputSessionLen').value = tutorData?.session_length || '60';
-    document.getElementById('inputFormat').value = tutorData?.teaching_format || 'online';
     document.getElementById('inputPrefTime').value = tutorData?.preferred_time || '';
     document.getElementById('inputMaxStudents').value = tutorData?.max_students || '';
     document.querySelectorAll('.avail-toggle').forEach(btn => btn.classList.toggle('on', availability.includes(btn.getAttribute('data-day'))));

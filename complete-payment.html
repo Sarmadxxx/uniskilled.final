@@ -47,6 +47,8 @@ nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.
   <div id="nav-root"></div>
 </nav>
 <script src="nav.js"></script>
+<script src="ui.js"></script>
+<script src="auth-guard.js"></script>
 <script>
 // ── XSS protection (security review Oct 2026) ──
 function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
@@ -241,10 +243,10 @@ async function payWithCard() {
   const body = isGroup ? { group_participant_id: groupParticipantId } : { session_id: sessionId };
   try {
     // The server only starts checkout for the signed-in student who owns this booking.
-    const { data: { session: authSession } } = await _sb.auth.getSession();
+    // usAuthHeaders confirms the login with the server first (auth-guard.js).
     const res = await fetch(`${SUPABASE_URL}/functions/v1/create-stripe-checkout`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authSession?.access_token || ''}` },
+      headers: await usAuthHeaders(_sb),
       body: JSON.stringify(body),
     });
     const data = await res.json();
@@ -297,6 +299,8 @@ async function init() {
     window.location.href = 'signin.html?redirect=' + encodeURIComponent(window.location.href);
     return;
   }
+  // Make sure the saved login is still active before showing the payment form.
+  if (!new URLSearchParams(location.search).get('stripe_success')) await usFreshToken(_sb);
   currentUser = authSession.user;
 
   if (params.get('stripe_success') === '1') {

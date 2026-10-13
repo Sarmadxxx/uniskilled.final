@@ -248,6 +248,7 @@ main.main .subject-tag{background:#f4f6f9;color:#334155;border:1px solid #e3e8ef
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="auth-guard.js"></script>
 <script src="reschedule.js"></script>
 <script src="analytics.js" defer></script>
 </head>
@@ -421,9 +422,10 @@ const _sb = window.supabase.createClient(
 
 // Sends the signed-in user's access token with calls to secured edge functions,
 // so the server can verify who is really asking (instead of trusting an ID in the request body).
+// Confirms the login with the server first (auth-guard.js); if it has ended, sends the
+// person to sign in and back here instead of letting the call fail with "Not signed in".
 async function authedHeaders() {
-  const { data: { session } } = await _sb.auth.getSession();
-  return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (session?.access_token || '') };
+  return usAuthHeaders(_sb);
 }
 
 
@@ -869,7 +871,7 @@ async function submitBecomeTutor() {
     alertEl.className = 'dm-alert error';
     return;
   }
-  const format = document.getElementById('btFormat').value;
+  const format = 'online'; // all sessions are online
   const bio = document.getElementById('btBio').value.trim();
 
   const { data: { session } } = await _sb.auth.getSession();
@@ -994,14 +996,6 @@ function shareReferralLink() {
             <option value="EUR">€ EUR</option><option value="USD">$ USD</option>
           </select>
         </div>
-      </div>
-      <div class="dm-form-group">
-        <label for="btFormat" class="dm-label">Teaching format</label>
-        <select class="dm-select" id="btFormat">
-          <option value="online">Online only</option>
-          <option value="inperson">In-person only</option>
-          <option value="both">Both online & in-person</option>
-        </select>
       </div>
       <div class="dm-form-group">
         <label for="btBio" class="dm-label">Short bio as a tutor</label>

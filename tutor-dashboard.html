@@ -228,6 +228,7 @@ a.profile-av{text-decoration:none;}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="auth-guard.js"></script>
 <script src="reschedule.js"></script>
 <script src="university-verify.js"></script>
 <script src="analytics.js" defer></script>
@@ -522,9 +523,10 @@ const _sb = window.supabase.createClient(
 
 // Sends the signed-in user's access token with calls to secured edge functions,
 // so the server can verify who is really asking (instead of trusting an ID in the request body).
+// Confirms the login with the server first (auth-guard.js); if it has ended, sends the
+// person to sign in and back here instead of letting the call fail with "Not signed in".
 async function authedHeaders() {
-  const { data: { session } } = await _sb.auth.getSession();
-  return { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (session?.access_token || '') };
+  return usAuthHeaders(_sb);
 }
 
 
@@ -681,7 +683,7 @@ async function submitGroupSession() {
   const date = document.getElementById('gsDate').value;
   const time = document.getElementById('gsTime').value;
   const duration = document.getElementById('gsDuration').value;
-  const format = document.getElementById('gsFormat').value;
+  const format = 'online'; // all sessions are online
   const maxStudents = document.getElementById('gsMaxStudents').value;
   const price = document.getElementById('gsPrice').value;
   const notes = document.getElementById('gsNotes').value.trim();
@@ -818,12 +820,12 @@ async function loadRequests() {
           <span style="font-size:0.75rem;color:var(--mid);">${__esc(r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : '')} ${__esc(r.scheduled_time ? r.scheduled_time.slice(0,5) + __tzNote(r.timezone) : '')}</span>
         </div>
         <div class="request-meta">
-          📋 ${__esc(r.duration_minutes || 60)} min · ${__esc(r.format || 'Online')} 
+          📋 ${__esc(r.duration_minutes || 60)} min · Online 
           ${__esc(r.notes ? ' · "' + r.notes.slice(0, 60) + '"' : '')}
         </div>
         <div class="request-actions">
-          <button class="btn-accept" onclick="respond('${r.id}','confirmed','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}')">✓ Accept</button>
-          <button class="btn-decline" onclick="respond('${r.id}','declined','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}')">✗ Decline</button>
+          <button class="btn-accept" onclick="respond('${r.id}','confirmed','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}', this)">✓ Accept</button>
+          <button class="btn-decline" onclick="respond('${r.id}','declined','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}', this)">✗ Decline</button>
           <button class="btn-msg" onclick="window.location.href='messages.html?with=${r.student_id}'">💬</button>
         </div>
       </div>`;
@@ -835,24 +837,36 @@ async function loadRequests() {
     : __ovLabels(html);
 }
 
-window.respond = async function(sessionId, status, studentId, studentName, subject) {
-  const newStatus = status === 'confirmed' ? 'awaiting_payment' : 'declined';
-  const paymentDueAt = status === 'confirmed' ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() : null;
+window.respond = async function(sessionId, status, studentId, studentName, subject, btn) {
+  const accepting = status === 'confirmed';
+  const newStatus = accepting ? 'awaiting_payment' : 'declined';
+  const paymentDueAt = accepting ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() : null;
+
+  // Immediate feedback: lock this request's buttons and show progress.
+  const row = btn && btn.closest ? btn.closest('.request-row') : null;
+  const rowButtons = row ? Array.from(row.querySelectorAll('button')) : [];
+  const btnLabel = btn ? btn.textContent : '';
+  rowButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'default'; });
+  if (btn) { btn.textContent = accepting ? 'Accepting…' : 'Declining…'; btn.style.opacity = '1'; }
+  const unlock = () => {
+    rowButtons.forEach(b => { b.disabled = false; b.style.opacity = ''; b.style.cursor = ''; });
+    if (btn) btn.textContent = btnLabel;
+  };
 
   const updatePayload = { status: newStatus };
   if (paymentDueAt) updatePayload.payment_due_at = paymentDueAt;
 
   const { error: respondErr } = await _sb.from('sessions').update(updatePayload).eq('id', sessionId);
   if (respondErr) {
+    unlock();
     showToast(__friendlyDbError(respondErr, 'Could not update this request. Please refresh and try again.'), 'error');
-    await loadAll();
     return;
   }
-  window.usTrack&&usTrack('booking_responded', { decision: newStatus === 'awaiting_payment' ? 'accepted' : 'declined' });
+  window.usTrack&&usTrack('booking_responded', { decision: accepting ? 'accepted' : 'declined' });
 
   // The database ends the payment window 1 hour before the session if that's sooner than 24 hours.
   let payWindowText = '24 hours';
-  if (newStatus === 'awaiting_payment') {
+  if (accepting) {
     try {
       const { data: dueRow } = await _sb.from('sessions').select('payment_due_at').eq('id', sessionId).maybeSingle();
       const mins = dueRow?.payment_due_at ? Math.floor((new Date(dueRow.payment_due_at).getTime() - Date.now()) / 60000) : null;
@@ -860,30 +874,29 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
     } catch (e) { /* keep the default wording */ }
   }
 
-  await _sb.from('notifications').insert({
+  // Tell the student (in-app notification + email) — both at once.
+  const notify = _sb.from('notifications').insert({
     user_id: studentId,
-    type: newStatus === 'awaiting_payment' ? 'awaiting_payment' : 'booking_declined',
-    title: newStatus === 'awaiting_payment' ? '🎉 Your tutor accepted!' : '❌ Session declined',
-    body: newStatus === 'awaiting_payment'
+    type: accepting ? 'awaiting_payment' : 'booking_declined',
+    title: accepting ? '🎉 Your tutor accepted!' : '❌ Session declined',
+    body: accepting
       ? tutorName + ' accepted your ' + subject + ' request. Complete payment within ' + payWindowText + ' to lock it in.'
       : 'Your ' + subject + ' session request was declined.',
-    link: newStatus === 'awaiting_payment' ? ('complete-payment.html?session=' + sessionId) : 'student-dashboard.html',
+    link: accepting ? ('complete-payment.html?session=' + sessionId) : 'student-dashboard.html',
     read: false
   });
-
-  // Send email to student
-  try {
-    const { data: sessionData } = await _sb.from('sessions')
-      .select('scheduled_date, scheduled_time, duration_minutes, student_id, price, currency, timezone')
-      .eq('id', sessionId).maybeSingle();
-    if (studentId && sessionData) {
+  const email = (async () => {
+    try {
+      const { data: sessionData } = await _sb.from('sessions')
+        .select('scheduled_date, scheduled_time, duration_minutes, student_id, price, currency, timezone')
+        .eq('id', sessionId).maybeSingle();
+      if (!studentId || !sessionData) return;
       const dateStr = sessionData.scheduled_date ? new Date(sessionData.scheduled_date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) : 'TBD';
-      const __tok = (await _sb.auth.getSession()).data.session?.access_token;
       await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (__tok || '') },
+        headers: await authedHeaders(),
         body: JSON.stringify({
-          type: newStatus === 'awaiting_payment' ? 'awaiting_payment' : 'booking_declined',
+          type: accepting ? 'awaiting_payment' : 'booking_declined',
           to_user_id: studentId,
           data: {
             studentName, tutorName, subject,
@@ -896,10 +909,19 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
           }
         })
       });
-    }
-  } catch(e) { console.error('Email failed (non-critical):', e); }
+    } catch (e) { console.error('Email failed (non-critical):', e); }
+  })();
+  await Promise.allSettled([notify, email]);
 
-  await loadAll();
+  const who = String(studentName || 'The student').split(' ')[0] || 'The student';
+  if (accepting) {
+    // Take the tutor to Sessions, where the booking now waits for payment.
+    showToast('✅ Request accepted. ' + who + ' has ' + payWindowText + ' to pay — the session is confirmed as soon as they do, and we\'ll notify you. You can follow it below.', 'success', { afterReload: true });
+    window.location.href = 'tutor-dashboard.html?tab=sessions';
+  } else {
+    showToast('Request declined. ' + who + ' has been notified.', 'success', { afterReload: true });
+    window.location.href = 'tutor-dashboard.html?tab=requests';
+  }
 };
 
 // ── OPEN SUBJECT REQUESTS (students post; any tutor can offer to teach) ──
@@ -1741,11 +1763,8 @@ async function joinSession(sessionId, subject, otherName) {
           </select>
         </div>
         <div style="flex:1;">
-          <label for="gsFormat" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</label>
-          <select id="gsFormat" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
-            <option value="online" selected>Online</option>
-            <option value="in-person">In-person</option>
-          </select>
+          <span style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</span>
+          <div style="width:100%;box-sizing:border-box;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;background:#f8fafc;color:var(--ink2);">💻 Online</div>
         </div>
       </div>
 

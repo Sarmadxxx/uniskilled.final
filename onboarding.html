@@ -198,7 +198,6 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
             <div class="hint" id="rateHint">Minimum €15 per hour</div>
             <div class="hint" id="rateGuide">Typical rates: €18–30/hr for university-student tutors, €30–50/hr for graduates and exam specialists.</div>
           </div>
-          <div class="form-group"><label for="teachingFormat" class="form-label">Teaching format</label><select id="teachingFormat" class="form-select"><option value="online">Online only</option><option value="inperson">In-person only</option><option value="both">Both</option></select></div>
         </div>
         <div class="form-group"><label for="bio" class="form-label">Bio — tell students about yourself</label><textarea id="bio" class="form-textarea" placeholder="Describe your teaching style, experience, and qualifications..."></textarea></div>
 
@@ -526,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const preferredTimes = Array.from(document.querySelectorAll('.pref-time-cb:checked')).map(cb => cb.value);
     const hourlyRate = selectedRole === 'tutor' ? document.getElementById('hourlyRate').value : null;
     const hourlyCurrency = selectedRole === 'tutor' ? document.getElementById('rateCurrency').value : null;
-    const teachingFormat = selectedRole === 'tutor' ? document.getElementById('teachingFormat').value : null;
+    const teachingFormat = selectedRole === 'tutor' ? 'online' : null; // all sessions are online
     const bio = selectedRole === 'tutor' ? document.getElementById('bio').value.trim() : null;
 
     const { data, error } = await _sb.auth.signUp({

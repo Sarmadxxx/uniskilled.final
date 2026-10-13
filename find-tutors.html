@@ -12,12 +12,12 @@
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_GB">
 <title>Find a Tutor — UniSkilled</title>
-<meta name="description" content="Browse university-verified peer tutors by subject, price and format, and book a session in minutes.">
+<meta name="description" content="Browse university-verified peer tutors by subject, price and availability, and book an online session in minutes.">
 <link rel="canonical" href="https://uniskilled.com/find-tutors.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
 <meta property="og:title" content="Find a Tutor — UniSkilled">
-<meta property="og:description" content="Browse university-verified peer tutors by subject, price and format, and book a session in minutes.">
+<meta property="og:description" content="Browse university-verified peer tutors by subject, price and availability, and book an online session in minutes.">
 <meta property="og:url" content="https://uniskilled.com/find-tutors.html">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -201,12 +201,6 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
 </div>
 
 <div class="filters">
-  <select class="filter-select" id="filterFormat" aria-label="Format" onchange="filterTutors()">
-    <option value="">Any format</option>
-    <option value="online">Online</option>
-    <option value="inperson">In-person</option>
-    <option value="both">Both</option>
-  </select>
   <select class="filter-select" id="filterPrice" aria-label="Price" onchange="filterTutors()">
     <option value="">Any price</option>
     <option value="0-20">Up to €20/hr</option>
@@ -397,7 +391,7 @@ function renderTutors(tutors) {
   }).join('');
 }
 
-const FILTER_IDS = ['filterFormat','filterPrice','filterDay','filterUniversity','filterCountry'];
+const FILTER_IDS = ['filterPrice','filterDay','filterUniversity','filterCountry'];
 function clearFilters() {
   document.getElementById('searchInput').value = '';
   FILTER_IDS.forEach(id => { document.getElementById(id).value = ''; });
@@ -427,7 +421,7 @@ function filterTutors() {
   const q = document.getElementById('searchInput').value.toLowerCase().trim();
   syncFilterUi(q);
   try { const u = new URL(location.href); q ? u.searchParams.set('q', q) : u.searchParams.delete('q'); history.replaceState(null, '', u); } catch (e) {}
-  const fmt = document.getElementById('filterFormat').value;
+  const fmt = ''; // all sessions are online — no format filter
   const price = document.getElementById('filterPrice').value;
   const day = document.getElementById('filterDay').value;
   const uniFilter = document.getElementById('filterUniversity').value;
@@ -444,7 +438,6 @@ function filterTutors() {
       (c.professor_name||'').toLowerCase().includes(q)
     );
     if(q && !subjects.some(s=>s.toLowerCase().includes(q)) && !matchesCourse && !(t.fullName||'').toLowerCase().includes(q) && !(t.location||'').toLowerCase().includes(q)) return false;
-    if(fmt && t.teaching_format!==fmt && t.teaching_format!=='both') return false;
     if(day && !avail.includes(day)) return false;
     if(price){const r=t.hourly_rate||0;if(price==='0-20'&&r>20)return false;if(price==='20-40'&&(r<20||r>40))return false;if(price==='40-60'&&(r<40||r>60))return false;if(price==='60+'&&r<60)return false;}
     if(uniFilter === 'same') {

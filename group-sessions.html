@@ -156,7 +156,7 @@ async function loadGroupSessions() {
         <div class="gs-meta">
           <span>📅 ${__esc(date)} · ${__esc(gs.scheduled_time.slice(0,5) + __tzNote(gs.timezone))}</span>
           <span>⏱️ ${__esc(gs.duration_minutes)} min</span>
-          <span>💻 ${__esc(gs.format === 'in-person' ? 'In-person' : 'Online')}</span>
+          <span>💻 Online</span>
         </div>
       </div>
       <span class="gs-spots ${__esc(isFull ? 'full' : '')}">${__esc(isFull ? 'Full' : spotsLeft + ' spot' + (spotsLeft === 1 ? '' : 's') + ' left')}</span>
