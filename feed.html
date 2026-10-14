@@ -548,7 +548,7 @@ async function toggleLike(postId, btn) {
     }
   }
   countEl.textContent = count;
-  await _sb.from('feed_posts').update({ like_count: count }).eq('id', postId);
+  // The database keeps feed_posts.like_count in step with feed_likes (trigger), so no update here.
 }
 
 let openReplies = new Set();
