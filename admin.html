@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="sentry.js"></script>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -102,6 +103,34 @@ tr:last-child td{border-bottom:none;}
 .notif-row-body{color:var(--mid);}
 .notif-row-time{color:var(--light);font-size:0.7rem;margin-top:4px;}
 
+/* ── SITE HEALTH (Sentry) ── */
+.health-head{display:flex;justify-content:space-between;align-items:center;gap:0.8rem;flex-wrap:wrap;margin-bottom:1.2rem;}
+.health-head .page-title{margin-bottom:0;}
+.health-actions{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;}
+.health-btn{padding:0.45rem 0.9rem;border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.78rem;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--ink2);text-decoration:none;}
+.health-btn.primary{background:var(--blue);border-color:var(--blue);color:#fff;}
+.health-updated{font-size:0.72rem;color:var(--light);}
+.stat-sub{font-size:0.72rem;color:var(--mid);margin-top:4px;}
+.stat-good{color:var(--green);} .stat-warn{color:#b45309;} .stat-bad{color:var(--red);}
+.health-note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:1rem 1.2rem;font-size:0.84rem;color:var(--ink2);margin-bottom:1.2rem;line-height:1.55;}
+.health-note.warn{background:var(--red-bg);border-color:#fecaca;}
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:0.4rem;}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0;}
+.bar{width:100%;max-width:46px;background:var(--blue);border-radius:4px 4px 0 0;min-height:2px;}
+.bar-col.today .bar{background:#0b4fd1;}
+.bar-val{font-size:0.7rem;font-weight:700;color:var(--ink2);margin-bottom:3px;}
+.bar-day{font-size:0.66rem;color:var(--light);margin-top:5px;white-space:nowrap;}
+.issue-title{font-weight:700;color:var(--ink);word-break:break-word;}
+.issue-where{font-size:0.72rem;color:var(--mid);word-break:break-all;}
+.review-card{border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;margin-bottom:0.8rem;}
+.review-top{display:flex;justify-content:space-between;gap:0.6rem;align-items:flex-start;flex-wrap:wrap;}
+.review-meta{font-size:0.72rem;color:var(--mid);margin-top:3px;}
+.review-diag{background:var(--off);border-radius:8px;padding:0.75rem 0.9rem;font-size:0.82rem;margin:0.7rem 0;white-space:pre-wrap;line-height:1.5;}
+.review-fix{margin:0.4rem 0 0.7rem;}
+.review-fix summary{cursor:pointer;font-size:0.78rem;font-weight:700;color:var(--blue);}
+.review-fix pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:0.8rem;font-size:0.72rem;overflow-x:auto;margin-top:0.5rem;max-height:360px;}
+.badge-blue{background:#eff6ff;color:var(--blue);}
+
 @media(max-width:800px){
   .layout{grid-template-columns:1fr;}
   .sidebar{display:none;position:fixed;top:60px;left:0;right:0;bottom:0;z-index:250;overflow-y:auto;}
@@ -155,6 +184,7 @@ tr:last-child td{border-bottom:none;}
       <div class="nav-item" onclick="showPage('sessions',this)">📅 Sessions</div>
       <div class="nav-item" onclick="showPage('groupsessions',this)">👥 Group Sessions</div>
       <div class="nav-item" onclick="showPage('users',this)">👤 Users</div>
+      <div class="nav-item" onclick="showPage('health',this);loadSiteHealth()">🩺 Site Health<span class="count" id="healthCount" style="display:none;">0</span></div>
     </div>
 
     <div class="main">
@@ -229,6 +259,19 @@ tr:last-child td{border-bottom:none;}
         <div class="card">
           <div class="table-scroll" id="usersTable"><div class="spinner"></div></div>
         </div>
+      </div>
+
+      <!-- SITE HEALTH (Sentry) -->
+      <div id="page-health" style="display:none;">
+        <div class="health-head">
+          <div class="page-title">🩺 Site Health</div>
+          <div class="health-actions">
+            <span class="health-updated" id="healthUpdated"></span>
+            <button class="health-btn" id="healthSyncBtn" onclick="loadSiteHealth(true)">↻ Check Sentry now</button>
+            <a class="health-btn primary" id="healthSentryLink" href="https://uniskilled.sentry.io/issues/" target="_blank" rel="noopener">Open Sentry ↗</a>
+          </div>
+        </div>
+        <div id="healthBody"><div class="spinner"></div></div>
       </div>
     </div>
   </div>
@@ -315,6 +358,7 @@ async function checkAdminAccess() {
 
   await loadEverything();
   setupRealtime();
+  loadSiteHealth();   // fills the Site Health badge in the background
 }
 
 async function signOut() {
@@ -633,6 +677,149 @@ async function markNotifRead(id) {
 
 function toggleNotifPanel() {
   document.getElementById('notifPanel').classList.toggle('open');
+}
+
+// ── SITE HEALTH (Sentry) ──
+// Numbers come from the site-health Edge Function, which talks to Sentry with a secret token
+// (the token never reaches the browser). Errors are reviewed daily by Claude, which writes a
+// diagnosis + proposed fix here; you upload the fix to GitHub and press "I uploaded the fix".
+let healthData = null, healthLoading = false;
+const REVIEW_LABELS = {
+  new: ['Waiting for review', 'badge-amber'], diagnosing: ['Being reviewed', 'badge-blue'],
+  fix_ready: ['Fix ready', 'badge-green'], needs_info: ['Needs your input', 'badge-amber'],
+  uploaded: ['Fix uploaded — watching', 'badge-blue'], fixed: ['Fixed', 'badge-gray'], ignored: ['Ignored', 'badge-gray'],
+};
+
+async function loadSiteHealth(sync) {
+  if (healthLoading) return;
+  healthLoading = true;
+  const btn = document.getElementById('healthSyncBtn');
+  if (sync && btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
+  if (!healthData) document.getElementById('healthBody').innerHTML = '<div class="spinner"></div>';
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/site-health`, {
+      method: 'POST', headers: await authedHeaders(), body: JSON.stringify({ action: sync ? 'sync' : 'stats' }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    healthData = data;
+    renderSiteHealth();
+  } catch (e) {
+    document.getElementById('healthBody').innerHTML = `<div class="health-note warn">Couldn't load Site Health: ${__esc(e.message)}</div>`;
+  } finally {
+    healthLoading = false;
+    if (btn) { btn.disabled = false; btn.textContent = '↻ Check Sentry now'; }
+  }
+}
+
+function fmtNum(n) { return n == null ? '—' : Number(n).toLocaleString(); }
+function fmtAgo(iso) {
+  if (!iso) return '—';
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1) return 'just now'; if (m < 60) return m + ' min ago';
+  const h = Math.round(m / 60); if (h < 48) return h + ' h ago';
+  return Math.round(h / 24) + ' days ago';
+}
+
+function updateHealthBadge() {
+  const b = document.getElementById('healthCount');
+  if (!b || !healthData) return;
+  const n = (healthData.reviews || []).filter(r => r.review_status === 'fix_ready' || r.review_status === 'needs_info').length;
+  b.textContent = n; b.style.display = n > 0 ? '' : 'none';
+}
+
+function renderSiteHealth() {
+  const d = healthData; const el = document.getElementById('healthBody');
+  updateHealthBadge();
+  document.getElementById('healthUpdated').textContent = 'Updated ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  if (d.sentry_org_url) document.getElementById('healthSentryLink').href = d.sentry_org_url;
+
+  let html = '';
+  if (!d.configured) {
+    html += `<div class="health-note">Sentry isn't connected to the dashboard yet. Add the <b>SENTRY_AUTH_TOKEN</b> and <b>SENTRY_DSN</b> secrets in Supabase → Edge Functions → Secrets, then press "Check Sentry now".</div>`;
+  } else {
+    const k = d.kpis || {};
+    const cf = k.crash_free_sessions;
+    const cfCls = cf == null ? '' : cf >= 0.99 ? 'stat-good' : cf >= 0.97 ? 'stat-warn' : 'stat-bad';
+    const e24Cls = !k.errors_24h ? 'stat-good' : k.errors_24h > 50 ? 'stat-bad' : 'stat-warn';
+    if (d.problems && d.problems.length) html += `<div class="health-note warn">Some numbers couldn't be loaded from Sentry (${__esc(d.problems.join(', '))}). Check that the token has org:read, project:read and event:read access.</div>`;
+    html += `<div class="stat-grid">
+      <div class="stat-card"><div class="stat-num ${cfCls}">${cf == null ? '—' : (cf * 100).toFixed(cf >= 0.999 ? 1 : 2) + '%'}</div><div class="stat-lbl">Error-free visits (24h)</div><div class="stat-sub">${k.sessions_24h == null ? 'No visits recorded yet' : fmtNum(k.sessions_24h) + ' visits'}</div></div>
+      <div class="stat-card"><div class="stat-num ${e24Cls}">${fmtNum(k.errors_24h)}</div><div class="stat-lbl">Errors today</div><div class="stat-sub">${fmtNum(k.errors_7d)} in the last 7 days</div></div>
+      <div class="stat-card"><div class="stat-num">${fmtNum(k.unresolved_issues)}</div><div class="stat-lbl">Open issues</div><div class="stat-sub">${fmtNum(k.new_issues_24h)} new in 24h</div></div>
+      <div class="stat-card"><div class="stat-num ${k.fixes_ready ? 'stat-good' : ''}">${fmtNum(k.fixes_ready)}</div><div class="stat-lbl">Fixes ready to upload</div><div class="stat-sub">${fmtNum(k.awaiting_review)} waiting for review</div></div>
+    </div>`;
+
+    const days = d.daily || [];
+    if (days.length) {
+      const max = Math.max(1, ...days.map(x => x.errors));
+      html += `<div class="card"><div class="card-title">Errors per day (last 7 days)</div>
+        <div class="bars" role="img" aria-label="Errors per day: ${__esc(days.map(x => x.day + ' ' + x.errors).join(', '))}">
+        ${days.map((x, i) => `<div class="bar-col${i === days.length - 1 ? ' today' : ''}" title="${__esc(x.day)}: ${x.errors} errors">
+          <div class="bar-val">${x.errors}</div><div class="bar" style="height:${Math.round(x.errors / max * 88)}%"></div>
+          <div class="bar-day">${__esc(new Date(x.day + 'T12:00:00Z').toLocaleDateString([], { weekday: 'short' }))}</div></div>`).join('')}
+        </div></div>`;
+    }
+
+    const top = d.top_issues || [];
+    html += `<div class="card"><div class="card-title">Most frequent issues (24h)</div>`;
+    html += top.length ? `<div class="table-scroll"><table><thead><tr><th>Issue</th><th>Events 24h</th><th>Users</th><th>Last seen</th><th></th></tr></thead><tbody>
+      ${top.map(i => `<tr><td><div class="issue-title">${__esc(i.title)}</div><div class="issue-where">${__esc(i.short_id || '')} · ${__esc(i.culprit || '')}</div></td>
+        <td>${fmtNum(i.events_24h)}</td><td>${fmtNum(i.users)}</td><td style="white-space:nowrap">${__esc(fmtAgo(i.last_seen))}</td>
+        <td><a href="${__safeUrl(i.permalink)}" target="_blank" rel="noopener" class="health-btn">View ↗</a></td></tr>`).join('')}
+      </tbody></table></div>` : `<div class="empty-state">🎉 No open errors in the last 24 hours.</div>`;
+    html += `</div>`;
+  }
+
+  // Review queue — what the daily Claude review found and proposes.
+  const reviews = (d.reviews || []);
+  const order = { fix_ready: 0, needs_info: 1, new: 2, diagnosing: 3, uploaded: 4, fixed: 5, ignored: 6 };
+  const active = reviews.filter(r => !['fixed', 'ignored'].includes(r.review_status)).sort((a, b) => (order[a.review_status] ?? 9) - (order[b.review_status] ?? 9));
+  const closed = reviews.filter(r => ['fixed', 'ignored'].includes(r.review_status)).slice(0, 10);
+  html += `<div class="card"><div class="card-title">🤖 Automatic review — errors &amp; proposed fixes</div>`;
+  html += `<div class="stat-sub" style="margin:-0.5rem 0 0.9rem">Every morning Claude reviews new errors, finds the cause in the code and prepares a fixed file. Nothing is changed on the live site until you upload it.</div>`;
+  html += active.length ? active.map(renderReviewCard).join('') : `<div class="empty-state">No errors waiting for review.</div>`;
+  if (closed.length) html += `<details style="margin-top:0.6rem"><summary style="cursor:pointer;font-size:0.8rem;color:var(--mid);font-weight:700">Recently fixed / ignored (${closed.length})</summary><div style="margin-top:0.7rem">${closed.map(renderReviewCard).join('')}</div></details>`;
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
+function renderReviewCard(r) {
+  const [label, cls] = REVIEW_LABELS[r.review_status] || [r.review_status, 'badge-gray'];
+  const where = r.event_summary && r.event_summary.tags && (r.event_summary.tags.page || r.event_summary.tags.function);
+  const files = (r.files_changed || []).length ? ` · Files: ${r.files_changed.map(f => __esc(f)).join(', ')}` : '';
+  const id = __jsStr(r.id);
+  let actions = '';
+  if (r.review_status === 'fix_ready' || r.review_status === 'needs_info') {
+    actions += `<button class="resolve-btn release" onclick="updateReview('${id}','uploaded',this)">✅ I uploaded the fix</button>`;
+  }
+  if (!['fixed', 'ignored'].includes(r.review_status)) actions += `<button class="resolve-btn" onclick="updateReview('${id}','ignored',this)">🙈 Ignore</button>`;
+  if (['fix_ready', 'needs_info', 'uploaded', 'fixed', 'ignored'].includes(r.review_status)) actions += `<button class="resolve-btn" onclick="updateReview('${id}','new',this)">🔁 Review again</button>`;
+  if (r.permalink) actions += `<a class="resolve-btn" style="text-decoration:none;color:var(--ink2)" href="${__safeUrl(r.permalink)}" target="_blank" rel="noopener">Sentry ↗</a>`;
+  return `<div class="review-card">
+    <div class="review-top"><div style="min-width:0;flex:1"><div class="issue-title">${__esc(r.title || 'Unknown error')}</div>
+      <div class="review-meta">${__esc(r.short_id || '')}${where ? ' · ' + __esc(where) : ''} · ${fmtNum(r.event_count)} events · ${fmtNum(r.user_count)} users · last seen ${__esc(fmtAgo(r.last_seen))}${files}</div></div>
+      <span class="badge ${cls}">${__esc(label)}</span></div>
+    ${r.diagnosis ? `<div class="review-diag">${__esc(r.diagnosis)}</div>` : ''}
+    ${r.proposed_fix ? `<details class="review-fix"><summary>Show the proposed change</summary><pre>${__esc(r.proposed_fix)}</pre></details>` : ''}
+    <div class="resolve-row">${actions}</div>
+  </div>`;
+}
+
+async function updateReview(id, status, btn) {
+  if (status === 'uploaded' && !confirm('Mark this fix as uploaded? The issue will be closed in Sentry — if the error happens again it comes straight back here.')) return;
+  if (btn) btn.disabled = true;
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/site-health`, {
+      method: 'POST', headers: await authedHeaders(), body: JSON.stringify({ action: 'update_review', id, review_status: status }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
+    await loadSiteHealth();
+  } catch (e) {
+    alert('Could not update: ' + e.message);
+    if (btn) btn.disabled = false;
+  }
 }
 
 // ── INIT ──
