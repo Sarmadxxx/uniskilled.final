@@ -19,7 +19,7 @@
  */
 (function () {
   // ── CONFIG ── paste the DSN from Sentry → Settings → Projects → uniskilled-web → Client Keys (DSN)
-  var SENTRY_DSN = 'REPLACE_WITH_SENTRY_DSN';
+  var SENTRY_DSN = 'https://1453b3c0e6dcfbacf04fc4db7b59c643@o4512267680153600.ingest.de.sentry.io/4512267926569040';
   var RELEASE = 'uniskilled-web@2026-10-16';        // bump when you upload a batch of changes
   var SDK_URL = 'sentry-sdk.min.js?v=11.8.0';
   var SB_TOKEN_KEY = 'sb-orghkbbohnabcietidiv-auth-token';
