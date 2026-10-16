@@ -184,7 +184,7 @@ tr:last-child td{border-bottom:none;}
       <div class="nav-item" onclick="showPage('sessions',this)">📅 Sessions</div>
       <div class="nav-item" onclick="showPage('groupsessions',this)">👥 Group Sessions</div>
       <div class="nav-item" onclick="showPage('users',this)">👤 Users</div>
-      <div class="nav-item" onclick="showPage('health',this);loadSiteHealth()">🩺 Site Health<span class="count" id="healthCount" style="display:none;">0</span></div>
+      <div class="nav-item" onclick="showPage('health',this);loadSiteHealth()">📈 Site Health<span class="count" id="healthCount" style="display:none;">0</span></div>
     </div>
 
     <div class="main">
@@ -264,7 +264,7 @@ tr:last-child td{border-bottom:none;}
       <!-- SITE HEALTH (Sentry) -->
       <div id="page-health" style="display:none;">
         <div class="health-head">
-          <div class="page-title">🩺 Site Health</div>
+          <div class="page-title">📈 Site Health</div>
           <div class="health-actions">
             <span class="health-updated" id="healthUpdated"></span>
             <button class="health-btn" id="healthSyncBtn" onclick="loadSiteHealth(true)">↻ Check Sentry now</button>
@@ -690,8 +690,8 @@ const REVIEW_LABELS = {
   uploaded: ['Fix uploaded — watching', 'badge-blue'], fixed: ['Fixed', 'badge-gray'], ignored: ['Ignored', 'badge-gray'],
 };
 
-async function loadSiteHealth(sync) {
-  if (healthLoading) return;
+async function loadSiteHealth(sync, retried) {
+  if (healthLoading && !retried) return;
   healthLoading = true;
   const btn = document.getElementById('healthSyncBtn');
   if (sync && btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
@@ -701,11 +701,20 @@ async function loadSiteHealth(sync) {
       method: 'POST', headers: await authedHeaders(), body: JSON.stringify({ action: sync ? 'sync' : 'stats' }),
     });
     const data = await res.json();
+    if (res.status === 403 && !retried && /session/i.test(data.error || '')) {
+      // The saved login was ended on the server (e.g. after a password reset): renew it once and retry.
+      const { error: refreshErr } = await _sb.auth.refreshSession();
+      if (!refreshErr) { healthLoading = false; return loadSiteHealth(sync, true); }
+      throw Object.assign(new Error('Your login has expired.'), { relogin: true });
+    }
+    if (res.status === 403 && /session/i.test(data.error || '')) throw Object.assign(new Error('Your login has expired.'), { relogin: true });
     if (!res.ok) throw new Error(data.error || ('HTTP ' + res.status));
     healthData = data;
     renderSiteHealth();
   } catch (e) {
-    document.getElementById('healthBody').innerHTML = `<div class="health-note warn">Couldn't load Site Health: ${__esc(e.message)}</div>`;
+    document.getElementById('healthBody').innerHTML = e.relogin
+      ? `<div class="health-note warn">Your login has expired. Please sign out and sign in again to see Site Health. <button class="health-btn" style="margin-left:0.5rem" onclick="signOut()">Sign out</button></div>`
+      : `<div class="health-note warn">Couldn't load Site Health: ${__esc(e.message)}</div>`;
   } finally {
     healthLoading = false;
     if (btn) { btn.disabled = false; btn.textContent = '↻ Check Sentry now'; }
