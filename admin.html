@@ -745,8 +745,9 @@ function renderSiteHealth() {
 
   let html = '';
   if (!d.configured) {
-    html += `<div class="health-note">Sentry isn't connected to the dashboard yet. Add the <b>SENTRY_AUTH_TOKEN</b> and <b>SENTRY_DSN</b> secrets in Supabase → Edge Functions → Secrets, then press "Check Sentry now".</div>`;
+    html += `<div class="health-note">No Sentry numbers yet. They appear after the next daily Claude review (every morning at 07:51), which reads your Sentry account and fills this page.</div>`;
   } else {
+    if (d.source === 'snapshot' && d.captured_at) html += `<div class="health-note">Sentry numbers as of <b>${__esc(new Date(d.captured_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }))}</b>. They refresh every morning with the Claude review. For live detail, open Sentry.</div>`;
     const k = d.kpis || {};
     const cf = k.crash_free_sessions;
     const cfCls = cf == null ? '' : cf >= 0.99 ? 'stat-good' : cf >= 0.97 ? 'stat-warn' : 'stat-bad';
