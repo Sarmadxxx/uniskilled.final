@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { withSentry } from './sentry.ts';
 
 const PAYPAL_CLIENT_ID = Deno.env.get('PAYPAL_CLIENT_ID') ?? '';
 const PAYPAL_SECRET = Deno.env.get('PAYPAL_SECRET') ?? '';
@@ -105,7 +106,7 @@ async function sendEmail(supabaseUrl: string, type: string, to: string, data: an
   }
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withSentry('cancel-session', async (req: Request) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -285,4 +286,4 @@ Deno.serve(async (req: Request) => {
     console.error('cancel-session error:', err);
     return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
   }
-});
+}));
