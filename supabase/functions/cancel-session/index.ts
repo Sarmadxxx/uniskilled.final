@@ -113,9 +113,21 @@ Deno.serve(withSentry('cancel-session', async (req: Request) => {
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   };
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
+  // Only the dashboards' POST requests are valid. Anything else (bots and scanners probing the URL
+  // with GET/HEAD, often with no body) is refused here instead of crashing on an empty body.
+  if (req.method !== 'POST') {
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { ...cors, 'Content-Type': 'application/json', 'Allow': 'POST, OPTIONS' } });
+  }
+
+  let body: any;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid request body' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
+  }
 
   try {
-    const { session_id, reason, confirm_no_refund } = await req.json();
+    const { session_id, reason, confirm_no_refund } = body || {};
     if (!session_id) {
       return new Response(JSON.stringify({ error: 'session_id required' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
     }
