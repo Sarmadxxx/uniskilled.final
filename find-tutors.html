@@ -266,6 +266,7 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
         </select>
       </div>
     </div>
+    <div class="req-form-group"><label for="reqUniversity" class="req-form-label">University (optional)</label><input type="text" class="req-form-input" id="reqUniversity" maxlength="120" placeholder="e.g. Freie Universität Berlin"></div>
     <div class="req-form-group"><label for="reqLanguage" class="req-form-label">Preferred language</label><input type="text" class="req-form-input" id="reqLanguage" placeholder="e.g. English, German"></div>
     <button type="button" class="req-submit-btn" id="reqSubmitBtn" onclick="submitRequest()">Post request →</button>
   </div>
@@ -530,6 +531,7 @@ window.submitRequest = async function(){
     level: document.getElementById('reqLevel').value || null,
     frequency: document.getElementById('reqFrequency').value || null,
     language: document.getElementById('reqLanguage').value.trim() || null,
+    university: document.getElementById('reqUniversity').value.trim().slice(0, 120) || null,
     status: 'open'
   });
   btn.disabled = false; btn.textContent = 'Post request →';
@@ -544,6 +546,7 @@ window.submitRequest = async function(){
   document.getElementById('reqLevel').value = '';
   document.getElementById('reqFrequency').value = '';
   document.getElementById('reqLanguage').value = '';
+  document.getElementById('reqUniversity').value = '';
   setTimeout(closeRequestModal, 1400);
 };
 

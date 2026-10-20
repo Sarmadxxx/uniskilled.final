@@ -1,0 +1,200 @@
+diff --git a/book-session.html b/book-session.html
+index 41c8145..b6fd8cb 100644
+--- a/book-session.html
++++ b/book-session.html
+@@ -203,6 +203,11 @@ body{background:#f4f6f9;color:#0f172a}
+ 
+       <section class="bk-section" aria-labelledby="stepNotes">
+         <h2 class="bk-step" id="stepNotes"><span>3</span>Anything the tutor should know?</h2>
++        <div class="form-group">
++          <label for="examDate" class="form-label">Exam date (optional)</label>
++          <input type="date" id="examDate" class="form-input" aria-describedby="examDateHint">
++          <div class="hint" id="examDateHint" style="margin-top:6px;">Preparing for an exam? Add the date so your tutor can plan the lessons around it.</div>
++        </div>
+         <div class="form-group">
+           <label for="notes" class="form-label">Notes for tutor (optional)</label>
+           <textarea id="notes" class="form-textarea" placeholder="What do you want to cover? Any specific topics or questions?"></textarea>
+@@ -277,6 +282,10 @@ let tutorData=null;
+ 
+ // Set min date to today
+ document.getElementById('date').min=new Date().toISOString().split('T')[0];
++// Exam date: today up to ~13 months ahead (same limits the database checks)
++function __localISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
++document.getElementById('examDate').min=__localISO(new Date());
++document.getElementById('examDate').max=__localISO(new Date(Date.now()+399*864e5));
+ 
+ let sessionPayload = null; // holds the booking details while submitting
+ let step = 'details'; // kept for structural clarity, always resolves in one step now
+@@ -428,8 +437,13 @@ async function submitBooking(){
+   const duration=document.getElementById('duration').value;
+   const format='online'; // all sessions are online
+   const notes=document.getElementById('notes').value.trim();
++  const examDate=document.getElementById('examDate').value||null;
+ 
+   if(!subject){showAlert('Please enter a subject.','error');return;}
++  if(examDate){
++    const ex=document.getElementById('examDate');
++    if(examDate<ex.min||examDate>ex.max){showAlert('Please check the exam date. It can be today or any date in the next year.','error');return;}
++  }
+   if(!date){showAlert('Please select a date.','error');return;}
+   if(!time){showAlert('Please select a time.','error');return;}
+ 
+@@ -459,7 +473,7 @@ async function submitBooking(){
+     tutor_id:tutorId, student_id:currentUser.id, tutor_name:tutorName, student_name:studentName,
+     subject, scheduled_date:date, scheduled_time:time, duration_minutes:parseInt(duration),
+     format, notes:notes||null, status:'pending', price:offerPrice, currency,
+-    payment_status:'unpaid', timezone:__viewerTz()
++    payment_status:'unpaid', timezone:__viewerTz(), exam_date:examDate
+   }).select().single();
+ 
+   if(sessError){showAlert(__friendlyDbError(sessError,'Could not send your request. Please try again.'),'error');setLoading(false);return;}
+@@ -481,7 +495,7 @@ async function submitBooking(){
+   }
+   if(convId){
+     const sym = currency === 'USD' ? '$' : '€';
+-    await _sb.from('messages').insert({conversation_id:convId,sender_id:currentUser.id,receiver_id:tutorId,sender_name:studentName,content:'Hi! I\'d like to book a '+subject+' session on '+new Date(date).toLocaleDateString()+' at '+time+' for '+sym+offerPrice.toFixed(2)+(notes?'. Notes: '+notes:''),read:false});
++    await _sb.from('messages').insert({conversation_id:convId,sender_id:currentUser.id,receiver_id:tutorId,sender_name:studentName,content:'Hi! I\'d like to book a '+subject+' session on '+new Date(date).toLocaleDateString()+' at '+time+' for '+sym+offerPrice.toFixed(2)+(examDate?'. My exam is on '+new Date(examDate+'T12:00:00').toLocaleDateString():'')+(notes?'. Notes: '+notes:''),read:false});
+     await _sb.from('conversations').update({last_message:'Session request: '+subject+' — '+sym+offerPrice.toFixed(2),last_message_at:new Date().toISOString()}).eq('id',convId);
+   }
+ 
+@@ -489,7 +503,7 @@ async function submitBooking(){
+ 
+   try {
+     const __tok=(await _sb.auth.getSession()).data.session?.access_token;
+-    if(tutorId&&__tok) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+__tok},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{sessionId:sess?.id,tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time:time+' ('+__viewerTz().split('/').pop().replace(/_/g,' ')+' time)',duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
++    if(tutorId&&__tok) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+__tok},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{sessionId:sess?.id,tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time:time+' ('+__viewerTz().split('/').pop().replace(/_/g,' ')+' time)',duration,format,notes:notes||'',examDate:examDate||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
+   } catch(e){console.error('Email failed:',e);}
+ 
+   setLoading(false);
+diff --git a/find-tutors.html b/find-tutors.html
+index 0ac292e..30d878f 100644
+--- a/find-tutors.html
++++ b/find-tutors.html
+@@ -266,6 +266,7 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
+         </select>
+       </div>
+     </div>
++    <div class="req-form-group"><label for="reqUniversity" class="req-form-label">University (optional)</label><input type="text" class="req-form-input" id="reqUniversity" maxlength="120" placeholder="e.g. Freie Universität Berlin"></div>
+     <div class="req-form-group"><label for="reqLanguage" class="req-form-label">Preferred language</label><input type="text" class="req-form-input" id="reqLanguage" placeholder="e.g. English, German"></div>
+     <button type="button" class="req-submit-btn" id="reqSubmitBtn" onclick="submitRequest()">Post request →</button>
+   </div>
+@@ -530,6 +531,7 @@ window.submitRequest = async function(){
+     level: document.getElementById('reqLevel').value || null,
+     frequency: document.getElementById('reqFrequency').value || null,
+     language: document.getElementById('reqLanguage').value.trim() || null,
++    university: document.getElementById('reqUniversity').value.trim().slice(0, 120) || null,
+     status: 'open'
+   });
+   btn.disabled = false; btn.textContent = 'Post request →';
+@@ -544,6 +546,7 @@ window.submitRequest = async function(){
+   document.getElementById('reqLevel').value = '';
+   document.getElementById('reqFrequency').value = '';
+   document.getElementById('reqLanguage').value = '';
++  document.getElementById('reqUniversity').value = '';
+   setTimeout(closeRequestModal, 1400);
+ };
+ 
+diff --git a/legal.html b/legal.html
+index d7af359..1a39f11 100644
+--- a/legal.html
++++ b/legal.html
+@@ -255,7 +255,9 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
+     <ul>
+       <li>To create and manage your account</li>
+       <li>To match students with tutors and facilitate bookings, payments, rescheduling and cancellations</li>
+-      <li>To send transactional emails and notifications (booking requests, payment reminders, reschedule requests, confirmations, refunds)</li>
++      <li>To send transactional emails and notifications (booking requests, payment reminders, reschedule requests, confirmations, refunds, lesson reminders 24 hours and 1 hour before a lesson, and reminders to tutors about unanswered requests)</li>
++      <li>To share an exam date you add to a booking request with your tutor, so they can plan the lessons (optional; only the tutor of that booking sees it)</li>
++      <li>To tell you when a tutor for a course you requested joins UniSkilled (only for requests you post)</li>
+       <li>To display tutor profiles publicly on the platform</li>
+       <li>To process payments, refunds and tutor payouts, and maintain financial records</li>
+       <li>To detect, prevent, and investigate fraud and abuse, including payments arranged outside the platform</li>
+@@ -285,6 +287,8 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);line-heig
+         <tr><td>Stripe (Stripe Payments Europe Ltd., Ireland)</td><td>Card payments, refunds, tutor payouts and identity checks (Stripe Connect), fraud prevention</td><td>EU / USA (SCCs)</td></tr>
+         <tr><td>Klarna</td><td>Pay-later option, only if you choose Klarna at checkout (Klarna processes your data as its own controller)</td><td>EU (Sweden)</td></tr>
+         <tr><td>Resend</td><td>Transactional email delivery</td><td>EU (based on sending region)</td></tr>
++        <tr><td>Microsoft 365 (Microsoft Ireland Operations Ltd.)</td><td>Our support mailbox: receives the emails you send us, including replies to our booking emails</td><td>EU / USA (SCCs)</td></tr>
++        <tr><td>Sentry (Functional Software, Inc., EU data region)</td><td>Error monitoring: technical error reports from the website and our servers. No IP addresses, cookies, names or email addresses are sent; logged-in users appear only as an anonymous user ID</td><td>EU (Frankfurt), SCCs for support access</td></tr>
+         <tr><td>PostHog (EU Cloud)</td><td>Product analytics and session recordings — only with your consent, beyond anonymous counts</td><td>EU (Frankfurt)</td></tr>
+         <tr><td>jsDelivr</td><td>Delivers website code libraries (receives your IP address to serve the files)</td><td>Global CDN</td></tr>
+         <tr><td>GitHub Pages</td><td>Static website hosting</td><td>Global CDN</td></tr>
+diff --git a/student-dashboard.html b/student-dashboard.html
+index 592c945..63c21d9 100644
+--- a/student-dashboard.html
++++ b/student-dashboard.html
+@@ -508,13 +508,17 @@ async function init() {
+       const initials = (s.tutor_name || 'T').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+       const date = s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+       const time = s.scheduled_time ? s.scheduled_time.slice(0, 5) + __tzNote(s.timezone) : '';
++      // A request the tutor never answered is released automatically (status 'declined' with this reason)
++      const __released = s.status === 'declined' && /^No answer from the tutor/.test(s.cancellation_reason || '');
+       const badgeClass = s.status === 'confirmed' ? 'badge-confirmed'
+         : s.status === 'completed' ? 'badge-completed'
+         : s.status === 'awaiting_payment' ? 'badge-awaiting-payment'
+         : s.status === 'payment_expired' ? 'badge-expired'
++        : __released ? 'badge-expired'
+         : 'badge-pending';
+       const badgeLabel = s.status === 'awaiting_payment' ? 'payment due'
+         : s.status === 'payment_expired' ? 'expired'
++        : __released ? 'no answer · released'
+         : s.status;
+ 
+       let actionBtn = '';
+diff --git a/tutor-dashboard.html b/tutor-dashboard.html
+index 32e9a9c..cb52468 100644
+--- a/tutor-dashboard.html
++++ b/tutor-dashboard.html
+@@ -785,6 +785,11 @@ async function loadGroupSessions() {
+   }).join('');
+ }
+ 
++// Exam date (YYYY-MM-DD) shown in the viewer's own date format, e.g. "19 Nov 2026"
++function __examDate(d) { try { return new Date(d + 'T12:00:00').toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return d; } }
++// A request nobody answered in time is released automatically (status 'declined' with this reason)
++function __isReleased(s) { return s.status === 'declined' && /^No answer from the tutor/.test(s.cancellation_reason || ''); }
++
+ // ── REQUESTS ──
+ async function loadRequests() {
+   const { data } = await _sb.from('sessions').select('*').eq('tutor_id', userId).eq('status', 'pending').order('created_at', { ascending: false });
+@@ -821,8 +826,9 @@ async function loadRequests() {
+           </div>
+           <span style="font-size:0.75rem;color:var(--mid);">${__esc(r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : '')} ${__esc(r.scheduled_time ? r.scheduled_time.slice(0,5) + __tzNote(r.timezone) : '')}</span>
+         </div>
++        ${r.exam_date ? `<div class="request-meta" style="font-weight:700;color:#92400e;">📝 Exam on ${__esc(__examDate(r.exam_date))}</div>` : ''}
+         <div class="request-meta">
+-          📋 ${__esc(r.duration_minutes || 60)} min · Online 
++          📋 ${__esc(r.duration_minutes || 60)} min · Online
+           ${__esc(r.notes ? ' · "' + r.notes.slice(0, 60) + '"' : '')}
+         </div>
+         <div class="request-actions">
+@@ -941,6 +947,7 @@ function renderSubjectRequestRow(r) {
+         <span style="font-size:0.75rem;color:var(--mid);">${__esc(new Date(r.created_at).toLocaleDateString())}</span>
+       </div>
+       ${r.notes ? `<div class="request-meta">💬 "${__esc(r.notes.slice(0, 160))}${__esc(r.notes.length > 160 ? '…' : '')}"</div>` : ''}
++      ${r.university ? `<div class="request-meta">🎓 ${__esc(r.university)}</div>` : ''}
+       ${r.language ? `<div class="request-meta">🌍 ${__esc(r.language)}</div>` : ''}
+       <div class="request-actions">
+         <button class="btn-accept" onclick="acceptSubjectRequest('${r.id}','${r.student_id}','${safeName}','${safeSubject}')">✓ I can offer this</button>
+@@ -1132,10 +1139,13 @@ async function loadSessions() {
+       : s.status === 'awaiting_payment' ? 'badge-awaiting-payment'
+       : s.status === 'payment_expired' ? 'badge-expired'
+       : s.status === 'cancelled' ? 'badge-expired'
++      : __isReleased(s) ? 'badge-expired'
+       : 'badge-pending';
+     const badgeLabel = s.status === 'awaiting_payment' ? 'awaiting payment'
+       : s.status === 'payment_expired' ? 'payment expired'
++      : __isReleased(s) ? 'no answer · released'
+       : s.status;
++    const examNote = s.exam_date && (s.status === 'confirmed' || s.status === 'awaiting_payment') ? ' · Exam ' + __examDate(s.exam_date) : '';
+     const joinBtn = s.status === 'confirmed'
+       ? `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.student_name||'Student')}')">🎥 Join Session</button>`
+       : '';
+@@ -1152,7 +1162,7 @@ async function loadSessions() {
+       <div class="session-av">${__esc(ini)}</div>
+       <div class="session-info">
+         <div class="session-name">${__esc(s.student_name || 'Student')}</div>
+-        <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')}</div>
++        <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')}${__esc(examNote)}</div>
+       </div>
+       <span class="badge ${__esc(badgeClass)}">${__esc(badgeLabel)}</span>
+       ${joinBtn}${cancelBtn}${reportBtn}${UsResched.rowHtml(s, __rr[s.id], userId)}

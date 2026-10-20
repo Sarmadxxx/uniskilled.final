@@ -508,13 +508,17 @@ async function init() {
       const initials = (s.tutor_name || 'T').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
       const date = s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
       const time = s.scheduled_time ? s.scheduled_time.slice(0, 5) + __tzNote(s.timezone) : '';
+      // A request the tutor never answered is released automatically (status 'declined' with this reason)
+      const __released = s.status === 'declined' && /^No answer from the tutor/.test(s.cancellation_reason || '');
       const badgeClass = s.status === 'confirmed' ? 'badge-confirmed'
         : s.status === 'completed' ? 'badge-completed'
         : s.status === 'awaiting_payment' ? 'badge-awaiting-payment'
         : s.status === 'payment_expired' ? 'badge-expired'
+        : __released ? 'badge-expired'
         : 'badge-pending';
       const badgeLabel = s.status === 'awaiting_payment' ? 'payment due'
         : s.status === 'payment_expired' ? 'expired'
+        : __released ? 'no answer · released'
         : s.status;
 
       let actionBtn = '';

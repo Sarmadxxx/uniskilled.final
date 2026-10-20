@@ -785,6 +785,11 @@ async function loadGroupSessions() {
   }).join('');
 }
 
+// Exam date (YYYY-MM-DD) shown in the viewer's own date format, e.g. "19 Nov 2026"
+function __examDate(d) { try { return new Date(d + 'T12:00:00').toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return d; } }
+// A request nobody answered in time is released automatically (status 'declined' with this reason)
+function __isReleased(s) { return s.status === 'declined' && /^No answer from the tutor/.test(s.cancellation_reason || ''); }
+
 // ── REQUESTS ──
 async function loadRequests() {
   const { data } = await _sb.from('sessions').select('*').eq('tutor_id', userId).eq('status', 'pending').order('created_at', { ascending: false });
@@ -821,8 +826,9 @@ async function loadRequests() {
           </div>
           <span style="font-size:0.75rem;color:var(--mid);">${__esc(r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : '')} ${__esc(r.scheduled_time ? r.scheduled_time.slice(0,5) + __tzNote(r.timezone) : '')}</span>
         </div>
+        ${r.exam_date ? `<div class="request-meta" style="font-weight:700;color:#92400e;">📝 Exam on ${__esc(__examDate(r.exam_date))}</div>` : ''}
         <div class="request-meta">
-          📋 ${__esc(r.duration_minutes || 60)} min · Online 
+          📋 ${__esc(r.duration_minutes || 60)} min · Online
           ${__esc(r.notes ? ' · "' + r.notes.slice(0, 60) + '"' : '')}
         </div>
         <div class="request-actions">
@@ -941,6 +947,7 @@ function renderSubjectRequestRow(r) {
         <span style="font-size:0.75rem;color:var(--mid);">${__esc(new Date(r.created_at).toLocaleDateString())}</span>
       </div>
       ${r.notes ? `<div class="request-meta">💬 "${__esc(r.notes.slice(0, 160))}${__esc(r.notes.length > 160 ? '…' : '')}"</div>` : ''}
+      ${r.university ? `<div class="request-meta">🎓 ${__esc(r.university)}</div>` : ''}
       ${r.language ? `<div class="request-meta">🌍 ${__esc(r.language)}</div>` : ''}
       <div class="request-actions">
         <button class="btn-accept" onclick="acceptSubjectRequest('${r.id}','${r.student_id}','${safeName}','${safeSubject}')">✓ I can offer this</button>
@@ -1132,10 +1139,13 @@ async function loadSessions() {
       : s.status === 'awaiting_payment' ? 'badge-awaiting-payment'
       : s.status === 'payment_expired' ? 'badge-expired'
       : s.status === 'cancelled' ? 'badge-expired'
+      : __isReleased(s) ? 'badge-expired'
       : 'badge-pending';
     const badgeLabel = s.status === 'awaiting_payment' ? 'awaiting payment'
       : s.status === 'payment_expired' ? 'payment expired'
+      : __isReleased(s) ? 'no answer · released'
       : s.status;
+    const examNote = s.exam_date && (s.status === 'confirmed' || s.status === 'awaiting_payment') ? ' · Exam ' + __examDate(s.exam_date) : '';
     const joinBtn = s.status === 'confirmed'
       ? `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.student_name||'Student')}')">🎥 Join Session</button>`
       : '';
@@ -1152,7 +1162,7 @@ async function loadSessions() {
       <div class="session-av">${__esc(ini)}</div>
       <div class="session-info">
         <div class="session-name">${__esc(s.student_name || 'Student')}</div>
-        <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')}</div>
+        <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')}${__esc(examNote)}</div>
       </div>
       <span class="badge ${__esc(badgeClass)}">${__esc(badgeLabel)}</span>
       ${joinBtn}${cancelBtn}${reportBtn}${UsResched.rowHtml(s, __rr[s.id], userId)}

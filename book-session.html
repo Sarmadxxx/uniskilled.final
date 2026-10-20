@@ -204,6 +204,11 @@ body{background:#f4f6f9;color:#0f172a}
       <section class="bk-section" aria-labelledby="stepNotes">
         <h2 class="bk-step" id="stepNotes"><span>3</span>Anything the tutor should know?</h2>
         <div class="form-group">
+          <label for="examDate" class="form-label">Exam date (optional)</label>
+          <input type="date" id="examDate" class="form-input" aria-describedby="examDateHint">
+          <div class="hint" id="examDateHint" style="margin-top:6px;">Preparing for an exam? Add the date so your tutor can plan the lessons around it.</div>
+        </div>
+        <div class="form-group">
           <label for="notes" class="form-label">Notes for tutor (optional)</label>
           <textarea id="notes" class="form-textarea" placeholder="What do you want to cover? Any specific topics or questions?"></textarea>
         </div>
@@ -277,6 +282,10 @@ let tutorData=null;
 
 // Set min date to today
 document.getElementById('date').min=new Date().toISOString().split('T')[0];
+// Exam date: today up to ~13 months ahead (same limits the database checks)
+function __localISO(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+document.getElementById('examDate').min=__localISO(new Date());
+document.getElementById('examDate').max=__localISO(new Date(Date.now()+399*864e5));
 
 let sessionPayload = null; // holds the booking details while submitting
 let step = 'details'; // kept for structural clarity, always resolves in one step now
@@ -428,8 +437,13 @@ async function submitBooking(){
   const duration=document.getElementById('duration').value;
   const format='online'; // all sessions are online
   const notes=document.getElementById('notes').value.trim();
+  const examDate=document.getElementById('examDate').value||null;
 
   if(!subject){showAlert('Please enter a subject.','error');return;}
+  if(examDate){
+    const ex=document.getElementById('examDate');
+    if(examDate<ex.min||examDate>ex.max){showAlert('Please check the exam date. It can be today or any date in the next year.','error');return;}
+  }
   if(!date){showAlert('Please select a date.','error');return;}
   if(!time){showAlert('Please select a time.','error');return;}
 
@@ -459,7 +473,7 @@ async function submitBooking(){
     tutor_id:tutorId, student_id:currentUser.id, tutor_name:tutorName, student_name:studentName,
     subject, scheduled_date:date, scheduled_time:time, duration_minutes:parseInt(duration),
     format, notes:notes||null, status:'pending', price:offerPrice, currency,
-    payment_status:'unpaid', timezone:__viewerTz()
+    payment_status:'unpaid', timezone:__viewerTz(), exam_date:examDate
   }).select().single();
 
   if(sessError){showAlert(__friendlyDbError(sessError,'Could not send your request. Please try again.'),'error');setLoading(false);return;}
@@ -481,7 +495,7 @@ async function submitBooking(){
   }
   if(convId){
     const sym = currency === 'USD' ? '$' : '€';
-    await _sb.from('messages').insert({conversation_id:convId,sender_id:currentUser.id,receiver_id:tutorId,sender_name:studentName,content:'Hi! I\'d like to book a '+subject+' session on '+new Date(date).toLocaleDateString()+' at '+time+' for '+sym+offerPrice.toFixed(2)+(notes?'. Notes: '+notes:''),read:false});
+    await _sb.from('messages').insert({conversation_id:convId,sender_id:currentUser.id,receiver_id:tutorId,sender_name:studentName,content:'Hi! I\'d like to book a '+subject+' session on '+new Date(date).toLocaleDateString()+' at '+time+' for '+sym+offerPrice.toFixed(2)+(examDate?'. My exam is on '+new Date(examDate+'T12:00:00').toLocaleDateString():'')+(notes?'. Notes: '+notes:''),read:false});
     await _sb.from('conversations').update({last_message:'Session request: '+subject+' — '+sym+offerPrice.toFixed(2),last_message_at:new Date().toISOString()}).eq('id',convId);
   }
 
@@ -489,7 +503,7 @@ async function submitBooking(){
 
   try {
     const __tok=(await _sb.auth.getSession()).data.session?.access_token;
-    if(tutorId&&__tok) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+__tok},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{sessionId:sess?.id,tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time:time+' ('+__viewerTz().split('/').pop().replace(/_/g,' ')+' time)',duration,format,notes:notes||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
+    if(tutorId&&__tok) await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/send-email',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+__tok},body:JSON.stringify({type:'booking_request',to_user_id:tutorId,data:{sessionId:sess?.id,tutorName,studentName,subject,date:new Date(date).toLocaleDateString('en-GB',{weekday:'long',year:'numeric',month:'long',day:'numeric'}),time:time+' ('+__viewerTz().split('/').pop().replace(/_/g,' ')+' time)',duration,format,notes:notes||'',examDate:examDate||'',price:offerPrice.toFixed(2),currencySymbol:currency === 'USD' ? '$' : '€',listedRate:tutorData?.hourly_rate||null}})});
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);
