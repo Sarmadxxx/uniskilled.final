@@ -316,13 +316,13 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- COURSES -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Specific courses</h2>
+        <h2 class="card-title">Courses I've passed</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalCourses')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body" id="coursesBody">
-        <span class="empty">No specific courses added yet.</span>
+        <span class="empty">No courses added yet.</span>
       </div>
-      <p class="owner-only" style="display:none;font-size:0.75rem;color:var(--mid);margin:0 1.4rem 1.2rem;">Add exact course codes so students searching for their specific class — not just the general subject — can find you.</p>
+      <p class="owner-only" style="display:none;font-size:0.75rem;color:var(--mid);margin:0 1.4rem 1.2rem;">Add the exact courses you passed and where. Students search for their own course, so this is how they find you.</p>
     </div>
 
     <!-- ACADEMIC -->
@@ -485,16 +485,23 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- Courses -->
 <div class="modal-overlay" id="modalCourses">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Specific Courses</div><button class="modal-close" onclick="closeModal('modalCourses')">✕</button></div>
+    <div class="modal-head"><div class="modal-title">Courses I've passed</div><button class="modal-close" onclick="closeModal('modalCourses')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertCourses"></div>
       <div id="coursesModalList" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;"></div>
       <div style="display:flex;flex-direction:column;gap:0.6rem;padding-top:0.8rem;border-top:1px solid var(--border);">
-        <div style="display:flex;gap:0.5rem;">
-          <input type="text" class="form-input" id="courseCodeInput" placeholder="Course code — e.g. MATH 201" style="flex:1;">
-          <input type="text" class="form-input" id="courseNameInput" placeholder="Course name (optional)" style="flex:1;">
+        <label for="courseNameInput" class="sr-only" style="position:absolute;left:-9999px;">Course name</label>
+        <input type="text" class="form-input" id="courseNameInput" maxlength="120" placeholder="Course name * — e.g. Statistics I">
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input type="text" class="form-input" id="courseCodeInput" maxlength="40" placeholder="Course code (optional)" aria-label="Course code (optional)" style="flex:1;min-width:200px;">
+          <input type="text" class="form-input" id="courseSemesterInput" maxlength="30" placeholder="Passed in, e.g. WS 2024/25" aria-label="Semester you passed it (optional)" style="flex:1;min-width:200px;">
         </div>
-        <input type="text" class="form-input" id="courseProfInput" placeholder="Professor's name (optional)">
+        <input type="text" class="form-input" id="courseUniInput" maxlength="120" placeholder="University" aria-label="University where you took the course">
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input type="text" class="form-input" id="courseGradeInput" maxlength="20" placeholder="Your grade (optional), e.g. 1.3" aria-label="Your grade (optional)" style="flex:1;min-width:200px;">
+          <input type="text" class="form-input" id="courseProfInput" maxlength="80" placeholder="Professor (optional)" aria-label="Professor (optional)" style="flex:1;min-width:200px;">
+        </div>
+        <div style="font-size:0.75rem;color:var(--mid);line-height:1.45;">Your grade is optional and shown as "self-reported". Only add details that are true; false course or grade details can lead to removal from UniSkilled.</div>
         <button class="btn btn-outline" onclick="addCourse()" style="width:100%;">+ Add course</button>
       </div>
     </div>
@@ -701,6 +708,8 @@ async function init() {
   }
 
   await loadProfile();
+  // Coming from the dashboard's "Add courses" button: open the courses window straight away
+  if (isOwner && new URLSearchParams(location.search).get('edit') === 'courses') openModal('modalCourses');
   if (isOwner) await loadMeetingLink();
   await loadReviews();
   if (!isOwner) hideEmptySectionsForVisitors();
@@ -810,6 +819,8 @@ async function loadProfile() {
 
   const { data: tc } = await _supabase.from('tutor_courses').select('*').eq('tutor_id', tutorId).order('created_at', { ascending: true });
   courses = tc || [];
+  window.__courseIdsLoaded = courses.map(c => c.id).filter(Boolean);
+  window.__coursesSaved = courses.map(c => ({ ...c }));
 
   applyTutorSeo(fullName, p, tp, subjects);
 
@@ -909,17 +920,28 @@ async function loadProfile() {
     ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>`
     : '<span class="empty">No subjects added yet.</span>';
 
-  // Courses
+  // Courses the tutor has passed (students can book a lesson for a course straight from here)
+  const canBookCourse = !isOwner && viewerRole !== 'tutor';
+  const courseUniDefault = tp?.verified_university || tp?.location || '';
   document.getElementById('coursesBody').innerHTML = courses.length > 0
-    ? `<div style="display:flex;flex-direction:column;gap:0.6rem;">${courses.map(c => `
-        <div style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--border);">
-          <div style="width:36px;height:36px;background:var(--blue-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🎯</div>
-          <div>
-            <div style="font-weight:700;font-size:0.85rem;">${__esc(c.course_code)}${__esc(c.course_name ? ' — ' + c.course_name : '')}</div>
+    ? `<div style="display:flex;flex-direction:column;gap:0.6rem;">${courses.map(c => {
+        const title = __courseTitle(c);
+        const meta = [c.university || courseUniDefault, c.semester ? 'passed ' + c.semester : ''].filter(Boolean).join(' · ');
+        const bookHref = currentUserId
+          ? `book-session.html?tutor=${encodeURIComponent(tutorId)}&name=${encodeURIComponent(fullName)}&subject=${encodeURIComponent(c.course_name || c.course_code || '')}`
+          : 'signin.html';
+        return `
+        <div style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
+          <div style="width:36px;height:36px;background:var(--blue-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🎓</div>
+          <div style="flex:1;min-width:180px;">
+            <div style="font-weight:700;font-size:0.85rem;">${__esc(title)}</div>
+            ${meta ? `<div style="font-size:0.75rem;color:var(--mid);">${__esc(meta)}</div>` : ''}
+            ${c.grade ? `<div style="font-size:0.75rem;color:#065f46;font-weight:600;">Grade ${__esc(c.grade)} <span style="color:var(--mid);font-weight:400;">(self-reported)</span></div>` : ''}
             ${c.professor_name ? `<div style="font-size:0.75rem;color:var(--mid);">Prof. ${__esc(c.professor_name)}</div>` : ''}
           </div>
-        </div>`).join('')}</div>`
-    : '<span class="empty">No specific courses added yet.</span>';
+          ${canBookCourse ? `<a href="${__safeUrl(bookHref)}" style="font-size:0.8rem;font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap;">Book this course →</a>` : ''}
+        </div>`; }).join('')}</div>`
+    : '<span class="empty">No courses added yet.</span>';
 
   // Academic
   const acadItems = [
@@ -1108,41 +1130,66 @@ async function saveSubjects() {
   setTimeout(async () => { closeModal('modalSubjects'); await loadProfile(); }, 700);
 }
 
+// "Statistics I (STAT 101)", or whichever of name/code exists
+function __courseTitle(c) {
+  const name = (c.course_name || '').trim(), code = (c.course_code || '').trim();
+  return name && code ? `${name} (${code})` : (name || code || 'Course');
+}
+
 // Courses modal
 function renderCoursesModal() {
   document.getElementById('coursesModalList').innerHTML = courses.length > 0
-    ? courses.map((c, i) => `
+    ? courses.map((c, i) => {
+      const meta = [c.university, c.semester ? 'passed ' + c.semester : '', c.grade ? 'grade ' + c.grade : ''].filter(Boolean).join(' · ');
+      return `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:var(--off);border-radius:8px;">
         <div>
-          <div style="font-weight:700;font-size:0.83rem;">${__esc(c.course_code)}${__esc(c.course_name ? ' — ' + c.course_name : '')}</div>
+          <div style="font-weight:700;font-size:0.83rem;">${__esc(__courseTitle(c))}</div>
+          ${meta ? `<div style="font-size:0.73rem;color:var(--mid);">${__esc(meta)}</div>` : ''}
           ${c.professor_name ? `<div style="font-size:0.73rem;color:var(--mid);">Prof. ${__esc(c.professor_name)}</div>` : ''}
         </div>
-        <button onclick="courses.splice(${i},1);renderCoursesModal()" style="background:none;border:none;color:var(--mid);font-size:1.1rem;cursor:pointer;">×</button>
-      </div>`).join('')
+        <button onclick="courses.splice(${i},1);renderCoursesModal()" aria-label="Remove ${__esc(__courseTitle(c))}" style="background:none;border:none;color:var(--mid);font-size:1.1rem;cursor:pointer;">×</button>
+      </div>`; }).join('')
     : '<span class="empty">No courses added yet.</span>';
+  // Default the university to the tutor's own (verified university first)
+  const uni = document.getElementById('courseUniInput');
+  if (uni && !uni.value) uni.value = tutorData?.verified_university || tutorData?.location || '';
 }
 window.addCourse = function() {
-  const code = document.getElementById('courseCodeInput').value.trim();
-  const name = document.getElementById('courseNameInput').value.trim();
-  const prof = document.getElementById('courseProfInput').value.trim();
-  if (!code) { showAlert('alertCourses', 'Please enter at least a course code.', 'error'); return; }
-  courses.push({ course_code: code, course_name: name || null, professor_name: prof || null });
+  const val = id => document.getElementById(id).value.trim();
+  const name = val('courseNameInput'), code = val('courseCodeInput');
+  if (!name && !code) { showAlert('alertCourses', 'Please enter the course name.', 'error'); return; }
+  courses.push({
+    course_name: name || null, course_code: code || null,
+    university: val('courseUniInput').slice(0, 120) || null,
+    semester: val('courseSemesterInput').slice(0, 30) || null,
+    grade: val('courseGradeInput').slice(0, 20) || null,
+    professor_name: val('courseProfInput').slice(0, 80) || null,
+  });
   renderCoursesModal();
-  document.getElementById('courseCodeInput').value = '';
-  document.getElementById('courseNameInput').value = '';
-  document.getElementById('courseProfInput').value = '';
+  ['courseNameInput', 'courseCodeInput', 'courseSemesterInput', 'courseGradeInput', 'courseProfInput'].forEach(id => { document.getElementById(id).value = ''; });
   document.getElementById('alertCourses').style.display = 'none';
+  document.getElementById('courseNameInput').focus();
 };
 async function saveCourses() {
-  // Full-replace sync: clear this tutor's existing rows, then insert the current list
-  await _supabase.from('tutor_courses').delete().eq('tutor_id', currentUserId);
-  if (courses.length > 0) {
-    const { error } = await _supabase.from('tutor_courses').insert(
-      courses.map(c => ({ tutor_id: currentUserId, course_code: c.course_code, course_name: c.course_name, professor_name: c.professor_name }))
-    );
-    if (error) { showAlert('alertCourses', 'Error: ' + error.message, 'error'); return; }
+  // Add new courses first, then remove the ones the tutor deleted — so a failed save never wipes the list.
+  const fresh = courses.filter(c => !c.id);
+  if (fresh.length > 0) {
+    const { error } = await _supabase.from('tutor_courses').insert(fresh.map(c => ({
+      tutor_id: currentUserId, course_code: c.course_code, course_name: c.course_name,
+      professor_name: c.professor_name, university: c.university, semester: c.semester, grade: c.grade,
+    })));
+    if (error) { showAlert('alertCourses', __friendlyDbError(error, 'Could not save your courses. Please check them and try again.'), 'error'); return; }
+  }
+  // Delete exactly the saved courses the tutor removed in this window (by id), nothing else.
+  const keep = new Set(courses.filter(c => c.id).map(c => c.id));
+  const removed = (window.__courseIdsLoaded || []).filter(id => !keep.has(id));
+  if (removed.length > 0) {
+    const { error: delErr } = await _supabase.from('tutor_courses').delete().eq('tutor_id', currentUserId).in('id', removed);
+    if (delErr) { showAlert('alertCourses', 'Your new courses were saved, but removing some old ones failed. Please try again.', 'error'); return; }
   }
   showAlert('alertCourses', 'Saved!', 'success');
+  window.usTrack && usTrack('tutor_courses_saved', { count: courses.length });
   setTimeout(async () => { closeModal('modalCourses'); await loadProfile(); }, 700);
 }
 
@@ -1300,6 +1347,9 @@ function openModal(id) {
     renderSubjectsModal();
   }
   if (id === 'modalCourses') {
+    // Start from what is actually saved, so changes left by a cancelled edit don't carry over
+    courses = (window.__coursesSaved || []).map(c => ({ ...c }));
+    document.getElementById('alertCourses').style.display = 'none';
     renderCoursesModal();
   }
   if (id === 'modalAcademic') {

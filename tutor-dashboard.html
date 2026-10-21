@@ -353,6 +353,17 @@ a.profile-av{text-decoration:none;}
       <!-- University verification (shows until verified; reminder on every visit) -->
       <div id="uniVerifyMount"></div>
 
+      <!-- Courses prompt (shows only while the tutor has no courses on their profile) -->
+      <div id="coursesNudge" class="card" style="display:none;border-left:4px solid var(--blue,#1a6bff);">
+        <div class="card-body" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+          <div style="flex:1;min-width:220px;">
+            <div style="font-weight:800;font-size:0.95rem;margin-bottom:0.2rem;">Add the courses you passed</div>
+            <div style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Students search for their own course, like "Statistics I at HU Berlin". Tutors with courses on their profile appear first in those searches.</div>
+          </div>
+          <a id="coursesNudgeLink" href="#" class="btn-accept" style="text-decoration:none;white-space:nowrap;">Add courses</a>
+        </div>
+      </div>
+
       <!-- Booking requests preview -->
       <div class="card">
         <div class="card-head">
@@ -612,6 +623,15 @@ async function init() {
   document.getElementById('heroTitle').textContent = greeting + ', ' + firstName;
   document.getElementById('heroSub').textContent = subjects.length > 0 ? 'Teaching: ' + subjects.join(', ') + (rate ? ' · ' + rate : '') : 'Complete your profile to attract students.';
   document.title = firstName + "'s Dashboard — UniSkilled";
+
+  // Nudge tutors without any courses to add them (that is how students find them in course search)
+  try {
+    const { count: courseCount } = await _sb.from('tutor_courses').select('id', { count: 'exact', head: true }).eq('tutor_id', userId);
+    if (courseCount === 0) {
+      document.getElementById('coursesNudgeLink').href = 'tutor-profile.html?id=' + encodeURIComponent(userId) + '&edit=courses';
+      document.getElementById('coursesNudge').style.display = 'block';
+    }
+  } catch (e) { /* the prompt is optional */ }
 
   await loadAll();
   await loadReferralCard();

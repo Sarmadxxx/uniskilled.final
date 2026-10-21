@@ -387,7 +387,7 @@ function renderTutors(tutors) {
         </div>
       </div>
       ${t.bio?`<p class="tutor-bio">${__esc(t.bio)}</p>`:''}
-      ${(t.courses||[]).length > 0 ? `<div class="chips">${t.courses.slice(0,3).map(c=>`<span class="course-tag">${__esc(c.course_code)}</span>`).join('')}</div>` : ''}
+      ${(t.courses||[]).length > 0 ? `<div class="chips">${t.courses.slice(0,3).map(c=>`<span class="course-tag" title="${__esc(['Passed', c.course_name || c.course_code, c.university ? 'at ' + c.university : ''].filter(Boolean).join(' '))}">${__esc(c.course_name || c.course_code || 'Course')}</span>`).join('')}${t.courses.length > 3 ? `<span class="more-tag">+${t.courses.length - 3} more</span>` : ''}</div>` : ''}
       ${subjects.length ? `<div class="subjects chips">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}${extra?`<span class="more-tag">+${extra} more</span>`:''}</div>` : ''}
       <div class="card-footer">
         <div class="tutor-rate">${rate ? `${__esc(rate)} <span>/ hour</span>` : `<span>Rate on request</span>`}</div>
@@ -436,15 +436,11 @@ function filterTutors() {
   const countryFilter = document.getElementById('filterCountry').value;
   window.usTrack&&usTrack('tutor_search', { query: q.slice(0, 100), has_query: !!q, format: fmt || null, price: price || null, day: day || null, university: uniFilter || null, country: countryFilter || null });
 
-  renderTutors(allTutors.filter(t => {
+  renderTutors(__rankByCourse(allTutors.filter(t => {
     const subjects = Array.isArray(t.subjects)?t.subjects:[];
     const avail = Array.isArray(t.availability)?t.availability:[];
     const courses = Array.isArray(t.courses)?t.courses:[];
-    const matchesCourse = courses.some(c =>
-      (c.course_code||'').toLowerCase().includes(q) ||
-      (c.course_name||'').toLowerCase().includes(q) ||
-      (c.professor_name||'').toLowerCase().includes(q)
-    );
+    const matchesCourse = courses.some(c => __courseMatches(c, q));
     if(q && !subjects.some(s=>s.toLowerCase().includes(q)) && !matchesCourse && !(t.fullName||'').toLowerCase().includes(q) && !(t.location||'').toLowerCase().includes(q)) return false;
     if(day && !avail.includes(day)) return false;
     if(price){const r=t.hourly_rate||0;if(price==='0-20'&&r>20)return false;if(price==='20-40'&&(r<20||r>40))return false;if(price==='40-60'&&(r<40||r>60))return false;if(price==='60+'&&r<60)return false;}
@@ -456,7 +452,25 @@ function filterTutors() {
     }
     if(countryFilter && (t.country||'') !== countryFilter) return false;
     return true;
-  }));
+  }), q));
+}
+
+// A course matches a search when its name, code, professor or university contains the words searched for
+function __courseMatches(c, q) {
+  if (!q) return false;
+  return ['course_code', 'course_name', 'professor_name', 'university'].some(k => (c[k] || '').toLowerCase().includes(q));
+}
+const __sameUni = (a, b) => !!a && !!b && (a.toLowerCase().includes(b.toLowerCase()) || b.toLowerCase().includes(a.toLowerCase()));
+// While searching: tutors who passed the searched course at the student's own university first,
+// then tutors who passed that course anywhere, then everyone else (existing order kept within each group).
+function __rankByCourse(list, q) {
+  if (!q) return list;
+  const score = t => {
+    const hits = (t.courses || []).filter(c => __courseMatches(c, q));
+    if (!hits.length) return 0;
+    return hits.some(c => __sameUni(c.university || t.verified_university || t.location || '', currentStudentUni || '')) ? 2 : 1;
+  };
+  return list.map((t, i) => ({ t, i, s: score(t) })).sort((a, b) => (b.s - a.s) || (a.i - b.i)).map(x => x.t);
 }
 
 
