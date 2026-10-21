@@ -12,7 +12,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Calendar — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--yellow:#f59e0b;}
@@ -128,8 +129,8 @@ function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').
 function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
 
 const _sb = window.supabase.createClient(
-  'https://orghkbbohnabcietidiv.supabase.co',
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
+  USK_CONFIG.url,
+  USK_CONFIG.anonKey
 );
 
 let currentUser = null;

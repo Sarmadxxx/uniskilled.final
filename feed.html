@@ -12,7 +12,8 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Feeds — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Manrope',sans-serif;}
 :root{--blue:#1a6bff;--ink:#0f172a;--ink2:#334155;--mid:#64748b;--light:#94a3b8;--border:#e2e8f0;--white:#fff;--off:#f8fafc;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--yellow:#f59e0b;--yellow-bg:#fffbeb;}
@@ -186,10 +187,10 @@ function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 
-const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
+const SUPABASE_URL = USK_CONFIG.url;
 const _sb = window.supabase.createClient(
   SUPABASE_URL,
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8'
+  USK_CONFIG.anonKey
 );
 
 let currentUser = null;

@@ -208,7 +208,8 @@ button{font-family:inherit;cursor:pointer}
   </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="vendor/supabase-js/2.45.4/supabase.js"></script>
+<script src="supabase-config.js"></script>
 <script src="auth-guard.js?v=2"></script>
 <script src="classroom.js?v=6"></script>
 <script>
@@ -261,8 +262,8 @@ button{font-family:inherit;cursor:pointer}
     // Production: the server checks the login, that you belong to this lesson, and that it's open.
     const sessionId = q.get('session');
     if (!sessionId) throw new Error('This classroom link is missing the lesson. Open it from your dashboard.');
-    const sb = window.supabase.createClient('https://orghkbbohnabcietidiv.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8');
+    const sb = window.supabase.createClient(USK_CONFIG.url,
+      USK_CONFIG.anonKey);
     const { data: s } = await sb.auth.getSession();
     if (!s.session) { location.href = 'signin.html?redirect=' + encodeURIComponent('classroom.html' + location.search); throw new Error('redirect'); }
     // Confirms the login is still active (renews it if needed, or sends you to sign in).
