@@ -51,7 +51,8 @@ for (const file of PAGES) {
 test('homepage shows the main call to action', async ({ page }) => {
   await page.goto('/index.html');
   await expect(page.locator('body')).toContainText(/tutor/i);
-  await expect(page.locator('a[href*="find-tutors"]').first()).toBeVisible();
+  // On phones the nav link sits in the collapsed menu, so look for any visible link to Find Tutors.
+  await expect(page.locator('a[href*="find-tutors"]:visible').first()).toBeVisible();
 });
 
 test('find-tutors lists tutors from the live database', async ({ page }) => {
