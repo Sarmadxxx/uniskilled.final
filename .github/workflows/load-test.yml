@@ -1,0 +1,36 @@
+name: Load test
+
+# Simulates many visitors browsing at the same time (tests/load/browse.js, using k6). Manual only.
+# Point it at STAGING. It is read-only, but it does use database capacity while it runs.
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: 'Website address to test'
+        required: true
+        default: 'https://uniskilled.com'
+      peak:
+        description: 'How many visitors at the same time at the peak'
+        required: true
+        default: '50'
+
+permissions:
+  contents: read
+
+jobs:
+  k6:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      API: ${{ vars.LOADTEST_SUPABASE_URL }}
+      KEY: ${{ vars.LOADTEST_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: grafana/setup-k6-action@v1
+      - name: Run
+        run: k6 run -e BASE="${{ inputs.base }}" -e PEAK="${{ inputs.peak }}" -e API="$API" -e KEY="$KEY" --summary-export=summary.json tests/load/browse.js
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-summary
+          path: summary.json

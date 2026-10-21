@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { withSentry } from './sentry.ts';
 import { sessionPaymentDecision, groupSeatPaymentDecision, isDuplicateKeyError, reviewReason, type PaymentDecision } from './confirm-logic.ts';
 
 const STRIPE_SECRET = Deno.env.get('STRIPE_SECRET_KEY') ?? '';
@@ -119,7 +120,7 @@ async function verifyStripeSignature(rawBody: string, sigHeader: string | null, 
 
 const toCents = (v: unknown) => Math.round(Number(v) * 100);
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withSentry('stripe-webhook', async (req: Request) => {
   const cors = { 'Access-Control-Allow-Origin': '*' };
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
   const ok = (b: unknown) => new Response(JSON.stringify(b), { headers: cors });
@@ -364,4 +365,4 @@ Deno.serve(async (req: Request) => {
     console.error('stripe-webhook error:', err);
     return new Response(JSON.stringify({ error: 'Webhook processing failed' }), { status: 500, headers: { 'Access-Control-Allow-Origin': '*' } });
   }
-});
+}));

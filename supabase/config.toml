@@ -1,0 +1,156 @@
+# Supabase CLI settings for this project.
+# verify_jwt mirrors each LIVE function exactly (checked 2026-10-21). Functions with verify_jwt = false
+# check the caller themselves (login token, Stripe signature, cron secret or service key).
+# The CLI defaults to true, so a function missing here would change behaviour when deployed —
+# tests/static_checks.py fails the build if any function folder has no entry.
+project_id = "orghkbbohnabcietidiv"
+
+[functions.admin-actions]
+verify_jwt = true
+
+[functions.admin-create-account]
+verify_jwt = true
+
+[functions.admin-fix-real-account]
+verify_jwt = true
+
+[functions.admin-set-password]
+verify_jwt = true
+
+[functions.auth-register]
+verify_jwt = true
+
+[functions.cancel-session]
+verify_jwt = false
+
+[functions.capture-paypal-order]
+verify_jwt = false
+
+[functions.capture-referral]
+verify_jwt = false
+
+[functions.check-connect-status]
+verify_jwt = true
+
+[functions.check-group-session-minimums]
+verify_jwt = false
+
+[functions.check-resend-domain]
+verify_jwt = false
+
+[functions.check-stripe-account-status]
+verify_jwt = false
+
+[functions.classroom-join]
+verify_jwt = false
+
+[functions.create-connect-account]
+verify_jwt = false
+
+[functions.create-daily-room]
+verify_jwt = false
+
+[functions.create-payment-intent]
+verify_jwt = false
+
+[functions.create-paypal-order]
+verify_jwt = false
+
+[functions.create-paypal-payout]
+verify_jwt = false
+
+[functions.create-stripe-checkout]
+verify_jwt = false
+
+[functions.expire-unpaid-sessions]
+verify_jwt = false
+
+[functions.get-platform-settings]
+verify_jwt = false
+
+[functions.manage-disputes]
+verify_jwt = true
+
+[functions.manage-jobs]
+verify_jwt = true
+
+[functions.manage-messages]
+verify_jwt = true
+
+[functions.manage-orders]
+verify_jwt = true
+
+[functions.manage-sessions]
+verify_jwt = true
+
+[functions.mark-sessions-completed]
+verify_jwt = false
+
+[functions.open-dispute]
+verify_jwt = false
+
+[functions.patch-connect-account]
+verify_jwt = true
+
+[functions.paypal-config]
+verify_jwt = false
+
+[functions.platform-jobs]
+verify_jwt = true
+
+[functions.platform-reminders]
+verify_jwt = false
+
+[functions.post-feed-answer]
+verify_jwt = true
+
+[functions.post-feed-reply]
+verify_jwt = false
+
+[functions.release-tutor-payout]
+verify_jwt = false
+
+[functions.reschedule-session]
+verify_jwt = false
+
+[functions.resolve-dispute]
+verify_jwt = false
+
+[functions.search-tutors]
+verify_jwt = false
+
+[functions.secret-name-check]
+verify_jwt = true
+
+[functions.send-email]
+verify_jwt = false
+
+[functions.session-calendar]
+verify_jwt = false
+
+[functions.site-health]
+verify_jwt = false
+
+[functions.stripe-checkout]
+verify_jwt = true
+
+[functions.stripe-payments]
+verify_jwt = true
+
+[functions.stripe-webhook]
+verify_jwt = false
+
+[functions.sync-connect-status]
+verify_jwt = false
+
+[functions.test-paypal-payout]
+verify_jwt = true
+
+[functions.upload-certificate]
+verify_jwt = false
+
+[functions.user-profile]
+verify_jwt = true
+
+[functions.verify-university]
+verify_jwt = false

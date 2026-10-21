@@ -1,0 +1,104 @@
+name: Tests
+
+# Runs on every pull request and on every change to main. A pull request can only be merged
+# safely when all of these are green. Nothing here touches real money, sends emails or changes data.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site:
+    name: Site checks + payment logic
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Site checks (JavaScript syntax, links, secrets, config, legal text)
+        run: python3 tests/static_checks.py
+      - name: Payment and payout decision tests
+        run: node --experimental-strip-types --test tests/functions/*.test.ts
+
+  functions:
+    name: Server functions type-check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Type-check all Edge Functions
+        run: deno check --config tests/typecheck/deno.json supabase/functions/*/index.ts
+
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Scan for leaked keys and passwords (gitleaks)
+        run: |
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.28.0/gitleaks_8.28.0_linux_x64.tar.gz | tar xz gitleaks
+          ./gitleaks detect --source . --config .gitleaks.toml --redact --verbose --exit-code 1
+
+  browser:
+    name: Browser tests (desktop + phone)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Open every page in Chromium and check nothing crashes
+        run: npx playwright test
+      - name: Keep the report when something fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  database:
+    name: Database security tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Needs the DATABASE_URL secret (Settings → Secrets and variables → Actions). Without it this
+    # job is skipped, not failed. The tests impersonate users and roll back every attempt.
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v5
+        if: env.DATABASE_URL != ''
+      - name: Run tests/db/security_tests.sql (every row must pass)
+        if: env.DATABASE_URL != ''
+        run: |
+          sudo apt-get -qq install -y postgresql-client >/dev/null
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -A -F $'\t' -f tests/db/security_tests.sql > result.tsv
+          cat result.tsv
+          total=$(grep -cE $'\t(t|f)$' result.tsv || true)
+          failed=$(grep -cE $'\tf$' result.tsv || true)
+          echo "security tests: $total run, $failed failed"
+          test "$total" -gt 0 || { echo "No tests ran — the database needs at least one real booking between two non-admin accounts."; exit 1; }
+          test "$failed" -eq 0
+      - name: Skipped (no DATABASE_URL secret yet)
+        if: env.DATABASE_URL == ''
+        run: echo "Add a DATABASE_URL repository secret to run the database security tests here."

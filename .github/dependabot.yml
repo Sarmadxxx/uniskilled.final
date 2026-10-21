@@ -1,0 +1,15 @@
+# Keeps the tools used by the tests and workflows up to date. Dependabot opens a pull request for
+# each update; the Tests workflow runs on it, and you merge when it's green.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      actions:
+        patterns: ['*']
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly

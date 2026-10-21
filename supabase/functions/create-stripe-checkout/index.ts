@@ -1,5 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { withSentry } from './sentry.ts';
 import { checkoutExpiresAt } from './checkout-expiry.ts';
 
 const STRIPE_SECRET = Deno.env.get('STRIPE_SECRET_KEY') ?? '';
@@ -19,7 +20,7 @@ async function getGroupFeeRate(supabase: any): Promise<number> {
   return isNaN(rate) ? 0.25 : rate;
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve(withSentry('create-stripe-checkout', async (req: Request) => {
   const cors = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -185,4 +186,4 @@ Deno.serve(async (req: Request) => {
     console.error('create-stripe-checkout error:', err);
     return json({ error: String(err) }, 500);
   }
-});
+}));

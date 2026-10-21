@@ -1,7 +1,6 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 
-// ─────────────────────────────────────────────────────────────────────────────
 // UniSkilled transactional email.
 //
 // Every email uses one professional layout: header, title, greeting, explanation,
@@ -9,7 +8,6 @@ import { createClient } from 'jsr:@supabase/supabase-js@2';
 // they are always accurate), a clear status box, "what happens next" steps,
 // one action button, policy links, support contact and the booking reference.
 // A plain-text version is sent alongside the HTML (better inbox placement).
-// ─────────────────────────────────────────────────────────────────────────────
 
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
@@ -47,7 +45,7 @@ function maskEmail(e: string): string {
 
 const first = (name: any) => String(name || '').trim().split(/\s+/)[0] || 'there';
 
-// ── Dates & money ────────────────────────────────────────────────────────────
+// ── Dates & money
 function tzLabel(tz: string) {
   return String(tz || 'Europe/Berlin').split('/').pop()!.replace(/_/g, ' ') + ' time';
 }
@@ -88,7 +86,16 @@ type Facts = {
   ref: string; subject: string; tutorName: string; studentName: string;
   date: string; time: string; duration: string; amount: string; due: string; dueLeft: string;
   status: string; kind: 'one-to-one' | 'group';
+  examDate: string;
 };
+
+// A plain calendar date (YYYY-MM-DD) shown as "Monday 2 February 2027". Empty when missing or invalid.
+function fmtPlainDate(v: any): string {
+  const s = String(v || '');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return '';
+  const d = new Date(s + 'T12:00:00Z');
+  return isNaN(d.getTime()) ? '' : fmtDate(d, 'UTC');
+}
 
 function factsFromSession(s: any): Facts {
   const tz = s.timezone || 'Europe/Berlin';
@@ -116,6 +123,7 @@ function factsFromSession(s: any): Facts {
     dueLeft: left !== null ? humanDuration(left) : '',
     status: s.status || '',
     kind: s.price_per_student !== undefined ? 'group' : 'one-to-one',
+    examDate: fmtPlainDate(s.exam_date),
   });
 }
 
@@ -129,10 +137,45 @@ function factsFromData(d: any, sym: string): Facts {
     duration: d.duration ? `${d.duration} minutes` : '',
     amount: d.amount ? `${sym}${d.amount}` : (d.price ? `${sym}${d.price}` : ''),
     due: '', dueLeft: '', status: '', kind: 'one-to-one',
+    examDate: fmtPlainDate(d.examDate),
   };
 }
 
-// ── Layout ───────────────────────────────────────────────────────────────────
+// ── Calendar links (only for real one-to-one sessions with a start time)
+// The .ics link carries a signature so only people who received the email can open it.
+async function calendarToken(sessionId: string): Promise<string> {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey('raw', enc.encode(SERVICE_KEY), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode('cal:' + sessionId));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+}
+const icsStamp = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+type CalLinks = { google: string; ics: string } | null;
+async function calendarLinks(s: any): Promise<CalLinks> {
+  if (!s || !s.id || !s.starts_at || s.price_per_student !== undefined) return null;
+  const start = new Date(s.starts_at);
+  if (isNaN(start.getTime())) return null;
+  const end = s.ends_at ? new Date(s.ends_at) : new Date(start.getTime() + (Number(s.duration_minutes) || 60) * 60000);
+  const room = `${SITE}/classroom.html?session=${encodeURIComponent(s.id)}`;
+  const g = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `UniSkilled lesson: ${s.subject || 'Tutoring session'}`,
+    dates: `${icsStamp(start)}/${icsStamp(end)}`,
+    details: `Online lesson on UniSkilled.\nJoin here: ${room}`,
+    location: room,
+  });
+  const token = await calendarToken(s.id);
+  return {
+    google: `https://calendar.google.com/calendar/render?${g.toString()}`,
+    ics: `${Deno.env.get('SUPABASE_URL')}/functions/v1/session-calendar?s=${encodeURIComponent(s.id)}&t=${token}`,
+  };
+}
+function calendarLine(cal: CalLinks): string {
+  if (!cal) return 'Add the session to your calendar.';
+  return `Add it to your calendar: <a href="${cal.google}" style="color:#1a6bff;font-weight:700;">Google Calendar</a> · <a href="${cal.ics}" style="color:#1a6bff;font-weight:700;">Apple / Outlook</a>.`;
+}
+
+// ── Layout
 type Tone = 'info' | 'success' | 'warning' | 'danger' | 'neutral';
 const TONES: Record<Tone, { bg: string; border: string; text: string; bar: string }> = {
   info:    { bg: '#eff6ff', border: '#bfdbfe', text: '#1e3a8a', bar: '#1a6bff' },
@@ -146,17 +189,17 @@ type Email = {
   subject: string;
   preheader: string;
   tone: Tone;
-  label: string;                 // small label above the title, e.g. "Booking confirmed"
+  label: string;
   title: string;
-  greeting?: string;             // first name
-  intro: string[];               // paragraphs (may contain <strong>)
-  details?: [string, string][];  // label/value rows
+  greeting?: string;
+  intro: string[];
+  details?: [string, string][];
   detailsTitle?: string;
   callout?: { tone: Tone; title?: string; text: string };
   steps?: string[];
   stepsTitle?: string;
   cta?: { label: string; url: string };
-  secondary?: string[];          // small print paragraphs
+  secondary?: string[];
   ref?: string;
   audience?: 'user' | 'admin';
 };
@@ -274,7 +317,7 @@ function renderText(e: Email): string {
   return out.join('\n');
 }
 
-// ── Reusable copy ────────────────────────────────────────────────────────────
+// ── Reusable copy
 const POLICY_SHORT = `Free cancellation up to 24 hours before the session, or within 30 minutes of paying. Cancellations later than that are not refunded. If your tutor cancels or moves the session, you can always get a full refund. <a href="${SITE}/legal.html#refund" style="color:#1a6bff;">Read the Refund Policy</a>.`;
 const RESCHEDULE_SHORT = `Each session can be moved up to 2 times, to a new time within 30 days and at least 2 hours ahead. Both of you must agree to the new time.`;
 const REFUND_TIMING = `Refunds go back to the original payment method. Card refunds usually appear within 5–10 business days, depending on your bank.`;
@@ -286,14 +329,15 @@ function sessionRows(f: Facts, opts: { who?: 'tutor' | 'student' | 'both'; amoun
   if ((who === 'tutor' || who === 'both') && f.tutorName) rows.push(['Tutor', f.tutorName]);
   if ((who === 'student' || who === 'both') && f.studentName) rows.push(['Student', f.studentName]);
   rows.push(['Date', f.date], ['Time', f.time], ['Duration', f.duration], ['Format', 'Online lesson in the UniSkilled classroom']);
+  if (f.examDate) rows.push(['Exam date', f.examDate]);
   if (!opts.noAmount && f.amount) rows.push([opts.amountLabel || 'Price', f.amount]);
   (opts.extra || []).forEach(r => rows.push(r));
   if (f.ref) rows.push(['Booking reference', `#${f.ref}`]);
   return rows;
 }
 
-// ── Templates ────────────────────────────────────────────────────────────────
-function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null, raw: any): Email | null {
+// ── Templates
+function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null, raw: any, cal: CalLinks = null): Email | null {
   const studentDash = `${SITE}/student-dashboard.html`;
   const tutorDash = `${SITE}/tutor-dashboard.html`;
   const sessionsLink = role === 'tutor' ? `${tutorDash}?tab=sessions` : studentDash;
@@ -307,7 +351,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
   const shortDate = f.date ? f.date.replace(/, \d{4}$/, '').replace(/ \d{4}$/, '') : '';
 
   switch (type) {
-    // ── Booking request ────────────────────────────────────────────────────
     case 'booking_request': {
       const isNegotiated = d.listedRate && d.price && Math.abs(Number(raw.price) - Number(raw.listedRate) * (Number(raw.duration) / 60)) >= 0.5;
       return {
@@ -352,7 +395,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         ref: f.ref,
       };
 
-    // ── Accepted, awaiting payment ─────────────────────────────────────────
     case 'awaiting_payment':
       return {
         subject: `Action required: complete payment for ${f.subject} with ${f.tutorName}`,
@@ -402,7 +444,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         ref: f.ref,
       };
 
-    // ── Paid & confirmed ───────────────────────────────────────────────────
     case 'booking_confirmed':
       return {
         subject: `Booking confirmed: ${f.subject} with ${f.tutorName}${shortDate ? ' on ' + shortDate : ''}`,
@@ -413,7 +454,7 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         callout: { tone: 'success', title: `Payment received${f.amount ? ': ' + f.amount : ''}`, text: 'Keep this email as your receipt. Your card statement will show the charge from UniSkilled.' },
         details: sessionRows(f, { who: f.kind === 'group' ? 'tutor' : 'tutor', amountLabel: 'Amount paid' }),
         steps: [
-          'Add the session to your calendar.',
+          calendarLine(cal),
           roomStep,
           'After the session you can leave a review. If something went wrong, report it within 48 hours.',
         ],
@@ -429,13 +470,12 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         greeting: first(f.tutorName),
         intro: [`<strong>${f.studentName}</strong> has completed payment for your <strong>${f.subject}</strong> session on <strong>${when}</strong>. It is now confirmed on both sides.`],
         details: sessionRows(f, { who: 'student', amountLabel: 'Session price' }),
-        steps: ['Prepare any materials you need for the lesson. You can share files in the lesson chat.', roomStep, PAYOUT_SHORT],
+        steps: ['Prepare any materials you need for the lesson. You can share files in the lesson chat.', calendarLine(cal), roomStep, PAYOUT_SHORT],
         cta: { label: 'View session', url: `${tutorDash}?tab=sessions` },
         secondary: ['If something urgent comes up, ask to move the session or cancel it from your dashboard. If you cancel, the student is refunded in full.'],
         ref: f.ref,
       };
 
-    // ── Declined / expired ─────────────────────────────────────────────────
     case 'booking_declined':
       return {
         subject: `Booking request not accepted: ${f.subject}${shortDate ? ' on ' + shortDate : ''}`,
@@ -476,7 +516,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         ref: f.ref,
       };
 
-    // ── Cancellation ───────────────────────────────────────────────────────
     case 'session_cancelled': {
       const by = d.cancelledBy === 'tutor' ? 'tutor' : 'student';
       const byMe = role === by;
@@ -513,7 +552,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
       };
     }
 
-    // ── Rescheduling ───────────────────────────────────────────────────────
     case 'reschedule_requested': {
       const dash = d.dashboard === 'tutor-dashboard.html' ? tutorDash : studentDash;
       return {
@@ -587,7 +625,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
       };
     }
 
-    // ── Group sessions ─────────────────────────────────────────────────────
     case 'group_session_cancelled':
       return {
         subject: `Group session cancelled: ${f.subject}${raw.refunded ? ' (full refund issued)' : ''}`,
@@ -614,7 +651,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         ref: f.ref,
       };
 
-    // ── Disputes ───────────────────────────────────────────────────────────
     case 'dispute_opened':
       return {
         subject: `An issue was reported with your ${f.subject} session`,
@@ -663,7 +699,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         ref: f.ref,
       };
 
-    // ── Rating reminder (day after the lesson) ─────────────────────────────
     case 'rate_lesson': {
       const stars = [1, 2, 3, 4, 5].map((n) =>
         `<a href="${rateLink}&stars=${n}" style="display:inline-block;margin:0 3px;font-size:34px;line-height:1;color:#f59e0b;text-decoration:none;" aria-label="${n} star${n > 1 ? 's' : ''}">&#9733;</a>`).join('');
@@ -686,7 +721,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
       };
     }
 
-    // ── Referral ───────────────────────────────────────────────────────────
     case 'referral_qualified':
       return {
         subject: `You earned €${d.amount} in UniSkilled credit`,
@@ -699,7 +733,6 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         secondary: ['There is no limit on how many friends you can refer.'],
       };
 
-    // ── Admin ──────────────────────────────────────────────────────────────
     case 'dispute_opened_admin':
       return {
         subject: `[Admin] New dispute #${String(d.disputeId || '').slice(0, 8)}: ${f.subject}`,
@@ -721,6 +754,111 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         cta: { label: 'View in admin console', url: `${SITE}/admin.html` },
         audience: 'admin',
       };
+    // ── Lesson reminders (sent to both sides, 24 hours and 1 hour before the start)
+    case 'session_reminder': {
+      const soon = raw.window === '1h';
+      const isTutor = role === 'tutor';
+      const other = isTutor ? f.studentName : f.tutorName;
+      const lessonDay = shortDate ? ` on ${shortDate}` : '';
+      return {
+        subject: soon
+          ? `Starts in 1 hour: your ${f.subject} lesson with ${other}`
+          : `Coming up${lessonDay}: your ${f.subject} lesson with ${other}`,
+        preheader: soon
+          ? `Your lesson starts at ${strip(f.time.split(' – ')[0] || '')}. The lesson room opens 10 minutes before.`
+          : `A reminder of your lesson with ${strip(other)}${lessonDay}.`,
+        tone: 'info', label: soon ? 'Starting soon' : 'Lesson reminder',
+        title: soon ? 'Your lesson starts in 1 hour' : 'Your lesson is coming up',
+        greeting: first(isTutor ? f.tutorName : f.studentName),
+        intro: [soon
+          ? `Your <strong>${f.subject}</strong> lesson with <strong>${other}</strong> starts in about an hour. The lesson room opens 10 minutes before the start.`
+          : `This is a reminder of your <strong>${f.subject}</strong> lesson with <strong>${other}</strong> on <strong>${when}</strong>.`],
+        callout: soon
+          ? { tone: 'info', title: 'Before you join', text: 'Use a laptop or phone with a camera and microphone, and a stable internet connection. Have your notes and questions ready.' }
+          : isTutor
+            ? { tone: 'info', title: 'Prepare for the lesson', text: `${f.examDate ? `${first(f.studentName)}'s exam is on <strong>${f.examDate}</strong>. ` : ''}Check the booking notes and prepare any materials. You can share files in the lesson chat.` }
+            : { tone: 'info', title: 'Need to change something?', text: 'You can ask to move the lesson from your dashboard. Free cancellation ends 24 hours before the start.' },
+        details: sessionRows(f, { who: isTutor ? 'student' : 'tutor', noAmount: true }),
+        detailsTitle: 'Your lesson',
+        steps: soon ? [roomStep] : [calendarLine(cal), roomStep],
+        stepsTitle: soon ? 'How to join' : 'Before the lesson',
+        cta: soon && roomLink ? { label: 'Open the lesson room', url: roomLink } : { label: 'View my lesson', url: sessionsLink },
+        secondary: isTutor ? [PAYOUT_SHORT] : ['If something goes wrong during the lesson, you can report it from your dashboard within 48 hours.'],
+        ref: f.ref,
+      };
+    }
+
+    // ── A tutor has not answered a request yet
+    case 'request_nudge_tutor':
+      return {
+        subject: `Reminder: ${f.studentName} is waiting for your answer (${f.subject})`,
+        preheader: `Please accept or decline ${strip(f.studentName)}'s request. Unanswered requests are released automatically.`,
+        tone: 'warning', label: 'Waiting for your answer', title: `${first(f.studentName)} is still waiting for your answer`,
+        greeting: first(f.tutorName),
+        intro: [`You have not answered <strong>${f.studentName}</strong>’s request for a <strong>${f.subject}</strong> session yet. Please accept or decline it, so they can plan.`],
+        callout: { tone: 'warning', title: d.releaseAt ? `Please answer by ${d.releaseAt}` : 'Please answer soon', text: 'If a request gets no answer in time, it is released automatically and the student is told to choose another tutor.' },
+        details: sessionRows(f, { who: 'student', amountLabel: 'Offered price' }),
+        cta: { label: 'Answer the request', url: `${tutorDash}?tab=requests` },
+        secondary: ['Can’t take it? Declining is fine and takes one click. It is better for the student than no answer. To stop requests at times you can’t teach, block them in your availability settings.'],
+        ref: f.ref,
+      };
+
+    // ── A request got no answer and was released
+    case 'request_expired_student':
+      return {
+        subject: `No answer from ${f.tutorName}: your ${f.subject} request was released`,
+        preheader: 'Your tutor did not answer in time. You have not been charged.',
+        tone: 'neutral', label: 'Request released', title: `${f.tutorName || 'Your tutor'} didn’t answer in time`,
+        greeting: first(f.studentName),
+        intro: [`We are sorry. <strong>${f.tutorName}</strong> did not answer your request for a <strong>${f.subject}</strong> session in time, so we released it. You can book another tutor straight away.`],
+        callout: { tone: 'success', title: 'You have not been charged', text: 'No payment was taken for this request.' },
+        details: sessionRows(f, { who: 'tutor', noAmount: true }),
+        steps: ['Book another university-verified tutor for the same subject, or', 'Send the same tutor a message and request a new time.'],
+        stepsTitle: 'What you can do',
+        cta: { label: `Find a ${f.subject} tutor`, url: `${SITE}/find-tutors.html?q=${encodeURIComponent(String(raw?.subject || ''))}` },
+        ref: f.ref,
+      };
+    case 'request_expired_tutor':
+      return {
+        subject: `Request released: ${f.studentName}'s ${f.subject} request got no answer`,
+        preheader: 'The request was not answered in time, so it was released.',
+        tone: 'neutral', label: 'Request released', title: 'A request was released without an answer',
+        greeting: first(f.tutorName),
+        intro: [`<strong>${f.studentName}</strong>’s request for a <strong>${f.subject}</strong> session was not answered in time, so it was released and the student was told to choose another tutor.`],
+        details: sessionRows(f, { who: 'student', noAmount: true }),
+        cta: { label: 'Open dashboard', url: tutorDash },
+        secondary: ['Students book tutors who answer quickly. Keep your availability up to date so you only get requests at times you can teach.'],
+        ref: f.ref,
+      };
+
+    // ── Course requests
+    case 'admin_course_requests': {
+      const list = Array.isArray(d.requests) ? d.requests : [];
+      return {
+        subject: `[Admin] ${list.length} new course request${list.length === 1 ? '' : 's'} with no tutor yet`,
+        preheader: 'Students asked for courses. Recruit tutors for these.',
+        tone: 'info', label: 'Admin · course requests', title: `${list.length} new course request${list.length === 1 ? '' : 's'}`,
+        intro: ['Students asked for help with these courses. Each one is a tutor to recruit.'],
+        details: list.slice(0, 25).map((r: any) => [
+          `${r.subject || 'Course'}${r.university ? ' · ' + r.university : ''}`,
+          [r.studentName, r.level, r.language].filter(Boolean).join(' · ') || '—',
+        ]) as [string, string][],
+        detailsTitle: 'Requested courses',
+        cta: { label: 'Open admin console', url: `${SITE}/admin.html` },
+        audience: 'admin',
+      };
+    }
+    case 'course_request_match':
+      return {
+        subject: `A tutor for ${d.subject} just joined UniSkilled`,
+        preheader: `You asked for help with ${strip(String(d.subject || ''))}. A tutor who teaches it is now available.`,
+        tone: 'success', label: 'Tutor found', title: `A tutor for ${d.subject} is now available`,
+        greeting: first(d.studentName),
+        intro: [`You asked for help with <strong>${d.subject}</strong>. A university-verified tutor who teaches it has just joined UniSkilled.`],
+        cta: { label: 'See tutors', url: `${SITE}/find-tutors.html?q=${encodeURIComponent(String(raw?.subject || ''))}` },
+        secondary: ['You only get this email once for each request.'],
+      };
+
     case 'admin_payout_summary':
       return {
         subject: `[Admin] ${d.count} tutor payout${String(d.count) === '1' ? '' : 's'} released: ${d.currency}${d.total}`,
@@ -734,7 +872,7 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
   return null;
 }
 
-// ── Sending ──────────────────────────────────────────────────────────────────
+// ── Sending
 async function deliver(type: string, to: string, e: Email): Promise<boolean> {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -786,8 +924,6 @@ Deno.serve(async (req) => {
         to = String(ru?.email || '').trim().toLowerCase();
       }
     } else {
-      // Browser callers: fixed set of booking emails, recipient by user id only, and only
-      // someone who shares a session with the caller.
       if (!USER_SENDABLE_TYPES.includes(type)) return json({ error: 'Not allowed' }, 403);
       recipientId = String(parsed.to_user_id || '');
       if (!UUID.test(recipientId) || recipientId === callerId) return json({ error: 'Not allowed' }, 403);
@@ -807,43 +943,42 @@ Deno.serve(async (req) => {
       if (!recipientId) recipientId = u[0].id;
     }
 
-    // Load the real session so every email shows accurate, complete details.
     let session: any = null;
     const sid = String(raw.sessionId || '');
     const gid = String(raw.groupSessionId || '');
     if (UUID.test(sid)) {
       const { data: s } = await sb.from('sessions').select('*').eq('id', sid).maybeSingle();
-      // A browser caller may only reference a session they are part of, with that recipient.
       if (s && (isServer || ((s.student_id === callerId && s.tutor_id === recipientId) || (s.tutor_id === callerId && s.student_id === recipientId)))) session = s;
     } else if (isServer && UUID.test(gid)) {
       const { data: g } = await sb.from('group_sessions').select('*').eq('id', gid).maybeSingle();
       if (g) session = { ...g, student_name: raw.studentName || '' };
     }
 
-    // Fill names, dates and amounts from the database; fall back to what the caller sent.
     const f: Facts = session ? factsFromSession(session) : factsFromData(data, sym);
     if (!f.studentName && data.studentName) f.studentName = data.studentName;
     if (!f.tutorName && data.tutorName) f.tutorName = data.tutorName;
     if (!f.date && data.date) f.date = data.date;
     if (!f.time && data.time) f.time = data.time;
-    // Who is reading: student or tutor (personalises the wording).
     let role: 'student' | 'tutor' | null = raw.role === 'tutor' || raw.role === 'student' ? raw.role : null;
     if (!role && session && recipientId) role = recipientId === session.tutor_id ? 'tutor' : recipientId === session.student_id ? 'student' : null;
     if (!role) {
-      if (['booking_request', 'payment_received', 'payment_expired_tutor', 'group_session_cancelled_tutor', 'booking_accepted_tutor'].includes(type)) role = 'tutor';
-      else if (['booking_request_sent', 'awaiting_payment', 'booking_confirmed', 'booking_declined', 'payment_expired', 'payment_reminder', 'group_session_cancelled', 'rate_lesson'].includes(type)) role = 'student';
+      if (['booking_request', 'payment_received', 'payment_expired_tutor', 'group_session_cancelled_tutor', 'booking_accepted_tutor', 'request_nudge_tutor', 'request_expired_tutor'].includes(type)) role = 'tutor';
+      else if (['booking_request_sent', 'awaiting_payment', 'booking_confirmed', 'booking_declined', 'payment_expired', 'payment_reminder', 'group_session_cancelled', 'rate_lesson', 'request_expired_student', 'course_request_match'].includes(type)) role = 'student';
     }
 
-    // What the student actually paid (after any credit or discount). Tutors keep seeing the session price.
     if (role !== 'tutor' && raw.amountPaid !== undefined && raw.amountPaid !== null && isFinite(Number(raw.amountPaid))) {
       f.amount = esc(money(raw.amountPaid, session?.currency || (sym === '$' ? 'USD' : 'EUR')));
     }
 
-    const email = build(type, data, f, role, raw);
+    let cal: CalLinks = null;
+    if (session && ['booking_confirmed', 'payment_received', 'session_reminder'].includes(type)) {
+      try { cal = await calendarLinks(session); } catch (e) { console.error('calendar links failed (non-critical):', String(e)); }
+    }
+
+    const email = build(type, data, f, role, raw, cal);
     if (!email) return json({ error: 'Unknown email type' }, 400);
     const ok = await deliver(type, to, email);
 
-    // Copies for the person who took the action, so both sides always have a record.
     if (ok && !isServer && callerId) {
       const copyType = type === 'booking_request' ? 'booking_request_sent' : type === 'awaiting_payment' ? 'booking_accepted_tutor' : '';
       if (copyType) {
