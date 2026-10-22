@@ -144,14 +144,6 @@ a.profile-av{text-decoration:none;}
 .badge-expired{background:#fee2e2;color:#b91c1c;}
 
 /* NOTIF ROWS */
-.notif-row{display:flex;gap:0.9rem;padding:0.9rem 0;border-bottom:1px solid var(--border);cursor:pointer;}
-.notif-row:last-child{border-bottom:none;}
-.notif-row.unread{background:#fafbff;margin:0 -1.4rem;padding:0.9rem 1.4rem;}
-.notif-ico{width:36px;height:36px;border-radius:10px;background:#eff6ff;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
-.notif-info{flex:1;}
-.notif-title{font-weight:700;font-size:0.85rem;margin-bottom:2px;}
-.notif-body{font-size:0.75rem;color:var(--mid);}
-.notif-time{font-size:0.7rem;color:var(--light);white-space:nowrap;margin-top:2px;}
 
 /* REVIEWS */
 .review-row{padding:1rem 0;border-bottom:1px solid var(--border);}
@@ -230,6 +222,7 @@ a.profile-av{text-decoration:none;}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
+<script src="notifications.js?v=1"></script>
 <script src="auth-guard.js"></script>
 <script src="reschedule.js"></script>
 <script src="reviews-ui.js?v=1"></script>
@@ -289,39 +282,8 @@ a.profile-av{text-decoration:none;}
       </div>
     </div>
     <div class="sidebar-nav" role="navigation" aria-label="Dashboard sections">
-      <div class="nav-group">Teaching</div>
       <a class="nav-item active" href="tutor-dashboard.html?tab=overview">
         <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Overview</div>
-      </a>
-      <a class="nav-item" href="tutor-dashboard.html?tab=requests">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>Booking requests</div>
-        <span class="nav-badge" id="badgeRequests" style="display:none">0</span>
-      </a>
-      <a class="nav-item" href="tutor-dashboard.html?tab=sessions">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><path d="M2 6h14v12H2z"/></svg>Sessions</div>
-      </a>
-      <a class="nav-item" href="calendar.html">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</div>
-      </a>
-      <a class="nav-item" href="manage-availability.html">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 7v5l3 2"/></svg>Availability</div>
-      </a>
-      <a class="nav-item" href="tutor-dashboard.html?tab=groupSessions">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group sessions</div>
-      </a>
-      <div class="nav-group">Grow</div>
-      <a class="nav-item" href="tutor-dashboard.html?tab=subjectRequests">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4H9z"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg>Open subject requests</div>
-        <span class="nav-badge green" id="badgeSubjectRequests" style="display:none">0</span>
-      </a>
-      <a class="nav-item" href="tutor-dashboard.html?tab=reviews">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>Reviews</div>
-      </a>
-      <a class="nav-item" href="tutor-dashboard.html?tab=referrals">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v4H3z"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></svg>Refer & earn</div>
-      </a>
-      <a class="nav-item" href="feed.html">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Feeds</div>
       </a>
       <div class="nav-group">Inbox</div>
       <a class="nav-item" href="messages.html">
@@ -331,6 +293,41 @@ a.profile-av{text-decoration:none;}
       <a class="nav-item" href="tutor-dashboard.html?tab=notifications">
         <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications</div>
         <span class="nav-badge" id="badgeNotifs" style="display:none">0</span>
+      </a>
+      <div class="nav-group">Teaching</div>
+      <a class="nav-item" href="tutor-dashboard.html?tab=requests">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>Booking requests</div>
+        <span class="nav-badge" id="badgeRequests" style="display:none">0</span>
+      </a>
+      <a class="nav-item" href="tutor-dashboard.html?tab=sessions">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><path d="M2 6h14v12H2z"/></svg>Sessions</div>
+        <span class="usk-sec-dot" data-sec="sessions" hidden></span>
+      </a>
+      <a class="nav-item" href="calendar.html">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</div>
+      </a>
+      <a class="nav-item" href="manage-availability.html">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 7v5l3 2"/></svg>Availability</div>
+      </a>
+      <a class="nav-item" href="tutor-dashboard.html?tab=groupSessions">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group sessions</div>
+        <span class="usk-sec-dot" data-sec="groupSessions" hidden></span>
+      </a>
+      <div class="nav-group">Grow</div>
+      <a class="nav-item" href="tutor-dashboard.html?tab=subjectRequests">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4H9z"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg>Open subject requests</div>
+        <span class="nav-badge green" id="badgeSubjectRequests" style="display:none">0</span>
+      </a>
+      <a class="nav-item" href="tutor-dashboard.html?tab=reviews">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>Reviews</div>
+        <span class="usk-sec-dot" data-sec="reviews" hidden></span>
+      </a>
+      <a class="nav-item" href="tutor-dashboard.html?tab=referrals">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v4H3z"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></svg>Refer & earn</div>
+        <span class="usk-sec-dot" data-sec="referrals" hidden></span>
+      </a>
+      <a class="nav-item" href="feed.html">
+        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Feeds</div>
       </a>
     </div>
   </div>
@@ -505,10 +502,9 @@ a.profile-av{text-decoration:none;}
     <!-- NOTIFICATIONS PAGE -->
     <div id="page-notifications" style="display:none;">
       <div class="card">
-        <div class="card-head"><h2 class="card-title">Notifications</h2></div>
-        <div class="card-body" id="notifsList">
-          <div class="empty-state"><div class="empty-icon">🔔</div><div class="empty-text">No notifications yet</div></div>
-        </div>
+        <div class="card-head"><h2 class="card-title">Notifications</h2>
+          <button type="button" class="usk-link" onclick="USKNotify.markAllRead()" style="background:none;border:0;color:var(--blue);font:700 0.8rem 'Manrope',sans-serif;cursor:pointer;">Mark all as read</button></div>
+        <div class="card-body" id="notifsList"><div class="spinner"></div></div>
       </div>
     </div>
 
@@ -643,6 +639,10 @@ async function init() {
   const requestedTab = new URLSearchParams(window.location.search).get('tab') || 'overview';
   const targetLink = document.querySelector(`.nav-item[href="tutor-dashboard.html?tab=${requestedTab}"]`);
   showPage(requestedTab, targetLink);
+  startNotifications(requestedTab);
+  _sb.channel('tutor-msgs-' + userId)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `receiver_id=eq.${userId}` }, () => loadMessageBadge())
+    .subscribe();
 
   // Realtime notifications
   _sb.channel('notifs-' + userId)
@@ -664,7 +664,7 @@ async function init() {
 }
 
 async function loadAll() {
-  await Promise.all([loadRequests(), loadSubjectRequests(), loadSessions(), loadReviews(), loadNotifications(), loadGroupSessions()]);
+  await Promise.all([loadRequests(), loadSubjectRequests(), loadSessions(), loadReviews(), loadGroupSessions(), loadMessageBadge()]);
 }
 
 // ── GROUP SESSIONS ──
@@ -1215,38 +1215,27 @@ async function loadReviews() {
   }
 }
 
-// ── NOTIFICATIONS ──
-async function loadNotifications() {
-  const { data } = await _sb.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(20);
-  const notifs = data || [];
-  const unread = notifs.filter(n => !n.read).length;
-
-  const badge = document.getElementById('badgeNotifs');
-  if (unread > 0) { badge.textContent = unread; badge.style.display = 'block'; }
-  else badge.style.display = 'none';
-
-  if (notifs.length === 0) return;
-
-  // Only mark as read when the person is actually viewing the Notifications
-  // tab — this used to fire on every single page load (including full
-  // reloads triggered by clicking any other sidebar item), which cleared
-  // the badge before anyone had a real chance to see it.
-  const viewingNotifsTab = new URLSearchParams(window.location.search).get('tab') === 'notifications';
-  if (viewingNotifsTab) {
-    await _sb.from('notifications').update({ read: true }).eq('user_id', userId);
-  }
-
-  const typeIcons = { booking_request: '📥', booking_confirmed: '✅', booking_declined: '❌', new_message: '💬', new_review: '⭐' };
-
-  document.getElementById('notifsList').innerHTML = notifs.map(n => `
-    <div class="notif-row ${__esc(n.read ? '' : 'unread')}" role="button" tabindex="0" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}" onclick="if('${__jsStr(n.link||'')}')window.location.href='${__jsStr(n.link||'')}'">
-      <div class="notif-ico">${__esc(typeIcons[n.type] || '🔔')}</div>
-      <div class="notif-info">
-        <div class="notif-title">${__esc(n.title || '')}</div>
-        <div class="notif-body">${__esc(n.body || '')}</div>
-        <div class="notif-time">${__esc(new Date(n.created_at).toLocaleString())}</div>
-      </div>
-    </div>`).join('');
+// ── NOTIFICATIONS ── (bell, panel, live alerts and section badges: notifications.js)
+const NOTIF_SECTIONS = ['requests', 'sessions', 'groupSessions', 'reviews', 'referrals', 'subjectRequests'];
+async function startNotifications(requestedTab) {
+  await USKNotify.mount({
+    sb: _sb, userId, role: 'tutor',
+    onSectionCounts(counts) {
+      const total = Object.values(counts).reduce((a, b) => a + b, 0);
+      const badge = document.getElementById('badgeNotifs');
+      if (total > 0) { badge.textContent = total > 99 ? '99+' : total; badge.style.display = 'block'; }
+      else badge.style.display = 'none';
+      document.querySelectorAll('.usk-sec-dot[data-sec]').forEach(d => {
+        const n = counts[d.dataset.sec] || 0;
+        d.hidden = n === 0;
+        d.textContent = n > 9 ? '9+' : n;
+        d.title = n ? n + ' new' : '';
+      });
+    },
+  });
+  USKNotify.renderFull(document.getElementById('notifsList'));
+  // Opening a section clears the alerts that belong to it.
+  if (NOTIF_SECTIONS.includes(requestedTab)) USKNotify.markSectionRead(requestedTab);
 }
 
 // ── UNREAD MESSAGES ──
