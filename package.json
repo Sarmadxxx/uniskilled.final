@@ -1,0 +1,15 @@
+{
+  "name": "uniskilled",
+  "private": true,
+  "description": "Tooling for uniskilled.com (the site itself is plain HTML served by GitHub Pages; nothing here is shipped to visitors).",
+  "scripts": {
+    "test": "npm run test:static && npm run test:logic && npm run test:types",
+    "test:static": "python3 tests/static_checks.py",
+    "test:logic": "node --experimental-strip-types --test tests/functions/*.test.ts",
+    "test:types": "deno check --config tests/typecheck/deno.json supabase/functions/*/index.ts",
+    "test:e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}

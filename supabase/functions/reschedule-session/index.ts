@@ -145,7 +145,7 @@ Deno.serve(async (req: Request) => {
       if (open) await supabase.from('reschedule_requests').update({ status: 'cancelled', responded_at: new Date().toISOString() }).eq('id', open.id).eq('status', 'pending');
 
       const check = await checkNewTime(supabase, session, String(new_date), String(new_time));
-      if (!check.ok) return json({ error: check.error }, 400);
+      if (check.ok === false) return json({ error: check.error }, 400);
 
       const isTutor = userId === session.tutor_id;
       // Only a paid session can be locked as non-refundable (nothing to refund before payment).
@@ -255,7 +255,7 @@ Deno.serve(async (req: Request) => {
     }
     // Re-check the time: the tutor's calendar may have changed since the request was made.
     const check = await checkNewTime(supabase, session, String(rr.new_date), String(rr.new_time));
-    if (!check.ok) {
+    if (check.ok === false) {
       await close('cancelled');
       return json({ error: `${check.error} The session stays at its current time.` }, 400);
     }

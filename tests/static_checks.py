@@ -142,6 +142,25 @@ check('404 page exists and resolves assets from the site root',
       bool(nf) and nf_fonts_ok and 'fonts.googleapis' not in nf and (nf_base_root or not nf_rel),
       'missing, Google Fonts, or relative paths without <base href="/">')
 
+# 10. Server functions ---------------------------------------------------------------------------
+# Every function folder needs an explicit verify_jwt entry in supabase/config.toml: the Supabase CLI
+# defaults to true, which would break webhooks and cron jobs that check their callers themselves.
+fn_dirs = sorted(d for d in os.listdir('supabase/functions') if os.path.isfile(os.path.join('supabase/functions', d, 'index.ts')))
+cfg = read('supabase/config.toml') if os.path.exists('supabase/config.toml') else ''
+no_entry = [d for d in fn_dirs if not re.search(r'^\[functions\.' + re.escape(d) + r'\]\s*\nverify_jwt = (true|false)', cfg, re.M)]
+check(f'Every server function has a verify_jwt setting ({len(fn_dirs)})', bool(fn_dirs) and not no_entry, ', '.join(no_entry))
+# A function that imports a local helper must ship it (sentry.ts, paypal-gate.ts, ...).
+missing_helpers = []
+for d in fn_dirs:
+    for imp in re.findall(r"from '\./([\w.-]+)'", read(os.path.join('supabase/functions', d, 'index.ts'))):
+        if not os.path.exists(os.path.join('supabase/functions', d, imp)):
+            missing_helpers.append(f'{d}/{imp}')
+check('Server functions ship every local file they import', not missing_helpers, ', '.join(missing_helpers))
+# The shared helpers must stay identical in every function that carries a copy.
+for helper in ('sentry.ts', 'paypal-gate.ts'):
+    copies = {read(p) for p in glob.glob(f'supabase/functions/*/{helper}')}
+    check(f'All copies of {helper} are identical', len(copies) <= 1, f'{len(copies)} different versions')
+
 # Report -----------------------------------------------------------------------------------------
 for p in passes:
     print(f'PASS  {p}')

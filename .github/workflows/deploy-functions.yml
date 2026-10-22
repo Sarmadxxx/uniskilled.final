@@ -1,0 +1,74 @@
+name: Deploy server functions
+
+# Deploys Edge Functions from this repository to Supabase. It never runs by itself: open the
+# Actions tab → "Deploy server functions" → Run workflow, and type which functions to deploy.
+#
+# Setup once: add a repository secret SUPABASE_ACCESS_TOKEN (Supabase → Account → Access Tokens;
+# prefer a scoped token limited to this project and "Edge Functions: write").
+# Keys used by the functions (Stripe, PayPal, Resend, …) stay in Supabase → Edge Functions →
+# Secrets; this workflow never sees them.
+#
+# verify_jwt for each function comes from supabase/config.toml, which mirrors the live settings.
+on:
+  workflow_dispatch:
+    inputs:
+      functions:
+        description: 'Function names separated by spaces (e.g. "send-email cancel-session")'
+        required: true
+      target:
+        description: 'Where to deploy'
+        type: choice
+        options: [staging, production]
+        default: staging
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-functions-${{ inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Tests must pass first
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: '22' }
+      - uses: denoland/setup-deno@v2
+        with: { deno-version: v2.x }
+      - run: python3 tests/static_checks.py
+      - run: node --experimental-strip-types --test tests/functions/*.test.ts
+      - run: deno check --config tests/typecheck/deno.json supabase/functions/*/index.ts
+
+  deploy:
+    name: Deploy to ${{ inputs.target }}
+    needs: test
+    runs-on: ubuntu-latest
+    # Production deploys can be made to wait for a manual approval: Settings → Environments →
+    # production → Required reviewers.
+    environment: ${{ inputs.target }}
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      PROJECT_REF: ${{ inputs.target == 'production' && 'orghkbbohnabcietidiv' || vars.STAGING_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Check the request
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo "Missing SUPABASE_ACCESS_TOKEN secret."; exit 1; }
+          test -n "$PROJECT_REF" || { echo "No project for '${{ inputs.target }}' (set the STAGING_PROJECT_REF variable)."; exit 1; }
+          for f in ${{ inputs.functions }}; do
+            test -f "supabase/functions/$f/index.ts" || { echo "Unknown function: $f"; exit 1; }
+            grep -q "^\[functions\.$f\]" supabase/config.toml || { echo "$f has no verify_jwt entry in supabase/config.toml"; exit 1; }
+          done
+      - name: Deploy
+        run: |
+          for f in ${{ inputs.functions }}; do
+            echo "::group::$f"
+            supabase functions deploy "$f" --project-ref "$PROJECT_REF" --use-api
+            echo "::endgroup::"
+          done

@@ -44,6 +44,11 @@ WITH ids AS (
   WHERE s.student_id <> s.tutor_id
     -- the tutor must have a real tutor profile, otherwise profile tests touch 0 rows and prove nothing
     AND EXISTS (SELECT 1 FROM public.tutor_profiles tp WHERE tp.user_id = s.tutor_id)
+    -- admins may legitimately bypass the guards, so a booking made from an admin account would
+    -- make "student cannot change the price" etc. look like failures; only test plain users
+    AND NOT EXISTS (SELECT 1 FROM public.users u
+                    WHERE u.id IN (s.student_id, s.tutor_id)
+                      AND 'admin' = ANY (coalesce(u.roles::text[], '{}')))
   ORDER BY s.created_at DESC LIMIT 1
 ),
 cases(test, who, role, sql_tpl, expect) AS (VALUES

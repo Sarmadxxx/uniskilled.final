@@ -1,0 +1,23 @@
+# Secret scan settings (gitleaks). Uses gitleaks' full built-in rule set, plus three exceptions for
+# values that are public by design and safe to commit:
+#  • the Supabase anon key (a JWT with "role":"anon") in supabase-config.js — it only allows what
+#    the database's access rules (RLS) allow;
+#  • the Sentry DSN — Sentry documents it as public; it can only send error reports;
+#  • the PostHog project key (phc_…) — public by design; PostHog's secret personal keys (phx_…) still fail.
+# A Stripe/PayPal/Resend secret, a service_role key or a password in any file still fails the build.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public-by-design values"
+paths = [
+  '''^vendor/''',
+  '''^node_modules/''',
+  '''^package-lock\.json$''',
+]
+regexes = [
+  # anon JWT: header + payload starting {"iss":"supabase","ref":"orghkbbohnabcietidiv","role":"anon"
+  '''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24i[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+''',
+  '''https://[0-9a-f]{32}@o\d+\.ingest\.de\.sentry\.io/\d+''',
+  '''phc_[A-Za-z0-9]{20,}''',
+]

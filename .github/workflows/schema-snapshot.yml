@@ -1,0 +1,59 @@
+name: Database structure snapshot
+
+# Saves the live database's STRUCTURE (tables, columns, access rules, functions, triggers, views —
+# no user data, no passwords) to db/schema.sql, so the repository always holds an exact blueprint:
+#  • a backup of everything changed directly in the database, not only recorded migrations;
+#  • the starting point for the staging (test) copy;
+#  • a readable history of every structural change, one pull request per change.
+#
+# Setup once: repository secret DATABASE_URL = the "Session pooler" connection string from
+# Supabase → Project Settings → Database (it contains the database password; GitHub keeps it
+# encrypted and hides it in logs). The same secret runs the database security tests.
+on:
+  schedule:
+    - cron: '41 4 * * *'   # daily, 04:41 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: schema-snapshot
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v5
+      - name: Skip when the secret isn't set yet
+        if: env.DATABASE_URL == ''
+        run: echo "Add the DATABASE_URL repository secret to enable daily structure snapshots."
+      - uses: supabase/setup-cli@v1
+        if: env.DATABASE_URL != ''
+        with:
+          version: latest
+      - name: Dump structure (no data)
+        if: env.DATABASE_URL != ''
+        run: supabase db dump --db-url "$DATABASE_URL" -f db/schema.sql
+      - name: Open a pull request when the structure changed
+        if: env.DATABASE_URL != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git diff --quiet -- db/schema.sql && git ls-files --error-unmatch db/schema.sql >/dev/null 2>&1; then
+            echo "No structural changes."; exit 0
+          fi
+          branch="schema-snapshot/$(date -u +%Y-%m-%d)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B "$branch"
+          git add db/schema.sql
+          git commit -m "Database structure snapshot $(date -u +%Y-%m-%d)"
+          git push -f origin "$branch"
+          gh pr view "$branch" >/dev/null 2>&1 || gh pr create --head "$branch" --title "Database structure snapshot $(date -u +%Y-%m-%d)" \
+            --body "The live database structure changed since the last snapshot. Review the diff, then merge to keep db/schema.sql current. No user data is included."
