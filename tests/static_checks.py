@@ -142,7 +142,28 @@ check('404 page exists and resolves assets from the site root',
       bool(nf) and nf_fonts_ok and 'fonts.googleapis' not in nf and (nf_base_root or not nf_rel),
       'missing, Google Fonts, or relative paths without <base href="/">')
 
-# 10. Server functions ---------------------------------------------------------------------------
+# 10. One shared database config, self-hosted library ------------------------------------------
+# The database address and public key live only in supabase-config.js; pages must load it before
+# their first use, and must use the self-hosted supabase-js (a blocked or down CDN broke every page).
+order_bad, cdn_pages, pasted = [], [], []
+for path in sorted(glob.glob('*.html')):
+    s = read(path)
+    if 'cdn.jsdelivr.net/npm/@supabase' in s:
+        cdn_pages.append(path)
+    if re.search(r"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\.", s):
+        pasted.append(path)
+    use = s.find('USK_CONFIG')
+    inc = s.find('<script src="supabase-config.js"></script>')
+    if use != -1 and (inc == -1 or inc > use):
+        order_bad.append(path)
+for vendored in re.findall(r'src="(vendor/supabase-js/[\d.]+/supabase\.js)"', ''.join(read(p) for p in glob.glob('*.html'))):
+    if not os.path.exists(vendored):
+        order_bad.append(f'{vendored} missing')
+check('Pages use the self-hosted supabase-js, not a CDN', not cdn_pages, ', '.join(cdn_pages))
+check('Database key appears only in supabase-config.js', not pasted, ', '.join(pasted))
+check('supabase-config.js loads before it is used', not order_bad, ', '.join(order_bad))
+
+# 11. Server functions ---------------------------------------------------------------------------
 # Every function folder needs an explicit verify_jwt entry in supabase/config.toml: the Supabase CLI
 # defaults to true, which would break webhooks and cron jobs that check their callers themselves.
 fn_dirs = sorted(d for d in os.listdir('supabase/functions') if os.path.isfile(os.path.join('supabase/functions', d, 'index.ts')))

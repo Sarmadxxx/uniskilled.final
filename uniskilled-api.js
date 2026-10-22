@@ -9,8 +9,8 @@
 (function () {
 
   // ── CONFIG ──
-  var SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
-  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8';
+  var SUPABASE_URL = USK_CONFIG.url;
+  var SUPABASE_ANON_KEY = USK_CONFIG.anonKey;
   var FUNCTIONS_URL = SUPABASE_URL + '/functions/v1';
 
   // ── HELPERS ──

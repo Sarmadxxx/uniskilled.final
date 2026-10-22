@@ -96,7 +96,8 @@ textarea:focus{border-color:var(--blue)}
   </div>
 </main>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
 <script src="auth-guard.js?v=2"></script>
 <script>
 (function () {
@@ -106,8 +107,8 @@ textarea:focus{border-color:var(--blue)}
   const TAGS = ['Clear explanations', 'Patient', 'Well prepared', 'Helpful materials', 'Encouraging', 'On time', 'Great for exams', 'Knows the subject'];
   const LABELS = ['', 'Poor', 'Fair', 'Good', 'Very good', 'Excellent'];
   const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.5 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6-4.9-4.5 6.6-.8z"/></svg>';
-  const sb = window.supabase.createClient('https://orghkbbohnabcietidiv.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yZ2hrYmJvaG5hYmNpZXRpZGl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMzcwMTMsImV4cCI6MjA5MjcxMzAxM30.3bOnZuga8a4xY4mbKdgLnw6EwAV5UuQDz26JI_vM-u8');
+  const sb = window.supabase.createClient(USK_CONFIG.url,
+    USK_CONFIG.anonKey);
   const q = new URLSearchParams(location.search);
   const sessionId = q.get('session') || '';
   let rating = Math.max(0, Math.min(5, parseInt(q.get('stars') || '0', 10) || 0));
