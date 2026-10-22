@@ -171,13 +171,16 @@ document.getElementById('signinForm').addEventListener('submit', async (e) => {
   setLoading(true);
 
   const keepSignedIn = document.getElementById('keepSignedIn').checked;
-  // Supabase persists sessions in localStorage by default.
-  // When NOT keeping signed in, we store a flag and sign out on tab close.
-  if (!keepSignedIn) {
-    sessionStorage.setItem('uniskilled_session_only', '1');
-  } else {
-    sessionStorage.removeItem('uniskilled_session_only');
-  }
+  // Not kept signed in: the login ends when the browser is closed (see supabase-config.js).
+  // Only this device is signed out; the login itself is never ended while the person is using it.
+  try {
+    if (!keepSignedIn) {
+      localStorage.setItem('usk_session_only', '1');
+      document.cookie = 'usk_alive=1; path=/; SameSite=Lax; Secure';   // no expiry: gone when the browser closes
+    } else {
+      localStorage.removeItem('usk_session_only');
+    }
+  } catch (e) { /* storage blocked: the login simply stays, as with "keep me signed in" */ }
 
   const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
 
@@ -223,12 +226,6 @@ document.getElementById('forgotLink').addEventListener('click', async (e) => {
     showAlert(error.message, 'error');
   } else {
     showAlert('Password reset email sent! Check your inbox.', 'success');
-  }
-});
-// If user chose NOT to keep signed in, sign out when they close the tab
-window.addEventListener('beforeunload', () => {
-  if (sessionStorage.getItem('uniskilled_session_only') === '1') {
-    _supabase.auth.signOut();
   }
 });
 </script>
