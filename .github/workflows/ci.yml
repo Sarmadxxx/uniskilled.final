@@ -29,6 +29,8 @@ jobs:
         run: python3 tests/static_checks.py
       - name: Payment and payout decision tests
         run: node --experimental-strip-types --test tests/functions/*.test.ts
+      - name: Notification routing tests
+        run: node --test tests/site/*.test.mjs
 
   functions:
     name: Server functions type-check
