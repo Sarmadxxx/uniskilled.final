@@ -814,7 +814,7 @@ function closeDualModal(id) {
 }
 
 document.getElementById('btCurrency')?.addEventListener('change', function() {
-  document.getElementById('btRate').min = this.value === 'USD' ? 11 : 10;
+  document.getElementById('btRate').min = this.value === 'USD' ? 17 : 15;
 });
 
 async function submitBecomeTutor() {
@@ -951,7 +951,7 @@ function shareReferralLink() {
       <div class="dm-row">
         <div class="dm-form-group">
           <label for="btRate" class="dm-label">Hourly rate</label>
-          <input type="number" class="dm-input" id="btRate" placeholder="e.g. 10" min="10">
+          <input type="number" class="dm-input" id="btRate" placeholder="e.g. 20" min="15">
         </div>
         <div class="dm-form-group">
           <label for="btCurrency" class="dm-label">Currency</label>

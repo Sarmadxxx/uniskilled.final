@@ -51,7 +51,7 @@ Deno.serve(withSentry('create-stripe-checkout', async (req: Request) => {
 
     if (group_participant_id) {
       const { data: participant, error: pErr } = await supabase.from('group_session_participants')
-        .select('id, status, payment_due_at, student_id, group_sessions(price_per_student, subject, currency, tutor_id)')
+        .select('id, status, payment_due_at, student_id, group_sessions(price_per_student, subject, currency, tutor_id, status, starts_at)')
         .eq('id', group_participant_id).single();
 
       if (pErr || !participant) return json({ error: 'Group session spot not found' }, 404);
@@ -59,6 +59,11 @@ Deno.serve(withSentry('create-stripe-checkout', async (req: Request) => {
       if (participant.status !== 'awaiting_payment') return json({ error: 'This spot is not currently awaiting payment.' }, 400);
       if (participant.payment_due_at && new Date(participant.payment_due_at).getTime() < Date.now()) {
         return json({ error: 'The 24-hour payment window for this spot has expired.' }, 400);
+      }
+      // Never take money for a group that was cancelled or has already started.
+      const gsStart = participant.group_sessions?.starts_at ? new Date(participant.group_sessions.starts_at).getTime() : NaN;
+      if (participant.group_sessions?.status !== 'open' || !(gsStart > Date.now())) {
+        return json({ error: 'This group session is no longer taking payments.' }, 400);
       }
 
       price = Number(participant.group_sessions.price_per_student);

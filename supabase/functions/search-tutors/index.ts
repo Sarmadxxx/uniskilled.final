@@ -20,8 +20,9 @@ Deno.serve(async (req) => {
   const min_rating = url.searchParams.get('min_rating');
   const language = url.searchParams.get('language');
   const student_skills = url.searchParams.get('student_skills')?.split(',') || [];
-  const limit = parseInt(url.searchParams.get('limit') || '20');
-  const offset = parseInt(url.searchParams.get('offset') || '0');
+  // Public endpoint: keep page sizes bounded so one request can't ask for the whole table.
+  const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit') || '20') || 20, 1), 50);
+  const offset = Math.max(parseInt(url.searchParams.get('offset') || '0') || 0, 0);
 
   // Check AI matching flag
   const { data: aiFlag } = await supabase
