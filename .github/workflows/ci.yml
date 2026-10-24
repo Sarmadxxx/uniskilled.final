@@ -94,8 +94,18 @@ jobs:
         if: env.DATABASE_URL != ''
         run: |
           sudo apt-get -qq install -y postgresql-client >/dev/null
-          # TEMPORARY (test branch only): show why the connection fails, without the password
-          psql "$DATABASE_URL" -c 'select 1' 2> conn_err.txt >/dev/null || { echo "::error::$(head -c 400 conn_err.txt | tr '\n' ' ' | sed -E 's#postgres(ql)?://[^ ]*#[url]#g')"; exit 2; }
+          # TEMPORARY (test branch only): diagnose the saved address without ever printing the password
+          python3 - <<'PY'
+          import os, subprocess, urllib.parse as up
+          u = up.urlsplit(os.environ['DATABASE_URL'].strip())
+          pw = up.unquote(u.password or '')
+          print(f"::error::shape scheme={u.scheme} user={u.username} host={u.hostname} port={u.port} path={u.path} query={u.query} pw_len={len(pw)} pw_has_symbols={any(not c.isalnum() for c in pw)}")
+          for h in ['aws-0-eu-north-1.pooler.supabase.com', 'aws-1-eu-north-1.pooler.supabase.com']:
+              env = dict(os.environ, PGPASSWORD=pw)
+              r = subprocess.run(['psql', f'host={h} port=5432 dbname=postgres user=postgres.orghkbbohnabcietidiv sslmode=require', '-c', 'select 1'], env=env, capture_output=True, text=True)
+              print(f"::error::try {h}: {'OK' if r.returncode == 0 else r.stderr.strip()[:200]}")
+          PY
+          exit 2
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -A -F $'\t' -f tests/db/security_tests.sql > result.tsv
           cat result.tsv
           total=$(grep -cE $'\t(t|f)$' result.tsv || true)
