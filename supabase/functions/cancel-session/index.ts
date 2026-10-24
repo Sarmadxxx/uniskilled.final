@@ -240,7 +240,13 @@ Deno.serve(withSentry('cancel-session', async (req: Request) => {
         return new Response(JSON.stringify({ error: 'No payment record found for this session — cannot process automatically. Please contact support.' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
-      await supabase.from('payments').update({ status: 'refund_processing' }).eq('id', payment.id);
+      // Claim the payment atomically: only one request may move it out of 'paid'. Without this a
+      // double click (or two tabs) ran the refund twice and gave the student their used credit back twice.
+      const { data: claimed } = await supabase.from('payments').update({ status: 'refund_processing' })
+        .eq('id', payment.id).eq('status', 'paid').select('id');
+      if (!claimed || claimed.length === 0) {
+        return new Response(JSON.stringify({ error: 'This cancellation is already being processed. Please refresh the page in a moment.' }), { status: 409, headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
 
       const result = await refundWhicheverMethodWasUsed(payment);
       if (!result.ok) {
@@ -251,13 +257,22 @@ Deno.serve(withSentry('cancel-session', async (req: Request) => {
       await restoreCreditUsed(supabase, payment, session.student_id, session_id);
     }
 
-    await supabase.from('sessions').update({
+    // Only a still-confirmed session is cancelled here, so a repeated request can't cancel it twice
+    // (duplicate notifications and emails). A refunded payment is already claimed above.
+    // After a refund the session is always marked cancelled, whatever its status now.
+    let cancelQuery = supabase.from('sessions').update({
       status: 'cancelled',
       cancelled_by: isTutor ? 'tutor' : 'student',
       cancelled_at: new Date().toISOString(),
       cancellation_reason: reason || null,
       refund_outcome: outcome,
     }).eq('id', session_id);
+    if (outcome !== 'full_refund') cancelQuery = cancelQuery.eq('status', 'confirmed');
+    const { data: cancelledRows, error: cancelErr } = await cancelQuery.select('id');
+    if (cancelErr) console.error('cancel-session: could not mark session cancelled:', cancelErr.message);
+    if (outcome !== 'full_refund' && (!cancelledRows || cancelledRows.length === 0)) {
+      return new Response(JSON.stringify({ error: 'This session was already cancelled. Please refresh the page.' }), { status: 409, headers: { ...cors, 'Content-Type': 'application/json' } });
+    }
 
     // A cancelled session can't be rescheduled: close any request still waiting for a reply.
     await supabase.from('reschedule_requests').update({ status: 'cancelled', responded_at: new Date().toISOString() })

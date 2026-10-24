@@ -161,7 +161,12 @@ Deno.serve(withSentry('resolve-dispute', async (req: Request) => {
         return new Response(JSON.stringify({ error: 'Invalid partial refund amount.' }), { status: 400, headers: { ...cors, 'Content-Type': 'application/json' } });
       }
 
-      await supabase.from('payments').update({ status: 'refund_processing' }).eq('id', payment.id);
+      // Claim the payment atomically so a double click can't refund twice or cut the tutor's payout twice.
+      const { data: claimed } = await supabase.from('payments').update({ status: 'refund_processing' })
+        .eq('id', payment.id).eq('status', 'paid').select('id');
+      if (!claimed || claimed.length === 0) {
+        return new Response(JSON.stringify({ error: 'This refund is already being processed. Refresh the page in a moment.' }), { status: 409, headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
 
       const result = await refundWhicheverMethodWasUsed(payment, resolution === 'partial' ? amountToRefund : undefined);
       if (!result.ok) {

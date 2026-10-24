@@ -101,6 +101,15 @@ jobs:
           echo "security tests: $total run, $failed failed"
           test "$total" -gt 0 || { echo "No tests ran — the database needs at least one real booking between two non-admin accounts."; exit 1; }
           test "$failed" -eq 0
+      - name: Run tests/db/group_seat_tests.sql (group seats; every row must pass)
+        if: env.DATABASE_URL != ''
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -A -F $'\t' -f tests/db/group_seat_tests.sql > seats.tsv
+          cat seats.tsv
+          total=$(grep -cE $'\t(t|f)$' seats.tsv || true)
+          failed=$(grep -cE $'\tf$' seats.tsv || true)
+          echo "group seat tests: $total run, $failed failed"
+          test "$total" -gt 0 && test "$failed" -eq 0
       - name: Skipped (no DATABASE_URL secret yet)
         if: env.DATABASE_URL == ''
         run: echo "Add a DATABASE_URL repository secret to run the database security tests here."

@@ -125,6 +125,17 @@ check('Payment page: discount preview capped at the platform fee', 'PREVIEW_FEE_
 td = read('tutor-dashboard.html')
 check('Tutor dashboard: PayPal payout picker switched off', 'const PAYPAL_PAYOUTS_ENABLED = false;' in td, 'switch missing or on')
 
+# 7b. Refunds and group checkout (audit 2026-10-24) -------------------------------------------------
+# A refund must claim the payment atomically (only while it is still 'paid'), otherwise a double click
+# refunds twice and returns the student's used credit twice.
+refund_claim = re.compile(r"update\(\{ status: 'refund_processing' \}\)\s*\.eq\('id', payment\.id\)\.eq\('status', 'paid'\)\.select\('id'\)")
+for fn in ('cancel-session', 'resolve-dispute'):
+    src = read(f'supabase/functions/{fn}/index.ts')
+    check(f'{fn}: refund claims the payment atomically', refund_claim.search(src) is not None
+          and "update({ status: 'refund_processing' }).eq('id', payment.id);" not in src, 'non-atomic refund claim')
+csc = read('supabase/functions/create-stripe-checkout/index.ts')
+check('Card checkout refuses cancelled or started group sessions', "group_sessions?.status !== 'open'" in csc, 'missing group status check')
+
 # 8. Legal page ----------------------------------------------------------------------------------
 lg = re.sub(r'<[^>]+>', ' ', read('legal.html'))
 check('Legal: Stripe listed as a processor', 'Stripe Payments Europe' in lg, 'missing')
