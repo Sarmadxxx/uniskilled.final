@@ -94,6 +94,8 @@ jobs:
         if: env.DATABASE_URL != ''
         run: |
           sudo apt-get -qq install -y postgresql-client >/dev/null
+          # TEMPORARY (test branch only): show why the connection fails, without the password
+          psql "$DATABASE_URL" -c 'select 1' 2> conn_err.txt >/dev/null || { echo "::error::$(head -c 400 conn_err.txt | tr '\n' ' ' | sed -E 's#postgres(ql)?://[^ ]*#[url]#g')"; exit 2; }
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -A -F $'\t' -f tests/db/security_tests.sql > result.tsv
           cat result.tsv
           total=$(grep -cE $'\t(t|f)$' result.tsv || true)
