@@ -28,22 +28,7 @@
 :root{--blue:#1a6bff;--blue-mid:#4d8fff;--blue-light:#e8f0ff;--blue-pale:#f0f5ff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#ffffff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--orange:#ea580c;--orange-bg:#fff7ed;--purple:#7c3aed;--purple-bg:#f5f3ff;}
 html{scroll-behavior:smooth}
 body{font-family:'Manrope',sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden;line-height:1.6}
-nav{position:fixed;top:0;left:0;right:0;z-index:900;height:64px;padding:0 6%;display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
-.logo{font-family:'Manrope',sans-serif;font-weight:800;font-size:1.2rem;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:10px;letter-spacing:-0.02em}
-.logo-icon{width:32px;height:32px;background:url('uniskilled-logo-icon.png') center/contain no-repeat;border-radius:9px;display:flex;align-items:center;justify-content:center;color:transparent;font-size:0;overflow:hidden}
-.nav-links{display:flex;gap:2rem}
-.nav-links a{font-size:0.85rem;color:var(--mid);text-decoration:none;font-weight:500;transition:color .18s}
-.nav-links a:hover{color:var(--ink)}
-.nav-burger{display:none;width:44px;height:44px;align-items:center;justify-content:center;background:none;border:none;font-size:1.4rem;color:var(--ink);cursor:pointer;border-radius:8px}
-nav.scrolled{box-shadow:0 4px 20px rgba(17,24,39,.06)}
-.nav-end{display:flex;align-items:center;gap:1rem;flex-shrink:0}
-.nav-end a{white-space:nowrap}
-.btn-text{font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:600;background:none;border:none;color:var(--ink2);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-.btn-blue{font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;background:var(--blue);color:#fff;border:none;padding:0.55rem 1.4rem;border-radius:8px;cursor:pointer;transition:all .18s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap}
-.btn-blue:hover{background:#1558e0;box-shadow:0 4px 16px rgba(26,107,255,0.3)}
-.btn-profile{font-family:'Manrope',sans-serif;font-size:0.88rem;font-weight:800;background:#f7e049;color:#0f172a;border:none;padding:0.55rem 1.4rem;border-radius:8px;cursor:pointer;transition:all .18s;text-decoration:none;display:inline-flex;align-items:center;gap:4px;white-space:nowrap;letter-spacing:-0.01em;}
-.btn-profile:hover{background:#f0d800;box-shadow:0 4px 14px rgba(247,224,73,0.4);}
-.hero{padding-top:64px;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;position:relative;}
+.hero{padding-top:0;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;position:relative;}
 .hero-l{background:var(--blue-pale);display:flex;flex-direction:column;justify-content:center;padding:7% 6% 7% 7%;position:relative;z-index:2;}
 .hero-l::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(26,107,255,0.08) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;}
 .hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:100px;padding:5px 14px 5px 8px;font-size:0.76rem;font-weight:700;color:var(--ink2);margin-bottom:2rem;width:fit-content;box-shadow:0 2px 10px rgba(0,0,0,0.05);position:relative;z-index:1;}
@@ -166,15 +151,6 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 .hero-l>*{animation:fadeUp .55s ease both}
 .hero-l>*:nth-child(1){animation-delay:.07s}.hero-l>*:nth-child(2){animation-delay:.16s}.hero-l>*:nth-child(3){animation-delay:.25s}.hero-l>*:nth-child(4){animation-delay:.34s}.hero-l>*:nth-child(5){animation-delay:.42s}
 @media(max-width:960px){
-  .nav-links{display:none}
-  .nav-burger{display:flex!important}
-  .nav-links.open{display:flex;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:#fff;padding:1rem 6%;gap:1rem;box-shadow:0 4px 16px rgba(0,0,0,.08);z-index:800;max-height:calc(100vh - 64px);overflow-y:auto;}
-  nav{padding:0 5%;}
-  .nav-end{display:none}
-  .nav-links.open #navEndMobile{display:flex!important;}
-  .nav-links.open > a{font-size:1rem;color:var(--ink);padding:0.55rem 0;min-height:44px;display:flex;align-items:center}
-  .nav-links.open .btn-text{color:var(--ink2);font-size:1rem;min-height:44px}
-  .nav-links.open .btn-profile{color:#0f172a;font-size:0.95rem;padding:0.75rem 1.4rem}
   .hero{grid-template-columns:1fr;min-height:auto}
   .hero-l{padding:2.4rem 6%;}
   .hero-r{height:320px}
@@ -209,21 +185,8 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
-<nav>
-  <a class="logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="177" height="44" style="height:44px;width:auto;display:block;"></a>
-  <div class="nav-links" id="navLinks">
-    <a href="about.html">About</a>
-    <a href="find-tutors.html">Find Tutors</a>
-    <a href="group-sessions.html">Group Sessions</a>
-    <a href="#how-it-works">How it Works</a>
-    <div id="navEndMobile" style="display:none;flex-direction:column;gap:0.7rem;margin-top:0.5rem;padding-top:1rem;border-top:1px solid var(--border);align-items:flex-start;"></div>
-  </div>
-  <div class="nav-end" id="navEnd">
-    <a href="signin.html" class="btn-text">Sign in</a>
-    <a href="onboarding.html" class="btn-profile">Get started →</a>
-  </div>
-  <button class="nav-burger" id="navBurger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">☰</button>
-</nav>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
 <main id="main">
 <section class="hero">
   <div class="hero-l">
@@ -362,37 +325,6 @@ const SUPABASE_URL = USK_CONFIG.url;
 const SUPABASE_ANON_KEY = USK_CONFIG.anonKey;
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-(async () => {
-  // If just signed out, force clear and keep default nav
-  if (window.location.search.includes('loggedout=1')) {
-    history.replaceState({}, '', 'index.html');
-    syncMobileNav();
-    return;
-  }
-  const { data: { session } } = await _supabase.auth.getSession();
-  if (!session) { syncMobileNav(); return; } // not signed in — keep default nav
-
-  const user = session.user;
-  const role = (user.user_metadata && user.user_metadata.role) || 'student';
-  const name = (user.user_metadata && user.user_metadata.full_name)
-    ? user.user_metadata.full_name.split(' ')[0]
-    : 'You';
-
-  const dashUrl  = role === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html';
-  const profUrl  = role === 'tutor' ? 'tutor-profile.html'   : 'student-profile.html';
-  const dashIcon = role === 'tutor' ? '📊' : '📊';
-
-  document.getElementById('navEnd').innerHTML =
-    `<a href="${__safeUrl(dashUrl)}" class="btn-text">📊 Dashboard</a>` +
-    `<a href="messages.html" class="btn-text">💬 Messages</a>` +
-    `<a href="${__safeUrl(profUrl)}" class="btn-profile">👤 ${__esc(name)}</a>` +
-    `<a href="#" class="btn-text" style="color:#999;font-size:0.8rem;" onclick="event.preventDefault();handleSignOut()">Sign out</a>`;
-  syncMobileNav();
-})();
-function syncMobileNav() {
-  const mobileSlot = document.getElementById('navEndMobile');
-  if (mobileSlot) mobileSlot.innerHTML = document.getElementById('navEnd').innerHTML;
-}
 function handleSignOut() {
   _supabase.auth.signOut().then(function() {
     sessionStorage.removeItem('keepSignedIn');
@@ -422,24 +354,6 @@ function handleSignOut() {
   });
 })();
 
-// Navbar: shadow once scrolled, accessible mobile menu that closes on link tap / Esc / outside tap
-(function(){
-  const nav = document.querySelector('nav'), burger = document.getElementById('navBurger'), links = document.getElementById('navLinks');
-  const onScroll = () => nav.classList.toggle('scrolled', scrollY > 8);
-  addEventListener('scroll', onScroll, { passive: true }); onScroll();
-  function setOpen(open) {
-    links.classList.toggle('open', open);
-    document.body.classList.toggle('nav-open', open);
-    burger.setAttribute('aria-expanded', open);
-    burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-    burger.textContent = open ? '✕' : '☰';
-  }
-  burger.addEventListener('click', () => setOpen(!links.classList.contains('open')));
-  links.addEventListener('click', e => { if (e.target.closest('a')) setOpen(false); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape' && links.classList.contains('open')) { setOpen(false); burger.focus(); } });
-  document.addEventListener('click', e => { if (links.classList.contains('open') && !e.target.closest('nav')) setOpen(false); });
-  matchMedia('(min-width: 961px)').addEventListener('change', e => { if (e.matches) setOpen(false); });
-})();
 </script>
 <script>
 // Referral links land here (e.g. uniskilled.com?ref=AB12CD3) — persist the code so it
