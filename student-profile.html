@@ -197,24 +197,8 @@ body{background:#f4f6f9}
 <script src="analytics.js" defer></script>
 </head>
 <body>
-<nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="177" height="44" style="height:44px;width:auto;display:block;"></a>
-  <div class="nav-links">
-    <a href="index.html" class="nav-link">🏠 Home</a>
-    <a href="student-dashboard.html" class="nav-link">📊 Dashboard</a>
-    <a href="messages.html" class="nav-link">💬 Messages</a>
-    <a href="find-tutors.html" class="nav-cta">Find Tutors</a>
-    <a href="#" class="nav-link" style="font-size:0.78rem;color:var(--mid);" onclick="event.preventDefault();profileSignOut()">Sign out</a>
-  </div>
-  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
-</nav>
-<div class="mobile-nav" id="mobileNav">
-  <a href="index.html">🏠 Home</a>
-  <a href="student-dashboard.html">📊 Dashboard</a>
-  <a href="messages.html">💬 Messages</a>
-  <a href="find-tutors.html">🔍 Find Tutors</a>
-  <a href="#" onclick="event.preventDefault();profileSignOut()">🚪 Sign out</a>
-</div>
+<header id="site-nav" data-nav="app"></header>
+<script src="site-nav.js"></script>
 
 <div class="cover-wrap" id="coverWrap">
   <img class="cover-img" id="coverImg" style="display:none;" alt="Cover">

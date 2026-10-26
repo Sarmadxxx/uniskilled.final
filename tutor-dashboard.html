@@ -231,24 +231,8 @@ a.profile-av{text-decoration:none;}
 </head>
 <body>
 
-<nav>
-  <a class="nav-logo" href="index.html"><img src="uniskilled-logo-sm.png" alt="UniSkilled" width="177" height="44" style="height:44px;width:auto;display:block;"></a>
-  <div class="nav-links">
-    <a href="index.html" class="nav-link">🏠 Home</a>
-    <a href="tutor-profile.html" class="nav-link">👤 My Profile</a>
-    <a href="messages.html" class="nav-link">💬 Messages</a>
-    <a href="tutor-profile.html" class="nav-cta">Edit Profile</a>
-    <a href="#" class="nav-link" style="font-size:0.78rem;color:var(--mid);" onclick="event.preventDefault();dashSignOut()">Sign out</a>
-  </div>
-  <button class="nav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" onclick="toggleNav(this)">☰</button>
-</nav>
-<div class="mobile-nav" id="mobileNav">
-  <a href="index.html">🏠 Home</a>
-  <a href="tutor-profile.html">👤 My Profile</a>
-  <a href="messages.html">💬 Messages</a>
-  <a href="tutor-profile.html">✏️ Edit Profile</a>
-  <a href="#" onclick="event.preventDefault();dashSignOut()">🚪 Sign out</a>
-</div>
+<header id="site-nav" data-nav="app"></header>
+<script src="site-nav.js"></script>
 
 <div class="layout">
   <!-- SIDEBAR -->
