@@ -30,7 +30,7 @@ html,body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:
 /* ── NAV ── */
 .nav{position:sticky;top:0;z-index:200;height:62px;background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1rem,5%,3rem)}
 .nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-weight:800;font-size:.98rem;color:var(--ink);letter-spacing:-.02em}
-.nav-logo-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.82rem;font-weight:800}
+.nav-logo-icon{width:30px;height:30px;background:none;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.82rem;font-weight:800}
 .nav-r{display:flex;align-items:center;gap:.55rem}
 .nb{background:var(--blue);color:#fff;border:none;border-radius:9px;padding:.5rem 1.1rem;font-family:'Plus Jakarta Sans',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:.35rem}
 .nb:hover{background:var(--blue-v);box-shadow:0 4px 14px rgba(37,99,235,.3);transform:translateY(-1px)}
@@ -268,7 +268,7 @@ html,body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:
 <!-- NAV -->
 <nav class="nav">
   <a class="nav-logo" href="index.html">
-    <div class="nav-logo-icon">U</div>
+    <img class="nav-logo-icon" src="uniskilled-logo-icon.png" alt="" width="30" height="30">
     UniSkilled
   </a>
   <div class="nav-r" id="navR"><!-- filled by JS --></div>

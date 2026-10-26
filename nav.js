@@ -14,7 +14,7 @@ function renderSimpleNav(backHref, backLabel) {
 
   root.innerHTML = `
     <a href="index.html" class="nav-logo">
-      <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="127" height="44" style="height:44px;width:auto;display:block;">
+      <img src="uniskilled-logo-sm.png" alt="UniSkilled" width="177" height="44" style="height:44px;width:auto;display:block;">
     </a>
     ${backLink}
   `;
