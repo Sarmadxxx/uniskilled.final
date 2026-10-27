@@ -27,105 +27,146 @@
 <script src="supabase-config.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--blue:#1a6bff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#ffffff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--red:#dc2626;--red-bg:#fef2f2;}
-body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;display:grid;grid-template-columns:1fr 1fr;}
-/* Left side */
-.left{background:linear-gradient(135deg,#0f2460 0%,#1a6bff 100%);display:flex;flex-direction:column;justify-content:center;padding:4rem;position:relative;overflow:hidden;}
-.left::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.06) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;}
-.left-logo{display:flex;align-items:center;gap:10px;margin-bottom:3rem;position:relative;z-index:1;}
-.logo-icon{width:36px;height:36px;background:rgba(255,255,255,0.2);border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;}
-.logo-text{font-weight:800;font-size:1.2rem;color:#fff;letter-spacing:-0.02em;}
-.left-content{position:relative;z-index:1;}
-.left-content h1{font-size:clamp(2rem,3vw,2.8rem);font-weight:800;color:#fff;line-height:1.15;letter-spacing:-0.03em;margin-bottom:1rem;}
-.left-content h1 span{color:#f7e049;}
-.left-content p{font-size:1rem;color:rgba(255,255,255,0.6);line-height:1.75;max-width:360px;margin-bottom:2.5rem;}
-.trust-items{display:flex;flex-direction:column;gap:0.8rem;}
-.trust-item{display:flex;align-items:center;gap:12px;color:rgba(255,255,255,0.75);font-size:0.88rem;font-weight:500;}
-.trust-icon{width:32px;height:32px;background:rgba(255,255,255,0.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
-/* Right side */
-.right{display:flex;flex-direction:column;justify-content:center;padding:4rem 5rem;background:var(--white);}
-.right-header{margin-bottom:2.5rem;}
-.right-header h2{font-size:1.8rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.4rem;}
-.right-header p{font-size:0.9rem;color:var(--mid);}
-.right-header p a{color:var(--blue);text-decoration:none;font-weight:600;}
-.form-group{margin-bottom:1.2rem;}
-.form-label{display:block;font-size:0.82rem;font-weight:700;color:var(--ink2);margin-bottom:0.5rem;}
-.form-input{width:100%;padding:0.85rem 1.1rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .18s,box-shadow .18s;}
-.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,0.1);}
-.form-input::placeholder{color:var(--light);}
-.form-input.error{border-color:var(--red);}
-.forgot{text-align:right;margin-top:0.4rem;}
-.forgot a{font-size:0.8rem;color:var(--blue);text-decoration:none;font-weight:600;}
-.btn-submit{width:100%;padding:0.95rem;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;transition:all .18s;margin-top:0.5rem;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-submit:hover{background:#1558e0;box-shadow:0 6px 20px rgba(26,107,255,0.35);}
-.btn-submit:disabled{opacity:0.6;cursor:not-allowed;}
-.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;}
+:root{--blue:#1a6bff;--blue-hover:#1558e0;--blue-light:#e8f0ff;--navy:#0f2460;--text:#0b1530;--text-2:#3d4659;--muted:#5b6478;--line:#e4e8ef;--line-strong:#cfd6e2;--surface:#f5f7fa;--ok:#0b7a55;--red:#b42318;--red-bg:#fef2f2;--red-line:#fecaca;--green:#05603a;--green-bg:#ecfdf5;--green-line:#a7f3d0}
+html,body{min-height:100%}
+/* body colour + line height match the other public pages, so the shared header renders identically */
+body{font-family:'Manrope',sans-serif;background:#fff;color:#111827;min-height:100vh;display:flex;flex-direction:column;line-height:1.6}
+.auth{color:var(--text);line-height:1.5}
+.auth{flex:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+.ico{width:20px;height:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* Navy panel — same grid texture and navy as the shared header */
+.panel{background-color:var(--navy);background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:56px 56px;color:#fff;padding:72px clamp(32px,5vw,88px);display:flex;flex-direction:column;justify-content:center;gap:36px}
+.panel h2{font-size:clamp(2rem,3vw,2.5rem);line-height:1.08;font-weight:800;letter-spacing:-.035em;max-width:460px}
+.panel p{font-size:1rem;color:#c8d3ee;line-height:1.6;max-width:440px;margin-top:14px}
+.status{background:#fff;color:var(--text);border-radius:16px;padding:18px 20px;max-width:380px;box-shadow:0 20px 48px rgba(3,10,32,.45);display:flex;flex-direction:column;gap:14px}
+.status-h{display:flex;justify-content:space-between;align-items:center;font-size:.875rem;font-weight:800}
+.status-h span{font-size:.6875rem;font-weight:600;color:var(--muted)}
+.status ol{list-style:none;display:flex;flex-direction:column;gap:10px;font-size:.84rem}
+.status li{display:flex;gap:10px;align-items:center}
+.dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:grid;place-items:center}
+.dot.done{background:var(--blue);color:#fff}
+.dot.done .ico{width:12px;height:12px;stroke-width:3}
+.dot.now{border:2px solid var(--blue)}
+.dot.next{border:2px solid var(--line-strong)}
+.status li.later{color:var(--muted)}
+
+/* Form side */
+.form-side{display:flex;align-items:center;justify-content:center;padding:56px clamp(24px,5vw,80px)}
+.card{width:100%;max-width:400px;display:flex;flex-direction:column;gap:22px}
+.card h1{font-size:1.875rem;font-weight:800;letter-spacing:-.03em;line-height:1.15}
+.card .sub{font-size:.9375rem;color:var(--text-2);margin-top:6px}
+.card .sub a,.signup-link a{color:var(--blue);font-weight:800;text-decoration:none}
+.card .sub a:hover,.signup-link a:hover{text-decoration:underline}
+#signinForm{display:flex;flex-direction:column;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:8px}
+.label-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.form-label{font-size:.875rem;font-weight:700;color:#252e42}
+.forgot{font-size:.875rem;font-weight:700;color:var(--blue);text-decoration:none}
+.forgot:hover{text-decoration:underline}
+.form-input{width:100%;min-height:50px;padding:0 14px;border:1.5px solid var(--line-strong);border-radius:10px;font-family:inherit;font-size:1rem;color:var(--text);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+.form-input::placeholder{color:#8a93a6}
+.form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,.15)}
+.pw-wrap{position:relative}
+.pw-wrap .form-input{padding-right:52px}
+.pw-toggle{position:absolute;right:3px;top:3px;width:44px;height:44px;border:0;background:none;color:var(--muted);border-radius:8px;display:grid;place-items:center;cursor:pointer}
+.pw-toggle:hover{color:var(--text);background:var(--surface)}
+.pw-toggle .i-hide{display:none}
+.pw-toggle[aria-pressed="true"] .i-show{display:none}
+.pw-toggle[aria-pressed="true"] .i-hide{display:block}
+.keep{display:flex;align-items:center;gap:10px;font-size:.875rem;color:var(--text-2);cursor:pointer;user-select:none;min-height:32px;align-self:flex-start}
+.keep input{width:18px;height:18px;accent-color:var(--blue);cursor:pointer;margin:0}
+.btn-submit{min-height:52px;width:100%;border:0;border-radius:10px;background:var(--blue);color:#fff;font-family:inherit;font-size:1rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:background .15s,box-shadow .15s}
+.btn-submit:hover{background:var(--blue-hover);box-shadow:0 6px 18px rgba(26,107,255,.28)}
+.btn-submit:disabled{background:#5c93ff;box-shadow:none;cursor:not-allowed}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
 @keyframes spin{to{transform:rotate(360deg)}}
-.divider{display:flex;align-items:center;gap:1rem;margin:1.5rem 0;color:var(--light);font-size:0.8rem;}
-.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
-.alert{padding:0.85rem 1.1rem;border-radius:9px;font-size:0.85rem;font-weight:500;margin-bottom:1.2rem;display:none;}
-.alert.error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;display:block;}
-.alert.success{background:var(--green-bg);color:var(--green);border:1px solid #a7f3d0;display:block;}
-.signup-link{text-align:center;margin-top:1.5rem;font-size:0.85rem;color:var(--mid);}
-.signup-link a{color:var(--blue);font-weight:700;text-decoration:none;}
-@media(max-width:768px){body{grid-template-columns:1fr;}.left{display:none;}.right{padding:3rem 2rem;}}
+
+/* Messages (the sign-in script sets class "alert error" / "alert success") */
+.alert{display:none;padding:12px 14px;border-radius:10px;font-size:.875rem;font-weight:600;line-height:1.45}
+.alert.error{display:block;background:var(--red-bg);color:var(--red);border:1px solid var(--red-line)}
+.alert.success{display:block;background:var(--green-bg);color:var(--green);border:1px solid var(--green-line)}
+body:has(#alert.error) #signinForm .form-input{border-color:#d92d20}
+.help{font-size:.8125rem;color:var(--muted);line-height:1.5}
+.help a{color:var(--navy);font-weight:700}
+
+/* Tablet & phone: the navy continues under the header as a short band, the form overlaps it */
+@media(max-width:960px){
+  .auth{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .panel{padding:28px 20px 76px;gap:0}
+  .panel h2{font-size:1.5rem}
+  .panel p{display:none}
+  .panel .status{display:none}
+  .form-side{align-items:flex-start;padding:0 16px 40px}
+  .card{margin-top:-52px;background:#fff;border-radius:20px;padding:28px 22px;box-shadow:0 12px 32px rgba(11,21,48,.12);max-width:440px}
+}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
 
-<!-- LEFT -->
-<div class="left">
-  <div class="left-logo">
-    <img src="uniskilled-logo-white-sm.png" alt="UniSkilled" width="147" height="36" style="height:36px;width:auto;display:block;">
-  </div>
-  <div class="left-content">
-    <h1>Welcome back to <span>UniSkilled</span></h1>
-    <p>Sign in to access your dashboard, manage your gigs, and keep earning.</p>
-    <div class="trust-items">
-      <div class="trust-item"><div class="trust-icon">🎓</div>University verified platform</div>
-      <div class="trust-item"><div class="trust-icon">🔐</div>Escrow protected payments</div>
-      <div class="trust-item"><div class="trust-icon">⚡</div>AI-matched opportunities</div>
+<main id="main" class="auth">
+  <aside class="panel" aria-label="About your UniSkilled account">
+    <div>
+      <h2>Your lessons, requests and payouts — in one place.</h2>
+      <p>Every payment stays on hold until 48 hours after the lesson.</p>
+    </div>
+    <div class="status" aria-label="Example of a booking's payment status">
+      <div class="status-h">Payment status<span>Example</span></div>
+      <ol>
+        <li><span class="dot done"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Tutor accepted your request</li>
+        <li><span class="dot done"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>Paid by card · on hold</li>
+        <li><span class="dot now" aria-hidden="true"></span><b>Lesson · Thursday 18:00</b></li>
+        <li class="later"><span class="dot next" aria-hidden="true"></span>Paid out to the tutor 48 hours later</li>
+      </ol>
+    </div>
+  </aside>
+
+  <div class="form-side">
+    <div class="card">
+      <div>
+        <h1>Sign in</h1>
+        <p class="sub">New to UniSkilled? <a href="onboarding.html">Create a free account</a></p>
+      </div>
+
+      <div id="alert" class="alert" role="alert"></div>
+
+      <form id="signinForm">
+        <div class="form-group">
+          <label for="email" class="form-label">Email address</label>
+          <input type="email" id="email" class="form-input" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <div class="label-row">
+            <label for="password" class="form-label">Password</label>
+            <a href="#" id="forgotLink" class="forgot hit">Forgot password?</a>
+          </div>
+          <div class="pw-wrap">
+            <input type="password" id="password" class="form-input" autocomplete="current-password" required>
+            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password" aria-pressed="false" aria-controls="password">
+              <svg class="ico i-show" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12c1-2 4.5-6 9.5-6s8.5 4 9.5 6c-1 2-4.5 6-9.5 6s-8.5-4-9.5-6z"/><circle cx="12" cy="12" r="3"/></svg>
+              <svg class="ico i-hide" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.1A9.8 9.8 0 0112 6c5 0 8.5 4 9.5 6-.4.9-1.3 2.2-2.6 3.4M6.3 7.6C4.5 8.9 3.1 10.6 2.5 12c1 2 4.5 6 9.5 6 1.7 0 3.2-.5 4.5-1.1"/><path d="M9.9 9.9a3 3 0 004.2 4.2"/></svg>
+            </button>
+          </div>
+          <p class="help">Forgot it? Enter your email above, then tap "Forgot password?".</p>
+        </div>
+
+        <label class="keep" for="keepSignedIn"><input type="checkbox" id="keepSignedIn">Keep me signed in</label>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <span id="btnText">Sign in</span>
+          <div class="spinner" id="spinner"></div>
+        </button>
+      </form>
+
+      <p class="help">Trouble signing in? Email <a href="mailto:info@uniskilled.com">info@uniskilled.com</a></p>
     </div>
   </div>
-</div>
-
-<!-- RIGHT -->
-<div class="right">
-  <div class="right-header">
-    <h2>Sign in</h2>
-    <p>Don't have an account? <a href="onboarding.html">Get started free</a></p>
-  </div>
-
-  <div id="alert" class="alert"></div>
-
-  <form id="signinForm">
-    <div class="form-group">
-      <label for="email" class="form-label">Email address</label>
-      <input type="email" id="email" class="form-input" autocomplete="email" inputmode="email" placeholder="you@example.com" required>
-    </div>
-    <div class="form-group">
-      <label for="password" class="form-label">Password</label>
-      <input type="password" id="password" class="form-input" autocomplete="current-password" placeholder="••••••••" required>
-      <div class="forgot"><a href="#" id="forgotLink" class="hit">Forgot password?</a></div>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
-      <input type="checkbox" id="keepSignedIn" style="width:16px;height:16px;cursor:pointer;accent-color:var(--blue);">
-      <label for="keepSignedIn" style="font-size:0.875rem;color:var(--mid);cursor:pointer;user-select:none;">Keep me signed in</label>
-    </div>
-
-    <button type="submit" class="btn-submit" id="submitBtn">
-      <span id="btnText">Sign in</span>
-      <div class="spinner" id="spinner"></div>
-    </button>
-  </form>
-
-  <div class="signup-link">
-    New to UniSkilled? <a href="onboarding.html" class="hit">Create an account</a>
-  </div>
-</div>
+</main>
 
 <script>
 // ── XSS protection (security review Oct 2026) ──
@@ -228,6 +269,19 @@ document.getElementById('forgotLink').addEventListener('click', async (e) => {
     showAlert('Password reset email sent! Check your inbox.', 'success');
   }
 });
+</script>
+<script>
+// Show / hide password — display only; the sign-in logic above is unchanged.
+(function () {
+  var btn = document.getElementById('pwToggle'), input = document.getElementById('password');
+  if (!btn || !input) return;
+  btn.addEventListener('click', function () {
+    var show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    btn.setAttribute('aria-pressed', show ? 'true' : 'false');
+    btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  });
+})();
 </script>
 </body>
 </html>

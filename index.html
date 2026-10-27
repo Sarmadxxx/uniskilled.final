@@ -25,116 +25,137 @@
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--blue:#1a6bff;--blue-mid:#4d8fff;--blue-light:#e8f0ff;--blue-pale:#f0f5ff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#ffffff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--orange:#ea580c;--orange-bg:#fff7ed;--purple:#7c3aed;--purple-bg:#f5f3ff;}
+/* Original tokens — the footer below still uses these, unchanged */
+:root{--blue:#1a6bff;--blue-mid:#4d8fff;--blue-light:#e8f0ff;--blue-pale:#f0f5ff;--ink:#111827;--ink2:#374151;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#ffffff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;}
+/* Clear Campus tokens (homepage content) */
+:root{--navy:#0f2460;--text:#0b1530;--text-2:#3d4659;--muted:#5b6478;--line:#e4e8ef;--line-strong:#cfd6e2;--surface:#f5f7fa;--blue-hover:#1558e0;--blue-text:#1557d6;--ok:#0b7a55;--sky:#9fb4e6;--gutter:clamp(20px,5vw,80px);--max:1240px}
 html{scroll-behavior:smooth}
 body{font-family:'Manrope',sans-serif;background:var(--white);color:var(--ink);overflow-x:hidden;line-height:1.6}
-.hero{padding-top:0;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;position:relative;}
-.hero-l{background:var(--blue-pale);display:flex;flex-direction:column;justify-content:center;padding:7% 6% 7% 7%;position:relative;z-index:2;}
-.hero-l::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(26,107,255,0.08) 1.5px,transparent 1.5px);background-size:28px 28px;pointer-events:none;}
-.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:100px;padding:5px 14px 5px 8px;font-size:0.76rem;font-weight:700;color:var(--ink2);margin-bottom:2rem;width:fit-content;box-shadow:0 2px 10px rgba(0,0,0,0.05);position:relative;z-index:1;}
-.badge-live{width:8px;height:8px;background:var(--green);border-radius:50%;animation:blink 1.8s infinite}
-@keyframes blink{0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,.5)}60%{box-shadow:0 0 0 5px rgba(5,150,105,0)}}
-h1.h1{font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(2.6rem,4.2vw,4rem);line-height:1.1;letter-spacing:-0.035em;color:var(--ink);margin-bottom:1.4rem;position:relative;z-index:1;}
-h1.h1 .blue{color:var(--blue)}
-h1.h1 .serif{font-family:'Lora',serif;font-style:italic;font-weight:600}
-.hero-p{font-size:1rem;color:var(--ink2);line-height:1.75;max-width:420px;margin-bottom:2.2rem;font-weight:400;position:relative;z-index:1}
-.hero-btns{display:flex;gap:0.8rem;margin-bottom:2.8rem;flex-wrap:wrap;position:relative;z-index:1}
-.btn-hero-blue{font-family:'Manrope',sans-serif;font-size:0.95rem;font-weight:700;background:var(--blue);color:#fff;border:none;padding:0.85rem 2rem;border-radius:8px;cursor:pointer;transition:all .18s;display:inline-flex;align-items:center;gap:7px;text-decoration:none}
-.btn-hero-blue:hover{background:#1558e0;transform:translateY(-1px);box-shadow:0 8px 24px rgba(26,107,255,0.35)}
-.btn-hero-white{font-family:'Manrope',sans-serif;font-size:0.95rem;font-weight:600;background:var(--white);color:var(--ink);border:1.5px solid var(--border);padding:0.85rem 2rem;border-radius:8px;cursor:pointer;transition:border-color .18s;text-decoration:none;display:inline-flex;align-items:center;gap:7px}
-.btn-hero-white:hover{border-color:var(--ink2)}
-.hero-trust{display:flex;gap:1.2rem;flex-wrap:wrap;position:relative;z-index:1}
-.ht{display:flex;align-items:center;gap:7px;font-size:0.8rem;font-weight:600;color:var(--ink2)}
-.ht-ic{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:0.7rem}
-.hero-r{position:relative;overflow:hidden;background:var(--blue);}
-.hero-photo{width:100%;height:100%;object-fit:cover;object-position:center 25%;display:block;}
-.hero-r-overlay{position:absolute;inset:0;background:linear-gradient(to bottom, transparent 50%, rgba(10,20,60,0.55) 100%);}
-.hero-stat{position:absolute;background:rgba(255,255,255,0.15);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.25);border-radius:14px;padding:1rem 1.3rem;color:#fff;}
-.hs1{top:12%;right:8%;}.hs2{top:44%;left:6%;}.hs3{bottom:14%;right:10%;}
-.hs-l{font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;opacity:0.65;margin-bottom:0.3rem}
-.hs-v{font-size:1.35rem;font-weight:800;letter-spacing:-0.03em;line-height:1}
-.hs-s{font-size:0.72rem;opacity:0.65;margin-top:0.2rem}
-.hs-chip{display:inline-flex;align-items:center;gap:4px;font-size:0.65rem;font-weight:700;background:rgba(255,255,255,0.2);border-radius:100px;padding:2px 8px;margin-top:0.35rem}
-.hero-r-text{position:absolute;bottom:0;left:0;right:0;padding:2.5rem 2rem;background:linear-gradient(transparent,rgba(10,20,60,0.75));}
-.hero-r-text h2{font-family:'Lora',serif;font-style:italic;font-size:1.6rem;color:rgba(255,255,255,0.9);font-weight:600;line-height:1.3;}
-.hero-r-text p{font-size:0.78rem;color:rgba(255,255,255,0.5);margin-top:0.4rem;font-weight:500;letter-spacing:0.04em;text-transform:uppercase}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--ink)}
-.stat{padding:3rem 5%;border-right:1px solid rgba(255,255,255,0.07);position:relative;overflow:hidden;transition:background .2s;}
-.stat:hover{background:rgba(255,255,255,0.03)}.stat:last-child{border-right:none}
-.stat-bar{position:absolute;top:0;left:0;right:0;height:3px}
-.stat:nth-child(1) .stat-bar{background:var(--blue)}.stat:nth-child(2) .stat-bar{background:var(--green)}.stat:nth-child(3) .stat-bar{background:var(--orange)}.stat:nth-child(4) .stat-bar{background:var(--purple)}
-.stat-n{font-family:'Manrope',sans-serif;font-weight:800;font-size:2.8rem;letter-spacing:-0.05em;line-height:1;color:#fff;margin-bottom:0.45rem}
-.stat-n em{font-style:normal;color:var(--blue-mid);font-size:1.6rem}
-.stat-d{font-size:0.82rem;color:rgba(255,255,255,0.38);line-height:1.5}
-section{padding:6rem 6%}
-.sk{font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;display:flex;align-items:center;gap:8px;margin-bottom:1rem}
-.sk-dot{width:6px;height:6px;border-radius:50%}
-h2.sh{font-family:'Manrope',sans-serif;font-weight:800;font-size:clamp(2rem,3.2vw,3rem);letter-spacing:-0.04em;line-height:1.08;margin-bottom:0.7rem}
-h2.sh em{font-family:'Lora',serif;font-style:italic;font-weight:600;color:var(--blue)}
-.who{background:var(--off)}
-.who-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem;margin-top:3rem}
-.wcard{background:var(--white);border:1.5px solid var(--border);border-radius:20px;padding:2.4rem;transition:transform .22s,box-shadow .22s,border-color .22s;position:relative;overflow:hidden;}
-.wcard:hover{transform:translateY(-5px);box-shadow:0 16px 48px rgba(0,0,0,0.08)}
-.wcard.w1:hover{border-color:var(--blue)}.wcard.w2:hover{border-color:var(--green)}.wcard.w3:hover{border-color:var(--purple)}
-.wcard-top-line{position:absolute;top:0;left:0;right:0;height:3px}
-.w1 .wcard-top-line{background:linear-gradient(90deg,var(--blue),var(--blue-mid))}.w2 .wcard-top-line{background:linear-gradient(90deg,var(--green),#34d399)}.w3 .wcard-top-line{background:linear-gradient(90deg,var(--purple),#a78bfa)}
-.wcard-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;margin-bottom:1.4rem}
-.w1 .wcard-icon{background:var(--blue-light)}.w2 .wcard-icon{background:var(--green-bg)}.w3 .wcard-icon{background:var(--purple-bg)}
-.wcard h3{font-weight:800;font-size:1.1rem;letter-spacing:-0.02em;margin-bottom:0.6rem}
-.wcard p{font-size:0.87rem;color:var(--mid);line-height:1.65;margin-bottom:1.3rem}
-.wcard ul{list-style:none;display:flex;flex-direction:column;gap:0.45rem;margin-bottom:1.8rem}
-.wcard li{font-size:0.84rem;font-weight:500;display:flex;align-items:center;gap:8px}
-.wcard li::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.w1 li::before{background:var(--blue)}.w2 li::before{background:var(--green)}.w3 li::before{background:var(--purple)}
-.wcard-cta{font-size:0.85rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:0.55rem 1.2rem;border-radius:8px;transition:gap .2s}
-.w1 .wcard-cta{background:var(--blue-light);color:var(--blue)}.w2 .wcard-cta{background:var(--green-bg);color:var(--green)}.w3 .wcard-cta{background:var(--purple-bg);color:var(--purple)}
-.wcard:hover .wcard-cta{gap:10px}
-.how-wrap{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-top:3rem}
-.how-steps{display:flex;flex-direction:column}
-.hstep{display:flex;gap:1.4rem;padding:1.6rem 0;border-bottom:1px solid var(--border);transition:padding-left .2s;cursor:default;}
-.hstep:first-child{border-top:1px solid var(--border)}.hstep:hover{padding-left:6px}
-.hstep-num{width:36px;height:36px;border-radius:9px;background:var(--off);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:800;color:var(--mid);flex-shrink:0;transition:all .18s;}
-.hstep:hover .hstep-num{background:var(--blue);color:#fff;border-color:var(--blue)}
-.hstep-tag{font-size:0.68rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:0.35rem;display:block}
-.hstep h4{font-weight:800;font-size:1rem;letter-spacing:-0.02em;margin-bottom:0.35rem}
-.hstep p{font-size:0.85rem;color:var(--mid);line-height:1.62}
-.hstep-link{font-size:0.82rem;font-weight:700;color:var(--blue);text-decoration:none;display:inline-flex;align-items:center;gap:5px;margin-top:0.55rem}
-.profile-card{background:var(--off);border:1.5px solid var(--border);border-radius:20px;padding:2rem;}
-.features{background:var(--off)}
-.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-top:3rem}
-.fc{background:var(--white);border:1.5px solid var(--border);border-radius:18px;padding:2rem;transition:transform .2s,border-color .2s,box-shadow .2s}
-.fc:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(0,0,0,0.07);border-color:var(--blue)}
-.fc-icon{font-size:1.4rem;margin-bottom:0.8rem;display:block}
-.fc h4{font-weight:800;font-size:0.97rem;letter-spacing:-0.02em;margin-bottom:0.4rem}
-.fc p{font-size:0.84rem;color:var(--mid);line-height:1.62}
-.quote{background:var(--blue);padding:5.5rem 6%;position:relative;overflow:hidden;}
-.quote::after{content:'"';position:absolute;right:4%;top:-1rem;font-family:'Lora',serif;font-size:18rem;font-weight:700;color:rgba(255,255,255,0.05);line-height:1;pointer-events:none;}
-.quote-inner{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;position:relative;z-index:1}
-.quote-text{font-family:'Lora',serif;font-style:italic;font-size:clamp(1.5rem,2.6vw,2.4rem);color:#fff;font-weight:600;line-height:1.3;}
-.quote-text em{font-style:normal;color:#f7e049}
-.quote-attr{margin-top:1.5rem;font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.09em}
-.quote-cards{display:flex;flex-direction:column;gap:0.9rem}
-.qc{background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.15);border-radius:14px;padding:1.2rem 1.4rem;display:flex;align-items:center;gap:1rem;transition:background .2s}
-.qc:hover{background:rgba(255,255,255,0.18)}
-.qc-icon{width:40px;height:40px;background:rgba(255,255,255,0.15);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
-.qc h4{font-size:0.88rem;font-weight:700;color:#fff;margin-bottom:0.15rem}
-.qc p{font-size:0.73rem;color:rgba(255,255,255,0.5)}
-.cta{padding:6rem 6%;background:var(--white);display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;border-top:1px solid var(--border);}
-.cta-l h2{font-weight:800;font-size:clamp(2rem,3.2vw,3rem);letter-spacing:-0.04em;line-height:1.1;margin-bottom:1rem}
-.cta-l h2 em{font-family:'Lora',serif;font-style:italic;font-weight:600;color:var(--blue)}
-.cta-l p{font-size:0.97rem;color:var(--mid);line-height:1.75;margin-bottom:2rem;max-width:400px}
-.cta-btns{display:flex;gap:0.8rem;flex-wrap:wrap}
-.cta-r{background:var(--off);border-radius:20px;border:1.5px solid var(--border);padding:2.5rem}
-.cta-r h3{font-weight:800;font-size:1.1rem;letter-spacing:-0.02em;margin-bottom:0.4rem}
-.cta-r > p{font-size:0.86rem;color:var(--mid);margin-bottom:1.6rem;line-height:1.6}
-.inp{width:100%;background:var(--white);border:1.5px solid var(--border);color:var(--ink);font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:500;padding:0.85rem 1.1rem;border-radius:9px;outline:none;transition:border-color .18s,box-shadow .18s;margin-bottom:0.8rem}
-.inp:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,0.1)}
-.inp::placeholder{color:var(--light)}
-.sub-btn{width:100%;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.95rem;background:var(--blue);color:#fff;border:none;padding:0.9rem;border-radius:9px;cursor:pointer;transition:all .18s}
-.sub-btn:hover{background:#1558e0;box-shadow:0 6px 20px rgba(26,107,255,0.35)}
-.perks{margin-top:1.3rem;display:flex;gap:1.2rem;flex-wrap:wrap}
-.pk{display:flex;align-items:center;gap:6px;font-size:0.77rem;color:var(--mid);font-weight:600}
-.pk-ic{width:16px;height:16px;background:var(--green-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.55rem;color:var(--green);font-weight:800;flex-shrink:0}
+main{color:var(--text)}
+.wrap{max-width:var(--max);margin:0 auto}
+.ico{width:20px;height:20px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.kicker{font-size:.8125rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue-text)}
+.h2{font-size:clamp(1.875rem,3.4vw,3rem);line-height:1.08;font-weight:800;letter-spacing:-.035em}
+.sec-head{display:flex;flex-direction:column;gap:14px;max-width:680px}
+.sec-head p.lede{font-size:1rem;color:var(--text-2);line-height:1.65}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 26px;border-radius:10px;font-family:inherit;font-weight:700;font-size:1rem;text-decoration:none;transition:background .15s,border-color .15s,box-shadow .15s;white-space:nowrap}
+.btn-primary{background:var(--blue);color:#fff}
+.btn-primary:hover{background:var(--blue-hover);box-shadow:0 6px 18px rgba(26,107,255,.28)}
+.btn-secondary{background:#fff;color:var(--text);border:1.5px solid var(--line-strong)}
+.btn-secondary:hover{border-color:var(--text-2)}
+.btn-light{background:#fff;color:var(--navy)}
+.btn-light:hover{background:#e6eeff}
+.btn-sm{min-height:48px;padding:0 22px;font-size:.9375rem}
+
+/* Hero */
+.hero{padding:clamp(40px,6.5vw,96px) var(--gutter) clamp(40px,5vw,72px)}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(40px,5vw,80px);align-items:center}
+.hero-copy{display:flex;flex-direction:column;gap:26px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;font-size:.8125rem;font-weight:700;color:var(--navy);padding:6px 12px 6px 8px;border:1px solid #dfe5ee;border-radius:999px}
+.eyebrow .ico{width:16px;height:16px;color:var(--blue);stroke-width:2}
+.hero h1{font-size:clamp(2.5rem,5vw,4.5rem);line-height:1.03;font-weight:800;letter-spacing:-.045em}
+.pillars{list-style:none;display:flex;flex-wrap:wrap;gap:10px 22px}
+.pillars li{display:flex;align-items:center;gap:8px;font-size:1rem;font-weight:700;color:var(--text)}
+.pillars .ico{color:var(--blue);stroke-width:2}
+.hero-p{font-size:clamp(1rem,1.25vw,1.15rem);line-height:1.65;color:var(--text-2);max-width:540px}
+.hero-btns{display:flex;flex-wrap:wrap;gap:12px}
+.ticks{list-style:none;display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.875rem;font-weight:600;color:var(--text-2)}
+.ticks li{display:flex;align-items:center;gap:7px}
+.ticks .ico{width:18px;height:18px;color:var(--ok);stroke-width:2.2}
+.hero-visual{position:relative}
+.hero-visual img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;object-position:center 22%;border-radius:24px;background:var(--surface)}
+.protect-card{position:absolute;left:-28px;bottom:28px;width:min(340px,calc(100% - 32px));background:#fff;border-radius:16px;padding:18px 18px 16px;box-shadow:0 1px 2px rgba(11,21,48,.06),0 16px 40px rgba(11,21,48,.16);display:flex;flex-direction:column;gap:12px}
+.protect-card h2{display:flex;align-items:center;gap:10px;font-size:.9375rem;font-weight:800;letter-spacing:-.01em}
+.protect-card h2 span{width:34px;height:34px;border-radius:10px;background:var(--blue-light);color:var(--blue);display:grid;place-items:center;flex-shrink:0}
+.protect-card ol{list-style:none;display:flex;flex-direction:column;gap:9px}
+.protect-card li{display:flex;gap:9px;font-size:.875rem;line-height:1.45;color:var(--text-2)}
+.protect-card li .ico{width:18px;height:18px;color:var(--ok);stroke-width:2.2;margin-top:1px}
+
+/* Payment protection band */
+.protection{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(56px,7vw,96px) var(--gutter)}
+.protection .wrap{display:flex;flex-direction:column;gap:40px}
+.p-grid{list-style:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;counter-reset:p}
+.p-grid li{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:10px}
+.p-grid .p-ic{width:40px;height:40px;border-radius:11px;background:var(--blue-light);color:var(--blue);display:grid;place-items:center}
+.p-grid .p-ic .ico{width:22px;height:22px}
+.p-grid h3{font-size:1.0625rem;font-weight:800;letter-spacing:-.015em;line-height:1.3}
+.p-grid p{font-size:.9375rem;color:var(--text-2);line-height:1.6}
+.p-foot{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;font-size:.875rem;color:var(--muted)}
+.p-foot a{color:var(--blue-text);font-weight:700;text-decoration:none}
+.p-foot a:hover{text-decoration:underline}
+
+/* Two paths */
+.paths{padding:clamp(64px,8vw,120px) var(--gutter)}
+.paths .wrap{display:flex;flex-direction:column;gap:48px}
+.path-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.path{border-radius:20px;padding:clamp(28px,3vw,44px);display:flex;flex-direction:column;gap:20px}
+.path-learn{border:1px solid var(--line);background:#fff}
+.path-earn{background:var(--navy);color:#fff}
+.path .tag{font-size:.8125rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.path-earn .tag{color:var(--sky)}
+.path h3{font-size:clamp(1.5rem,2.2vw,1.875rem);line-height:1.15;letter-spacing:-.025em;font-weight:800}
+.path ul{list-style:none;display:flex;flex-direction:column;gap:12px;font-size:.9375rem;color:var(--text-2)}
+.path-earn ul{color:#d6e0f7}
+.path li{display:flex;gap:10px;align-items:flex-start}
+.path li .ico{color:var(--blue);stroke-width:2.2;margin-top:2px}
+.path-earn li .ico{color:#7cc4ef}
+.path .btn{margin-top:auto;align-self:flex-start}
+
+/* How it works */
+.how{padding:0 var(--gutter) clamp(64px,8vw,120px)}
+.how .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(40px,6vw,96px);align-items:start}
+.how-l{display:flex;flex-direction:column;gap:36px}
+.steps{list-style:none}
+.steps li{display:flex;gap:20px;padding:24px 0;border-top:1px solid var(--line)}
+.steps li:last-child{border-bottom:1px solid var(--line)}
+.steps .n{font-size:.875rem;font-weight:800;color:var(--blue-text);width:28px;flex-shrink:0;padding-top:2px}
+.steps h3{font-size:1.125rem;font-weight:800;margin-bottom:6px;letter-spacing:-.01em}
+.steps p{font-size:.9375rem;color:var(--muted);line-height:1.6}
+.sample{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:clamp(20px,3vw,40px);display:flex;flex-direction:column;gap:14px}
+.sample figcaption{font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.tcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px}
+.tc-top{display:flex;gap:14px;align-items:center}
+.tc-av{width:52px;height:52px;border-radius:50%;background:var(--blue-light);color:var(--navy);display:grid;place-items:center;font-weight:800;font-size:1.0625rem;flex-shrink:0}
+.tc-name{flex:1;min-width:0}
+.tc-name b{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:1.0625rem}
+.tc-name span{font-size:.875rem;color:var(--muted)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:.75rem;font-weight:700;color:#0f4fd6;background:var(--blue-light);padding:3px 8px;border-radius:999px}
+.badge .ico{width:13px;height:13px;stroke-width:2.6}
+.tc-rate{text-align:right}
+.tc-rate b{display:block;font-size:1.125rem}
+.tc-rate span{font-size:.75rem;color:var(--muted)}
+.tc-courses{display:flex;flex-direction:column;gap:8px}
+.tc-courses div{display:flex;justify-content:space-between;gap:12px;padding:12px 14px;background:var(--surface);border-radius:10px;font-size:.875rem}
+.tc-courses span{color:var(--muted);text-align:right}
+.tc-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-size:.8125rem;color:var(--muted)}
+.tc-foot .fake-btn{display:inline-flex;align-items:center;min-height:40px;padding:0 16px;background:var(--blue);color:#fff;border-radius:10px;font-weight:700;font-size:.875rem}
+
+/* FAQ */
+.faq{background:var(--surface);border-top:1px solid var(--line);padding:clamp(64px,8vw,112px) var(--gutter)}
+.faq .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:clamp(32px,6vw,96px)}
+.faq-l{display:flex;flex-direction:column;gap:14px}
+.faq-l p{font-size:.9375rem;color:var(--muted)}
+.faq-l a{color:var(--blue-text);font-weight:700}
+.faq-list details{border-top:1px solid #dfe5ee}
+.faq-list details:last-child{border-bottom:1px solid #dfe5ee}
+.faq-list summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;font-size:1.0625rem;font-weight:700;min-height:44px}
+.faq-list summary::-webkit-details-marker{display:none}
+.faq-list summary .ico{transition:transform .2s;color:var(--muted)}
+.faq-list details[open] summary .ico{transform:rotate(45deg)}
+.faq-list details p{padding:0 0 22px;font-size:.9375rem;color:var(--text-2);line-height:1.65;max-width:680px}
+.faq-list details p a{color:var(--blue-text);font-weight:700}
+
+/* Final CTA */
+.final{padding:clamp(64px,8vw,112px) var(--gutter)}
+.final .wrap{display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px}
+.final h2{font-size:clamp(2rem,4vw,3.5rem);line-height:1.05;font-weight:800;letter-spacing:-.04em;max-width:780px}
+.final .hero-btns{justify-content:center}
+.final .roadmap{font-size:.875rem;color:var(--muted)}
+.final .roadmap a{color:var(--blue-text);font-weight:700}
+
+/* Footer — unchanged from the previous homepage */
 footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 .ft{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:4rem;margin-bottom:3.5rem}
 .fl{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.1rem;color:#fff;margin-bottom:0.7rem;}
@@ -147,30 +168,33 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 .fb p{font-size:0.78rem;color:rgba(255,255,255,0.2)}
 .fb-live{display:flex;align-items:center;gap:7px;font-size:0.75rem;color:rgba(255,255,255,0.22);font-weight:600}
 .fb-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:blink 2s infinite}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-.hero-l>*{animation:fadeUp .55s ease both}
-.hero-l>*:nth-child(1){animation-delay:.07s}.hero-l>*:nth-child(2){animation-delay:.16s}.hero-l>*:nth-child(3){animation-delay:.25s}.hero-l>*:nth-child(4){animation-delay:.34s}.hero-l>*:nth-child(5){animation-delay:.42s}
-@media(max-width:960px){
-  .hero{grid-template-columns:1fr;min-height:auto}
-  .hero-l{padding:2.4rem 6%;}
-  .hero-r{height:320px}
-  .stats{grid-template-columns:1fr 1fr}
-  .stat{padding:2rem 5%}
-  .stat-n{font-size:2rem}
-  .who-cards,.feat-grid,.how-wrap,.quote-inner,.cta{grid-template-columns:1fr}
-  .ft{grid-template-columns:1fr 1fr}
-  .hs1,.hs2,.hs3{display:none}
-  section{padding:3.5rem 6%}
+@keyframes blink{0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,.5)}60%{box-shadow:0 0 0 5px rgba(5,150,105,0)}}
+
+/* Entrance (reduced-motion users get none: see site.css) */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.hero-copy>*{animation:fadeUp .5s ease both}
+.hero-copy>*:nth-child(2){animation-delay:.06s}.hero-copy>*:nth-child(3){animation-delay:.12s}.hero-copy>*:nth-child(4){animation-delay:.18s}.hero-copy>*:nth-child(5){animation-delay:.24s}.hero-copy>*:nth-child(6){animation-delay:.3s}
+
+/* Tablet */
+@media(max-width:1100px){
+  .p-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .protect-card{left:16px}
 }
+@media(max-width:960px){
+  .hero .wrap,.how .wrap,.faq .wrap{grid-template-columns:1fr}
+  .hero-visual img{aspect-ratio:4/3.2}
+  .path-grid{grid-template-columns:1fr}
+  .ft{grid-template-columns:1fr 1fr}
+}
+/* Phone */
 @media(max-width:600px){
-  .stats{grid-template-columns:1fr 1fr}
-  .stat{padding:1.6rem 5%}
-  .stat-n{font-size:1.7rem}
-  .ft{grid-template-columns:1fr;gap:2.2rem}
   .hero-btns{flex-direction:column;align-items:stretch}
-  .btn-hero-blue,.btn-hero-white{justify-content:center}
-  .hero-trust{gap:0.8rem}
-  h1.h1{font-size:clamp(2rem,8vw,2.6rem)}
+  .hero-btns .btn{width:100%}
+  .hero-visual img{aspect-ratio:4/3.4;border-radius:18px}
+  .protect-card{position:relative;z-index:1;left:auto;bottom:auto;width:auto;margin-top:-40px;margin-inline:12px}
+  .p-grid{grid-template-columns:1fr}
+  .path .btn{align-self:stretch}
+  .ft{grid-template-columns:1fr;gap:2.2rem}
 }
 </style>
 <script type="application/ld+json">
@@ -188,115 +212,146 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 <header id="site-nav"></header>
 <script src="site-nav.js"></script>
 <main id="main">
-<section class="hero">
-  <div class="hero-l">
-    <div class="hero-badge"><span class="badge-live"></span>University-verified tutoring, protected by real escrow</div>
-    <h1 class="h1">Turn your skills<br>into <span class="blue">real income</span><br><span class="serif">while you study.</span></h1>
-    <p class="hero-p">Book a university-verified peer tutor in your exact course — or become one. Payments are held safely until your session is done, with a real 48-hour refund guarantee behind it, not just a policy page.</p>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap">
+    <div class="hero-copy">
+      <p class="eyebrow"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Peer tutoring for university students</p>
+      <h1 id="hero-title">The tutoring marketplace that actually protects your money.</h1>
+      <ul class="pillars" aria-label="Why UniSkilled">
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>University-verified tutors</li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>Payment held until after your lesson</li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg>Built for university students</li>
+      </ul>
+      <p class="hero-p">Book a fellow student who has already passed your exact course — or earn by tutoring the courses you've aced.</p>
+      <div class="hero-btns">
+        <a href="find-tutors.html" class="btn btn-primary">Find a tutor<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a href="onboarding.html?role=tutor" class="btn btn-secondary">Start tutoring</a>
+      </div>
+      <ul class="ticks">
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Free to join</li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>No card to sign up</li>
+        <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>All lessons online</li>
+      </ul>
+    </div>
+    <div class="hero-visual">
+      <picture><source type="image/webp" srcset="hero-photo-640.webp 640w, hero-photo-960.webp 960w, hero-photo-1256.webp 1256w" sizes="(max-width: 960px) 100vw, 46vw"><img src="hero-photo.jpg" alt="A university student studying with a laptop in a campus library" width="1256" height="832" fetchpriority="high" decoding="async"></picture>
+      <div class="protect-card">
+        <h2><span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></span>How your payment is protected</h2>
+        <ol>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>You pay only after your tutor accepts</li>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Held until 48 hours after the lesson</li>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Tutor cancels? Automatic full refund</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="protection" aria-labelledby="protect-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Payment protection</p>
+      <h2 class="h2" id="protect-title">Your money is protected at every step.</h2>
+      <p class="lede">Paying someone you haven't met should feel safe. Here's exactly what happens to your payment.</p>
+    </div>
+    <ol class="p-grid">
+      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span><h3>Requests are free</h3><p>Sending a request costs nothing. You pay by card only after your tutor accepts it.</p></li>
+      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h3>Held for 48 hours</h3><p>Your tutor's payout stays on hold until 48 hours after the lesson.</p></li>
+      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg></span><h3>Report a problem</h3><p>Tutor didn't show up? Report it within 48 hours. Their payout is paused while we review it, and a no-show is refunded in full.</p></li>
+      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><h3>Tutor cancels?</h3><p>You're refunded in full, automatically — whenever they cancel.</p></li>
+    </ol>
+    <p class="p-foot"><span>Card payments are processed by Stripe.</span><a href="legal.html#refund">Read the full refund policy</a></p>
+  </div>
+</section>
+
+<section class="paths" aria-labelledby="paths-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="kicker">Two ways to use UniSkilled</p>
+      <h2 class="h2" id="paths-title">Get help with a course, or get paid for one you've mastered.</h2>
+    </div>
+    <div class="path-grid">
+      <article class="path path-learn">
+        <p class="tag">For students who need help</p>
+        <h3>Someone who sat the same exam explains it your way.</h3>
+        <ul>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Tutors verified by university email are listed first</li>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Search by your exact course and propose your own time and price</li>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Split a group session with up to 3 classmates</li>
+        </ul>
+        <a href="find-tutors.html" class="btn btn-primary btn-sm">Find a tutor</a>
+      </article>
+      <article class="path path-earn">
+        <p class="tag">For students who want to earn</p>
+        <h3>Teach the courses you've passed, on your schedule.</h3>
+        <ul>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Keep 80% of every one-to-one booking</li>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Set your own rate and the hours you're free</li>
+          <li><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Paid to your bank through Stripe, 48 hours after each lesson</li>
+        </ul>
+        <a href="onboarding.html?role=tutor" class="btn btn-light btn-sm">Start tutoring</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how-it-works" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="how-l">
+      <div class="sec-head">
+        <p class="kicker">How it works</p>
+        <h2 class="h2" id="how-title">Three steps from stuck to sorted.</h2>
+      </div>
+      <ol class="steps">
+        <li><span class="n" aria-hidden="true">01</span><div><h3>Find your course</h3><p>See tutors who have taken it, often with where and when they passed it. Verified tutors come first.</p></div></li>
+        <li><span class="n" aria-hidden="true">02</span><div><h3>Send a request</h3><p>Propose a time and price. Nothing is charged until your tutor accepts.</p></div></li>
+        <li><span class="n" aria-hidden="true">03</span><div><h3>Learn online</h3><p>Meet your tutor online. Your payment stays on hold until 48 hours after the lesson.</p></div></li>
+      </ol>
+    </div>
+    <figure class="sample">
+      <figcaption>Example tutor profile — sample data</figcaption>
+      <div class="tcard">
+        <div class="tc-top">
+          <span class="tc-av" aria-hidden="true">MK</span>
+          <span class="tc-name"><b>Mira K. <span class="badge"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Verified</span></b><span>Economics student</span></span>
+          <span class="tc-rate"><b>€22</b><span>per hour</span></span>
+        </div>
+        <div class="tc-courses">
+          <div><b>Microeconomics I</b><span>passed WS 2024/25 · grade 1.3*</span></div>
+          <div><b>Statistics for Economists</b><span>passed SS 2025</span></div>
+        </div>
+        <div class="tc-foot"><span>*Grades are self-reported by tutors</span><a href="find-tutors.html" class="btn btn-primary btn-sm">See real tutors</a></div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section class="faq" aria-labelledby="faq-title">
+  <div class="wrap">
+    <div class="faq-l">
+      <p class="kicker">Questions</p>
+      <h2 class="h2" id="faq-title">Before you book</h2>
+      <p>Anything else? Write to <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>.</p>
+    </div>
+    <div class="faq-list">
+      <details open><summary>Who are the tutors?<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>University students teaching courses they've already taken. Tutors who confirm a university email address get the Verified badge and appear first in search.</p></details>
+      <details><summary>When am I charged?<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>Only after your tutor accepts your request. You then pay by card to confirm the lesson. If you don't pay in time, the booking simply expires — nothing is charged.</p></details>
+      <details><summary>What if the lesson doesn't happen?<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>If your tutor cancels, you're refunded in full automatically. If they don't show up, use "Report an Issue" on the session within 48 hours — their payout is paused, we review it, and you get a full refund.</p></details>
+      <details><summary>Can I cancel a booking?<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>Yes. Cancel more than 24 hours before the lesson, or within 30 minutes of paying, for a full refund. Later than that there's no refund, but you can propose a new time instead. Details are in the <a href="legal.html#refund">refund policy</a>.</p></details>
+      <details><summary>How much does it cost?<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>Tutors set their own rates, and you can propose your own price in your request. The minimum booking is €15. Group sessions split the cost between up to 4 students.</p></details>
+      <details><summary>How do tutors get paid?<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></summary><p>Through Stripe, to your bank account, 48 hours after each completed lesson. You keep 80% of every one-to-one booking.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="final" aria-labelledby="final-title">
+  <div class="wrap">
+    <h2 id="final-title">Your next exam, with someone who's been there.</h2>
     <div class="hero-btns">
-      <a href="onboarding.html?role=tutor" class="btn-hero-blue">🎓 Start tutoring</a>
-      <a href="find-tutors.html" class="btn-hero-white">Find a tutor →</a>
+      <a href="find-tutors.html" class="btn btn-primary">Find a tutor</a>
+      <a href="onboarding.html?role=tutor" class="btn btn-secondary">Start tutoring</a>
     </div>
-    <div class="hero-trust">
-      <div class="ht"><div class="ht-ic" style="background:var(--green-bg);color:var(--green)">✓</div>University verified</div>
-      <div class="ht"><div class="ht-ic" style="background:var(--blue-light);color:var(--blue)">🔐</div>Escrow protected</div>
-      <div class="ht"><div class="ht-ic" style="background:var(--orange-bg);color:var(--orange)">🛡️</div>48-hour refund guarantee</div>
-    </div>
-  </div>
-  <div class="hero-r">
-    <picture style="display:contents"><source type="image/webp" srcset="hero-photo-640.webp 640w, hero-photo-960.webp 960w, hero-photo-1256.webp 1256w" sizes="(max-width: 960px) 100vw, 50vw"><img class="hero-photo" src="hero-photo.jpg" alt="University student tutoring online from a campus library" width="1256" height="832" fetchpriority="high" decoding="async"></picture>
-    <div class="hero-r-overlay"></div>
-    <div class="hero-stat hs1"><div class="hs-l">Platform</div><div class="hs-v">Live now</div><div class="hs-s">Book your first session today</div></div>
-    <div class="hero-stat hs2"><div class="hs-l">Every payment</div><div class="hs-v">48hr held</div><div class="hs-chip">🔐 Real refund protection</div></div>
-    <div class="hero-stat hs3"><div class="hs-l">Join today</div><div class="hs-v" style="font-size:1.05rem">Sign up free</div><div class="hs-chip">● Now open</div></div>
-    <div class="hero-r-text"><h2>"Real students.<br>Real earnings."</h2><p>UniSkilled · University Verified Platform</p></div>
-  </div>
-</section>
-<section class="who">
-  <div class="sk" style="color:var(--blue)"><span class="sk-dot" style="background:var(--blue)"></span>Who it's for</div>
-  <h2 class="sh">One platform. <em>Both sides of learning.</em></h2>
-  <div class="who-cards">
-    <div class="wcard w1"><div class="wcard-top-line"></div><div class="wcard-icon">📚</div><h3>Need a Tutor</h3><p>Book a peer who's already aced your exact course — verified tutors carry a badge. Nothing charged until they accept — and your payment stays protected for 48 hours after your session.</p><ul><li>Verified tutors listed first</li><li>Pay only after they accept</li><li>48-hour refund guarantee</li></ul><a class="wcard-cta" href="find-tutors.html">Find a tutor →</a></div>
-    <div class="wcard w2"><div class="wcard-top-line"></div><div class="wcard-icon">🎓</div><h3>Want to Tutor</h3><p>Set your own rate and hours, teach what you know, and get paid safely through PayPal — with a real, verifiable track record building behind every session.</p><ul><li>Set your own rate and schedule</li><li>Verified reviews & track record</li><li>Fast, secure PayPal payouts</li></ul><a class="wcard-cta" href="onboarding.html?role=tutor">Start tutoring →</a></div>
-    <div class="wcard w3"><div class="wcard-top-line"></div><div class="wcard-icon">👥</div><h3>Group Sessions</h3><p>Studying the same course as your classmates? Split one session between up to 4 students and everyone pays less — same tutor, same quality.</p><ul><li>Split the cost, up to 4 students</li><li>Same 48-hour protection</li><li>Great for shared coursework</li></ul><a class="wcard-cta" href="group-sessions.html">Browse group sessions →</a></div>
-  </div>
-</section>
-<section id="how-it-works">
-  <div class="sk" style="color:var(--green)"><span class="sk-dot" style="background:var(--green)"></span>How it works</div>
-  <h2 class="sh">Simple to book. <em>Genuinely protected.</em></h2>
-  <div class="how-wrap">
-    <div class="how-steps">
-      <div class="hstep"><div class="hstep-num">01</div><div><span class="hstep-tag">🔍 Find your tutor</span><h4>Search by exact course</h4><p>Browse peer tutors who've already succeeded in your subject — verified ones are listed first.</p><a class="hstep-link" href="find-tutors.html">Find a tutor →</a></div></div>
-      <div class="hstep"><div class="hstep-num">02</div><div><span class="hstep-tag">📅 Request & confirm</span><h4>You're not charged yet</h4><p>Send a request with your proposed time and price. Nothing is charged until your tutor actually accepts.</p><a class="hstep-link" href="find-tutors.html">See how it works →</a></div></div>
-      <div class="hstep"><div class="hstep-num">03</div><div><span class="hstep-tag">🛡️ Pay safely</span><h4>Held for 48 hours, refund guaranteed</h4><p>Your payment is held securely and only released to your tutor 48 hours after the session — giving you a real window to report any issue and get a genuine refund.</p><a class="hstep-link" href="onboarding.html?role=tutor">Start tutoring →</a></div></div>
-    </div>
-    <div class="profile-card" style="padding:0;overflow:hidden;">
-      <picture style="display:contents"><source type="image/webp" srcset="video-session-640.webp 640w, video-session-1083.webp 1083w" sizes="(max-width: 960px) 100vw, 50vw"><img src="video-session.jpg" alt="Live online tutoring session between a physics tutor and a student" width="1083" height="611" loading="lazy" decoding="async" style="display:block;width:100%;height:auto;border-radius:20px;"></picture>
-    </div>
-  </div>
-</section>
-<section class="features">
-  <div class="sk" style="color:var(--purple)"><span class="sk-dot" style="background:var(--purple)"></span>Platform features</div>
-  <h2 class="sh">Everything you need. <em>Nothing you don't.</em></h2>
-  <div class="feat-grid">
-    <div class="fc"><span class="fc-icon">✓</span><h4>University Verified</h4><p>Tutors verify with their university email — look for the ✓ Verified badge. No guesswork about who you're learning from.</p></div>
-    <div class="fc"><span class="fc-icon">✅</span><h4>Never Lose Money to a No-Show</h4><p>If your tutor cancels, you're refunded automatically. If they don't show up, report it from your dashboard within 48 hours for a full refund — your payment stays on hold until then.</p></div>
-    <div class="fc"><span class="fc-icon">🛡️</span><h4>Real Dispute Resolution</h4><p>Something wrong? Report it directly from your dashboard. Every case is reviewed by a real person, with real refunds when warranted — not just a policy page.</p></div>
-    <div class="fc"><span class="fc-icon">👥</span><h4>Group Sessions</h4><p>Split a session with up to 3 classmates studying the same course. Same tutor, same quality, lower cost for everyone.</p></div>
-    <div class="fc"><span class="fc-icon">📊</span><h4>Verified Track Record</h4><p>Every completed session, review, and certificate builds a real, verifiable profile — not a black-box score you have to trust blindly.</p></div>
-    <div class="fc"><span class="fc-icon">🗓️</span><h4>Flexible Availability</h4><p>Tutors set exactly which days and hours they're free, so you always know what you're booking before you request it.</p></div>
-  </div>
-</section>
-<section style="background:var(--off);padding:4rem 5%;">
-  <div style="max-width:1100px;margin:0 auto;">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);border-radius:100px;padding:0.4rem 1rem;font-size:0.78rem;font-weight:700;color:var(--mid);margin-bottom:1rem;">
-      <span style="width:7px;height:7px;border-radius:50%;background:var(--orange);"></span>ON THE ROADMAP — NOT YET LIVE
-    </div>
-    <h2 class="sh" style="margin-bottom:0.6rem;">Next up: <em>a freelance marketplace.</em></h2>
-    <p style="max-width:600px;color:var(--mid);font-size:0.95rem;margin-bottom:2rem;line-height:1.6;">Tutoring is live today. Next, we're building a way for businesses to post real projects — design, development, marketing, writing, data — and hire verified university students directly, protected by the same escrow system that already secures every tutoring payment.</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem;">
-      <div style="background:#fff;border:1.5px dashed var(--border);border-radius:14px;padding:1.4rem;"><div style="font-size:1.3rem;margin-bottom:0.5rem;">🏢</div><h4 style="font-size:0.95rem;margin-bottom:0.4rem;">For Businesses</h4><p style="font-size:0.83rem;color:var(--mid);">Post a project, hire verified student talent, pay only when you approve the work.</p></div>
-      <div style="background:#fff;border:1.5px dashed var(--border);border-radius:14px;padding:1.4rem;"><div style="font-size:1.3rem;margin-bottom:0.5rem;">💼</div><h4 style="font-size:0.95rem;margin-bottom:0.4rem;">For Students</h4><p style="font-size:0.83rem;color:var(--mid);">Take on real freelance work alongside tutoring, and build a portfolio before you graduate.</p></div>
-      <div style="background:#fff;border:1.5px dashed var(--border);border-radius:14px;padding:1.4rem;"><div style="font-size:1.3rem;margin-bottom:0.5rem;">🔐</div><h4 style="font-size:0.95rem;margin-bottom:0.4rem;">Same Protection</h4><p style="font-size:0.83rem;color:var(--mid);">The escrow and dispute system already live for tutoring carries straight over.</p></div>
-    </div>
-    <a href="coming-soon.html" style="display:inline-flex;align-items:center;gap:6px;margin-top:1.8rem;font-size:0.88rem;font-weight:700;color:var(--blue);text-decoration:none;">Get notified when it launches →</a>
-  </div>
-</section>
-<div class="quote">
-  <div class="quote-inner">
-    <div>
-      <div class="quote-text">"The tutoring marketplace that actually protects your money. <em>University-verified. Payment-protected. Built for real students.</em>"</div>
-      <p class="quote-attr">Real students. Real earnings. — UniSkilled</p>
-    </div>
-    <div class="quote-cards">
-      <div class="qc"><div class="qc-icon">🎓</div><div><h4>Live now</h4><p>Book your first verified session today</p></div></div>
-      <div class="qc"><div class="qc-icon">💰</div><div><h4>Earn while you study</h4><p>Real income for real students</p></div></div>
-      <div class="qc"><div class="qc-icon">🔐</div><div><h4>48-hour protection</h4><p>Real refunds, not just a policy page</p></div></div>
-    </div>
-  </div>
-</div>
-<section class="cta">
-  <div class="cta-l">
-    <h2>Your skills are worth <em>real money.</em></h2>
-    <p>Join the platform and be the first to earn on UniSkilled. Sign up in minutes, then verify your university email to earn the ✓ Verified badge.</p>
-    <div class="cta-btns">
-      <a href="onboarding.html?role=tutor" class="btn-hero-blue">🎓 Start tutoring</a>
-      <a href="find-tutors.html" class="btn-hero-white">Find a tutor →</a>
-    </div>
-  </div>
-  <div class="cta-r">
-    <h3>Join UniSkilled today</h3>
-    <p>Sign up with any email — book or offer your first session today, fully protected.</p>
-    <form action="onboarding.html" method="get" id="ctaForm">
-      <label for="ctaEmail" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Email</label>
-      <input class="inp" id="ctaEmail" name="email" type="email" autocomplete="email" placeholder="you@example.com">
-      <button class="sub-btn" type="submit">Get started →</button>
-    </form>
-    <div class="perks">
-      <div class="pk"><div class="pk-ic">✓</div>Free to join</div>
-      <div class="pk"><div class="pk-ic">✓</div>48-hour protection</div>
-      <div class="pk"><div class="pk-ic">✓</div>No card to sign up</div>
-    </div>
+    <p class="roadmap">Coming next: freelance projects for businesses, hiring verified students. <a href="coming-soon.html">Get notified</a></p>
   </div>
 </section>
 </main>
@@ -345,7 +400,7 @@ function handleSignOut() {
     x.target.style.opacity = '1'; x.target.style.transform = 'none';
     io.unobserve(x.target);
   }), { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-  document.querySelectorAll('.who-cards,.how-steps,.feat-grid,.quote-cards').forEach(group => {
+  document.querySelectorAll('.p-grid,.path-grid,.steps').forEach(group => {
     [...group.children].forEach((el, i) => {
       el.style.opacity = '0'; el.style.transform = 'translateY(16px)';
       el.style.transition = `opacity .5s ${Math.min(i, 5) * 0.06}s ease, transform .5s ${Math.min(i, 5) * 0.06}s cubic-bezier(.2,.7,.2,1)`;
