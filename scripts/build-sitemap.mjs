@@ -28,6 +28,7 @@ const STATIC_PAGES = [
   { path: '/',                    file: 'index.html',          changefreq: 'weekly',  priority: '1.0' },
   { path: '/find-tutors.html',    file: 'find-tutors.html',    changefreq: 'daily',   priority: '0.9' },
   { path: '/group-sessions.html', file: 'group-sessions.html', changefreq: 'daily',   priority: '0.8' },
+  { path: '/courses.html',        file: 'courses.html',        changefreq: 'daily',   priority: '0.8' },
   { path: '/about.html',          file: 'about.html',          changefreq: 'monthly', priority: '0.7' },
   { path: '/onboarding.html',     file: 'onboarding.html',     changefreq: 'monthly', priority: '0.6' },
   { path: '/legal.html',          file: 'legal.html',          changefreq: 'yearly',  priority: '0.3' },
@@ -71,11 +72,26 @@ const tutors = (await loadTutors())
   .filter(t => t.id && !EXCLUDE_TUTOR_IDS.has(t.id) && isCompleteProfile(t))
   .sort((a, b) => String(a.id).localeCompare(String(b.id)));
 
+// Course pages: only courses at least one active tutor has passed (pages without tutors are noindexed).
+async function loadCourses() {
+  if (process.argv.includes('--data')) return [];
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/list_courses`, {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ p_query: null, p_limit: 200 }),
+  });
+  if (!res.ok) throw new Error(`Supabase list_courses → HTTP ${res.status}: ${await res.text()}`);
+  return (await res.json()).filter(c => c.course_key && c.tutor_count > 0).map(c => c.course_key).sort();
+}
+const courses = await loadCourses();
+
 const urls = STATIC_PAGES.map(p => {
   const lm = lastCommitDate(p.file);
   return `  <url><loc>${SITE}${p.path}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ''}<changefreq>${p.changefreq}</changefreq><priority>${p.priority}</priority></url>`;
 }).concat(tutors.map(t =>
   `  <url><loc>${esc(`${SITE}/tutor-profile.html?id=${encodeURIComponent(t.id)}`)}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`
+)).concat(courses.map(k =>
+  `  <url><loc>${esc(`${SITE}/course.html?c=${encodeURIComponent(k)}`)}</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>`
 ));
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -84,4 +100,4 @@ ${urls.join('\n')}
 </urlset>
 `;
 writeFileSync('sitemap.xml', xml);
-console.log(`sitemap.xml: ${STATIC_PAGES.length} pages + ${tutors.length} tutor profile(s)`);
+console.log(`sitemap.xml: ${STATIC_PAGES.length} pages + ${tutors.length} tutor profile(s) + ${courses.length} course page(s)`);

@@ -15,6 +15,7 @@ Disallow: /student-profile.html
 Disallow: /book-session.html
 Disallow: /complete-payment.html
 Disallow: /calendar.html
+Disallow: /exam-planner.html
 Disallow: /manage-availability.html
 Disallow: /messages.html
 Disallow: /feed.html

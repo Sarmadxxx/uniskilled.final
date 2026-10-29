@@ -88,7 +88,12 @@ cases(test, who, role, sql_tpl, expect) AS (VALUES
   ('Cannot send a notification to an unrelated user',             'str','authenticated', 'INSERT INTO public.notifications (user_id, type, title, body) VALUES (%L, ''x'', ''x'', ''x'')', 'blocked'),
   ('Non-admin cannot change the platform fee',                    'stu','authenticated', 'UPDATE public.platform_settings SET value = ''0'' WHERE key = ''platform_fee_rate''', 'blocked_or_zero'),
   ('Anonymous visitor cannot check the cron secret',              'none','anon',         'SELECT public.verify_cron_secret(''guess'')', 'blocked'),
-  ('Anonymous visitor cannot read disputes',                      'none','anon',         'SELECT 1 FROM public.disputes', 'blocked_or_zero')
+  ('Anonymous visitor cannot read disputes',                      'none','anon',         'SELECT 1 FROM public.disputes', 'blocked_or_zero'),
+  -- ── Exam planner (private to each student) and file storage ──
+  ('Planner: stranger cannot read another student''s exams',     'str','authenticated', 'SELECT 1 FROM public.student_exams WHERE student_id <> %L::uuid', 'zero_rows'),
+  ('Planner: anonymous visitor cannot read exams',               'none','anon',         'SELECT 1 FROM public.student_exams', 'blocked_or_zero'),
+  ('Planner: cannot add a task to someone else''s exam',         'stu','authenticated', 'INSERT INTO public.exam_plan_tasks (exam_id, student_id, day, topic, kind) SELECT gen_random_uuid(), %L::uuid, current_date, ''x'', ''learn''', 'blocked'),
+  ('Storage: anonymous visitor cannot list avatar files',        'none','anon',         'SELECT 1 FROM storage.objects WHERE bucket_id = ''avatars''', 'blocked_or_zero')
 ),
 run AS (
   SELECT c.test, c.expect,
@@ -106,6 +111,8 @@ run AS (
           THEN format(c.sql_tpl, i.stu, i.str)
         WHEN c.test LIKE 'Cannot send a notification%'
           THEN format(c.sql_tpl, i.stu)
+        WHEN c.test LIKE 'Planner:%' AND c.sql_tpl LIKE '%%L%'
+          THEN format(c.sql_tpl, CASE c.who WHEN 'str' THEN i.str ELSE i.stu END)
         WHEN c.sql_tpl LIKE '%user_id = %L%' AND c.test ILIKE '%tutor%'
           THEN format(c.sql_tpl, i.tut)
         WHEN c.sql_tpl LIKE '%FROM public.users WHERE id = %L%'

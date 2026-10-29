@@ -111,6 +111,9 @@ body{background:#f4f6f9;color:#0f172a;--blue-pale:#eef4ff}
 .qs-chip{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font-family:'Manrope',sans-serif;font-size:0.875rem;font-weight:600;cursor:pointer}
 .qs-chip:hover{background:rgba(255,255,255,.18)}
 .qs-chip[aria-pressed="true"]{background:#fff;color:#01367c;border-color:#fff}
+.qs-link{display:inline-flex;align-items:center;min-height:36px;padding:0 4px;color:#fff;font-size:0.875rem;font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.course-tag{text-decoration:none}a.course-tag:hover{background:#dce8ff}
+.course-match{font-size:0.8125rem;color:#047857;font-weight:700}
 .post-req-btn{min-height:40px;border-radius:10px;font-size:0.875rem;border:1px solid rgba(255,255,255,.45);background:transparent}
 .filters{position:sticky;top:64px;z-index:50;padding:12px 24px;justify-content:center;align-items:center;gap:8px;border-bottom:1px solid #e3e8ef;box-shadow:0 1px 2px rgba(15,23,42,.04)}
 .filter-select{height:40px;padding:0 32px 0 12px;border:1px solid #8792a2;border-radius:10px;font-size:0.875rem;color:#0f172a;appearance:none;-webkit-appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b6474' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center}
@@ -368,7 +371,11 @@ function renderTutors(tutors) {
     grid.innerHTML = '<div class="empty"><h2>No tutors match yet</h2><p>Try another subject or fewer filters' + (canRequest ? ' — or post a request and tutors who can help will reach out.' : '.') + '</p><div class="empty-actions"><button type="button" class="book-btn secondary" onclick="clearFilters()">Clear search and filters</button>' + (canRequest ? '<button type="button" class="book-btn" onclick="openRequestModal()">Post a request</button>' : '') + '</div></div>';
     return;
   }
+  const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
   grid.innerHTML = tutors.map(t => {
+    // When the search matches a course this tutor passed, that course is shown first and called out
+    const matched = q ? (t.courses || []).find(c => __courseMatches(c, q)) : null;
+    const courses = matched ? [matched].concat((t.courses || []).filter(c => c !== matched)) : (t.courses || []);
     const initials = (t.fullName||'T').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
     const subjects = Array.isArray(t.subjects) ? t.subjects : [];
     const sym = currSymbol(t.currency);
@@ -388,7 +395,8 @@ function renderTutors(tutors) {
         </div>
       </div>
       ${t.bio?`<p class="tutor-bio">${__esc(t.bio)}</p>`:''}
-      ${(t.courses||[]).length > 0 ? `<div class="chips">${t.courses.slice(0,3).map(c=>`<span class="course-tag" title="${__esc(['Passed', c.course_name || c.course_code, c.university ? 'at ' + c.university : ''].filter(Boolean).join(' '))}">${__esc(c.course_name || c.course_code || 'Course')}</span>`).join('')}${t.courses.length > 3 ? `<span class="more-tag">+${t.courses.length - 3} more</span>` : ''}</div>` : ''}
+      ${matched ? `<div class="course-match">✓ Passed ${__esc(matched.course_name || matched.course_code)}${__sameUni(matched.university || t.verified_university || t.location || '', currentStudentUni || '') ? ' at your university' : (matched.university ? ' at ' + __esc(matched.university) : '')}</div>` : ''}
+      ${courses.length > 0 ? `<div class="chips">${courses.slice(0,3).map(c=>`<a class="course-tag" href="course.html?c=${encodeURIComponent(c.course_key || '')}" title="${__esc(['Passed', c.course_name || c.course_code, c.university ? 'at ' + c.university : ''].filter(Boolean).join(' '))}">${__esc(c.course_name || c.course_code || 'Course')}</a>`).join('')}${courses.length > 3 ? `<span class="more-tag">+${courses.length - 3} more</span>` : ''}</div>` : ''}
       ${subjects.length ? `<div class="subjects chips">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}${extra?`<span class="more-tag">+${extra} more</span>`:''}</div>` : ''}
       <div class="card-footer">
         <div class="tutor-rate">${rate ? `${__esc(rate)} <span>/ hour</span>` : `<span>Rate on request</span>`}</div>
@@ -419,6 +427,7 @@ function renderQuickSubjects() {
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8).map(e => e[0]);
   const box = document.getElementById('quickSubjects');
   box.innerHTML = top.length ? '<span class="quick-label">Popular:</span>' + top.map(sub => `<button type="button" class="qs-chip" aria-pressed="false" data-subject="${__esc(sub)}" onclick="quickSubject(this)">${__esc(sub)}</button>`).join('') : '';
+  box.insertAdjacentHTML('beforeend', '<a class="qs-link" href="courses.html">Browse by course</a>');
 }
 function syncFilterUi(q) {
   let any = !!q;

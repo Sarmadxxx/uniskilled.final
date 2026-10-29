@@ -935,7 +935,7 @@ async function loadProfile() {
         <div style="display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap;">
           <div style="width:36px;height:36px;background:var(--blue-pale);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:0.9rem;">🎓</div>
           <div style="flex:1;min-width:180px;">
-            <div style="font-weight:700;font-size:0.85rem;">${__esc(title)}</div>
+            <div style="font-weight:700;font-size:0.85rem;">${c.course_key ? `<a href="course.html?c=${encodeURIComponent(c.course_key)}" style="color:inherit;text-decoration:underline;text-decoration-color:#c9d8f5;text-underline-offset:3px;">${__esc(title)}</a>` : __esc(title)}</div>
             ${meta ? `<div style="font-size:0.75rem;color:var(--mid);">${__esc(meta)}</div>` : ''}
             ${c.grade ? `<div style="font-size:0.75rem;color:#065f46;font-weight:600;">Grade ${__esc(c.grade)} <span style="color:var(--mid);font-weight:400;">(self-reported)</span></div>` : ''}
             ${c.professor_name ? `<div style="font-size:0.75rem;color:var(--mid);">Prof. ${__esc(c.professor_name)}</div>` : ''}
