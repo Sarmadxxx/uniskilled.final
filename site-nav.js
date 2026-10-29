@@ -115,9 +115,9 @@
   if (mode === 'app' && user) {
     items = isTutor
       ? [[dash, 'Dashboard'], ['messages.html', 'Messages'], ['calendar.html', 'Calendar'], ['manage-availability.html', 'Availability']]
-      : [[dash, 'Dashboard'], ['find-tutors.html', 'Find Tutors'], ['messages.html', 'Messages'], ['calendar.html', 'Calendar']];
+      : [[dash, 'Dashboard'], ['find-tutors.html', 'Find Tutors'], ['courses.html', 'Courses'], ['messages.html', 'Messages'], ['calendar.html', 'Calendar']];
   } else {
-    items = [['about.html', 'About'], ['find-tutors.html', 'Find Tutors'], ['group-sessions.html', 'Group Sessions'], ['index.html#how-it-works', 'How it Works']];
+    items = [['about.html', 'About'], ['find-tutors.html', 'Find Tutors'], ['courses.html', 'Courses'], ['group-sessions.html', 'Group Sessions'], ['index.html#how-it-works', 'How it Works']];
   }
   var main = items.map(function (i) { return link(i[0], i[1]); }).join('');
 

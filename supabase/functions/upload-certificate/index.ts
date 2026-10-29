@@ -51,9 +51,15 @@ Deno.serve(async (req: Request) => {
       filePath = `${userId}/${Date.now()}_${safeLabel}.${ext}`;
     }
 
+    // Certificate documents go to the PRIVATE bucket: only the tutor, admins and the students the
+    // tutor allows can open them (signed links, see can_view_tutor_certificates in the database).
+    // Avatars, covers (fixed_filename) and Feed attachments (feed_share) stay public as before.
+    const isCertificate = !fixedFilename && subjectLabel !== 'feed_share';
+    const bucket = isCertificate ? 'tutor-certificates' : 'certificates';
+
     const fileBuffer = await file.arrayBuffer();
     const { error: uploadError } = await supabase.storage
-      .from('certificates')
+      .from(bucket)
       .upload(filePath, fileBuffer, { contentType: ALLOWED[ext], upsert: true });
 
     if (uploadError) {
@@ -61,6 +67,10 @@ Deno.serve(async (req: Request) => {
       return json({ error: 'Upload failed. Please try again.' }, 500);
     }
 
+    if (isCertificate) {
+      // No public link exists. Pages store "private:<path>" and ask for a short-lived signed link when opened.
+      return json({ success: true, fileUrl: `private:${filePath}`, filePath, private: true });
+    }
     const { data: urlData } = supabase.storage.from('certificates').getPublicUrl(filePath);
     return json({ success: true, fileUrl: urlData.publicUrl, filePath });
   } catch (err) {
