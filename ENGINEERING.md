@@ -33,7 +33,7 @@ Run on every pull request and every change to `main`. Results also show on the a
 | Type-check (Deno) | All 50 server functions compile. |
 | Secret scan (gitleaks) | No keys or passwords in the code or its history. |
 | Browser tests (Playwright) | Every page opens in Chromium on desktop and phone without a JavaScript crash; signed-out visitors are sent to sign in. |
-| Database security (`tests/db/security_tests.sql`) | 31 attempts by a student, a tutor and a stranger to do things they must not (change prices, mark bookings paid, make themselves admin, read others' data). All rolled back. Needs `DATABASE_URL`. |
+| Database security (`tests/db/security_tests.sql`) | 35 attempts by a student, a tutor and a stranger to do things they must not (change prices, mark bookings paid, make themselves admin, read others' data or exam plans, list stored files). All rolled back. Needs `DATABASE_URL`. |
 
 Run them locally: `npm test` (site, logic, types) and `npm run test:e2e` (browser; first `npx playwright install chromium`).
 
@@ -55,3 +55,17 @@ Planned as a free second Supabase project, built from `db/schema.sql` once the s
 - `db/live-migration-history/`: all 88 migrations recorded in the live database, exported for reference. Some changes were applied directly and are only in `db/schema.sql` (once the snapshot runs).
 - `vendor/supabase-js/`: the Supabase browser library, self-hosted (checked against npm's published checksums).
 - `tests/`: everything above.
+
+## Security scanner warnings we keep on purpose (reviewed 29 Oct 2026)
+
+Supabase → Advisors shows these. Each was checked; changing them would break the site or add nothing.
+
+| Warning | Why it stays |
+|---|---|
+| "Security definer view": `public_tutors`, `public_tutor_subject_stats`, `group_session_seats` | They are the safe window onto private tables: they expose only public columns (name, photo, completed-session counts, seat counts). Switching them to the viewer's rights would show visitors nothing, because the tables behind them are private. |
+| `is_admin()` / `has_role()` callable by visitors | Dozens of access rules call them, including rules that apply to signed-out visitors; removing visitors' right to run them would make those rules fail and break public pages. For a visitor they simply return "false". |
+| `list_courses()` / `course_stats()` callable by visitors | Course pages need follower and question counts, but who follows a course is private. These return numbers only, never names. |
+| Other "signed-in users can run a security-definer function" items | Each checks the caller itself (own account, own session, admin only) before doing anything. |
+| `pg_net` installed in the public schema | Supabase can't move this extension; the scheduled jobs depend on it. |
+| Four tables with access rules switched on but no rules | Deliberate: only server functions (service role) use them; nobody else can read or write them. |
+| Leaked-password protection off | Dashboard setting (Authentication → Passwords), not code. Turn it on if the plan allows. |

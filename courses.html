@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="sentry.js"></script>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<title>Courses — UniSkilled</title>
+<meta name="description" content="Find a university course and the verified student tutors who already passed it. Follow a course to see classmates' questions.">
+<link rel="canonical" href="https://uniskilled.com/courses.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="UniSkilled">
+<meta property="og:title" content="Courses — UniSkilled">
+<meta property="og:description" content="Find a university course and the student tutors who already passed it.">
+<meta property="og:url" content="https://uniskilled.com/courses.html">
+<meta property="og:image" content="https://uniskilled.com/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--blue-dark:#01367c;--blue-pale:#eef4ff;--ink:#0f172a;--ink2:#334155;--mid:#5b6474;--border:#e2e8f0;--off:#f8fafc;}
+body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;}
+.page{max-width:960px;margin:0 auto;padding:2rem 16px 3.5rem;}
+@media(min-width:700px){.page{padding:2.5rem 5% 4rem;}}
+.page-title{font-size:1.6rem;font-weight:800;letter-spacing:-.01em;margin-bottom:.4rem;}
+.page-sub{font-size:.95rem;color:var(--mid);line-height:1.55;max-width:620px;}
+.search{margin:1.5rem 0 1.25rem;position:relative;}
+.search input{width:100%;font:inherit;font-size:1rem;padding:.85rem 1rem .85rem 2.75rem;border:1px solid var(--border);border-radius:12px;background:#fff;color:var(--ink);}
+.search input:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:transparent;}
+.search svg{position:absolute;left:1rem;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--mid);fill:none;stroke-width:2;stroke-linecap:round;}
+.count{font-size:.85rem;color:var(--mid);margin-bottom:.75rem;min-height:1.2em;}
+.grid{display:grid;gap:.75rem;grid-template-columns:1fr;}
+@media(min-width:700px){.grid{grid-template-columns:1fr 1fr;}}
+.course{display:block;background:#fff;border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.2rem;text-decoration:none;color:inherit;transition:border-color .15s,box-shadow .15s;}
+.course:hover{border-color:#b9cdf5;box-shadow:0 4px 16px rgba(15,36,96,.06);}
+.course-label{font-size:1.02rem;font-weight:800;color:var(--ink);}
+.course-name{font-size:.86rem;color:var(--ink2);margin-top:2px;}
+.course-unis{font-size:.8rem;color:var(--mid);margin-top:.45rem;}
+.course-stats{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem;}
+.pill{font-size:.75rem;font-weight:700;padding:.25rem .6rem;border-radius:999px;background:var(--blue-pale);color:var(--blue-dark);}
+.pill.muted{background:#f1f5f9;color:var(--mid);font-weight:600;}
+.empty{background:#fff;border:1px dashed var(--border);border-radius:14px;padding:2rem 1.25rem;text-align:center;color:var(--mid);font-size:.92rem;line-height:1.6;}
+.empty a{color:var(--blue);font-weight:700;text-decoration:none;}
+.spinner{width:28px;height:28px;border:3px solid rgba(26,107,255,.2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:3rem auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
+<script src="analytics.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
+
+<main class="page" id="main">
+  <h1 class="page-title">Courses</h1>
+  <p class="page-sub">Find your course and the student tutors who already passed it. Follow a course to see questions from classmates.</p>
+
+  <div class="search" role="search">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <label for="q" class="sr-only" style="position:absolute;left:-9999px">Search courses</label>
+    <input id="q" type="search" placeholder="Course code, course name or university" autocomplete="off">
+  </div>
+  <div class="count" id="count" aria-live="polite"></div>
+  <div id="list"><div class="spinner" role="status" aria-label="Loading courses"></div></div>
+</main>
+
+<script>
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+
+const _sb = window.supabase.createClient(USK_CONFIG.url, USK_CONFIG.anonKey);
+
+let timer = null, lastRun = 0;
+
+function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+
+function courseCard(c) {
+  const unis = c.universities || [];
+  const uniText = unis.length ? unis.slice(0, 2).join(' · ') + (unis.length > 2 ? ' +' + (unis.length - 2) + ' more' : '') : '';
+  const showName = c.course_name && c.course_name.toLowerCase() !== String(c.label || '').toLowerCase();
+  return `<a class="course" href="course.html?c=${encodeURIComponent(c.course_key)}">
+    <div class="course-label">${__esc(c.label)}</div>
+    ${showName ? `<div class="course-name">${__esc(c.course_name)}</div>` : ''}
+    ${uniText ? `<div class="course-unis">${__esc(uniText)}</div>` : ''}
+    <div class="course-stats">
+      <span class="pill${c.tutor_count ? '' : ' muted'}">${__esc(plural(c.tutor_count, 'tutor', 'tutors'))}</span>
+      ${c.follower_count ? `<span class="pill muted">${__esc(plural(c.follower_count, 'follower', 'followers'))}</span>` : ''}
+      ${c.question_count ? `<span class="pill muted">${__esc(plural(c.question_count, 'question', 'questions'))}</span>` : ''}
+    </div>
+  </a>`;
+}
+
+async function load() {
+  const q = document.getElementById('q').value.trim();
+  const run = ++lastRun;
+  const list = document.getElementById('list');
+  const count = document.getElementById('count');
+  try { const u = new URL(location.href); q ? u.searchParams.set('q', q) : u.searchParams.delete('q'); history.replaceState(null, '', u); } catch (e) {}
+
+  const { data, error } = await _sb.rpc('list_courses', { p_query: q || null, p_limit: 120 });
+  if (run !== lastRun) return; // a newer search is already on its way
+  if (error) {
+    count.textContent = '';
+    list.innerHTML = '<div class="empty">Could not load courses. Please refresh the page or try again in a moment.</div>';
+    return;
+  }
+  const rows = data || [];
+  count.textContent = q ? plural(rows.length, 'course found', 'courses found') : '';
+  if (!rows.length) {
+    list.innerHTML = q
+      ? `<div class="empty">No course matches “${__esc(q)}” yet.<br><a href="find-tutors.html?q=${encodeURIComponent(q)}">Search tutors by subject instead</a> or <a href="find-tutors.html?q=${encodeURIComponent(q)}#request">post a request</a>.</div>`
+      : '<div class="empty">No courses yet. Tutors add the courses they passed to their profile, and they appear here.<br><a href="find-tutors.html">Browse tutors</a></div>';
+    return;
+  }
+  list.innerHTML = `<div class="grid">${rows.map(courseCard).join('')}</div>`;
+  if (q) window.usTrack && usTrack('course_search', { query: q.slice(0, 100), results: rows.length });
+}
+
+document.getElementById('q').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(load, 250); });
+const q0 = new URLSearchParams(location.search).get('q');
+if (q0) document.getElementById('q').value = q0;
+load();
+</script>
+</body>
+</html>

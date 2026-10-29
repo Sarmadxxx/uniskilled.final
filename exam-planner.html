@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<script src="sentry.js"></script>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#1a6bff">
+<title>Exam planner — UniSkilled</title>
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<script src="exam-plan.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--blue:#1a6bff;--blue-dark:#01367c;--blue-pale:#eef4ff;--ink:#0f172a;--ink2:#334155;--mid:#5b6474;--border:#e2e8f0;--off:#f8fafc;--green:#047857;--green-bg:#ecfdf5;--amber:#92400e;--amber-bg:#fffbeb;}
+body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min-height:100vh;}
+.page{max-width:860px;margin:0 auto;padding:1.5rem 16px 4rem;}
+@media(min-width:700px){.page{padding:2rem 5% 4rem;}}
+.crumb{font-size:.85rem;margin-bottom:1rem;}
+.crumb a{color:var(--blue);text-decoration:none;font-weight:600;}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem;}
+.page-title{font-size:1.55rem;font-weight:800;letter-spacing:-.01em;}
+.page-sub{font-size:.92rem;color:var(--mid);line-height:1.55;max-width:560px;margin-top:.3rem;}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 1.1rem;border-radius:10px;font:inherit;font-size:.88rem;font-weight:700;text-decoration:none;cursor:pointer;border:1px solid transparent;white-space:nowrap;}
+.btn.primary{background:var(--blue);color:#fff;}
+.btn.primary:hover{background:#1559d6;}
+.btn.ghost{background:#fff;color:var(--blue-dark);border-color:#c9d8f5;}
+.btn.ghost:hover{background:var(--blue-pale);}
+.btn.danger{background:#fff;color:#b91c1c;border-color:#fecaca;}
+.btn:disabled{opacity:.6;cursor:wait;}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:1.25rem 1.3rem;margin-bottom:1rem;}
+.suggest{background:var(--blue-pale);border:1px solid #c9d8f5;border-radius:14px;padding:.9rem 1.1rem;margin-bottom:1rem;font-size:.88rem;color:var(--ink2);}
+.suggest b{color:var(--ink);}
+.suggest .chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+.chip{font:inherit;font-size:.8rem;font-weight:700;background:#fff;color:var(--blue-dark);border:1px solid #c9d8f5;border-radius:999px;padding:.45rem .8rem;cursor:pointer;min-height:36px;}
+/* form */
+form .row{display:grid;gap:.9rem;grid-template-columns:1fr;}
+@media(min-width:640px){form .row.two{grid-template-columns:1fr 1fr;}}
+.field{display:flex;flex-direction:column;gap:.35rem;margin-bottom:.9rem;}
+.field label,.field legend{font-size:.82rem;font-weight:700;color:var(--ink2);}
+.field .opt{font-weight:500;color:var(--mid);}
+.field input,.field textarea{font:inherit;font-size:.95rem;padding:.7rem .85rem;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--ink);width:100%;}
+.field textarea{min-height:150px;resize:vertical;line-height:1.5;}
+.field input:focus,.field textarea:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:transparent;}
+.help{font-size:.78rem;color:var(--mid);}
+fieldset{border:0;}
+.days{display:flex;gap:.4rem;flex-wrap:wrap;}
+.days label{position:relative;}
+.days input{position:absolute;opacity:0;width:1px;height:1px;}
+.days span{display:inline-grid;place-items:center;min-width:48px;min-height:40px;padding:0 .6rem;border:1px solid var(--border);border-radius:10px;font-size:.82rem;font-weight:700;color:var(--ink2);cursor:pointer;background:#fff;}
+.days input:checked+span{background:var(--blue);border-color:var(--blue);color:#fff;}
+.days input:focus-visible+span{outline:2px solid var(--blue);outline-offset:2px;}
+.form-actions{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+.err{font-size:.85rem;color:#b91c1c;margin-top:.6rem;min-height:1.1em;}
+.preview{font-size:.84rem;color:var(--mid);}
+/* exams */
+.exam-head{display:flex;justify-content:space-between;gap:.75rem;flex-wrap:wrap;align-items:flex-start;}
+.exam-title{font-size:1.1rem;font-weight:800;}
+.exam-meta{font-size:.84rem;color:var(--mid);margin-top:.2rem;}
+.countdown{font-size:.78rem;font-weight:800;padding:.3rem .7rem;border-radius:999px;background:var(--blue-pale);color:var(--blue-dark);white-space:nowrap;}
+.countdown.soon{background:var(--amber-bg);color:var(--amber);}
+.bar{height:8px;background:#eef1f5;border-radius:999px;overflow:hidden;margin:.9rem 0 .35rem;}
+.bar>div{height:100%;background:var(--blue);border-radius:999px;}
+.bar-label{font-size:.78rem;color:var(--mid);}
+.group{margin-top:1rem;}
+.group h3{font-size:.78rem;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--mid);margin-bottom:.4rem;}
+.task{display:flex;align-items:center;gap:.7rem;padding:.55rem 0;border-bottom:1px solid #f1f5f9;}
+.task:last-child{border-bottom:0;}
+.task input[type=checkbox]{width:20px;height:20px;accent-color:var(--blue);flex-shrink:0;cursor:pointer;}
+.task .t{flex:1;min-width:0;font-size:.9rem;}
+.task .t small{display:block;font-size:.75rem;color:var(--mid);}
+.task.done .t>span{text-decoration:line-through;color:var(--mid);}
+.kind{font-size:.7rem;font-weight:800;padding:.15rem .5rem;border-radius:6px;margin-right:.35rem;vertical-align:1px;}
+.kind.learn{background:var(--blue-pale);color:var(--blue-dark);}
+.kind.review{background:#f1f5f9;color:var(--ink2);}
+.kind.practice{background:var(--green-bg);color:var(--green);}
+.unsure-btn{font:inherit;font-size:.74rem;font-weight:700;color:var(--mid);background:none;border:1px solid var(--border);border-radius:999px;padding:.3rem .65rem;cursor:pointer;white-space:nowrap;min-height:32px;}
+.unsure-btn[aria-pressed="true"]{color:var(--amber);border-color:#fcd34d;background:var(--amber-bg);}
+.help-box{margin-top:1rem;background:var(--amber-bg);border:1px solid #fde68a;border-radius:12px;padding:.85rem 1rem;font-size:.86rem;color:var(--ink2);line-height:1.5;}
+.help-box a{color:var(--blue-dark);font-weight:800;}
+.more{font:inherit;font-size:.82rem;font-weight:700;color:var(--blue);background:none;border:0;cursor:pointer;padding:.5rem 0;min-height:36px;}
+.exam-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;padding-top:1rem;border-top:1px solid #f1f5f9;}
+.empty{background:#fff;border:1px dashed var(--border);border-radius:14px;padding:2rem 1.25rem;text-align:center;color:var(--mid);font-size:.92rem;line-height:1.6;}
+.note{font-size:.78rem;color:var(--mid);margin-top:1.5rem;line-height:1.55;}
+.spinner{width:28px;height:28px;border:3px solid rgba(26,107,255,.2);border-top-color:var(--blue);border-radius:50%;animation:spin .7s linear infinite;margin:3rem auto;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+<link rel="stylesheet" href="site.css">
+<script src="ui.js"></script>
+<script src="analytics.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header id="site-nav" data-nav="app"></header>
+<script src="site-nav.js"></script>
+
+<main class="page" id="main">
+  <div class="crumb"><a href="student-dashboard.html">← Dashboard</a></div>
+  <div class="top">
+    <div>
+      <h1 class="page-title">Exam planner</h1>
+      <p class="page-sub">Add an exam and the topics it covers. You get a day-by-day revision plan up to the exam date, and you can change it any time.</p>
+    </div>
+    <button type="button" class="btn primary" id="addBtn" hidden>Add an exam</button>
+  </div>
+
+  <div id="suggest"></div>
+
+  <section class="card" id="formCard" hidden aria-labelledby="formTitle">
+    <h2 id="formTitle" style="font-size:1.05rem;font-weight:800;margin-bottom:1rem">Add an exam</h2>
+    <form id="examForm" novalidate>
+      <div class="row two">
+        <div class="field">
+          <label for="fTitle">Exam</label>
+          <input id="fTitle" maxlength="120" placeholder="e.g. Calculus I final" required>
+        </div>
+        <div class="field">
+          <label for="fCode">Course code <span class="opt">(optional)</span></label>
+          <input id="fCode" maxlength="60" placeholder="e.g. MATH 101">
+        </div>
+      </div>
+      <div class="field" style="max-width:260px">
+        <label for="fDate">Exam date</label>
+        <input id="fDate" type="date" required>
+      </div>
+      <div class="field">
+        <label for="fTopics">Topics, one per line, in the order you want to learn them</label>
+        <textarea id="fTopics" placeholder="Limits&#10;Derivatives&#10;Integrals"></textarea>
+        <span class="help">Up to 30 topics. Your lecture slides or the syllabus are a good place to find them.</span>
+      </div>
+      <fieldset class="field">
+        <legend>Days I can study</legend>
+        <div class="days" id="fDays"></div>
+      </fieldset>
+      <div class="form-actions">
+        <button type="submit" class="btn primary" id="saveBtn">Create my plan</button>
+        <button type="button" class="btn ghost" id="cancelBtn">Cancel</button>
+        <span class="preview" id="preview" aria-live="polite"></span>
+      </div>
+      <div class="err" id="formErr" role="alert"></div>
+    </form>
+  </section>
+
+  <div id="exams"><div class="spinner" role="status" aria-label="Loading your exams"></div></div>
+
+  <p class="note">The plan is a suggestion to help you spread your revision. It doesn't predict your result. Your exams and plans are private to you.</p>
+</main>
+
+<script>
+function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
+function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
+
+const _sb = window.supabase.createClient(USK_CONFIG.url, USK_CONFIG.anonKey, { realtime: { params: { eventsPerSecond: 0 } } });
+const { buildPlan, iso, parse } = window.UskExamPlan;
+const courseKey = s => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const KIND_LABEL = { learn: 'Learn', review: 'Review', practice: 'Practice' };
+
+let me = null, exams = [], tasksByExam = {}, editingId = null;
+const expanded = new Set();
+
+const todayIso = () => iso(new Date());
+function dayLabel(d) {
+  const t = todayIso();
+  const tm = new Date(); tm.setDate(tm.getDate() + 1);
+  if (d === t) return 'Today';
+  if (d === iso(tm)) return 'Tomorrow';
+  return parse(d).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+}
+function daysUntil(d) { return Math.round((parse(d) - parse(todayIso())) / 86400000); }
+
+// ── Form ─────────────────────────────────────────────────────────────────────────────────────
+document.getElementById('fDays').innerHTML = DAY_NAMES.map((n, i) =>
+  `<label><input type="checkbox" value="${i + 1}" ${i < 5 ? 'checked' : ''}><span>${n}</span></label>`).join('');
+
+function readForm() {
+  return {
+    title: document.getElementById('fTitle').value.trim(),
+    code: document.getElementById('fCode').value.trim(),
+    date: document.getElementById('fDate').value,
+    topics: document.getElementById('fTopics').value.split('\n').map(s => s.trim()).filter(Boolean),
+    studyDays: [...document.querySelectorAll('#fDays input:checked')].map(i => Number(i.value)),
+  };
+}
+
+function updatePreview() {
+  const f = readForm();
+  const el = document.getElementById('preview');
+  if (!f.date || !f.topics.length) { el.textContent = ''; return; }
+  const learned = editingId ? learnedTopics(editingId) : [];
+  const r = buildPlan({ topics: f.topics, examDate: f.date, studyDays: f.studyDays, learned });
+  el.textContent = r.ok ? `${r.tasks.length} tasks over ${r.days.length} study day${r.days.length === 1 ? '' : 's'}` : '';
+}
+['fDate', 'fTopics'].forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
+document.getElementById('fDays').addEventListener('change', updatePreview);
+
+function openForm(prefill) {
+  const card = document.getElementById('formCard');
+  const p = prefill || {};
+  editingId = p.id || null;
+  document.getElementById('formTitle').textContent = editingId ? 'Change exam' : 'Add an exam';
+  document.getElementById('saveBtn').textContent = editingId ? 'Update my plan' : 'Create my plan';
+  document.getElementById('fTitle').value = p.title || '';
+  document.getElementById('fCode').value = p.course_code || '';
+  document.getElementById('fDate').value = p.exam_date || '';
+  document.getElementById('fTopics').value = (p.topics || []).join('\n');
+  const days = p.study_days || [1, 2, 3, 4, 5];
+  document.querySelectorAll('#fDays input').forEach(i => { i.checked = days.includes(Number(i.value)); });
+  const tm = new Date(); tm.setDate(tm.getDate() + 1);
+  document.getElementById('fDate').min = iso(tm);
+  document.getElementById('formErr').textContent = '';
+  card.hidden = false;
+  document.getElementById('addBtn').hidden = true;
+  updatePreview();
+  card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => document.getElementById(p.title ? 'fTopics' : 'fTitle').focus(), 250);
+}
+function closeForm() {
+  document.getElementById('formCard').hidden = true;
+  document.getElementById('addBtn').hidden = false;
+  editingId = null;
+  render();
+}
+document.getElementById('addBtn').addEventListener('click', () => openForm());
+document.getElementById('cancelBtn').addEventListener('click', closeForm);
+
+function learnedTopics(examId) {
+  return (tasksByExam[examId] || []).filter(t => t.kind === 'learn' && t.done_at).map(t => t.topic);
+}
+
+document.getElementById('examForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const err = document.getElementById('formErr');
+  const btn = document.getElementById('saveBtn');
+  const f = readForm();
+  err.textContent = '';
+  if (!f.title) { err.textContent = 'Give the exam a name.'; document.getElementById('fTitle').focus(); return; }
+  if (!f.date) { err.textContent = 'Choose the exam date.'; document.getElementById('fDate').focus(); return; }
+  const learned = editingId ? learnedTopics(editingId) : [];
+  const plan = buildPlan({ topics: f.topics, examDate: f.date, studyDays: f.studyDays, learned });
+  if (!plan.ok) { err.textContent = plan.error; return; }
+
+  btn.disabled = true;
+  try {
+    const row = { title: f.title, course_code: f.code || null, exam_date: f.date, topics: f.topics.slice(0, 30), study_days: f.studyDays };
+    let examId = editingId;
+    if (editingId) {
+      const { error } = await _sb.from('student_exams').update(row).eq('id', editingId);
+      if (error) throw error;
+      // Keep everything already done; rebuild the rest from today
+      const { error: delErr } = await _sb.from('exam_plan_tasks').delete().eq('exam_id', editingId).is('done_at', null);
+      if (delErr) throw delErr;
+    } else {
+      const { data, error } = await _sb.from('student_exams').insert({ ...row, student_id: me }).select('id').single();
+      if (error) throw error;
+      examId = data.id;
+    }
+    const { error: tErr } = await _sb.from('exam_plan_tasks').insert(plan.tasks.map(t => ({ ...t, exam_id: examId, student_id: me })));
+    if (tErr) {
+      if (!editingId) await _sb.from('student_exams').delete().eq('id', examId);   // don't leave an exam without a plan
+      throw tErr;
+    }
+    window.usTrack && usTrack(editingId ? 'exam_plan_updated' : 'exam_plan_created', { topics: f.topics.length, days: plan.days.length, tasks: plan.tasks.length });
+    closeForm();
+    expanded.add(examId);
+    await loadAll();
+  } catch (ex) {
+    err.textContent = __friendlyDbError(ex, 'Your plan couldn’t be saved. Please try again.');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+// ── Exams list ───────────────────────────────────────────────────────────────────────────────
+function taskRow(t) {
+  return `<div class="task${t.done_at ? ' done' : ''}">
+    <input type="checkbox" id="tk-${t.id}" data-task="${t.id}" ${t.done_at ? 'checked' : ''} aria-label="Done: ${__esc(KIND_LABEL[t.kind])} ${__esc(t.topic)}">
+    <label class="t" for="tk-${t.id}"><span><span class="kind ${t.kind}">${KIND_LABEL[t.kind]}</span>${__esc(t.topic)}</span><small>${__esc(dayLabel(t.day))}</small></label>
+    ${t.kind !== 'practice' ? `<button type="button" class="unsure-btn" data-unsure="${t.id}" aria-pressed="${t.unsure}">${t.unsure ? 'Still unsure' : 'Not sure yet?'}</button>` : ''}
+  </div>`;
+}
+
+function examCard(x) {
+  const tasks = tasksByExam[x.id] || [];
+  const done = tasks.filter(t => t.done_at).length;
+  const pct = tasks.length ? Math.round(done / tasks.length * 100) : 0;
+  const left = daysUntil(x.exam_date);
+  const t0 = todayIso();
+  const overdue = tasks.filter(t => !t.done_at && t.day < t0);
+  const today = tasks.filter(t => t.day === t0);
+  const upcomingAll = tasks.filter(t => t.day > t0);
+  const isOpen = expanded.has(x.id);
+  const upcoming = isOpen ? upcomingAll : upcomingAll.slice(0, 5);
+  const unsure = [...new Set(tasks.filter(t => t.unsure).map(t => t.topic))];
+  const courseHref = 'course.html?c=' + encodeURIComponent(x.course_key || courseKey(x.course_code || x.title));
+  const dateText = parse(x.exam_date).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const countdown = left < 0 ? 'Exam passed' : left === 0 ? 'Exam today' : left === 1 ? 'Exam tomorrow' : `${left} days to go`;
+
+  return `<article class="card" aria-labelledby="ex-${x.id}">
+    <div class="exam-head">
+      <div style="min-width:0">
+        <h2 class="exam-title" id="ex-${x.id}">${__esc(x.title)}</h2>
+        <div class="exam-meta">${x.course_code ? __esc(x.course_code) + ' · ' : ''}${__esc(dateText)}</div>
+      </div>
+      <span class="countdown${left >= 0 && left <= 7 ? ' soon' : ''}">${__esc(countdown)}</span>
+    </div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Plan progress"><div style="width:${pct}%"></div></div>
+    <div class="bar-label">${done} of ${tasks.length} tasks done</div>
+
+    ${overdue.length ? `<div class="group"><h3>Catch up</h3>${overdue.map(taskRow).join('')}</div>` : ''}
+    <div class="group"><h3>Today</h3>${today.length ? today.map(taskRow).join('') : `<div class="help">${left > 0 ? 'Nothing planned today.' : 'No more study days in this plan.'}</div>`}</div>
+    ${upcoming.length ? `<div class="group"><h3>Coming up</h3>${upcoming.map(taskRow).join('')}
+      ${upcomingAll.length > 5 ? `<button type="button" class="more" data-expand="${x.id}" aria-expanded="${isOpen}">${isOpen ? 'Show less' : `Show all ${upcomingAll.length} upcoming tasks`}</button>` : ''}</div>` : ''}
+
+    ${unsure.length ? `<div class="help-box">Still unsure about <b>${unsure.map(__esc).join(', ')}</b>?
+      A tutor who passed this course can go through it with you. <a href="${courseHref}">Find a tutor for ${__esc(x.course_code || x.title)}</a></div>` : ''}
+
+    <div class="exam-actions">
+      <button type="button" class="btn ghost" data-edit="${x.id}">Change exam or topics</button>
+      <a class="btn ghost" href="${courseHref}">Course page</a>
+      <button type="button" class="btn danger" data-delete="${x.id}">Delete</button>
+    </div>
+  </article>`;
+}
+
+function render() {
+  const box = document.getElementById('exams');
+  if (!exams.length) {
+    box.innerHTML = document.getElementById('formCard').hidden
+      ? '<div class="empty">No exams planned yet.<br><button type="button" class="btn primary" style="margin-top:.85rem" onclick="openForm()">Add your first exam</button></div>'
+      : '';
+    return;
+  }
+  box.innerHTML = exams.map(examCard).join('');
+}
+
+async function loadAll() {
+  const [ex, tk] = await Promise.all([
+    _sb.from('student_exams').select('id,title,course_code,course_key,exam_date,topics,study_days').eq('student_id', me).order('exam_date'),
+    _sb.from('exam_plan_tasks').select('id,exam_id,day,topic,kind,done_at,unsure').eq('student_id', me).order('day').order('created_at'),
+  ]);
+  if (ex.error || tk.error) {
+    document.getElementById('exams').innerHTML = '<div class="empty">Could not load your exams. Please refresh the page.</div>';
+    return;
+  }
+  // upcoming exams first, then past ones
+  const t0 = todayIso();
+  exams = (ex.data || []).sort((a, b) => ((a.exam_date < t0) - (b.exam_date < t0)) || a.exam_date.localeCompare(b.exam_date));
+  tasksByExam = {};
+  (tk.data || []).forEach(t => (tasksByExam[t.exam_id] = tasksByExam[t.exam_id] || []).push(t));
+  render();
+  await renderSuggestions();
+}
+
+// Exams the student already told a tutor about (exam date on a booking) but hasn't planned yet
+async function renderSuggestions() {
+  const box = document.getElementById('suggest');
+  const { data } = await _sb.from('sessions').select('subject,exam_date').eq('student_id', me).gt('exam_date', todayIso()).not('exam_date', 'is', null);
+  const planned = new Set(exams.map(x => x.exam_date + '|' + courseKey(x.course_code || x.title)));
+  const seen = new Set();
+  const list = (data || []).filter(s => {
+    const k = s.exam_date + '|' + courseKey(s.subject);
+    if (planned.has(k) || seen.has(k)) return false;
+    seen.add(k); return true;
+  }).slice(0, 4);
+  box.innerHTML = list.length ? `<div class="suggest"><b>From your bookings:</b> you mentioned ${list.length === 1 ? 'this exam' : 'these exams'} to a tutor.
+    <div class="chips">${list.map((s, i) => `<button type="button" class="chip" data-suggest="${i}">Plan ${__esc(s.subject || 'exam')} · ${__esc(parse(s.exam_date).toLocaleDateString([], { day: 'numeric', month: 'short' }))}</button>`).join('')}</div></div>` : '';
+  box.querySelectorAll('[data-suggest]').forEach(b => b.addEventListener('click', () => {
+    const s = list[Number(b.dataset.suggest)];
+    openForm({ title: (s.subject || 'Exam') + ' exam', course_code: s.subject || '', exam_date: s.exam_date });
+  }));
+}
+
+document.getElementById('exams').addEventListener('click', async (e) => {
+  const t = e.target.closest('button,input');
+  if (!t) return;
+  if (t.dataset.task) {
+    const done = t.checked;
+    t.disabled = true;
+    const { error } = await _sb.from('exam_plan_tasks').update({ done_at: done ? new Date().toISOString() : null }).eq('id', t.dataset.task);
+    t.disabled = false;
+    if (error) { t.checked = !done; return; }
+    for (const id in tasksByExam) tasksByExam[id].forEach(x => { if (x.id === t.dataset.task) x.done_at = done ? new Date().toISOString() : null; });
+    window.usTrack && done && usTrack('exam_task_done', {});
+    render();
+    const again = document.getElementById('tk-' + t.dataset.task); if (again) again.focus();
+  } else if (t.dataset.unsure) {
+    const id = t.dataset.unsure;
+    const now = t.getAttribute('aria-pressed') !== 'true';
+    const { error } = await _sb.from('exam_plan_tasks').update({ unsure: now }).eq('id', id);
+    if (error) return;
+    for (const ex in tasksByExam) tasksByExam[ex].forEach(x => { if (x.id === id) x.unsure = now; });
+    window.usTrack && now && usTrack('exam_topic_unsure', {});
+    render();
+    const again = document.querySelector(`[data-unsure="${id}"]`); if (again) again.focus();
+  } else if (t.dataset.expand) {
+    expanded.has(t.dataset.expand) ? expanded.delete(t.dataset.expand) : expanded.add(t.dataset.expand);
+    render();
+  } else if (t.dataset.edit) {
+    openForm(exams.find(x => x.id === t.dataset.edit));
+  } else if (t.dataset.delete) {
+    const x = exams.find(y => y.id === t.dataset.delete);
+    if (!confirm(`Delete "${x.title}" and its plan? This can't be undone.`)) return;
+    const { error } = await _sb.from('student_exams').delete().eq('id', x.id);
+    if (!error) await loadAll();
+  }
+});
+
+(async function init() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (!session) { location.href = 'signin.html?redirect=' + encodeURIComponent(location.pathname + location.search); return; }
+  me = session.user.id;
+  document.getElementById('addBtn').hidden = false;
+  await loadAll();
+  const pre = new URLSearchParams(location.search).get('course');
+  if (pre) openForm({ title: pre + ' exam', course_code: pre });
+})();
+</script>
+</body>
+</html>
