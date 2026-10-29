@@ -86,6 +86,9 @@ verify_jwt = true
 [functions.mark-sessions-completed]
 verify_jwt = false
 
+[functions.move-certificates-private]
+verify_jwt = false
+
 [functions.open-dispute]
 verify_jwt = false
 

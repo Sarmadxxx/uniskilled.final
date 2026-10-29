@@ -338,7 +338,7 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     </div>
 
     <!-- CERTIFICATES -->
-    <div class="card">
+    <div class="card" id="certificates">
       <div class="card-head">
         <h2 class="card-title">Certificates &amp; grades</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalCerts')" style="display:none;">✏️ Edit</button>
@@ -346,6 +346,7 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
       <div class="card-body" id="certsBody">
         <span class="empty">No certificates added yet.</span>
       </div>
+      <div class="card-body owner-only" id="certsAccess" style="display:none;border-top:1px solid var(--border);"></div>
     </div>
 
     <!-- TEACHING LEVELS & LANGUAGES -->
@@ -969,25 +970,8 @@ async function loadProfile() {
     : '';
   document.getElementById('levelsBody').innerHTML = (levelsHtml + langsHtml + videoHtml) || '<span class="empty">Not set yet.</span>';
 
-  // Certs
-  document.getElementById('certsBody').innerHTML = certificates.length > 0
-    ? certificates.map(c => {
-        const isPdf = (c.fileName || '').toLowerCase().endsWith('.pdf');
-        const icon = c.fileUrl ? (isPdf ? '📄' : '🖼️') : '🏅';
-        const iconClass = c.fileUrl && isPdf ? 'cert-icon pdf' : 'cert-icon';
-        const rightSide = c.fileUrl
-          ? `<a href="${__safeUrl(c.fileUrl)}" target="_blank" class="cert-view-btn">${__esc(isPdf ? '📄' : '🖼️')} View ${__esc(isPdf ? 'PDF' : 'Image')}</a>`
-          : (c.fileName ? '<span class="cert-missing">File pending</span>' : '');
-        return `<div class="cert-row">
-          <div class="${__esc(iconClass)}">${__esc(icon)}</div>
-          <div style="flex:1;">
-            <div class="cert-name">${__esc(c.subject)}</div>
-            <div class="cert-grade">${__esc(c.grade ? 'Grade: ' + c.grade : 'No grade specified')}</div>
-          </div>
-          ${rightSide}
-        </div>`;
-      }).join('')
-    : '<span class="empty">No certificates added yet.</span>';
+  // Certs (files are private: see renderCertificates)
+  renderCertificates();
 
   // Availability
   const days = ['mon','tue','wed','thu','fri','sat','sun'];
@@ -1132,6 +1116,129 @@ async function saveSubjects() {
 }
 
 // "Statistics I (STAT 101)", or whichever of name/code exists
+// ── Certificate files are private ──────────────────────────────────────────────────────────────
+// A file is stored as fileUrl "private:<path>" in the private tutor-certificates bucket. The
+// database decides who may open it (can_view_tutor_certificates): the tutor, admins, and signed-in
+// students — all of them, or only those the tutor approved, depending on the tutor's setting.
+let certVisibility = 'students', certCanView = false, certMyRequest = null, certRequests = [];
+const __certPath = c => (String(c.fileUrl || '').startsWith('private:') ? String(c.fileUrl).slice(8) : '');
+
+async function renderCertificates() {
+  const body = document.getElementById('certsBody');
+  if (!certificates.length) { body.innerHTML = '<span class="empty">No certificates added yet.</span>'; renderCertAccess(); return; }
+  const hasFiles = certificates.some(c => c.fileUrl);
+  certCanView = false; certMyRequest = null;
+  if (hasFiles && currentUserId) {
+    const [{ data: tpv }, { data: can }] = await Promise.all([
+      _supabase.from('tutor_profiles').select('certificate_visibility').eq('user_id', tutorId).maybeSingle(),
+      _supabase.rpc('can_view_tutor_certificates', { p_tutor: tutorId }),
+    ]);
+    certVisibility = tpv?.certificate_visibility || 'students';
+    certCanView = can === true;
+    if (!certCanView && !isOwner && viewerRole === 'student') {
+      const { data: req } = await _supabase.from('certificate_access_requests').select('status').eq('tutor_id', tutorId).eq('student_id', currentUserId).maybeSingle();
+      certMyRequest = req?.status || null;
+    }
+  }
+  const signinHref = 'signin.html?redirect=' + encodeURIComponent(location.pathname + location.search + '#certificates');
+  body.innerHTML = certificates.map((c, i) => {
+    const isPdf = (c.fileName || '').toLowerCase().endsWith('.pdf');
+    const icon = c.fileUrl ? (isPdf ? '📄' : '🖼️') : '🏅';
+    const iconClass = c.fileUrl && isPdf ? 'cert-icon pdf' : 'cert-icon';
+    let rightSide = '';
+    if (c.fileUrl) {
+      if (certCanView) rightSide = `<button type="button" class="cert-view-btn" onclick="openCertificate(${i})" style="cursor:pointer;font-family:inherit;">${__esc(isPdf ? '📄' : '🖼️')} View ${__esc(isPdf ? 'PDF' : 'Image')}</button>`;
+      else rightSide = '<span class="cert-missing">🔒 File</span>';
+    } else if (c.fileName) rightSide = '<span class="cert-missing">File pending</span>';
+    return `<div class="cert-row">
+      <div class="${__esc(iconClass)}">${__esc(icon)}</div>
+      <div style="flex:1;">
+        <div class="cert-name">${__esc(c.subject)}</div>
+        <div class="cert-grade">${__esc(c.grade ? 'Grade: ' + c.grade : 'No grade specified')}</div>
+      </div>
+      ${rightSide}
+    </div>`;
+  }).join('');
+
+  // Why a file is locked, and what the viewer can do about it
+  if (hasFiles && !certCanView) {
+    let note = '';
+    if (!currentUserId) note = `Certificate files are shown to signed-in students. <a href="${__safeUrl(signinHref)}" style="color:var(--blue);font-weight:700;">Sign in</a>`;
+    else if (viewerRole !== 'student') note = 'Certificate files are shown to students only.';
+    else if (certMyRequest === 'pending') note = 'You asked to see this tutor’s certificate files. You’ll get a notification when they answer.';
+    else if (certMyRequest === 'declined') note = 'This tutor didn’t share their certificate files with you. <button type="button" onclick="requestCertificates()" style="background:none;border:0;color:var(--blue);font-weight:700;cursor:pointer;font-family:inherit;padding:0;">Ask again</button>';
+    else note = 'This tutor shares certificate files with students on request. <button type="button" class="btn btn-outline" onclick="requestCertificates()" style="margin-top:0.5rem;">Ask to see certificates</button>';
+    body.insertAdjacentHTML('beforeend', `<div id="certNote" style="font-size:0.8rem;color:var(--mid);margin-top:0.75rem;line-height:1.5;">${note}</div>`);
+  }
+  renderCertAccess();
+}
+
+async function openCertificate(i) {
+  const path = __certPath(certificates[i] || {});
+  if (!path) return;
+  const win = window.open('', '_blank');   // opened now so pop-up blockers allow it
+  const { data, error } = await _supabase.storage.from('tutor-certificates').createSignedUrl(path, 120);
+  if (error || !data?.signedUrl) {
+    if (win) win.close();
+    alert('This file can’t be opened right now. Please try again.');
+    return;
+  }
+  if (win) win.location.href = data.signedUrl; else location.href = data.signedUrl;
+  window.usTrack && usTrack('certificate_viewed', {});
+}
+
+async function requestCertificates() {
+  const note = document.getElementById('certNote');
+  const res = certMyRequest === 'declined'
+    ? await _supabase.from('certificate_access_requests').update({ status: 'pending' }).eq('tutor_id', tutorId).eq('student_id', currentUserId)
+    : await _supabase.from('certificate_access_requests').insert({ tutor_id: tutorId, student_id: currentUserId });
+  if (res.error) { if (note) note.textContent = 'That didn’t work. Please try again.'; return; }
+  window.usTrack && usTrack('certificate_access_requested', {});
+  await renderCertificates();
+}
+
+// Owner only: who can see the files, and requests waiting for an answer
+async function renderCertAccess() {
+  const box = document.getElementById('certsAccess');
+  if (!box || !isOwner) return;
+  const { data: tpv } = await _supabase.from('tutor_profiles').select('certificate_visibility').eq('user_id', currentUserId).maybeSingle();
+  certVisibility = tpv?.certificate_visibility || 'students';
+  const { data: reqs } = await _supabase.from('certificate_access_requests').select('id,student_id,student_name,status,created_at').eq('tutor_id', currentUserId).order('created_at', { ascending: false });
+  certRequests = reqs || [];
+  const pending = certRequests.filter(r => r.status === 'pending');
+  const approved = certRequests.filter(r => r.status === 'approved');
+  const row = (r, actions) => `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;flex-wrap:wrap;">
+      <span style="flex:1;min-width:140px;font-size:0.85rem;font-weight:600;">${__esc(r.student_name || 'Student')}</span>${actions}</div>`;
+  box.innerHTML = `
+    <div style="font-size:0.85rem;font-weight:800;margin-bottom:0.2rem;">Who can open your certificate files?</div>
+    <div style="font-size:0.75rem;color:var(--mid);margin-bottom:0.6rem;">Names and grades stay on your profile. The files themselves are never public.</div>
+    <label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.85rem;margin-bottom:0.4rem;cursor:pointer;">
+      <input type="radio" name="certVis" value="students" ${certVisibility === 'students' ? 'checked' : ''} onchange="setCertVisibility(this.value)" style="margin-top:3px;"> All signed-in students</label>
+    <label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.85rem;cursor:pointer;">
+      <input type="radio" name="certVis" value="on_request" ${certVisibility === 'on_request' ? 'checked' : ''} onchange="setCertVisibility(this.value)" style="margin-top:3px;"> Only students I approve</label>
+    <div id="certVisMsg" role="status" style="font-size:0.75rem;color:var(--green);min-height:1em;margin-top:0.3rem;"></div>
+    ${pending.length ? `<div style="font-size:0.85rem;font-weight:800;margin-top:0.8rem;">Requests</div>${pending.map(r => row(r,
+      `<button type="button" class="btn btn-primary" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="answerCertRequest('${__esc(r.id)}','approved')">Share</button>
+       <button type="button" class="btn btn-outline" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="answerCertRequest('${__esc(r.id)}','declined')">Decline</button>`)).join('')}` : ''}
+    ${approved.length ? `<div style="font-size:0.85rem;font-weight:800;margin-top:0.8rem;">Shared with</div>${approved.map(r => row(r,
+      `<button type="button" class="btn btn-outline" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="removeCertAccess('${__esc(r.id)}')">Stop sharing</button>`)).join('')}` : ''}`;
+}
+
+async function setCertVisibility(v) {
+  const msg = document.getElementById('certVisMsg');
+  const { error } = await _supabase.from('tutor_profiles').update({ certificate_visibility: v }).eq('user_id', currentUserId);
+  if (msg) { msg.style.color = error ? '#b91c1c' : 'var(--green)'; msg.textContent = error ? 'Couldn’t save. Please try again.' : 'Saved'; }
+  if (!error) { certVisibility = v; window.usTrack && usTrack('certificate_visibility_set', { value: v }); }
+}
+async function answerCertRequest(id, status) {
+  const { error } = await _supabase.from('certificate_access_requests').update({ status }).eq('id', id);
+  if (!error) renderCertAccess();
+}
+async function removeCertAccess(id) {
+  const { error } = await _supabase.from('certificate_access_requests').delete().eq('id', id);
+  if (!error) renderCertAccess();
+}
+
 function __courseTitle(c) {
   const name = (c.course_name || '').trim(), code = (c.course_code || '').trim();
   return name && code ? `${name} (${code})` : (name || code || 'Course');
