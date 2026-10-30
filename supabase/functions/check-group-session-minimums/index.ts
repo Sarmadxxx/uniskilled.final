@@ -57,7 +57,7 @@ async function refundCapture(token: string, captureId: string): Promise<{ ok: bo
 
 // Card-paid spots used to be cancelled WITHOUT a refund. Refund them too, pulling back the
 // tutor's transferred share and our fee when it was a destination charge.
-async function refundStripe(paymentIntentId: string): Promise<{ ok: boolean; error?: string }> {
+async function refundStripe(paymentIntentId: string): Promise<{ ok: boolean; error?: string; refundId?: string }> {
   const piRes = await fetch(`https://api.stripe.com/v1/payment_intents/${encodeURIComponent(paymentIntentId)}`, {
     headers: { 'Authorization': `Bearer ${STRIPE_SECRET}` },
   });
@@ -75,7 +75,7 @@ async function refundStripe(paymentIntentId: string): Promise<{ ok: boolean; err
   });
   const data = await res.json();
   if (!res.ok) { console.error('Stripe refund failed:', JSON.stringify(data)); return { ok: false, error: data.error?.message || 'Refund failed' }; }
-  return { ok: true };
+  return { ok: true, refundId: data.id };
 }
 
 async function sendEmail(supabaseUrl: string, type: string, to: string, data: any) {
@@ -140,14 +140,16 @@ Deno.serve(async (req: Request) => {
           .select('*').eq('group_session_id', gs.id).eq('payer_id', p.student_id).eq('status', 'paid').maybeSingle();
 
         let refundOk = false;
+        let refundId: string | undefined;
         if (payment?.paypal_capture_id) {
           if (!token) token = await getToken();
           refundOk = (await refundCapture(token, payment.paypal_capture_id)).ok;
         } else if (payment?.stripe_payment_intent_id) {
-          refundOk = (await refundStripe(payment.stripe_payment_intent_id)).ok;
+          const r = await refundStripe(payment.stripe_payment_intent_id);
+          refundOk = r.ok; refundId = r.refundId;
         }
         if (payment) {
-          await supabase.from('payments').update({ status: refundOk ? 'refunded' : 'refund_failed' }).eq('id', payment.id);
+          await supabase.from('payments').update({ status: refundOk ? 'refunded' : 'refund_failed', ...(refundId ? { stripe_refund_id: refundId } : {}) }).eq('id', payment.id);
           if (!refundOk) console.error(`Group refund FAILED — needs manual refund: payment ${payment.id}`);
         }
 

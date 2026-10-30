@@ -46,7 +46,7 @@ async function refundPaypalCapture(token: string, captureId: string, amount?: nu
 // Card payments are destination charges: the tutor's share sits in their Stripe account.
 // Refunds must reverse that transfer (and our fee) proportionally, otherwise the platform
 // pays the whole refund while the tutor keeps their share.
-async function refundStripePayment(paymentIntentId: string, amount?: number): Promise<{ ok: boolean; error?: string }> {
+async function refundStripePayment(paymentIntentId: string, amount?: number): Promise<{ ok: boolean; error?: string; refundId?: string }> {
   const piRes = await fetch(`https://api.stripe.com/v1/payment_intents/${encodeURIComponent(paymentIntentId)}`, {
     headers: { 'Authorization': `Bearer ${STRIPE_SECRET}` },
   });
@@ -66,10 +66,10 @@ async function refundStripePayment(paymentIntentId: string, amount?: number): Pr
   });
   const data = await res.json();
   if (!res.ok) { console.error('Stripe refund failed:', JSON.stringify(data)); return { ok: false, error: data.error?.message || 'Refund failed' }; }
-  return { ok: true };
+  return { ok: true, refundId: data.id };
 }
 
-async function refundWhicheverMethodWasUsed(payment: any, amount?: number): Promise<{ ok: boolean; error?: string }> {
+async function refundWhicheverMethodWasUsed(payment: any, amount?: number): Promise<{ ok: boolean; error?: string; refundId?: string }> {
   if (payment?.paypal_capture_id) {
     const token = await getPaypalToken();
     return refundPaypalCapture(token, payment.paypal_capture_id, amount, payment.currency);
@@ -176,6 +176,8 @@ Deno.serve(withSentry('resolve-dispute', async (req: Request) => {
       refundedAmount = amountToRefund;
 
       const paymentUpdate: Record<string, unknown> = { status: resolution === 'partial' ? 'partially_refunded' : 'refunded' };
+      // stripe_refund_id lets each refund be matched to Stripe's records
+      if (result.refundId) paymentUpdate.stripe_refund_id = result.refundId;
 
       if (resolution === 'partial') {
         const originalAmount = Number(payment.amount) || 0;
