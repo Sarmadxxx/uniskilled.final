@@ -46,7 +46,7 @@ async function refundPaypalCapture(token: string, captureId: string): Promise<{ 
 // Card payments are destination charges: the tutor's share was transferred to their Stripe
 // account at checkout. A refund must pull that share (and our fee) back, otherwise the
 // platform pays the entire refund while the tutor keeps their 80%.
-async function refundStripePayment(paymentIntentId: string): Promise<{ ok: boolean; error?: string }> {
+async function refundStripePayment(paymentIntentId: string): Promise<{ ok: boolean; error?: string; refundId?: string }> {
   const piRes = await fetch(`https://api.stripe.com/v1/payment_intents/${encodeURIComponent(paymentIntentId)}`, {
     headers: { 'Authorization': `Bearer ${STRIPE_SECRET}` },
   });
@@ -65,10 +65,10 @@ async function refundStripePayment(paymentIntentId: string): Promise<{ ok: boole
   });
   const data = await res.json();
   if (!res.ok) { console.error('Stripe refund failed:', JSON.stringify(data)); return { ok: false, error: data.error?.message || 'Refund failed' }; }
-  return { ok: true };
+  return { ok: true, refundId: data.id };
 }
 
-async function refundWhicheverMethodWasUsed(payment: any): Promise<{ ok: boolean; error?: string }> {
+async function refundWhicheverMethodWasUsed(payment: any): Promise<{ ok: boolean; error?: string; refundId?: string }> {
   if (payment?.paypal_capture_id) {
     const token = await getPaypalToken();
     return refundPaypalCapture(token, payment.paypal_capture_id);
@@ -253,7 +253,8 @@ Deno.serve(withSentry('cancel-session', async (req: Request) => {
         await supabase.from('payments').update({ status: 'refund_failed' }).eq('id', payment.id);
         return new Response(JSON.stringify({ error: 'Could not process the refund automatically: ' + result.error }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
       }
-      await supabase.from('payments').update({ status: 'refunded' }).eq('id', payment.id);
+      // stripe_refund_id lets each refund be matched to Stripe's records
+      await supabase.from('payments').update({ status: 'refunded', ...(result.refundId ? { stripe_refund_id: result.refundId } : {}) }).eq('id', payment.id);
       await restoreCreditUsed(supabase, payment, session.student_id, session_id);
     }
 
