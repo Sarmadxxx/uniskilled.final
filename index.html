@@ -238,12 +238,6 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 .vtrust li{display:flex;align-items:center;gap:8px;font-size:.9375rem;font-weight:700;color:#fff}
 .vtrust .ico{color:#8fb6ff}
 
-.vhero-toggle{position:absolute;right:max(var(--gutter),env(safe-area-inset-right,0px));bottom:24px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:#fff;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);transition:background .15s}
-.vhero-toggle:hover{background:rgba(255,255,255,.24)}
-.vhero-toggle .ico{width:18px;height:18px;fill:currentColor;stroke:none}
-.vhero-toggle .i-play{display:none}
-.vhero-toggle.is-paused .i-play{display:block}
-.vhero-toggle.is-paused .i-pause{display:none}
 .vh-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 @media (max-width:720px){
@@ -265,9 +259,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   .vpopular::-webkit-scrollbar{display:none}
   .vtrust{flex-direction:column;gap:10px;padding-top:16px}
   .vtrust li{font-size:.875rem}
-  .vhero-toggle{top:16px;bottom:auto;width:40px;height:40px}
-}
-@media (prefers-reduced-motion:reduce){.vhero-toggle{transition:none}}
+  }
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
@@ -320,31 +312,19 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
       </ul>
     </div>
   </div>
-  <button type="button" class="vhero-toggle" id="heroToggle" aria-label="Pause background video" aria-pressed="false">
-    <svg class="ico i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
-    <svg class="ico i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z"/></svg>
-  </button>
 </section>
 <script>
-// Background video: always starts by itself, muted and looping. The pause button
-// stops it for anyone who wants it still; if a phone blocks autoplay (e.g. Low Power
-// Mode), it starts on the visitor's first tap, click, key or scroll instead.
+// Background video: always starts by itself, muted and looping. If a phone blocks
+// autoplay (e.g. Low Power Mode), it starts on the visitor's first tap, click, key or scroll.
 (function () {
-  var v = document.getElementById('heroVideo'), b = document.getElementById('heroToggle');
-  if (!v || !b) return;
+  var v = document.getElementById('heroVideo');
+  if (!v) return;
   if (matchMedia('(max-width: 720px)').matches) {
     var q = document.getElementById('heroSearch'); if (q) q.placeholder = 'Course, subject or tutor name';
   }
-  var userPaused = false;
   v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
-  function sync() {
-    var paused = v.paused;
-    b.classList.toggle('is-paused', paused);
-    b.setAttribute('aria-pressed', paused ? 'true' : 'false');
-    b.setAttribute('aria-label', paused ? 'Play background video' : 'Pause background video');
-  }
   function tryPlay() {
-    if (userPaused || !v.paused) return;
+    if (!v.paused) return;
     var p = v.play(); if (p && p.catch) p.catch(function () {});
   }
   var events = ['pointerdown', 'touchstart', 'keydown', 'scroll'];
@@ -353,14 +333,10 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
     if (!v.paused) events.forEach(function (e) { window.removeEventListener(e, onFirstInteraction); });
   }
   events.forEach(function (e) { window.addEventListener(e, onFirstInteraction, { passive: true }); });
-  v.addEventListener('play', sync); v.addEventListener('pause', sync);
   v.addEventListener('canplay', tryPlay);
+  v.addEventListener('pause', function () { setTimeout(tryPlay, 0); });
   document.addEventListener('visibilitychange', function () { if (!document.hidden) tryPlay(); });
-  b.addEventListener('click', function (e) {
-    e.stopPropagation();
-    if (v.paused) { userPaused = false; tryPlay(); } else { userPaused = true; v.pause(); }
-  });
-  tryPlay(); sync();
+  tryPlay();
 })();
 </script>
 
