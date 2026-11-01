@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Find a Tutor · Concept B · UniSkilled (preview)</title>
+<link rel="icon" href="favicon.ico?v=20261101" sizes="any">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<style>
+/* B — Next-generation EdTech. The navy header continues into a discovery band where
+   subjects are tiles with live counts; below, a filter rail and expandable result rows
+   (details open in place, so comparing two tutors never needs a page change). */
+:root{--night:#0a1a4a;--navy:#0f2460;--blue:#1a6bff;--blue-2:#1558e0;--cyan:#28a9e0;--ice:#e3f5ff;--bg:#f4f7fb;--card:#fff;--ink:#0b1530;--ink-2:#3d4659;--mute:#667085;--line:#e3e8f0;--line-2:#cfd7e3;--ok:#0b7a55;--ok-wash:#e8f6f0;--warn:#8a5a00;--warn-wash:#fff6e0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}button{font-family:inherit}
+.disc{background:radial-gradient(80% 120% at 85% 0%,rgba(40,169,224,.28),transparent 60%),linear-gradient(180deg,var(--navy),var(--night));color:#fff;padding:36px max(20px,4vw) 30px}
+.disc .in{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.disc h1{font-size:clamp(1.8rem,3.4vw,2.6rem);letter-spacing:-.04em;line-height:1.06;font-weight:800;max-width:22ch}
+.disc h1 span{color:#8fd3f4}
+.sbox{display:flex;align-items:center;gap:10px;max-width:640px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:14px;padding:4px 4px 4px 14px;transition:background .15s,border-color .15s}
+.sbox:focus-within{background:#fff;border-color:#fff}
+.sbox svg{width:20px;height:20px;fill:none;stroke:#b9c8ea;stroke-width:2;stroke-linecap:round;flex:0 0 20px}
+.sbox:focus-within svg{stroke:var(--mute)}
+.sbox input{flex:1;min-width:0;height:46px;border:0;outline:0;background:transparent;color:#fff;font:500 1rem 'Manrope',sans-serif}
+.sbox:focus-within input{color:var(--ink)}
+.sbox input::placeholder{color:#b9c8ea}
+.sbox:focus-within input::placeholder{color:#8a93a6}
+.sbox button{height:46px;border:0;border-radius:10px;background:var(--cyan);color:#05223a;font-weight:800;padding:0 18px;cursor:pointer}
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.tile{position:relative;overflow:hidden;text-align:left;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;border-radius:14px;padding:14px 14px 12px;cursor:pointer;min-height:84px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;transition:background .18s,border-color .18s,transform .18s}
+.tile::after{content:"";position:absolute;right:-18px;top:-18px;width:56px;height:56px;border-radius:0 0 0 100%;background:rgba(40,169,224,.25);transition:transform .25s}
+.tile:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+.tile:hover::after{transform:scale(1.25)}
+.tile[aria-pressed="true"]{background:#fff;color:var(--navy);border-color:#fff}
+.tile b{font-size:.9375rem;letter-spacing:-.01em;position:relative}
+.tile small{font-size:.75rem;color:#b9c8ea;font-weight:700;position:relative}
+.tile[aria-pressed="true"] small{color:var(--mute)}
+.tile.req{border-style:dashed}
+
+.layout{max-width:1200px;margin:0 auto;padding:24px max(20px,4vw) 48px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;align-items:start}
+.rail{position:sticky;top:84px;display:flex;flex-direction:column;gap:20px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px}
+.rail h2{font-size:.75rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.fg{display:flex;flex-direction:column;gap:8px}
+.fg label.t,.fg .t{font-size:.8125rem;font-weight:800;color:var(--ink-2)}
+.dchips{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dchips button{height:34px;border-radius:8px;border:1px solid var(--line-2);background:#fff;font-weight:800;font-size:.6875rem;color:var(--ink-2);cursor:pointer}
+.dchips button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.tchips{display:flex;flex-wrap:wrap;gap:6px}
+.tchips button{border:1px solid var(--line-2);background:#fff;border-radius:999px;padding:6px 11px;font-size:.75rem;font-weight:800;color:var(--ink-2);cursor:pointer}
+.tchips button[aria-pressed="true"]{background:var(--ice);border-color:var(--cyan);color:#0b5f85}
+.rail select{height:42px;border:1px solid var(--line-2);border-radius:10px;padding:0 10px;font:600 .875rem 'Manrope',sans-serif;background:#fff;color:var(--ink);width:100%}
+.rng{display:flex;justify-content:space-between;font-size:.75rem;color:var(--mute);font-weight:700}
+.rail input[type=range]{accent-color:var(--blue);width:100%}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:.875rem;font-weight:700}
+.tog input{width:40px;height:22px;accent-color:var(--blue)}
+.reset{border:0;background:none;color:var(--blue-2);font-weight:800;font-size:.8125rem;cursor:pointer;align-self:flex-start}
+
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.top p{font-size:.9375rem;color:var(--mute)}.top p b{color:var(--ink)}
+.top select{height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 10px;font:700 .8125rem 'Manrope',sans-serif;background:#fff}
+.fbtn{display:none;height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 14px;background:#fff;font-weight:800;font-size:.8125rem;cursor:pointer}
+
+.rows{display:flex;flex-direction:column;gap:10px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:border-color .15s,box-shadow .15s}
+.row.open{border-color:var(--navy);box-shadow:0 20px 44px -30px rgba(15,36,96,.55)}
+.rh{display:grid;grid-template-columns:56px minmax(0,1fr) auto auto;gap:16px;align-items:center;padding:16px 18px;width:100%;border:0;background:none;text-align:left;cursor:pointer;color:inherit;font:inherit}
+.av{width:56px;height:56px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:conic-gradient(from 210deg,#cfe9f7,#dfe9ff,#cfe9f7);color:var(--navy);font-weight:800}
+.nm{font-weight:800;font-size:1.0625rem;letter-spacing:-.015em;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.vb{font-size:.6875rem;font-weight:800;color:#0b5f85;background:var(--ice);padding:2px 7px;border-radius:999px}
+.sb{font-size:.6875rem;font-weight:800;color:var(--warn);background:var(--warn-wash);padding:2px 7px;border-radius:999px}
+.sub{font-size:.8125rem;color:var(--mute);display:block}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.tag{font-size:.75rem;font-weight:700;padding:3px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-2)}
+.match{font-size:.75rem;font-weight:800;color:var(--ok);background:var(--ok-wash);padding:3px 9px;border-radius:999px}
+.dots{display:flex;gap:3px}
+.dots i{width:8px;height:22px;border-radius:4px;background:#e7ebf2}
+.dots i.on{background:linear-gradient(180deg,var(--cyan),var(--blue))}
+.pr{text-align:right;min-width:92px}
+.pr b{font-size:1.375rem;letter-spacing:-.02em;display:block;line-height:1.1}
+.pr small{font-size:.75rem;color:var(--mute)}
+.chev{width:20px;height:20px;fill:none;stroke:var(--mute);stroke-width:2;transition:transform .2s}
+.row.open .chev{transform:rotate(180deg)}
+.rb{display:none;border-top:1px solid var(--line);padding:18px;gap:18px;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+.row.open .rb{display:grid}
+.rb h3{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-bottom:6px}
+.rb p{font-size:.9375rem;color:var(--ink-2)}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.wk div{text-align:center;font-size:.6875rem;font-weight:800;padding:8px 0;border-radius:8px;background:#f1f4f9;color:#a2abbb}
+.wk div.on{background:var(--ice);color:#0b5f85}
+.crs{display:flex;justify-content:space-between;gap:10px;font-size:.8125rem;padding:8px 10px;border-radius:9px;background:#f6f8fb;margin-top:6px}
+.crs span{color:var(--mute)}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border-radius:12px;font-weight:800;font-size:.9375rem;text-decoration:none;border:1px solid transparent;cursor:pointer}
+.btn.p{background:var(--blue);color:#fff}.btn.p:hover{background:var(--blue-2)}
+.btn.s{background:#fff;border-color:var(--line-2)}
+.note{font-size:.8125rem;color:var(--mute)}
+.skel{height:92px;border-radius:18px;background:linear-gradient(90deg,#e9eef5 25%,#f4f7fb 37%,#e9eef5 63%);background-size:400% 100%;animation:sh 1.3s ease infinite}
+@keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.empty{background:#fff;border:1px dashed var(--line-2);border-radius:18px;padding:36px 20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty p{color:var(--mute);max-width:46ch}
+.sheet-h{display:none}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px;border-radius:8px}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .fbtn{display:inline-flex;align-items:center}
+  .rail{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:1001;border-radius:22px 22px 0 0;max-height:82vh;overflow:auto;transform:translateY(105%);transition:transform .28s cubic-bezier(.2,.7,.2,1);padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}
+  body.sheet .rail{transform:none}
+  .scrim{position:fixed;inset:0;background:rgba(8,16,40,.4);z-index:1000;display:none}
+  body.sheet .scrim{display:block}
+  .sheet-h{display:flex;justify-content:space-between;align-items:center}
+  .hide-m{display:none}
+  .sheet-h button{border:0;background:var(--navy);color:#fff;border-radius:10px;height:40px;padding:0 16px;font-weight:800}
+  .tiles{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:150px;overflow-x:auto;margin:0 calc(-1*max(20px,4vw));padding:0 max(20px,4vw) 4px;scrollbar-width:none}
+  .tiles::-webkit-scrollbar{display:none}
+}
+@media (max-width:620px){
+  .rh{grid-template-columns:48px minmax(0,1fr) auto;gap:12px;padding:14px}
+  .av{width:48px;height:48px}
+  .dots{display:none}
+  .rb{grid-template-columns:1fr;padding:14px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
+
+<section class="disc" aria-labelledby="t"><div class="in">
+  <h1 id="t">Learn from students who <span>already passed it.</span></h1>
+  <form class="sbox" id="sf" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" aria-label="Search tutors" placeholder="Search a subject, course code or university" enterkeyhint="search"><button type="submit">Search</button></form>
+  <div class="tiles" id="tiles" role="group" aria-label="Browse by subject"></div>
+</div></section>
+
+<div class="scrim" id="scrim"></div>
+<div class="layout">
+  <aside class="rail" id="rail" aria-label="Filters">
+    <div class="sheet-h"><h2>Filters</h2><button type="button" id="done">Show tutors</button></div>
+    <h2 class="hide-m">Refine</h2>
+    <div class="fg"><span class="t">Available on</span><div class="dchips" id="days"></div></div>
+    <div class="fg"><span class="t">Time of day</span><div class="tchips" id="times"></div></div>
+    <div class="fg"><label class="t" for="max">Hourly rate</label><input id="max" type="range" step="1"><div class="rng"><span id="minL"></span><span id="maxL"></span></div></div>
+    <div class="fg"><label class="t" for="uni">University</label><select id="uni"><option value="">Any university</option></select></div>
+    <label class="tog">Verified tutors only<input type="checkbox" id="ver"></label>
+    <button type="button" class="reset" id="reset">Reset filters</button>
+  </aside>
+
+  <main id="main">
+    <div class="top"><p id="count" role="status" aria-live="polite">Loading tutors…</p><div style="display:flex;gap:8px"><button type="button" class="fbtn" id="fbtn">Filters</button><select id="sort" aria-label="Sort"><option value="best">Recommended</option><option value="price-asc">Lowest price</option><option value="price-desc">Highest price</option><option value="days">Most available</option></select></div></div>
+    <div class="rows" id="rows"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+  </main>
+</div>
+
+<script src="find-tutors-concepts.js"></script>
+<script>
+(function () {
+  var E = FT.esc, list = [], openId = null;
+  var st = { q: new URLSearchParams(location.search).get('q') || '', subject: '', days: [], times: [], max: null, uni: '', verified: false, sort: 'best' };
+  var $ = function (id) { return document.getElementById(id); };
+  $('q').value = st.q;
+
+  function row(t) {
+    var w = FT.why(t, st.q), p = FT.price(t), bk = FT.links.book(t), pf = FT.links.profile(t), open = openId === t.id;
+    return '<article class="row' + (open ? ' open' : '') + '" data-id="' + E(t.id) + '">' +
+      '<button type="button" class="rh" aria-expanded="' + open + '" aria-controls="rb-' + E(t.id) + '">' + FT.avatar(t, 'av') +
+      '<span style="min-width:0"><span class="nm">' + E(t.name) + (t.verified ? '<span class="vb">✓ Verified</span>' : '') + (t.sample ? '<span class="sb">Sample</span>' : '') + '</span>' +
+      '<span class="sub">' + E([t.uni, t.rating ? '★ ' + t.rating.toFixed(1) + ' (' + t.reviews + ')' : 'New tutor'].filter(Boolean).join(' · ')) + '</span>' +
+      '<span class="tags">' + (w && w.text ? '<span class="match">✓ ' + E(w.text) + '</span>' : '') + t.subjects.slice(0, 3).map(function (s) { return '<span class="tag">' + E(s) + '</span>'; }).join('') + '</span></span>' +
+      '<span class="dots" aria-label="Available ' + E(FT.daysLabel(t) || 'no days set') + '">' + FT.DAYS.map(function (d) { return '<i class="' + (t.days.indexOf(d[0]) > -1 ? 'on' : '') + '" title="' + d[1] + '"></i>'; }).join('') + '</span>' +
+      '<span class="pr">' + (p ? '<b>' + E(p) + '</b><small>per hour</small>' : '<small>Rate on request</small>') + '</span>' +
+      '<svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>' +
+      '<div class="rb" id="rb-' + E(t.id) + '"><div>' + (t.bio ? '<h3>About</h3><p>' + E(t.bio) + '</p>' : '') + (t.study ? '<p class="note" style="margin-top:8px">' + E(t.study) + '</p>' : '') +
+      (t.courses.length ? '<h3 style="margin-top:14px">Courses passed</h3>' + t.courses.map(function (c) { return '<div class="crs"><b>' + E(c.course_name || c.course_code) + '</b><span>' + E([c.university, c.grade ? 'grade ' + c.grade : ''].filter(Boolean).join(' · ')) + '</span></div>'; }).join('') + '<p class="note" style="margin-top:4px">Grades are self-reported.</p>' : '') + '</div>' +
+      '<div><h3>Usually available</h3>' + (t.days.length ? '<div class="wk">' + FT.DAYS.map(function (d) { return '<div class="' + (t.days.indexOf(d[0]) > -1 ? 'on' : '') + '">' + d[1] + '</div>'; }).join('') + '</div>' : '<p class="note">No days set yet.</p>') +
+      (t.times.length ? '<p class="note" style="margin-top:8px">Prefers ' + E(FT.timesLabel(t).toLowerCase()) + '</p>' : '') +
+      '<div class="acts">' + (t.sample ? '<span class="note">Sample profile, not bookable</span>' : (bk ? '<a class="btn p" href="' + bk + '">Book a lesson</a>' : '') + (pf ? '<a class="btn s" href="' + pf + '">Full profile</a>' : '')) + '</div></div></div></article>';
+  }
+
+  function tiles() {
+    var c = FT.counts(list);
+    $('tiles').innerHTML = c.map(function (x) { return '<button type="button" class="tile" aria-pressed="' + (st.subject === x.subject) + '" data-s="' + E(x.subject) + '"><b>' + E(x.subject) + '</b><small>' + x.count + ' tutor' + (x.count === 1 ? '' : 's') + '</small></button>'; }).join('') +
+      '<a class="tile req" href="' + FT.links.request + '"><b>Can\'t find it?</b><small>Post a request</small></a>';
+  }
+
+  function render() {
+    var r = FT.search(list, st.q, { subject: st.subject, days: st.days, times: st.times, maxRate: st.max, uni: st.uni, verified: st.verified, sort: st.sort });
+    $('count').innerHTML = '<b>' + r.length + '</b> tutor' + (r.length === 1 ? '' : 's') + (st.subject ? ' in ' + E(st.subject) : '') + (st.q ? ' for “' + E(st.q) + '”' : '') + (FT.demo ? ' · includes sample tutors' : '');
+    $('rows').innerHTML = r.length ? r.map(row).join('') : '<div class="empty"><h2>No tutors match yet</h2><p>Loosen a filter, pick another subject, or post a request and tutors who can help will reach out.</p><a class="btn p" href="' + FT.links.request + '">Post a request</a></div>';
+    document.querySelectorAll('.tile[data-s]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.s === st.subject ? 'true' : 'false'); });
+  }
+
+  $('rows').addEventListener('click', function (e) { var h = e.target.closest('.rh'); if (!h) return; var id = h.parentNode.dataset.id; openId = openId === id ? null : id; render(); var el = document.querySelector('.row[data-id="' + CSS.escape(id) + '"] .rh'); if (el) el.focus(); });
+  $('tiles').addEventListener('click', function (e) { var b = e.target.closest('.tile[data-s]'); if (!b) return; st.subject = st.subject === b.dataset.s ? '' : b.dataset.s; render(); });
+  $('sf').addEventListener('submit', function (e) { e.preventDefault(); st.q = $('q').value.trim(); render(); });
+  $('q').addEventListener('input', function () { if (!this.value) { st.q = ''; render(); } });
+  $('fbtn').onclick = function () { document.body.classList.add('sheet'); };
+  $('done').onclick = $('scrim').onclick = function () { document.body.classList.remove('sheet'); };
+
+  FT.ready.then(function (data) {
+    list = data; tiles();
+    var b = FT.rateBounds(list), m = $('max'); m.min = b.min; m.max = b.max; m.value = b.max; st.max = b.max; $('minL').textContent = '€' + b.min; $('maxL').textContent = 'up to €' + b.max;
+    m.oninput = function () { st.max = +m.value; $('maxL').textContent = 'up to €' + m.value; render(); };
+    $('days').innerHTML = FT.DAYS.map(function (d) { return '<button type="button" data-d="' + d[0] + '" aria-pressed="false" aria-label="' + d[1] + '">' + d[1].slice(0, 2) + '</button>'; }).join('');
+    $('days').onclick = function (e) { var x = e.target.closest('button'); if (!x) return; var i = st.days.indexOf(x.dataset.d); i > -1 ? st.days.splice(i, 1) : st.days.push(x.dataset.d); x.setAttribute('aria-pressed', i < 0); render(); };
+    $('times').innerHTML = ['morning', 'afternoon', 'evening'].map(function (k) { return '<button type="button" data-t="' + k + '" aria-pressed="false">' + FT.TIMES[k] + '</button>'; }).join('');
+    $('times').onclick = function (e) { var x = e.target.closest('button'); if (!x) return; var i = st.times.indexOf(x.dataset.t); i > -1 ? st.times.splice(i, 1) : st.times.push(x.dataset.t); x.setAttribute('aria-pressed', i < 0); render(); };
+    if (FT.me.uni) $('uni').insertAdjacentHTML('beforeend', '<option value="same">Same as mine</option>');
+    FT.unis(list).forEach(function (u) { $('uni').insertAdjacentHTML('beforeend', '<option value="' + E(u) + '">' + E(u) + '</option>'); });
+    $('uni').onchange = function () { st.uni = this.value; render(); };
+    $('ver').onchange = function () { st.verified = this.checked; render(); };
+    $('sort').onchange = function () { st.sort = this.value; render(); };
+    $('reset').onclick = function () { st.days = []; st.times = []; st.uni = ''; st.verified = false; st.subject = ''; st.max = b.max; m.value = b.max; $('maxL').textContent = 'up to €' + b.max; $('uni').value = ''; $('ver').checked = false; document.querySelectorAll('#days button,#times button').forEach(function (x) { x.setAttribute('aria-pressed', 'false'); }); render(); };
+    render();
+  }).catch(function () { $('rows').innerHTML = '<div class="empty"><h2>Could not load tutors</h2><p>Please refresh the page or try again in a moment.</p></div>'; $('count').textContent = ''; });
+})();
+</script>
+</body>
+</html>

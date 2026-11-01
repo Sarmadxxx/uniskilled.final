@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Find a Tutor · Concept A · UniSkilled (preview)</title>
+<link rel="icon" href="favicon.ico?v=20261101" sizes="any">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<style>
+/* A — Premium minimalist marketplace. One search, one tidy filter bar, calm cards,
+   and a slide-over profile preview so a student can judge a tutor without leaving results. */
+:root{--bg:#f7f9fc;--card:#fff;--ink:#0b1530;--ink-2:#3d4659;--mute:#667085;--line:#e6eaf0;--line-2:#d3dae5;--navy:#0f2460;--blue:#1a6bff;--blue-2:#1558e0;--wash:#eef4ff;--sky:#28a9e0;--ok:#0b7a55;--ok-wash:#e8f6f0;--warn:#8a5a00;--warn-wash:#fff6e0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+button{font-family:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 max(20px,4vw)}
+.head{padding:40px 0 24px;display:flex;flex-direction:column;gap:18px}
+.head h1{font-size:clamp(1.9rem,3.4vw,2.75rem);letter-spacing:-.04em;line-height:1.05;font-weight:800}
+.head p{color:var(--mute);font-size:1rem;margin-top:-8px}
+.search{position:relative;max-width:760px}
+.search form{display:flex;gap:8px;background:#fff;border:1px solid var(--line-2);border-radius:16px;padding:6px;box-shadow:0 16px 40px -28px rgba(11,21,48,.4);transition:border-color .15s,box-shadow .15s}
+.search form:focus-within{border-color:var(--blue);box-shadow:0 0 0 4px rgba(26,107,255,.12),0 16px 40px -28px rgba(11,21,48,.4)}
+.search label{flex:1;display:flex;align-items:center;gap:10px;padding-left:12px;min-width:0}
+.search svg{width:20px;height:20px;flex:0 0 20px;fill:none;stroke:var(--mute);stroke-width:2;stroke-linecap:round}
+.search input{flex:1;min-width:0;border:0;outline:0;font:500 1.0625rem inherit;font-family:inherit;color:var(--ink);height:48px;background:transparent}
+.search button{border:0;border-radius:11px;background:var(--navy);color:#fff;font-weight:800;font-size:.9375rem;padding:0 22px;cursor:pointer}
+.sug{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 24px 48px -24px rgba(11,21,48,.35);padding:6px;z-index:20;list-style:none}
+.sug li{display:flex;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:.9375rem}
+.sug li[aria-selected="true"],.sug li:hover{background:var(--wash)}
+.sug small{color:var(--mute);font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px 0 18px;border-bottom:1px solid var(--line);position:sticky;top:64px;background:var(--bg);z-index:10}
+.pill{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line-2);background:#fff;font-size:.875rem;font-weight:700;color:var(--ink-2);cursor:pointer;position:relative}
+.pill.on{border-color:var(--navy);background:var(--navy);color:#fff}
+.pill select{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.pill svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2.2}
+.days{display:inline-flex;border:1px solid var(--line-2);border-radius:999px;background:#fff;padding:3px;gap:2px}
+.days button{width:34px;height:34px;border-radius:50%;border:0;background:none;font-weight:800;font-size:.75rem;color:var(--mute);cursor:pointer}
+.days button[aria-pressed="true"]{background:var(--blue);color:#fff}
+.price{display:inline-flex;align-items:center;gap:10px;min-height:40px;padding:0 14px;border-radius:999px;border:1px solid var(--line-2);background:#fff;font-size:.875rem;font-weight:700;color:var(--ink-2)}
+.price input{accent-color:var(--navy);width:110px}
+.bar .grow{flex:1}
+.clear{border:0;background:none;color:var(--blue-2);font-weight:800;font-size:.875rem;cursor:pointer;padding:8px}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:18px 0 12px;font-size:.875rem;color:var(--mute)}
+.meta b{color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;padding-bottom:40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:16px;cursor:pointer;transition:box-shadow .18s,transform .18s,border-color .18s;text-align:left;width:100%;color:inherit;font:inherit}
+.card:hover{box-shadow:0 20px 40px -26px rgba(11,21,48,.4);transform:translateY(-2px);border-color:var(--line-2)}
+.av{width:72px;height:72px;border-radius:16px;object-fit:cover;display:grid;place-items:center;background:linear-gradient(135deg,#dfe9ff,#cfe9f7);color:var(--navy);font-weight:800;font-size:1.25rem}
+.who{min-width:0;display:flex;flex-direction:column;gap:6px}
+.who .nm{font-weight:800;font-size:1.0625rem;letter-spacing:-.015em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.vb{display:inline-flex;align-items:center;gap:4px;font-size:.6875rem;font-weight:800;color:var(--blue-2);background:var(--wash);padding:2px 7px;border-radius:999px}
+.sb{font-size:.6875rem;font-weight:800;color:var(--warn);background:var(--warn-wash);padding:2px 7px;border-radius:999px}
+.uni{font-size:.8125rem;color:var(--mute)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.75rem;font-weight:700;padding:4px 9px;border-radius:7px;background:#f1f4f9;color:var(--ink-2)}
+.match{font-size:.8125rem;font-weight:700;color:var(--ok);background:var(--ok-wash);padding:5px 9px;border-radius:8px;align-self:flex-start}
+.week{display:flex;gap:4px;align-items:center;margin-top:2px}
+.week i{width:22px;height:22px;border-radius:6px;font-style:normal;font-size:.625rem;font-weight:800;display:grid;place-items:center;background:#f1f4f9;color:#a2abbb}
+.week i.on{background:#e3f4fb;color:#0e6f97}
+.week span{font-size:.75rem;color:var(--mute);margin-left:6px}
+.side{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between;gap:10px;text-align:right}
+.rate{font-size:1.375rem;font-weight:800;letter-spacing:-.02em;white-space:nowrap}
+.rate small{font-size:.75rem;color:var(--mute);font-weight:600;display:block;letter-spacing:0}
+.stars{font-size:.8125rem;font-weight:800;white-space:nowrap}
+.stars em{font-style:normal;color:#f5a400}
+.new{font-size:.75rem;font-weight:700;color:var(--mute)}
+.open{font-size:.8125rem;font-weight:800;color:var(--blue-2);white-space:nowrap}
+
+.skel{height:150px;border-radius:18px;background:linear-gradient(90deg,#eef2f7 25%,#f6f8fb 37%,#eef2f7 63%);background-size:400% 100%;animation:sh 1.3s ease infinite}
+@keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.empty{grid-column:1/-1;text-align:center;background:#fff;border:1px dashed var(--line-2);border-radius:18px;padding:40px 20px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.empty h2{font-size:1.25rem}
+.empty p{color:var(--mute);max-width:46ch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:12px;font-weight:800;font-size:.9375rem;text-decoration:none;border:1px solid transparent;cursor:pointer}
+.btn.p{background:var(--blue);color:#fff}.btn.p:hover{background:var(--blue-2)}
+.btn.s{background:#fff;border-color:var(--line-2);color:var(--ink)}.btn.s:hover{border-color:var(--ink-2)}
+
+.scrim{position:fixed;inset:0;background:rgba(8,16,40,.38);opacity:0;pointer-events:none;transition:opacity .2s;z-index:1000}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);background:#fff;z-index:1001;transform:translateX(100%);transition:transform .28s cubic-bezier(.2,.7,.2,1);display:flex;flex-direction:column;box-shadow:-24px 0 48px -24px rgba(11,21,48,.35)}
+body.dr .scrim{opacity:1;pointer-events:auto}body.dr .drawer{transform:none}
+.dr-h{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line)}
+.dr-h button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:#fff;cursor:pointer;font-size:1.1rem}
+.dr-b{flex:1;overflow:auto;padding:22px 22px 28px;display:flex;flex-direction:column;gap:20px}
+.dr-top{display:flex;gap:16px;align-items:center}
+.dr-top .av{width:80px;height:80px}
+.dr-top h2{font-size:1.375rem;letter-spacing:-.025em}
+.dr-b h3{font-size:.75rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);margin-bottom:8px}
+.dr-b p{color:var(--ink-2);font-size:.9375rem}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wk div{border-radius:10px;padding:10px 0;text-align:center;font-size:.75rem;font-weight:800;background:#f4f6fa;color:#a2abbb}
+.wk div.on{background:#e3f4fb;color:#0e6f97}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.facts div{background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:12px}
+.facts b{display:block;font-size:1rem}
+.facts span{font-size:.75rem;color:var(--mute)}
+.dr-f{border-top:1px solid var(--line);padding:16px 22px calc(16px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;align-items:center}
+.dr-f .rate{margin-right:auto;text-align:left}
+.note{font-size:.8125rem;color:var(--mute)}
+.course{display:flex;justify-content:space-between;gap:10px;background:#f7f9fc;border-radius:10px;padding:10px 12px;font-size:.875rem}
+.course span{color:var(--mute)}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
+
+@media (max-width:900px){.grid{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .head{padding-top:26px}
+  .bar{top:56px;flex-wrap:nowrap;overflow-x:auto;margin:0 calc(-1*max(20px,4vw));padding-left:max(20px,4vw);padding-right:max(20px,4vw);scrollbar-width:none}
+  .bar::-webkit-scrollbar{display:none}
+  .pill,.days,.price{flex:0 0 auto}
+  .bar .grow{display:none}
+  .card{grid-template-columns:56px minmax(0,1fr);padding:16px}
+  .av{width:56px;height:56px;border-radius:14px;font-size:1rem}
+  .side{grid-column:1/-1;flex-direction:row;align-items:center;text-align:left;border-top:1px solid var(--line);padding-top:12px}
+  .search button{padding:0 16px}
+  .facts{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
+
+<main id="main" class="wrap">
+  <section class="head" aria-labelledby="t">
+    <h1 id="t">Find a tutor who passed your course</h1>
+    <p>Peer tutors from universities like yours. Every lesson is online and paid only after the tutor accepts.</p>
+    <div class="search">
+      <form id="sf" role="search" autocomplete="off">
+        <label><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <span class="vh" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Search tutors</span>
+          <input id="q" type="search" placeholder="Subject, course code, university or name" aria-autocomplete="list" aria-controls="sug" enterkeyhint="search"></label>
+        <button type="submit">Search</button>
+      </form>
+      <ul class="sug" id="sug" role="listbox" hidden></ul>
+    </div>
+  </section>
+
+  <div class="bar" role="group" aria-label="Filters">
+    <span class="pill" id="subjPill"><span id="subjL">Subject</span> <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><select id="subject" aria-label="Subject"><option value="">Any subject</option></select></span>
+    <span class="price"><label for="max">Up to</label><input id="max" type="range" step="1"><b id="maxL"></b></span>
+    <span class="days" role="group" aria-label="Available on" id="days"></span>
+    <span class="pill" id="uniPill"><span id="uniL">University</span> <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><select id="uni" aria-label="University"><option value="">Any university</option></select></span>
+    <span class="grow"></span>
+    <button class="clear" id="clear" type="button" hidden>Clear all</button>
+    <span class="pill">Sort: <span id="sortL">Recommended</span> <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg><select id="sort" aria-label="Sort"><option value="best">Recommended</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="days">Most days available</option></select></span>
+  </div>
+  <div class="meta"><span id="count" role="status" aria-live="polite">Loading tutors…</span><span>Verified tutors are listed first</span></div>
+  <section class="grid" id="grid" aria-label="Tutors"><div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></section>
+</main>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drName" aria-hidden="true">
+  <div class="dr-h"><b>Tutor preview</b><button type="button" id="drClose" aria-label="Close preview">✕</button></div>
+  <div class="dr-b" id="drBody"></div>
+  <div class="dr-f" id="drFoot"></div>
+</aside>
+
+<script src="find-tutors-concepts.js"></script>
+<script>
+(function () {
+  var E = FT.esc, list = [], st = { q: new URLSearchParams(location.search).get('q') || '', days: [], max: null, uni: '', subject: '', sort: 'best' };
+  var $ = function (id) { return document.getElementById(id); };
+  var q = $('q'); q.value = st.q;
+
+  function week(t, big) {
+    return FT.DAYS.map(function (d) { var on = t.days.indexOf(d[0]) > -1; return big ? '<div class="' + (on ? 'on' : '') + '" title="' + d[1] + (on ? ': available' : ': not available') + '">' + d[1].slice(0, 2) + '</div>' : '<i class="' + (on ? 'on' : '') + '" title="' + d[1] + '">' + d[2] + '</i>'; }).join('');
+  }
+  function rating(t) { return t.rating ? '<span class="stars"><em>★</em> ' + t.rating.toFixed(1) + ' <span class="new">(' + t.reviews + ')</span></span>' : '<span class="new">New tutor</span>'; }
+
+  function card(t) {
+    var w = FT.why(t, st.q), p = FT.price(t);
+    return '<button type="button" class="card" data-id="' + E(t.id) + '" aria-label="Preview ' + E(t.name) + '">' +
+      FT.avatar(t, 'av') +
+      '<span class="who"><span class="nm">' + E(t.name) + (t.verified ? '<span class="vb">✓ Verified</span>' : '') + (t.sample ? '<span class="sb">Sample</span>' : '') + '</span>' +
+      '<span class="uni">' + E([t.uni, t.study].filter(Boolean).join(' · ') || t.country) + '</span>' +
+      (w && w.text ? '<span class="match">✓ ' + E(w.text) + '</span>' : '') +
+      (t.subjects.length ? '<span class="chips">' + t.subjects.slice(0, 3).map(function (s) { return '<span class="chip">' + E(s) + '</span>'; }).join('') + (t.subjects.length > 3 ? '<span class="chip">+' + (t.subjects.length - 3) + '</span>' : '') + '</span>' : '') +
+      (t.days.length ? '<span class="week" aria-label="Available ' + E(FT.daysLabel(t)) + '">' + week(t) + (t.times.length ? '<span>' + E(FT.timesLabel(t)) + '</span>' : '') + '</span>' : '') +
+      '</span><span class="side"><span class="rate">' + (p ? E(p) + '<small>per hour</small>' : '<small>Rate on request</small>') + '</span>' + rating(t) + '<span class="open">View profile →</span></span></button>';
+  }
+
+  function render() {
+    var f = { days: st.days, maxRate: st.max, uni: st.uni, subject: st.subject, sort: st.sort };
+    var r = FT.search(list, st.q, f), g = $('grid');
+    $('count').innerHTML = '<b>' + r.length + '</b> tutor' + (r.length === 1 ? '' : 's') + (st.q ? ' for “' + E(st.q) + '”' : '') + (FT.demo ? ' · includes sample tutors' : '');
+    var any = st.q || st.days.length || st.uni || st.subject || (st.max != null && st.max < FT.rateBounds(list).max);
+    $('clear').hidden = !any;
+    $('subjPill').classList.toggle('on', !!st.subject); $('uniPill').classList.toggle('on', !!st.uni);
+    $('subjL').textContent = st.subject || 'Subject'; $('uniL').textContent = st.uni === 'same' ? 'My university' : (st.uni || 'University'); $('sortL').textContent = $('sort').selectedOptions[0].textContent;
+    if (!r.length) { g.innerHTML = '<div class="empty"><h2>No tutors match yet</h2><p>Try another subject or fewer filters. You can also post a request, and tutors who can help will reach out.</p><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center"><button class="btn s" type="button" id="clr2">Clear filters</button><a class="btn p" href="' + FT.links.request + '">Post a request</a></div></div>'; $('clr2').onclick = clearAll; return; }
+    g.innerHTML = r.map(card).join('');
+    try { var u = new URL(location.href); st.q ? u.searchParams.set('q', st.q) : u.searchParams.delete('q'); history.replaceState(null, '', u); } catch (e) {}
+  }
+  function clearAll() { st.q = ''; q.value = ''; st.days = []; st.uni = ''; st.subject = ''; st.max = FT.rateBounds(list).max; $('max').value = st.max; $('maxL').textContent = '€' + st.max; $('uni').value = ''; $('subject').value = ''; syncDays(); render(); }
+  function syncDays() { document.querySelectorAll('#days button').forEach(function (b) { b.setAttribute('aria-pressed', st.days.indexOf(b.dataset.d) > -1 ? 'true' : 'false'); }); }
+
+  // Drawer: a full preview without leaving the results
+  var lastFocus = null;
+  function open(t) {
+    var p = FT.price(t), bk = FT.links.book(t), pf = FT.links.profile(t);
+    $('drBody').innerHTML = '<div class="dr-top">' + FT.avatar(t, 'av') + '<div><h2 id="drName">' + E(t.name) + '</h2><div class="uni">' + E(t.uni || t.country) + '</div><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">' + (t.verified ? '<span class="vb">✓ University email verified</span>' : '') + (t.sample ? '<span class="sb">Sample profile</span>' : '') + '</div></div></div>' +
+      (t.bio ? '<div><h3>About</h3><p>' + E(t.bio) + '</p></div>' : '') +
+      '<div class="facts"><div><b>' + (t.rating ? '★ ' + t.rating.toFixed(1) : 'New') + '</b><span>' + (t.rating ? t.reviews + ' reviews' : 'Fewer than 3 reviews') + '</span></div><div><b>' + (t.lessons || 0) + '</b><span>lessons completed</span></div>' + (t.study ? '<div style="grid-column:1/-1"><b style="font-size:.9375rem">' + E(t.study) + '</b><span>Studies</span></div>' : '') + '</div>' +
+      (t.courses.length ? '<div><h3>Courses passed</h3><div style="display:grid;gap:6px">' + t.courses.map(function (c) { return '<div class="course"><b>' + E(c.course_name || c.course_code) + '</b><span>' + E([c.university, c.grade ? 'grade ' + c.grade : ''].filter(Boolean).join(' · ')) + '</span></div>'; }).join('') + '</div><p class="note" style="margin-top:6px">Grades are self-reported by tutors.</p></div>' : '') +
+      (t.subjects.length ? '<div><h3>Subjects</h3><div class="chips">' + t.subjects.map(function (s) { return '<span class="chip">' + E(s) + '</span>'; }).join('') + '</div></div>' : '') +
+      '<div><h3>Usually available</h3>' + (t.days.length ? '<div class="wk">' + week(t, true) + '</div>' + (t.times.length ? '<p class="note" style="margin-top:8px">Prefers ' + E(FT.timesLabel(t).toLowerCase()) + '. You pick the exact time when you book.</p>' : '<p class="note" style="margin-top:8px">You pick the exact time when you book.</p>') : '<p class="note">No days set yet. Propose a time when you book.</p>') + '</div>';
+    $('drFoot').innerHTML = '<span class="rate">' + (p ? E(p) + '<small>per hour · ' + t.sessionLength + '-min lessons</small>' : '<small>Rate on request</small>') + '</span>' +
+      (t.sample ? '<span class="note">Sample profile, not bookable</span>' : (pf ? '<a class="btn s" href="' + pf + '">Full profile</a>' : '') + (bk ? '<a class="btn p" href="' + bk + '">Book a lesson</a>' : ''));
+    lastFocus = document.activeElement;
+    document.body.classList.add('dr'); $('drawer').setAttribute('aria-hidden', 'false'); $('drClose').focus();
+  }
+  function close() { document.body.classList.remove('dr'); $('drawer').setAttribute('aria-hidden', 'true'); if (lastFocus) lastFocus.focus(); }
+  $('drClose').onclick = close; $('scrim').onclick = close;
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('dr')) close(); });
+  $('grid').addEventListener('click', function (e) { var c = e.target.closest('.card'); if (!c) return; var t = list.find(function (x) { return x.id === c.dataset.id; }); if (t) open(t); });
+
+  // Search with suggestions from real data
+  var sug = $('sug'), sel = -1, items = [];
+  function showSug() { items = FT.suggest(list, q.value); sel = -1; if (!items.length || document.activeElement !== q) { sug.hidden = true; return; } sug.innerHTML = items.map(function (s, i) { return '<li role="option" id="s' + i + '" data-i="' + i + '" aria-selected="false"><span>' + E(s.label) + '</span><small>' + s.type + '</small></li>'; }).join(''); sug.hidden = false; }
+  function pick(i) { q.value = items[i].value; sug.hidden = true; st.q = q.value; render(); }
+  q.addEventListener('input', function () { showSug(); if (!q.value) { st.q = ''; render(); } });
+  q.addEventListener('keydown', function (e) {
+    if (sug.hidden) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); sel = (sel + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length; [].forEach.call(sug.children, function (li, i) { li.setAttribute('aria-selected', i === sel ? 'true' : 'false'); }); q.setAttribute('aria-activedescendant', 's' + sel); }
+    if (e.key === 'Enter' && sel > -1) { e.preventDefault(); pick(sel); }
+    if (e.key === 'Escape') sug.hidden = true;
+  });
+  q.addEventListener('blur', function () { setTimeout(function () { sug.hidden = true; }, 150); });
+  sug.addEventListener('mousedown', function (e) { var li = e.target.closest('li'); if (li) { e.preventDefault(); pick(+li.dataset.i); } });
+  $('sf').addEventListener('submit', function (e) { e.preventDefault(); sug.hidden = true; st.q = q.value.trim(); render(); });
+
+  FT.ready.then(function (data) {
+    list = data;
+    FT.counts(list).forEach(function (c) { $('subject').insertAdjacentHTML('beforeend', '<option value="' + E(c.subject) + '">' + E(c.subject) + ' (' + c.count + ')</option>'); });
+    if (FT.me.uni) $('uni').insertAdjacentHTML('beforeend', '<option value="same">Same as mine</option>');
+    FT.unis(list).forEach(function (u) { $('uni').insertAdjacentHTML('beforeend', '<option value="' + E(u) + '">' + E(u) + '</option>'); });
+    var b = FT.rateBounds(list); var m = $('max'); m.min = b.min; m.max = b.max; m.value = b.max; st.max = b.max; $('maxL').textContent = '€' + b.max;
+    m.oninput = function () { st.max = +m.value; $('maxL').textContent = '€' + m.value; render(); };
+    $('days').innerHTML = FT.DAYS.map(function (d) { return '<button type="button" data-d="' + d[0] + '" aria-pressed="false" aria-label="' + d[1] + '">' + d[2] + '</button>'; }).join('');
+    $('days').onclick = function (e) { var x = e.target.closest('button'); if (!x) return; var i = st.days.indexOf(x.dataset.d); i > -1 ? st.days.splice(i, 1) : st.days.push(x.dataset.d); syncDays(); render(); };
+    $('subject').onchange = function () { st.subject = this.value; render(); };
+    $('uni').onchange = function () { st.uni = this.value; render(); };
+    $('sort').onchange = function () { st.sort = this.value; render(); };
+    $('clear').onclick = clearAll;
+    render();
+  }).catch(function () { $('grid').innerHTML = '<div class="empty"><h2>Could not load tutors</h2><p>Please refresh the page or try again in a moment.</p></div>'; $('count').textContent = ''; });
+})();
+</script>
+</body>
+</html>

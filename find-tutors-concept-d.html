@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Find a Tutor · Concept D · UniSkilled (preview)</title>
+<link rel="icon" href="favicon.ico?v=20261101" sizes="any">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<style>
+/* D — Intelligent discovery. One search box that understands days, times and budget (plain
+   rules, no AI), results that say why they match, and a sticky profile preview with the
+   Book button, so discovery to booking is two clicks. */
+:root{--bg:#f6f8fb;--card:#fff;--ink:#0b1530;--ink-2:#3d4659;--mute:#667085;--line:#e3e8f0;--line-2:#cfd7e3;--navy:#0f2460;--blue:#1a6bff;--blue-2:#1558e0;--wash:#eaf1ff;--sky:#28a9e0;--ice:#e3f5ff;--ok:#0b7a55;--ok-wash:#e8f6f0;--warn:#8a5a00;--warn-wash:#fff6e0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}button{font-family:inherit}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(20px,4vw)}
+.sh{padding:28px 0 16px;display:flex;flex-direction:column;gap:12px}
+.sh h1{font-size:clamp(1.6rem,2.8vw,2.2rem);letter-spacing:-.035em;line-height:1.1;font-weight:800}
+.smart{display:flex;flex-wrap:wrap;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--line-2);border-radius:16px;padding:8px 8px 8px 14px;min-height:62px;transition:border-color .15s,box-shadow .15s}
+.smart:focus-within{border-color:var(--blue);box-shadow:0 0 0 4px rgba(26,107,255,.12)}
+.smart svg{width:20px;height:20px;fill:none;stroke:var(--mute);stroke-width:2;stroke-linecap:round;flex:0 0 20px;margin-right:4px}
+.tok{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 6px 0 10px;border-radius:9px;font-size:.8125rem;font-weight:800;background:var(--ice);color:#0b5f85}
+.tok.s{background:var(--wash);color:var(--blue-2)}
+.tok button{width:22px;height:22px;border-radius:6px;border:0;background:rgba(0,0,0,.06);cursor:pointer;color:inherit;font-weight:800}
+.smart input{flex:1;min-width:180px;height:44px;border:0;outline:0;font:500 1.0625rem 'Manrope',sans-serif;color:var(--ink);background:transparent}
+.smart .go{height:46px;border:0;border-radius:11px;background:var(--navy);color:#fff;font-weight:800;padding:0 20px;cursor:pointer}
+.hint{font-size:.8125rem;color:var(--mute)}
+.hint button{border:0;background:none;color:var(--blue-2);font-weight:800;cursor:pointer;padding:2px 0;font-size:.8125rem}
+
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:20px;align-items:start;padding-bottom:48px}
+.lh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.lh p{font-size:.875rem;color:var(--mute)}.lh p b{color:var(--ink)}
+.lh select{height:38px;border:1px solid var(--line-2);border-radius:10px;padding:0 10px;font:700 .8125rem 'Manrope',sans-serif;background:#fff}
+.how{font-size:.75rem;color:var(--mute);background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.how b{color:var(--ink-2)}
+.list{display:flex;flex-direction:column;gap:8px}
+.it{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:12px 14px;cursor:pointer;color:inherit;font:inherit;transition:border-color .15s,box-shadow .15s}
+.it:hover{border-color:var(--line-2)}
+.it[aria-current="true"]{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue),0 14px 30px -22px rgba(26,107,255,.6)}
+.av{width:48px;height:48px;border-radius:14px;object-fit:cover;display:grid;place-items:center;background:linear-gradient(135deg,#dfe9ff,#cfeefa);color:var(--navy);font-weight:800}
+.nm{font-weight:800;display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.9375rem}
+.vb{font-size:.625rem;font-weight:800;color:var(--blue-2);background:var(--wash);padding:2px 6px;border-radius:999px}
+.sb{font-size:.625rem;font-weight:800;color:var(--warn);background:var(--warn-wash);padding:2px 6px;border-radius:999px}
+.ln{font-size:.8125rem;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.rs{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px}
+.rs span{font-size:.6875rem;font-weight:800;color:var(--ok);background:var(--ok-wash);padding:2px 7px;border-radius:999px}
+.pr{text-align:right;font-weight:800;font-size:1.0625rem;white-space:nowrap}
+.pr small{display:block;font-size:.6875rem;color:var(--mute);font-weight:600}
+
+.pv{position:sticky;top:84px;background:#fff;border:1px solid var(--line);border-radius:22px;overflow:hidden;max-height:calc(100vh - 100px);display:flex;flex-direction:column}
+.pv-b{overflow:auto;padding:22px;display:flex;flex-direction:column;gap:18px}
+.ph{display:flex;gap:16px;align-items:center}
+.ph .av{width:84px;height:84px;border-radius:22px;font-size:1.5rem}
+.ph h2{font-size:1.5rem;letter-spacing:-.03em;line-height:1.15}
+.ph p{font-size:.875rem;color:var(--mute)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats div{background:#f7f9fc;border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stats b{display:block;font-size:1.0625rem}
+.stats span{font-size:.6875rem;color:var(--mute);font-weight:700}
+.pv h3{font-size:.75rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin-bottom:8px}
+.pv p.t{font-size:.9375rem;color:var(--ink-2)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chips span{font-size:.75rem;font-weight:700;padding:5px 10px;border-radius:999px;background:#0f2460;color:#fff}
+.wk{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wk div{border-radius:12px;padding:10px 0;text-align:center;font-size:.75rem;font-weight:800;background:#f3f5f9;color:#a2abbb;display:flex;flex-direction:column;gap:3px}
+.wk div.on{background:var(--ice);color:#0b5f85}
+.wk div.hit{background:var(--blue);color:#fff}
+.wk small{font-size:.625rem;font-weight:700;opacity:.8}
+.crs{display:flex;justify-content:space-between;gap:10px;font-size:.875rem;padding:9px 12px;border-radius:10px;background:#f7f9fc}
+.crs span{color:var(--mute)}
+.pv-f{border-top:1px solid var(--line);padding:14px 22px;display:flex;align-items:center;gap:10px;background:#fff}
+.pv-f .p{margin-right:auto}
+.pv-f .p b{font-size:1.5rem;letter-spacing:-.02em}
+.pv-f .p small{font-size:.75rem;color:var(--mute);display:block}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 20px;border-radius:12px;font-weight:800;font-size:.9375rem;text-decoration:none;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+.btn.p{background:var(--blue);color:#fff}.btn.p:hover{background:var(--blue-2)}
+.btn.s{background:#fff;border-color:var(--line-2)}
+.note{font-size:.8125rem;color:var(--mute)}
+.back{display:none}
+.skel{height:76px;border-radius:16px;background:linear-gradient(90deg,#e9eef5 25%,#f4f7fb 37%,#e9eef5 63%);background-size:400% 100%;animation:sh 1.3s ease infinite}
+@keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.empty{background:#fff;border:1px dashed var(--line-2);border-radius:18px;padding:32px 20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty p{color:var(--mute);max-width:44ch}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
+
+@media (max-width:900px){
+  .split{grid-template-columns:1fr}
+  .pv{position:fixed;inset:0;top:0;border-radius:0;max-height:none;z-index:1001;transform:translateY(100%);transition:transform .28s cubic-bezier(.2,.7,.2,1)}
+  body.pv-open .pv{transform:none}
+  body.pv-open{overflow:hidden}
+  .back{display:flex;align-items:center;gap:8px;border:0;background:none;font-weight:800;font-size:.9375rem;padding:14px 22px 0;cursor:pointer;color:var(--blue-2)}
+  .pv-f{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:520px){
+  .smart input{min-width:120px}
+  .smart .go{padding:0 14px}
+  .stats{grid-template-columns:1fr 1fr 1fr}
+  .wk{gap:4px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
+
+<main id="main" class="wrap">
+  <section class="sh" aria-labelledby="t">
+    <h1 id="t">Who can help you pass?</h1>
+    <form class="smart" id="sf" role="search" autocomplete="off">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span id="toks" style="display:contents"></span>
+      <input id="q" type="search" aria-label="Search tutors. You can add a day, a time of day or a budget, for example: statistics sunday evening under 25" placeholder="Try “statistics sunday evening under 25”" enterkeyhint="search">
+      <button class="go" type="submit">Search</button>
+    </form>
+    <p class="hint" id="hint">Add a day, a time of day or a budget to your search. Try: <span id="ex"></span></p>
+  </section>
+
+  <div class="split">
+    <section aria-label="Results">
+      <div class="lh"><p id="count" role="status" aria-live="polite">Loading tutors…</p><select id="sort" aria-label="Sort"><option value="best">Best match</option><option value="price-asc">Lowest price</option><option value="days">Most available</option></select></div>
+      <p class="how" id="how"><b>How results are ordered:</b> tutors who passed the course you searched (at your university first), then tutors verified by university email, then by reviews.</p>
+      <div class="list" id="list"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+    </section>
+    <aside class="pv" id="pv" aria-label="Tutor preview" tabindex="-1">
+      <button type="button" class="back" id="back">← Back to results</button>
+      <div class="pv-b" id="pvb"><div class="skel" style="height:300px"></div></div>
+      <div class="pv-f" id="pvf"></div>
+    </aside>
+  </div>
+</main>
+
+<script src="find-tutors-concepts.js"></script>
+<script>
+(function () {
+  var E = FT.esc, list = [], cur = null;
+  var st = { text: new URLSearchParams(location.search).get('q') || '', days: [], times: [], max: null, sort: 'best' };
+  var $ = function (id) { return document.getElementById(id); };
+  var DAYWORDS = {}; FT.DAYS.forEach(function (d) { DAYWORDS[d[0]] = d[0]; DAYWORDS[d[1].toLowerCase()] = d[0]; }); Object.assign(DAYWORDS, { monday: 'mon', tuesday: 'tue', wednesday: 'wed', thursday: 'thu', friday: 'fri', saturday: 'sat', sunday: 'sun', weekend: 'weekend' });
+  var TIMEWORDS = { morning: 'morning', mornings: 'morning', afternoon: 'afternoon', afternoons: 'afternoon', evening: 'evening', evenings: 'evening', night: 'evening' };
+
+  // Plain-rule parser: day names, time of day and "under/below/max N" become filters; the rest is the search text
+  function parse(raw) {
+    var words = raw.toLowerCase().replace(/[€$£]/g, ' ').split(/\s+/).filter(Boolean), keep = [];
+    for (var i = 0; i < words.length; i++) {
+      var w = words[i];
+      if (DAYWORDS[w]) { var d = DAYWORDS[w] === 'weekend' ? ['sat', 'sun'] : [DAYWORDS[w]]; d.forEach(function (x) { if (st.days.indexOf(x) < 0) st.days.push(x); }); continue; }
+      if (TIMEWORDS[w]) { if (st.times.indexOf(TIMEWORDS[w]) < 0) st.times.push(TIMEWORDS[w]); continue; }
+      if (/^(under|below|max|upto|cheaper)$/.test(w) && /^\d+$/.test(words[i + 1] || '')) { st.max = +words[i + 1]; i++; continue; }
+      if (w === 'up' && words[i + 1] === 'to' && /^\d+$/.test(words[i + 2] || '')) { st.max = +words[i + 2]; i += 2; continue; }
+      if (/^(on|in|the|a|an|for|at|tutor|tutors|with|and)$/.test(w) && keep.length === 0 && !words[i + 1]) continue;
+      keep.push(w);
+    }
+    st.text = keep.filter(function (w) { return !/^(on|in|for|with|and|tutor|tutors)$/.test(w); }).join(' ');
+  }
+
+  function tokens() {
+    var h = '';
+    if (st.text) h += '<span class="tok s">' + E(st.text) + '<button type="button" data-x="text" aria-label="Remove ' + E(st.text) + '">×</button></span>';
+    st.days.forEach(function (d) { var n = FT.DAYS.find(function (x) { return x[0] === d; })[1]; h += '<span class="tok">' + n + '<button type="button" data-x="day" data-v="' + d + '" aria-label="Remove ' + n + '">×</button></span>'; });
+    st.times.forEach(function (t) { h += '<span class="tok">' + FT.TIMES[t] + '<button type="button" data-x="time" data-v="' + t + '" aria-label="Remove ' + FT.TIMES[t] + '">×</button></span>'; });
+    if (st.max != null) h += '<span class="tok">Up to €' + st.max + '<button type="button" data-x="max" aria-label="Remove budget">×</button></span>';
+    $('toks').innerHTML = h;
+  }
+
+  function reasons(t) {
+    var r = [], w = FT.why(t, st.text);
+    if (w && w.text) r.push(w.text);
+    var d = st.days.filter(function (x) { return t.days.indexOf(x) > -1; });
+    if (d.length) r.push('Free ' + d.map(function (x) { return FT.DAYS.find(function (y) { return y[0] === x; })[1]; }).join(' & '));
+    if (st.times.length && t.times.length) r.push('Prefers ' + FT.timesLabel(t).toLowerCase());
+    if (st.max != null && t.rate != null) r.push('Within budget');
+    return r;
+  }
+
+  function item(t) {
+    var p = FT.price(t), r = reasons(t);
+    return '<button type="button" class="it" data-id="' + E(t.id) + '" aria-current="' + (cur && cur.id === t.id) + '">' + FT.avatar(t, 'av') +
+      '<span style="min-width:0"><span class="nm">' + E(t.name) + (t.verified ? '<span class="vb">✓ Verified</span>' : '') + (t.sample ? '<span class="sb">Sample</span>' : '') + '</span>' +
+      '<span class="ln">' + E([t.uni, t.subjects.slice(0, 2).join(', ')].filter(Boolean).join(' · ')) + '</span>' +
+      (r.length ? '<span class="rs">' + r.map(function (x) { return '<span>✓ ' + E(x) + '</span>'; }).join('') + '</span>' : '') + '</span>' +
+      '<span class="pr">' + (p ? E(p) + '<small>/ hour</small>' : '<small>On request</small>') + '</span></button>';
+  }
+
+  function preview(t) {
+    cur = t;
+    if (!t) { $('pvb').innerHTML = '<div class="empty"><h2>Pick a tutor</h2><p>Their profile, availability and price appear here.</p></div>'; $('pvf').innerHTML = ''; return; }
+    var p = FT.price(t), bk = FT.links.book(t), pf = FT.links.profile(t);
+    $('pvb').innerHTML = '<div class="ph">' + FT.avatar(t, 'av') + '<div><h2>' + E(t.name) + '</h2><p>' + E(t.uni || t.country || '') + '</p><div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">' + (t.verified ? '<span class="vb">✓ University email verified</span>' : '') + (t.sample ? '<span class="sb">Sample profile</span>' : '') + '</div></div></div>' +
+      '<div class="stats"><div><b>' + (t.rating ? '★ ' + t.rating.toFixed(1) : 'New') + '</b><span>' + (t.rating ? t.reviews + ' reviews' : 'tutor') + '</span></div><div><b>' + (t.lessons || 0) + '</b><span>lessons done</span></div><div><b>' + t.sessionLength + ' min</b><span>lesson length</span></div></div>' +
+      (t.bio ? '<div><h3>About</h3><p class="t">' + E(t.bio) + '</p></div>' : '') +
+      (t.study ? '<div><h3>Studies</h3><p class="t">' + E(t.study) + '</p></div>' : '') +
+      (t.subjects.length ? '<div><h3>Teaches</h3><div class="chips">' + t.subjects.map(function (s) { return '<span>' + E(s) + '</span>'; }).join('') + '</div></div>' : '') +
+      (t.courses.length ? '<div><h3>Courses passed</h3><div style="display:grid;gap:6px">' + t.courses.map(function (c) { return '<div class="crs"><b>' + E(c.course_name || c.course_code) + '</b><span>' + E([c.university, c.grade ? 'grade ' + c.grade : ''].filter(Boolean).join(' · ')) + '</span></div>'; }).join('') + '</div><p class="note" style="margin-top:6px">Grades are self-reported by tutors.</p></div>' : '') +
+      '<div><h3>Usually available</h3>' + (t.days.length ? '<div class="wk">' + FT.DAYS.map(function (d) { var on = t.days.indexOf(d[0]) > -1, hit = on && st.days.indexOf(d[0]) > -1; return '<div class="' + (hit ? 'hit' : on ? 'on' : '') + '">' + d[1] + '<small>' + (on ? 'free' : '—') + '</small></div>'; }).join('') + '</div><p class="note" style="margin-top:8px">' + (t.times.length ? 'Prefers ' + E(FT.timesLabel(t).toLowerCase()) + '. ' : '') + 'You propose the exact time and price when you book.</p>' : '<p class="note">No days set yet. Propose a time when you book.</p>') + '</div>' +
+      '<p class="note">You pay only after the tutor accepts. Payment is held until 48 hours after the lesson.</p>';
+    $('pvf').innerHTML = '<span class="p">' + (p ? '<b>' + E(p) + '</b><small>per hour</small>' : '<small>Rate on request</small>') + '</span>' + (t.sample ? '<span class="note">Sample, not bookable</span>' : (pf ? '<a class="btn s" href="' + pf + '">Full profile</a>' : '') + (bk ? '<a class="btn p" href="' + bk + '">Book a lesson</a>' : ''));
+    document.querySelectorAll('.it').forEach(function (b) { b.setAttribute('aria-current', b.dataset.id === t.id ? 'true' : 'false'); });
+  }
+
+  function render(keep) {
+    tokens();
+    var r = FT.search(list, st.text, { days: st.days, times: st.times, maxRate: st.max, sort: st.sort });
+    $('count').innerHTML = '<b>' + r.length + '</b> tutor' + (r.length === 1 ? '' : 's') + ' match' + (r.length === 1 ? 'es' : '') + (FT.demo ? ' · includes sample tutors' : '');
+    $('list').innerHTML = r.length ? r.map(item).join('') : '<div class="empty"><h2>No exact match</h2><p>Remove a chip above to widen the search, or post a request and tutors who can help will reach out.</p><a class="btn p" href="' + FT.links.request + '">Post a request</a></div>';
+    if (!keep || !cur || r.indexOf(cur) < 0) { if (window.innerWidth > 900 || !r.length) preview(r[0] || null); else cur = null; } else preview(cur);
+  }
+
+  $('sf').addEventListener('submit', function (e) { e.preventDefault(); var v = $('q').value.trim(); if (v) { st.text = ''; parse(v); } $('q').value = ''; render(); });
+  $('toks').addEventListener('click', function (e) { var b = e.target.closest('button[data-x]'); if (!b) return; var x = b.dataset.x; if (x === 'text') st.text = ''; if (x === 'day') st.days.splice(st.days.indexOf(b.dataset.v), 1); if (x === 'time') st.times.splice(st.times.indexOf(b.dataset.v), 1); if (x === 'max') st.max = null; render(true); $('q').focus(); });
+  $('q').addEventListener('keydown', function (e) { if (e.key === 'Backspace' && !this.value) { if (st.max != null) st.max = null; else if (st.times.length) st.times.pop(); else if (st.days.length) st.days.pop(); else st.text = ''; render(true); } });
+  $('list').addEventListener('click', function (e) { var b = e.target.closest('.it'); if (!b) return; var t = list.find(function (x) { return x.id === b.dataset.id; }); preview(t); if (window.innerWidth <= 900) { document.body.classList.add('pv-open'); $('back').focus(); } });
+  $('back').onclick = function () { document.body.classList.remove('pv-open'); var b = cur && document.querySelector('.it[data-id="' + CSS.escape(cur.id) + '"]'); if (b) b.focus(); };
+  $('sort').onchange = function () { st.sort = this.value; render(true); };
+  $('ex').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; st.text = ''; st.days = []; st.times = []; st.max = null; parse(b.dataset.q); render(); });
+
+  FT.ready.then(function (data) {
+    list = data;
+    // Example searches built from real subjects and real availability
+    var c = FT.counts(list).slice(0, 2).map(function (x) { return x.subject; });
+    var ex = c.map(function (s, i) { return s + (i === 0 ? ' weekend' : ' evening under 30'); });
+    $('ex').innerHTML = ex.map(function (q) { return '<button type="button" data-q="' + E(q) + '">' + E(q) + '</button>'; }).join(' · ') || '—';
+    if (st.text) { var v = st.text; st.text = ''; parse(v); }
+    render();
+  }).catch(function () { $('list').innerHTML = '<div class="empty"><h2>Could not load tutors</h2><p>Please refresh the page or try again in a moment.</p></div>'; $('count').textContent = ''; $('pvb').innerHTML = ''; });
+})();
+</script>
+</body>
+</html>

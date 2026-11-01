@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Find a Tutor · Concept C · UniSkilled (preview)</title>
+<link rel="icon" href="favicon.ico?v=20261101" sizes="any">
+<link rel="stylesheet" href="fonts/fonts.css">
+<script src="vendor/supabase-js/2.39.3/supabase.js"></script>
+<script src="supabase-config.js"></script>
+<style>
+/* C — Student-first discovery. Search the way students think (what + where), see academic
+   background before price, and compare up to three tutors side by side before booking. */
+:root{--bg:#f5f7fb;--card:#fff;--ink:#0b1530;--ink-2:#3d4659;--mute:#667085;--line:#e3e8f0;--line-2:#cfd7e3;--navy:#0f2460;--blue:#1a6bff;--blue-2:#1558e0;--wash:#eaf1ff;--sky:#28a9e0;--hl:#ffe27a;--ok:#0b7a55;--ok-wash:#e8f6f0;--warn:#8a5a00;--warn-wash:#fff6e0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}button{font-family:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 max(20px,4vw)}
+.hero{padding:36px 0 18px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.hero h1{font-size:clamp(1.8rem,3.4vw,2.6rem);letter-spacing:-.04em;line-height:1.06;font-weight:800;max-width:24ch}
+.hero h1 em{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:600;letter-spacing:-.02em;background:linear-gradient(transparent 62%,var(--hl) 62%,var(--hl) 92%,transparent 92%)}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:0;background:#fff;border:1px solid var(--line-2);border-radius:18px;box-shadow:0 18px 40px -30px rgba(11,21,48,.5);max-width:880px;overflow:hidden}
+.two label{display:flex;flex-direction:column;gap:2px;padding:12px 18px;min-width:0}
+.two label + label{border-left:1px solid var(--line)}
+.two span{font-size:.75rem;font-weight:800;color:var(--ink-2)}
+.two input,.two select{border:0;outline:0;font:500 1rem 'Manrope',sans-serif;color:var(--ink);background:transparent;height:28px;min-width:0;width:100%}
+.two label:focus-within{background:var(--wash)}
+.two button{margin:8px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;padding:0 24px;cursor:pointer;font-size:.9375rem}
+.two button:hover{background:var(--blue-2)}
+.mine{display:inline-flex;align-items:center;gap:8px;font-size:.875rem;font-weight:700;color:var(--ink-2)}
+.mine input{width:18px;height:18px;accent-color:var(--blue)}
+.trust{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.8125rem;font-weight:700;color:var(--ink-2);list-style:none}
+.trust li{display:flex;align-items:center;gap:6px}
+.trust svg{width:16px;height:16px;fill:none;stroke:var(--ok);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--line)}
+.bar p{font-size:.9375rem;color:var(--mute)}.bar p b{color:var(--ink)}
+.bar .f{display:flex;gap:8px;flex-wrap:wrap}
+.bar select{height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 10px;font:700 .8125rem 'Manrope',sans-serif;background:#fff;color:var(--ink)}
+
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-bottom:120px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px;position:relative;transition:box-shadow .18s,border-color .18s}
+.card:hover{box-shadow:0 18px 36px -26px rgba(11,21,48,.45)}
+.card.cmp{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.ct{display:flex;gap:12px;align-items:center}
+.av{width:58px;height:58px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--wash);color:var(--navy);font-weight:800;flex:0 0 58px}
+.ct h2{font-size:1.0625rem;letter-spacing:-.015em;line-height:1.25}
+.ct h2 a{text-decoration:none}.ct h2 a:hover{text-decoration:underline}
+.bdg{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.vb{font-size:.6875rem;font-weight:800;color:var(--blue-2);background:var(--wash);padding:2px 7px;border-radius:999px}
+.nb{font-size:.6875rem;font-weight:800;color:var(--ink-2);background:#f0f2f6;padding:2px 7px;border-radius:999px}
+.rb{font-size:.6875rem;font-weight:800;color:#7a5200;background:#fff4d6;padding:2px 7px;border-radius:999px}
+.sb{font-size:.6875rem;font-weight:800;color:var(--warn);background:var(--warn-wash);padding:2px 7px;border-radius:999px}
+.acad{background:#f7f9fc;border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:6px;font-size:.8125rem}
+.acad div{display:flex;gap:8px;align-items:flex-start}
+.acad svg{width:16px;height:16px;flex:0 0 16px;margin-top:2px;fill:none;stroke:var(--navy);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.acad b{font-weight:700}
+.match{font-size:.8125rem;font-weight:800;color:var(--ok);background:var(--ok-wash);padding:6px 10px;border-radius:10px}
+.teach{display:flex;gap:6px;flex-wrap:wrap}
+.teach span{font-size:.75rem;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-2)}
+.avail{display:flex;justify-content:space-between;align-items:center;font-size:.8125rem;color:var(--ink-2);gap:8px}
+.avail b{font-weight:800}
+.foot{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.price{margin-right:auto}
+.price b{font-size:1.375rem;letter-spacing:-.02em}
+.price small{font-size:.75rem;color:var(--mute)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 14px;border-radius:11px;font-weight:800;font-size:.875rem;text-decoration:none;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+.btn.p{background:var(--blue);color:#fff}.btn.p:hover{background:var(--blue-2)}
+.btn.s{background:#fff;border-color:var(--line-2)}
+.cmpb{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;font-size:.75rem;font-weight:800;color:var(--ink-2);cursor:pointer}
+.cmpb input{width:16px;height:16px;accent-color:var(--blue)}
+.note{font-size:.75rem;color:var(--mute)}
+.skel{height:300px;border-radius:20px;background:linear-gradient(90deg,#e9eef5 25%,#f4f7fb 37%,#e9eef5 63%);background-size:400% 100%;animation:sh 1.3s ease infinite}
+@keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.empty{grid-column:1/-1;background:#fff;border:1px dashed var(--line-2);border-radius:20px;padding:36px 20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty p{color:var(--mute);max-width:46ch}
+
+.tray{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--navy);color:#fff;border-radius:18px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 20px 50px -18px rgba(8,16,40,.6);transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:900;max-width:calc(100% - 32px)}
+.tray.on{transform:translate(-50%,0)}
+.tray .pp{display:flex}
+.tray .pp > *{width:34px;height:34px;border-radius:50%;border:2px solid var(--navy);margin-left:-8px;background:#dfe9ff;color:var(--navy);font-size:.75rem;font-weight:800;display:grid;place-items:center;object-fit:cover}
+.tray .pp > *:first-child{margin-left:0}
+.tray p{font-size:.875rem;font-weight:700;white-space:nowrap}
+.tray button{border:0;border-radius:11px;height:42px;padding:0 16px;font-weight:800;cursor:pointer}
+.tray .go{background:#fff;color:var(--navy)}
+.tray .x{background:transparent;color:#b9c8ea}
+dialog{border:0;border-radius:22px;padding:0;width:min(980px,calc(100% - 24px));max-height:calc(100vh - 40px);box-shadow:0 30px 70px -20px rgba(8,16,40,.5)}
+dialog::backdrop{background:rgba(8,16,40,.45)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
+.dh button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:#fff;cursor:pointer}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:.875rem}
+th,td{padding:12px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th[scope=row]{color:var(--mute);font-weight:700;width:150px;background:#fafbfd}
+thead th{vertical-align:bottom}
+.ch{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.best{color:var(--ok);font-weight:800}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
+
+@media (max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:680px){
+  .two{grid-template-columns:1fr}
+  .two label + label{border-left:0;border-top:1px solid var(--line)}
+  .two button{min-height:48px}
+  .grid{grid-template-columns:1fr}
+  .bar{flex-direction:column;align-items:stretch}
+  .bar .f{display:grid;grid-template-columns:1fr 1fr}
+  .tray p{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+<header id="site-nav"></header>
+<script src="site-nav.js"></script>
+
+<main id="main" class="wrap">
+  <section class="hero" aria-labelledby="t">
+    <h1 id="t">Find someone who <em>already passed</em> your course</h1>
+    <form class="two" id="sf" role="search">
+      <label><span>What do you need help with?</span><input id="q" type="search" placeholder="e.g. Statistics, MATH 101" enterkeyhint="search"></label>
+      <label><span>Which university?</span><select id="uni"><option value="">Any university</option></select></label>
+      <button type="submit">Find tutors</button>
+    </form>
+    <label class="mine" id="mineWrap" hidden><input type="checkbox" id="mine">Only tutors from my university</label>
+    <ul class="trust">
+      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Pay only after your tutor accepts</li>
+      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Payment held until 48 hours after the lesson</li>
+      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Tutor cancels? Automatic full refund</li>
+    </ul>
+  </section>
+  <div class="bar"><p id="count" role="status" aria-live="polite">Loading tutors…</p>
+    <div class="f">
+      <select id="day" aria-label="Available on"><option value="">Any day</option></select>
+      <select id="max" aria-label="Maximum price"><option value="">Any price</option></select>
+      <select id="sort" aria-label="Sort"><option value="best">Recommended</option><option value="price-asc">Lowest price</option><option value="days">Most available</option></select>
+    </div></div>
+  <section class="grid" id="grid" aria-label="Tutors"><div class="skel"></div><div class="skel"></div><div class="skel"></div></section>
+</main>
+
+<div class="tray" id="tray" role="region" aria-label="Compare tutors"><div class="pp" id="pp"></div><p id="trayT"></p><button type="button" class="go" id="cmpGo">Compare</button><button type="button" class="x" id="cmpX">Clear</button></div>
+<dialog id="dlg" aria-labelledby="dlgT"><div class="dh"><b id="dlgT">Compare tutors</b><button type="button" id="dlgX" aria-label="Close">✕</button></div><div class="tbl" id="tbl"></div></dialog>
+
+<script src="find-tutors-concepts.js"></script>
+<script>
+(function () {
+  var E = FT.esc, list = [], picked = [];
+  var st = { q: new URLSearchParams(location.search).get('q') || '', uni: '', day: '', max: '', sort: 'best' };
+  var $ = function (id) { return document.getElementById(id); };
+  $('q').value = st.q;
+  var I = { uni: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg>', book: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>', star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>' };
+
+  function card(t) {
+    var w = FT.why(t, st.q), p = FT.price(t), bk = FT.links.book(t), pf = FT.links.profile(t), on = picked.indexOf(t.id) > -1;
+    return '<article class="card' + (on ? ' cmp' : '') + '">' +
+      '<label class="cmpb"><input type="checkbox" data-c="' + E(t.id) + '"' + (on ? ' checked' : '') + (!on && picked.length >= 3 ? ' disabled' : '') + '>Compare</label>' +
+      '<div class="ct">' + FT.avatar(t, 'av') + '<div style="min-width:0;padding-right:70px"><h2>' + (pf ? '<a href="' + pf + '">' + E(t.name) + '</a>' : E(t.name)) + '</h2><div class="bdg">' +
+      (t.verified ? '<span class="vb">✓ Verified student</span>' : '') + (t.rating ? '<span class="rb">★ ' + t.rating.toFixed(1) + ' · ' + t.reviews + ' reviews</span>' : '<span class="nb">New tutor</span>') + (t.sample ? '<span class="sb">Sample</span>' : '') + '</div></div></div>' +
+      '<div class="acad">' + (t.uni ? '<div>' + I.uni + '<span>Studies at <b>' + E(t.uni) + '</b></span></div>' : '') + (t.study ? '<div>' + I.book + '<span>' + E(t.study) + '</span></div>' : '') +
+      (t.courses.length ? '<div>' + I.star + '<span>Passed <b>' + E(t.courses.slice(0, 2).map(function (c) { return c.course_code || c.course_name; }).join(', ')) + '</b>' + (t.courses.length > 2 ? ' +' + (t.courses.length - 2) : '') + '</span></div>' : '') +
+      (!t.uni && !t.study && !t.courses.length ? '<div><span class="note">No academic details added yet</span></div>' : '') + '</div>' +
+      (w && w.text ? '<div class="match">✓ ' + E(w.text) + '</div>' : '') +
+      (t.subjects.length ? '<div class="teach">' + t.subjects.slice(0, 4).map(function (s) { return '<span>' + E(s) + '</span>'; }).join('') + '</div>' : '') +
+      '<div class="avail"><span>Available: <b>' + E(FT.daysLabel(t) || 'not set yet') + '</b></span>' + (t.times.length ? '<span class="note">' + E(FT.timesLabel(t)) + '</span>' : '') + '</div>' +
+      '<div class="foot"><span class="price">' + (p ? '<b>' + E(p) + '</b> <small>/ hour</small>' : '<small>Rate on request</small>') + '</span>' +
+      (t.sample ? '<span class="note">Sample, not bookable</span>' : (pf ? '<a class="btn s" href="' + pf + '">Profile</a>' : '') + (bk ? '<a class="btn p" href="' + bk + '">Book</a>' : '')) + '</div></article>';
+  }
+
+  function render() {
+    var f = { uni: st.uni, days: st.day ? [st.day] : [], maxRate: st.max ? +st.max : null, sort: st.sort };
+    var r = FT.search(list, st.q, f);
+    $('count').innerHTML = '<b>' + r.length + '</b> tutor' + (r.length === 1 ? '' : 's') + (st.q ? ' for “' + E(st.q) + '”' : '') + (st.uni ? ' · ' + E(st.uni === 'same' ? 'your university' : st.uni) : '') + (FT.demo ? ' · includes sample tutors' : '');
+    $('grid').innerHTML = r.length ? r.map(card).join('') : '<div class="empty"><h2>No tutors match yet</h2><p>Try a broader subject or any university. Or post a request, and tutors who can help will reach out.</p><a class="btn p" href="' + FT.links.request + '">Post a request</a></div>';
+    tray();
+  }
+
+  function tray() {
+    var ts = picked.map(function (id) { return list.find(function (t) { return t.id === id; }); }).filter(Boolean);
+    $('pp').innerHTML = ts.map(function (t) { return FT.avatar(t, 'x'); }).join('');
+    $('trayT').textContent = ts.length + ' of 3 selected';
+    $('cmpGo').disabled = ts.length < 2; $('cmpGo').textContent = ts.length < 2 ? 'Pick one more' : 'Compare ' + ts.length;
+    $('tray').classList.toggle('on', ts.length > 0);
+  }
+
+  function compare() {
+    var ts = picked.map(function (id) { return list.find(function (t) { return t.id === id; }); }).filter(Boolean);
+    var rates = ts.map(function (t) { return t.rate; }).filter(function (x) { return x != null; }), low = rates.length ? Math.min.apply(null, rates) : null;
+    var most = Math.max.apply(null, ts.map(function (t) { return t.days.length; }));
+    var row = function (h, f) { return '<tr><th scope="row">' + h + '</th>' + ts.map(function (t) { return '<td>' + f(t) + '</td>'; }).join('') + '</tr>'; };
+    $('tbl').innerHTML = '<table><thead><tr><th scope="col"><span class="note">Side by side</span></th>' + ts.map(function (t) { var bk = FT.links.book(t); return '<th scope="col"><div class="ch">' + FT.avatar(t, 'av') + '<b>' + E(t.name) + '</b>' + (t.sample ? '<span class="sb">Sample, not bookable</span>' : (bk ? '<a class="btn p" href="' + bk + '">Book</a>' : '')) + '</div></th>'; }).join('') + '</tr></thead><tbody>' +
+      row('Price per hour', function (t) { var p = FT.price(t); return p ? (t.rate === low && ts.length > 1 ? '<span class="best">' + E(p) + ' · lowest</span>' : E(p)) : 'On request'; }) +
+      row('University', function (t) { return E(t.uni || '—') + (t.verified ? '<br><span class="vb">✓ Verified</span>' : ''); }) +
+      row('Studies', function (t) { return E(t.study || '—'); }) +
+      row('Teaches', function (t) { return E(t.subjects.join(', ') || '—'); }) +
+      row('Courses passed', function (t) { return t.courses.length ? E(t.courses.map(function (c) { return (c.course_code || c.course_name) + (c.grade ? ' (' + c.grade + ')' : ''); }).join(', ')) + '<br><span class="note">Self-reported grades</span>' : '—'; }) +
+      row('Available', function (t) { var l = FT.daysLabel(t) || 'Not set'; return t.days.length === most && ts.length > 1 && most > 0 ? '<span class="best">' + E(l) + '</span>' : E(l); }) +
+      row('Preferred times', function (t) { return E(FT.timesLabel(t) || '—'); }) +
+      row('Reviews', function (t) { return t.rating ? '★ ' + t.rating.toFixed(1) + ' (' + t.reviews + ')' : 'New tutor'; }) +
+      row('Lessons completed', function (t) { return String(t.lessons || 0); }) +
+      '</tbody></table>';
+    $('dlg').showModal();
+  }
+
+  $('grid').addEventListener('change', function (e) { var c = e.target.closest('input[data-c]'); if (!c) return; var id = c.dataset.c, i = picked.indexOf(id); if (c.checked && i < 0 && picked.length < 3) picked.push(id); if (!c.checked && i > -1) picked.splice(i, 1); render(); var again = document.querySelector('input[data-c="' + CSS.escape(id) + '"]'); if (again) again.focus(); });
+  $('cmpGo').onclick = compare; $('cmpX').onclick = function () { picked = []; render(); };
+  $('dlgX').onclick = function () { $('dlg').close(); };
+  $('sf').addEventListener('submit', function (e) { e.preventDefault(); st.q = $('q').value.trim(); st.uni = $('mine').checked ? 'same' : $('uni').value; render(); });
+  $('q').addEventListener('input', function () { if (!this.value) { st.q = ''; render(); } });
+
+  FT.ready.then(function (data) {
+    list = data;
+    FT.unis(list).forEach(function (u) { $('uni').insertAdjacentHTML('beforeend', '<option value="' + E(u) + '">' + E(u) + '</option>'); });
+    $('uni').onchange = function () { $('mine').checked = false; st.uni = this.value; render(); };
+    if (FT.me.uni) { $('mineWrap').hidden = false; $('mine').onchange = function () { st.uni = this.checked ? 'same' : $('uni').value; render(); }; }
+    FT.DAYS.forEach(function (d) { $('day').insertAdjacentHTML('beforeend', '<option value="' + d[0] + '">Available ' + d[1] + '</option>'); });
+    var b = FT.rateBounds(list); [15, 20, 25, 30, 40, 60].filter(function (x) { return x >= b.min && x < b.max; }).forEach(function (x) { $('max').insertAdjacentHTML('beforeend', '<option value="' + x + '">Up to €' + x + '/h</option>'); });
+    $('day').onchange = function () { st.day = this.value; render(); };
+    $('max').onchange = function () { st.max = this.value; render(); };
+    $('sort').onchange = function () { st.sort = this.value; render(); };
+    render();
+  }).catch(function () { $('grid').innerHTML = '<div class="empty"><h2>Could not load tutors</h2><p>Please refresh the page or try again in a moment.</p></div>'; $('count').textContent = ''; });
+})();
+</script>
+</body>
+</html>
