@@ -28,7 +28,7 @@
 <style>
 /* Find a Tutor — Concept C "Student-first discovery" (chosen 1 Nov 2026).
    Search the way students think (what + where), academic background before price,
-   and compare up to three tutors side by side before booking. */
+   so a student can pick a tutor and book straight from the results. */
 :root{--bg:#f5f7fb;--card:#fff;--ink:#0b1530;--ink-2:#3d4659;--mute:#667085;--line:#e3e8f0;--line-2:#cfd7e3;--navy:#0f2460;--blue:#1a6bff;--blue-2:#1558e0;--wash:#eaf1ff;--hl:#ffe27a;--ok:#0b7a55;--ok-wash:#e8f6f0}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -71,7 +71,6 @@ a{color:inherit}button{font-family:inherit}
 .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-bottom:120px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px;position:relative;transition:box-shadow .18s,border-color .18s}
 .card:hover{box-shadow:0 18px 36px -26px rgba(11,21,48,.45)}
-.card.cmp{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
 .ct{display:flex;gap:12px;align-items:center}
 .av{width:58px;height:58px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--wash);color:var(--navy);font-weight:800;flex:0 0 58px}
 .ct h2{font-size:1.0625rem;letter-spacing:-.015em;line-height:1.25}
@@ -97,8 +96,6 @@ a{color:inherit}button{font-family:inherit}
 .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:11px;font-weight:800;font-size:.875rem;text-decoration:none;border:1px solid transparent;cursor:pointer;white-space:nowrap}
 .btn.p{background:var(--blue);color:#fff}.btn.p:hover{background:var(--blue-2)}
 .btn.s{background:#fff;border-color:var(--line-2)}.btn.s:hover{border-color:var(--ink-2)}
-.cmpb{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;font-size:.75rem;font-weight:800;color:var(--ink-2);cursor:pointer;min-height:32px}
-.cmpb input{width:16px;height:16px;accent-color:var(--blue)}
 .note{font-size:.75rem;color:var(--mute)}
 .skel{height:300px;border-radius:20px;background:linear-gradient(90deg,#e9eef5 25%,#f4f7fb 37%,#e9eef5 63%);background-size:400% 100%;animation:sh 1.3s ease infinite}
 @keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
@@ -107,27 +104,6 @@ a{color:inherit}button{font-family:inherit}
 .empty p{color:var(--mute);max-width:46ch}
 .empty-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 
-.tray{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--navy);color:#fff;border-radius:18px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 20px 50px -18px rgba(8,16,40,.6);transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:900;max-width:calc(100% - 32px)}
-.tray.on{transform:translate(-50%,0)}
-.tray .pp{display:flex}
-.tray .pp > *{width:34px;height:34px;border-radius:50%;border:2px solid var(--navy);margin-left:-8px;background:#dfe9ff;color:var(--navy);font-size:.75rem;font-weight:800;display:grid;place-items:center;object-fit:cover}
-.tray .pp > *:first-child{margin-left:0}
-.tray p{font-size:.875rem;font-weight:700;white-space:nowrap}
-.tray button{border:0;border-radius:11px;height:44px;padding:0 16px;font-weight:800;cursor:pointer;white-space:nowrap}
-.tray .go{background:#fff;color:var(--navy)}
-.tray .go:disabled{opacity:.7;cursor:default}
-.tray .x{background:transparent;color:#b9c8ea}
-#cmpDlg{border:0;border-radius:22px;padding:0;width:min(980px,calc(100% - 24px));max-height:calc(100vh - 40px);margin:auto;box-shadow:0 30px 70px -20px rgba(8,16,40,.5)}
-#cmpDlg::backdrop{background:rgba(8,16,40,.45)}
-.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
-.dh button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line-2);background:#fff;cursor:pointer}
-.tbl{overflow-x:auto}
-.tbl table{border-collapse:collapse;width:100%;min-width:560px;font-size:.875rem}
-.tbl th,.tbl td{padding:12px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
-.tbl th[scope=row]{color:var(--mute);font-weight:700;width:150px;background:#fafbfd}
-.tbl thead th{vertical-align:bottom}
-.ch{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
-.best{color:var(--ok);font-weight:800}
 
 /* Post-a-request form (unchanged behaviour) */
 .req-modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
@@ -160,7 +136,6 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
   .bar{flex-direction:column;align-items:stretch}
   .bar .f{display:grid;grid-template-columns:1fr 1fr}
   .bar select{font-size:16px;height:44px}
-  .tray p{display:none}
   .req-modal-overlay{align-items:flex-end;padding:0}
   .req-modal{border-radius:16px 16px 0 0;max-height:92vh}
   .req-form-input{font-size:16px}
@@ -204,8 +179,6 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
   <section class="grid" id="tutorGrid" aria-label="Tutors"><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div></section>
 </main>
 
-<div class="tray" id="tray" role="region" aria-label="Compare tutors"><div class="pp" id="pp"></div><p id="trayT"></p><button type="button" class="go" id="cmpGo">Compare</button><button type="button" class="x" id="cmpX">Clear</button></div>
-<dialog id="cmpDlg" aria-labelledby="cmpT"><div class="dh"><b id="cmpT">Compare tutors</b><button type="button" id="cmpClose" aria-label="Close">✕</button></div><div class="tbl" id="cmpTbl"></div></dialog>
 
 <!-- POST SUBJECT REQUEST MODAL -->
 <div class="req-modal-overlay" id="requestModal" onclick="if(event.target===this)closeRequestModal()">
@@ -266,7 +239,6 @@ const _sb = window.supabase.createClient(
 const TUTOR_COLUMNS = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url';
 
 let allTutors = [];
-let compareIds = [];
 const DAYS = [['mon','Mon'],['tue','Tue'],['wed','Wed'],['thu','Thu'],['fri','Fri'],['sat','Sat'],['sun','Sun']];
 const TIME_LABELS = { morning: 'Mornings', afternoon: 'Afternoons', evening: 'Evenings', flexible: 'Flexible hours' };
 const LEVELS = { bachelor: "Bachelor's", master: "Master's", masters: "Master's", phd: 'PhD', doctorate: 'PhD' };
@@ -437,14 +409,13 @@ function renderTutors(tutors, q) {
   if (!tutors.length) {
     const canRequest = currentUserId && currentUserRole !== 'tutor';
     grid.innerHTML = '<div class="empty"><h2>No tutors match yet</h2><p>Try another subject or fewer filters' + (canRequest ? ', or post a request and tutors who can help will reach out.' : '.') + '</p><div class="empty-actions"><button type="button" class="btn s" onclick="clearFilters()">Clear filters</button>' + (canRequest ? '<button type="button" class="btn p" onclick="openRequestModal()">Post a request</button>' : '') + '</div></div>';
-    syncCompare(); return;
+    return;
   }
   grid.innerHTML = tutors.map(t => {
-    const on = compareIds.includes(t.user_id), why = whyMatch(t, q), p = priceLabel(t), own = t.user_id === currentUserId;
+    const why = whyMatch(t, q), p = priceLabel(t), own = t.user_id === currentUserId;
     const courses = t.courses.slice(0, 2).map(c => c.course_key ? `<a href="course.html?c=${encodeURIComponent(c.course_key)}">${__esc(c.course_code || c.course_name)}</a>` : __esc(c.course_code || c.course_name)).join(', ');
-    return `<article class="card${on ? ' cmp' : ''}">
-      <label class="cmpb"><input type="checkbox" data-c="${__esc(t.user_id)}"${on ? ' checked' : ''}${!on && compareIds.length >= 3 ? ' disabled' : ''}>Compare</label>
-      <div class="ct">${avatarHtml(t, 'av')}<div style="min-width:0;padding-right:70px"><h2><a href="${profileUrl(t)}">${__esc(t.fullName)}</a></h2><div class="bdg">
+    return `<article class="card">
+      <div class="ct">${avatarHtml(t, 'av')}<div style="min-width:0"><h2><a href="${profileUrl(t)}">${__esc(t.fullName)}</a></h2><div class="bdg">
         ${t.university_verified_at ? `<span class="vb" title="University email verified${t.verified_university ? ' — ' + __esc(t.verified_university) : ''}">✓ Verified student</span>` : ''}
         ${t.avgRating ? `<span class="rb" aria-label="Rated ${__esc(t.avgRating)} out of 5 from ${t.reviewCount} reviews">★ ${__esc(t.avgRating)} · ${t.reviewCount} reviews</span>` : '<span class="nb">New tutor</span>'}</div></div></div>
       <div class="acad">${t.location ? `<div>${ICO.uni}<span>Studies at <b>${__esc(t.location)}</b></span></div>` : ''}${t.study ? `<div>${ICO.book}<span>${__esc(t.study)}</span></div>` : ''}${courses ? `<div>${ICO.star}<span>Passed ${courses}${t.courses.length > 2 ? ' +' + (t.courses.length - 2) : ''}</span></div>` : ''}${!t.location && !t.study && !courses ? '<div><span class="note">No academic details added yet</span></div>' : ''}</div>
@@ -456,38 +427,8 @@ function renderTutors(tutors, q) {
         ${canBook(t) ? `<a class="btn p" href="${bookUrl(t)}" aria-label="Book a session with ${__esc(t.fullName)}">Book</a>` : ''}</div>
     </article>`;
   }).join('');
-  syncCompare();
 }
 
-function syncCompare() {
-  compareIds = compareIds.filter(id => allTutors.some(t => t.user_id === id));
-  const ts = compareIds.map(id => allTutors.find(t => t.user_id === id));
-  document.getElementById('pp').innerHTML = ts.map(t => avatarHtml(t, 'tav')).join('');
-  document.getElementById('trayT').textContent = ts.length + ' of 3 selected';
-  const go = document.getElementById('cmpGo');
-  go.disabled = ts.length < 2; go.textContent = ts.length < 2 ? 'Pick one more' : 'Compare ' + ts.length;
-  document.getElementById('tray').classList.toggle('on', ts.length > 0);
-}
-
-function openCompare() {
-  const ts = compareIds.map(id => allTutors.find(t => t.user_id === id)).filter(Boolean);
-  const rates = ts.map(t => Number(t.hourly_rate)).filter(r => r > 0), low = rates.length ? Math.min(...rates) : null;
-  const most = Math.max(...ts.map(t => t.availability.length));
-  const row = (h, f) => '<tr><th scope="row">' + h + '</th>' + ts.map(t => '<td>' + f(t) + '</td>').join('') + '</tr>';
-  document.getElementById('cmpTbl').innerHTML = '<table><thead><tr><th scope="col"><span class="note">Side by side</span></th>' +
-    ts.map(t => `<th scope="col"><div class="ch">${avatarHtml(t, 'av')}<a href="${profileUrl(t)}"><b>${__esc(t.fullName)}</b></a>${canBook(t) ? `<a class="btn p" href="${bookUrl(t)}">Book</a>` : ''}</div></th>`).join('') + '</tr></thead><tbody>' +
-    row('Price per hour', t => { const p = priceLabel(t); return p ? (Number(t.hourly_rate) === low && ts.length > 1 ? `<span class="best">${__esc(p)} · lowest</span>` : __esc(p)) : 'On request'; }) +
-    row('University', t => __esc(t.location || '—') + (t.university_verified_at ? '<br><span class="vb">✓ Verified</span>' : '')) +
-    row('Studies', t => __esc(t.study || '—')) +
-    row('Teaches', t => __esc(t.subjects.join(', ') || '—')) +
-    row('Courses passed', t => t.courses.length ? __esc(t.courses.map(c => (c.course_code || c.course_name) + (c.grade ? ' (' + c.grade + ')' : '')).join(', ')) + '<br><span class="note">Grades are self-reported</span>' : '—') +
-    row('Available', t => { const l = daysLabel(t) || 'Not set'; return t.availability.length === most && most > 0 && ts.length > 1 ? `<span class="best">${__esc(l)}</span>` : __esc(l); }) +
-    row('Preferred times', t => __esc(timesLabel(t) || '—')) +
-    row('Reviews', t => t.avgRating ? '★ ' + __esc(t.avgRating) + ' (' + t.reviewCount + ')' : 'New tutor') +
-    row('Lessons completed', t => String(t.sessions_count || 0)) + '</tbody></table>';
-  window.usTrack && usTrack('tutor_compare', { count: ts.length });
-  document.getElementById('cmpDlg').showModal();
-}
 
 // ── Events ──
 document.getElementById('sf').addEventListener('submit', e => { e.preventDefault(); filterTutors(); });
@@ -502,17 +443,6 @@ document.getElementById('quickSubjects').addEventListener('click', e => {
   input.value = b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.subject;
   filterTutors();
 });
-document.getElementById('tutorGrid').addEventListener('change', e => {
-  const c = e.target.closest('input[data-c]'); if (!c) return;
-  const id = c.dataset.c, i = compareIds.indexOf(id);
-  if (c.checked && i < 0 && compareIds.length < 3) compareIds.push(id);
-  if (!c.checked && i > -1) compareIds.splice(i, 1);
-  filterTutors();
-  const again = document.querySelector('input[data-c="' + CSS.escape(id) + '"]'); if (again) again.focus();
-});
-document.getElementById('cmpGo').addEventListener('click', openCompare);
-document.getElementById('cmpX').addEventListener('click', () => { compareIds = []; filterTutors(); });
-document.getElementById('cmpClose').addEventListener('click', () => document.getElementById('cmpDlg').close());
 
 let currentUserId = null;
 let currentUserName = 'Student';
