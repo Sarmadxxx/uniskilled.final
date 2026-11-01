@@ -150,7 +150,7 @@
 
   root.className = 'snav';
   root.innerHTML =
-    '<a class="snav-logo" href="index.html" aria-label="UniSkilled home"><img src="uniskilled-logo-white-sm.png" alt="UniSkilled" width="153" height="38"></a>' +
+    '<a class="snav-logo" href="index.html" aria-label="UniSkilled home"><img src="uniskilled-logo-white-sm.png?v=20261101" alt="UniSkilled" width="153" height="38"></a>' +
     '<div class="snav-links" role="navigation" aria-label="Main">' + main + '</div>' +
     '<div class="snav-end">' + end + '</div>' +
     '<button class="snav-burger" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="snavMenu">' + BURGER + CLOSE + '</button>' +
