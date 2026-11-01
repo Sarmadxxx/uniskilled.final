@@ -326,26 +326,41 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   </button>
 </section>
 <script>
-// Background video: phone poster, honour reduced-motion, accessible pause/play.
+// Background video: always starts by itself, muted and looping. The pause button
+// stops it for anyone who wants it still; if a phone blocks autoplay (e.g. Low Power
+// Mode), it starts on the visitor's first tap, click, key or scroll instead.
 (function () {
   var v = document.getElementById('heroVideo'), b = document.getElementById('heroToggle');
   if (!v || !b) return;
   if (matchMedia('(max-width: 720px)').matches) {
     var q = document.getElementById('heroSearch'); if (q) q.placeholder = 'Course, subject or tutor name';
   }
-  function state(paused) {
+  var userPaused = false;
+  v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+  function sync() {
+    var paused = v.paused;
     b.classList.toggle('is-paused', paused);
     b.setAttribute('aria-pressed', paused ? 'true' : 'false');
     b.setAttribute('aria-label', paused ? 'Play background video' : 'Pause background video');
   }
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    v.removeAttribute('autoplay'); v.pause(); state(true);
-  } else {
-    var p = v.play(); if (p && p.catch) p.catch(function () { state(true); });
+  function tryPlay() {
+    if (userPaused || !v.paused) return;
+    var p = v.play(); if (p && p.catch) p.catch(function () {});
   }
-  b.addEventListener('click', function () {
-    if (v.paused) { v.play(); state(false); } else { v.pause(); state(true); }
+  var events = ['pointerdown', 'touchstart', 'keydown', 'scroll'];
+  function onFirstInteraction() {
+    tryPlay();
+    if (!v.paused) events.forEach(function (e) { window.removeEventListener(e, onFirstInteraction); });
+  }
+  events.forEach(function (e) { window.addEventListener(e, onFirstInteraction, { passive: true }); });
+  v.addEventListener('play', sync); v.addEventListener('pause', sync);
+  v.addEventListener('canplay', tryPlay);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) tryPlay(); });
+  b.addEventListener('click', function (e) {
+    e.stopPropagation();
+    if (v.paused) { userPaused = false; tryPlay(); } else { userPaused = true; v.pause(); }
   });
+  tryPlay(); sync();
 })();
 </script>
 
