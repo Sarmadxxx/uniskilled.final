@@ -100,6 +100,23 @@ body:has(#alert.error) #signinForm .form-input{border-color:#d92d20}
   .form-side{align-items:flex-start;padding:0 16px 40px}
   .card{margin-top:-52px;background:#fff;border-radius:20px;padding:28px 22px;box-shadow:0 12px 32px rgba(11,21,48,.12);max-width:440px}
 }
+
+/* ── Left panel: cinematic background video ──────────────────────────────
+   Video sits behind the existing copy and status card. A light navy wash keeps
+   the white text readable without flattening the footage. */
+.panel{position:relative;isolation:isolate;overflow:hidden;background-image:none}
+.panel-media{position:absolute;inset:0;z-index:-2;background:var(--navy) url(media/signin/signin-poster.jpg) center/cover no-repeat}
+.panel-media video{width:100%;height:100%;object-fit:cover;object-position:50% 50%;display:block;opacity:0;transition:opacity .6s ease}
+.panel-media video.is-ready{opacity:1}
+.panel::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:
+  linear-gradient(90deg,rgba(9,24,66,.52) 0%,rgba(9,24,66,.22) 70%,rgba(9,24,66,.12) 100%),
+  linear-gradient(180deg,rgba(9,24,66,.40) 0%,rgba(9,24,66,.10) 42%,rgba(9,24,66,.52) 100%)}
+.panel h2{text-shadow:0 2px 22px rgba(5,14,40,.45)}
+.panel p{color:#dde6f8;text-shadow:0 1px 12px rgba(5,14,40,.5)}
+.form-side{position:relative;z-index:1}
+@media(max-width:960px){
+  .panel::before{background:linear-gradient(180deg,rgba(9,24,66,.55) 0%,rgba(9,24,66,.62) 100%)}
+}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
@@ -111,6 +128,9 @@ body:has(#alert.error) #signinForm .form-input{border-color:#d92d20}
 
 <main id="main" class="auth">
   <aside class="panel" aria-label="About your UniSkilled account">
+    <div class="panel-media" aria-hidden="true">
+      <video id="panelVideo" muted loop playsinline autoplay preload="none" disablepictureinpicture disableremoteplayback tabindex="-1" poster="media/signin/signin-poster.jpg" data-src="media/signin/signin-brand.mp4" data-src-mobile="media/signin/signin-brand-mobile.mp4"></video>
+    </div>
     <div>
       <h2>Your lessons, requests and payouts — in one place.</h2>
       <p>Every payment stays on hold until 48 hours after the lesson.</p>
@@ -281,6 +301,38 @@ document.getElementById('forgotLink').addEventListener('click', async (e) => {
     btn.setAttribute('aria-pressed', show ? 'true' : 'false');
     btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
   });
+})();
+</script>
+<script>
+// Left-panel background video: display only, independent of the sign-in logic.
+// Plays by itself, muted and looping, with no controls. It loads after the page so it
+// never slows sign-in, and phones get a lighter copy. If a phone blocks autoplay
+// (e.g. Low Power Mode), it starts on the visitor's first tap, key or scroll.
+(function () {
+  var v = document.getElementById('panelVideo');
+  if (!v) return;
+  v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+  function tryPlay() {
+    if (!v.getAttribute('src') || !v.paused) return;
+    var p = v.play(); if (p && p.catch) p.catch(function () {});
+  }
+  function start() {
+    var small = matchMedia('(max-width: 960px)').matches;
+    v.addEventListener('playing', function () { v.classList.add('is-ready'); }, { once: true });
+    v.src = v.getAttribute(small ? 'data-src-mobile' : 'data-src');
+    tryPlay();
+  }
+  var events = ['pointerdown', 'touchstart', 'keydown', 'scroll'];
+  function onFirstInteraction() {
+    tryPlay();
+    if (!v.paused) events.forEach(function (e) { window.removeEventListener(e, onFirstInteraction); });
+  }
+  events.forEach(function (e) { window.addEventListener(e, onFirstInteraction, { passive: true }); });
+  v.addEventListener('canplay', tryPlay);
+  v.addEventListener('pause', function () { setTimeout(tryPlay, 0); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) tryPlay(); });
+  if (document.readyState === 'complete') setTimeout(start, 100);
+  else window.addEventListener('load', function () { setTimeout(start, 100); });
 })();
 </script>
 </body>
