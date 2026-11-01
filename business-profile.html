@@ -5,9 +5,9 @@
 <script>/* Demo/prototype page: only for these roles; everyone else is sent on before it renders */(function(){var ok=false;try{var t=JSON.parse(localStorage.getItem("sb-orghkbbohnabcietidiv-auth-token")||"null");var s=t&&(t.currentSession||t);var r=s&&s.user&&s.user.user_metadata&&s.user.user_metadata.role;ok=['business','admin'].indexOf(r)>-1;}catch(e){}if(!ok)location.replace("coming-soon.html");})();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="sentry.js"></script>
-<link rel="icon" href="favicon.ico" sizes="any">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="favicon.ico?v=20261101" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261101">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
@@ -268,7 +268,7 @@ html,body{background:var(--bg);font-family:'Plus Jakarta Sans',sans-serif;color:
 <!-- NAV -->
 <nav class="nav">
   <a class="nav-logo" href="index.html">
-    <img class="nav-logo-icon" src="uniskilled-logo-icon.png" alt="" width="30" height="30">
+    <img class="nav-logo-icon" src="uniskilled-logo-icon.png?v=20261101" alt="" width="30" height="30">
     UniSkilled
   </a>
   <div class="nav-r" id="navR"><!-- filled by JS --></div>
