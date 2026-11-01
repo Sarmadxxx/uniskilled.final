@@ -26,163 +26,147 @@
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{--blue:#1a6bff;--ink:#111827;--mid:#6b7280;--light:#9ca3af;--border:#e5e7eb;--white:#fff;--off:#f9fafb;--green:#059669;--green-bg:#ecfdf5;--yellow:#f59e0b;}
-body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);}
-nav{position:sticky;top:0;z-index:100;height:60px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 5%;}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;font-size:1.1rem;color:var(--ink);}
-.logo-icon{width:30px;height:30px;background:var(--blue);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;}
-.nav-links{display:flex;align-items:center;gap:0.5rem;}
-.nav-link{font-size:0.83rem;font-weight:600;color:var(--mid);text-decoration:none;padding:0.4rem 0.7rem;border-radius:7px;}
-.nav-link:hover{background:var(--off);color:var(--ink);}
-.nav-cta{font-size:0.83rem;font-weight:700;background:var(--blue);color:#fff;text-decoration:none;padding:0.4rem 1rem;border-radius:8px;}
-.nav-burger{display:none;background:none;border:none;font-size:1.4rem;cursor:pointer;}
-.mobile-nav{display:none;position:fixed;top:60px;left:0;right:0;background:#fff;border-bottom:1px solid var(--border);z-index:99;padding:1rem;flex-direction:column;gap:0.5rem;}
-body:not(.signed-in) .auth-only,body.signed-in .guest-only{display:none!important;}
-.tutor-card{position:relative;}
-.tutor-link{color:inherit;text-decoration:none;}
-.tutor-link::after{content:"";position:absolute;inset:0;border-radius:16px;}
-.tutor-link:focus-visible{outline:none;}
-.tutor-card:focus-within{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,.18);}
-.book-btn{position:relative;z-index:1;white-space:nowrap;flex-shrink:0;}
-.mobile-nav a{display:block;padding:0.7rem 1rem;font-weight:600;color:var(--ink);text-decoration:none;border-radius:8px;background:var(--off);}
-.hero-search{background:linear-gradient(135deg,#0b1f4a,#1a6bff);padding:3rem 5%;text-align:center;}
-.hero-search h1{font-size:2rem;font-weight:800;color:#fff;margin-bottom:0.5rem;}
-.hero-search p{color:rgba(255,255,255,0.65);margin-bottom:1.5rem;}
-.search-bar{display:flex;gap:0.7rem;max-width:580px;margin:0 auto;}
-.search-input{flex:1;padding:0.9rem 1.2rem;border:none;border-radius:10px;font-family:'Manrope',sans-serif;font-size:0.95rem;outline:none;}
-.search-btn{padding:0.9rem 1.6rem;background:#f7e049;color:var(--ink);border:none;border-radius:10px;font-family:'Manrope',sans-serif;font-weight:800;font-size:0.9rem;cursor:pointer;}
-.post-req-btn{background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.3);color:#fff;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.83rem;padding:0.6rem 1.2rem;border-radius:9px;cursor:pointer;backdrop-filter:blur(6px);transition:background .18s;}
-.post-req-btn:hover{background:rgba(255,255,255,0.2);}
-.req-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:600;display:none;align-items:center;justify-content:center;padding:1rem;}
-.req-modal-overlay.open{display:flex;}
-.req-modal{background:#fff;border-radius:16px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:1.6rem;}
-.req-modal-title{font-weight:800;font-size:1.1rem;margin-bottom:0.3rem;}
-.req-modal-sub{font-size:0.85rem;color:var(--mid);line-height:1.5;margin-bottom:1.2rem;}
-.req-form-group{margin-bottom:0.9rem;}
-.req-form-label{display:block;font-size:0.8rem;font-weight:700;color:#374151;margin-bottom:0.35rem;}
-.req-form-input{width:100%;padding:0.7rem 0.9rem;border:1.5px solid var(--border);border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.87rem;outline:none;}
-.req-form-input:focus{border-color:var(--blue);}
-.req-form-row{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;}
-.req-submit-btn{width:100%;padding:0.8rem;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;margin-top:0.4rem;}
-.req-submit-btn:hover{background:#1558e0;}
-.req-alert{padding:0.65rem 0.9rem;border-radius:8px;font-size:0.82rem;font-weight:600;margin-bottom:0.8rem;display:none;}
-.req-alert.success{background:var(--green-bg);color:var(--green);display:block;}
-.req-alert.error{background:#fef2f2;color:#dc2626;display:block;}
-@media(max-width:480px){.req-form-row{grid-template-columns:1fr;}}
-.filters{padding:1rem 5%;background:#fff;border-bottom:1px solid var(--border);display:flex;gap:0.7rem;flex-wrap:wrap;}
-.filter-select{padding:0.5rem 0.85rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.83rem;color:var(--ink);background:#fff;outline:none;cursor:pointer;}
-.main{max-width:1100px;margin:0 auto;padding:2rem 5%;}
-.results-count{font-size:0.85rem;color:var(--mid);font-weight:600;margin-bottom:1.2rem;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.2rem;}
-.tutor-card{background:#fff;border:1.5px solid var(--border);border-radius:16px;padding:1.5rem;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;}
-.tutor-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.08);border-color:var(--blue);}
-.card-top{display:flex;align-items:center;gap:1rem;margin-bottom:1rem;}
-.tutor-av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1a6bff,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;font-weight:800;flex-shrink:0;overflow:hidden;}
-.tutor-av img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
-.tutor-name{font-weight:800;font-size:1rem;margin-bottom:2px;}
-.tutor-uni{font-size:0.75rem;color:var(--mid);}
-.stars{color:var(--yellow);font-size:0.8rem;}
-.verified{display:inline-flex;align-items:center;gap:4px;background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-top:3px;}
-.subjects{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:0.9rem;}
-.subject-tag{background:#e8f0ff;color:var(--blue);font-size:0.72rem;font-weight:600;padding:3px 9px;border-radius:100px;}
-.card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:0.9rem;border-top:1px solid var(--border);}
-.tutor-rate{font-size:1.1rem;font-weight:800;}
-.tutor-rate span{font-size:0.72rem;color:var(--mid);font-weight:400;}
-.book-btn{background:var(--blue);color:#fff;border:none;padding:0.5rem 1.1rem;border-radius:8px;font-family:'Manrope',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;}
-.empty{text-align:center;padding:4rem 2rem;color:var(--mid);grid-column:1/-1;}
-.loading-text{text-align:center;padding:3rem;color:var(--mid);grid-column:1/-1;}
-@media(max-width:768px){.nav-links{display:none;}.nav-burger{display:block;}.search-bar{flex-direction:column;}.grid{grid-template-columns:1fr;}}
-/* ===== Redesign 11 Oct 2026 — matches the profiles and dashboards. Navbar (site-nav.js) unchanged. ===== */
-body{background:#f4f6f9;color:#0f172a;--blue-pale:#eef4ff}
-.hero-search{background-color:#01367c;background-image:radial-gradient(circle at 1px 1px,rgba(255,255,255,.12) 1px,transparent 0);background-size:22px 22px;padding:48px 24px 40px}
-.hero-search h1{font-size:2.25rem;line-height:2.75rem;letter-spacing:-.02em;margin-bottom:8px}
-.hero-search p{color:#dbe7ff;font-size:1rem;margin-bottom:24px}
-.search-bar{max-width:640px;gap:8px;background:#fff;border-radius:14px;padding:6px;box-shadow:0 12px 32px rgba(1,54,124,.35)}
-.search-field{position:relative;flex:1;display:flex;align-items:center}
-.search-field svg{position:absolute;left:14px;width:20px;height:20px;fill:none;stroke:#5b6474;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
-.search-input{width:100%;padding:0 12px 0 44px;height:48px;border-radius:10px;font-size:1rem;color:#0f172a}
-.search-input::placeholder{color:#5b6474}
-.search-btn{height:48px;padding:0 24px;background:#1a6bff;color:#fff;border-radius:10px;font-weight:700;font-size:0.9375rem}
-.search-btn:hover{background:#1550d4}
-.quick-subjects{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;max-width:760px;margin:18px auto 0}
-.quick-subjects:empty{display:none}
-.quick-label{color:#dbe7ff;font-size:0.875rem;font-weight:600;align-self:center;margin-right:2px}
-.qs-chip{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font-family:'Manrope',sans-serif;font-size:0.875rem;font-weight:600;cursor:pointer}
-.qs-chip:hover{background:rgba(255,255,255,.18)}
-.qs-chip[aria-pressed="true"]{background:#fff;color:#01367c;border-color:#fff}
-.qs-link{display:inline-flex;align-items:center;min-height:36px;padding:0 4px;color:#fff;font-size:0.875rem;font-weight:700;text-decoration:underline;text-underline-offset:3px}
-.course-tag{text-decoration:none}a.course-tag:hover{background:#dce8ff}
-.course-match{font-size:0.8125rem;color:#047857;font-weight:700}
-.post-req-btn{min-height:40px;border-radius:10px;font-size:0.875rem;border:1px solid rgba(255,255,255,.45);background:transparent}
-.filters{position:sticky;top:64px;z-index:50;padding:12px 24px;justify-content:center;align-items:center;gap:8px;border-bottom:1px solid #e3e8ef;box-shadow:0 1px 2px rgba(15,23,42,.04)}
-.filter-select{height:40px;padding:0 32px 0 12px;border:1px solid #8792a2;border-radius:10px;font-size:0.875rem;color:#0f172a;appearance:none;-webkit-appearance:none;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b6474' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 10px center}
-.filter-select.is-set{border-color:#01367c;background-color:#eef4ff;color:#01367c;font-weight:700}
-.clear-filters{height:40px;padding:0 12px;border:0;background:none;color:#1550d4;font-family:'Manrope',sans-serif;font-size:0.875rem;font-weight:700;cursor:pointer;display:none}
-.clear-filters.show{display:inline-flex;align-items:center}
-.main{max-width:1180px;padding:24px 24px 56px}
-.results-count{font-size:0.9375rem;color:#334155;margin-bottom:16px}
-.grid{grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
-.tutor-card{border:1px solid #e3e8ef;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;transition:border-color .15s,box-shadow .15s}
-.tutor-card:hover{transform:none;border-color:#b9cdf5;box-shadow:0 8px 24px rgba(15,23,42,.08)}
-.tutor-link::after{border-radius:14px}
-.card-top{margin:0;gap:14px;align-items:flex-start}
-.tutor-av{width:56px;height:56px;background:#dbe7ff;color:#01367c;font-size:1.125rem}
-.tutor-name{font-size:1.0625rem;line-height:1.5rem;font-weight:800;margin:0}
-.tutor-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:4px;font-size:0.8125rem;color:#5b6474}
-.verified{font-size:0.75rem;padding:2px 8px;margin:0;color:#047857;background:#ecfdf5}
-.rating{display:inline-flex;align-items:center;gap:4px;font-weight:700;color:#0f172a}
-.rating svg{width:14px;height:14px;fill:#b45309;stroke:none}
-.rating span{font-weight:500;color:#5b6474}
-.new-tutor{font-weight:600;color:#5b6474}
-.tutor-bio{font-size:0.875rem;line-height:1.55;color:#334155;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.subjects{margin:0;gap:6px}
-.subject-tag{background:#f4f6f9;color:#334155;border:1px solid #e3e8ef;font-size:0.8125rem;padding:4px 10px}
-.course-tag{background:#eef4ff;color:#01367c;font-size:0.8125rem;font-weight:700;padding:4px 10px;border-radius:999px}
-.more-tag{font-size:0.8125rem;color:#5b6474;align-self:center;font-weight:600}
-.card-footer{margin-top:auto;padding-top:14px;border-top:1px solid #eef1f5}
-.tutor-rate{font-size:1.25rem;font-weight:800}
-.tutor-rate span{font-size:0.8125rem;color:#5b6474;font-weight:500}
-.book-btn{display:inline-flex;align-items:center;min-height:40px;padding:0 18px;border-radius:10px;background:#1a6bff;font-size:0.875rem}
-.book-btn:hover{background:#1550d4}
-.book-btn.secondary{background:#fff;color:#0f172a;border:1px solid #c3cad5}
-.book-btn.secondary:hover{border-color:#1550d4;color:#1550d4}
-.skel{background:#fff;border:1px solid #e3e8ef;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px}
-.skel i{display:block;border-radius:8px;background:linear-gradient(90deg,#eef1f5 25%,#f6f8fb 50%,#eef1f5 75%);background-size:200% 100%;animation:skel 1.2s infinite linear;height:14px}
-@keyframes skel{to{background-position:-200% 0}}
-.empty{background:#fff;border:1px dashed #c3cad5;border-radius:14px;padding:40px 24px;color:#334155;display:flex;flex-direction:column;align-items:center;gap:8px}
-.empty h2{font-size:1.125rem;color:#0f172a;margin:0}
-.empty p{margin:0;font-size:0.9375rem;color:#5b6474;max-width:440px}
-.empty-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-/* request pop-up */
-.req-modal-overlay{background:rgba(15,23,42,.5)}
-.req-modal{border-radius:14px;padding:24px;box-shadow:0 12px 32px rgba(15,23,42,.16);position:relative}
-.req-modal-title{font-size:1.25rem;font-weight:800;margin:0 40px 6px 0}
-.req-modal-sub{font-size:0.9375rem;color:#334155}
-.req-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border:0;background:none;border-radius:10px;font-size:1.2rem;color:#334155;cursor:pointer}
+/* Find a Tutor — Concept C "Student-first discovery" (chosen 1 Nov 2026).
+   Search the way students think (what + where), academic background before price,
+   and compare up to three tutors side by side before booking. */
+:root{--bg:#f5f7fb;--card:#fff;--ink:#0b1530;--ink-2:#3d4659;--mute:#667085;--line:#e3e8f0;--line-2:#cfd7e3;--navy:#0f2460;--blue:#1a6bff;--blue-2:#1558e0;--wash:#eaf1ff;--hl:#ffe27a;--ok:#0b7a55;--ok-wash:#e8f6f0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Manrope',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}button{font-family:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:0 max(20px,4vw)}
+.hero{padding:36px 0 18px;display:grid;gap:16px}
+.hero h1{font-size:clamp(1.8rem,3.4vw,2.6rem);letter-spacing:-.04em;line-height:1.06;font-weight:800;max-width:24ch;text-wrap:balance}
+.hero h1 em{font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:600;letter-spacing:-.02em;background:linear-gradient(transparent 62%,var(--hl) 62%,var(--hl) 92%,transparent 92%)}
+.two{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;background:#fff;border:1px solid var(--line-2);border-radius:18px;box-shadow:0 18px 40px -30px rgba(11,21,48,.5);max-width:880px;overflow:hidden}
+.two label{display:flex;flex-direction:column;gap:2px;padding:12px 18px;min-width:0;cursor:text}
+.two label + label{border-left:1px solid var(--line)}
+.two span{font-size:.75rem;font-weight:800;color:var(--ink-2)}
+.two input,.two select{border:0;outline:0;font:500 1rem 'Manrope',sans-serif;color:var(--ink);background:transparent;height:28px;min-width:0;width:100%}
+.two label:focus-within{background:var(--wash)}
+.two button{margin:8px;border:0;border-radius:12px;background:var(--blue);color:#fff;font-weight:800;padding:0 24px;cursor:pointer;font-size:.9375rem;min-height:48px}
+.two button:hover{background:var(--blue-2)}
+.quick{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.8125rem}
+.quick:empty{display:none}
+.quick .ql{color:var(--mute);font-weight:700}
+.qs-chip{min-height:34px;padding:0 13px;border-radius:999px;border:1px solid var(--line-2);background:#fff;color:var(--ink-2);font:700 .8125rem 'Manrope',sans-serif;cursor:pointer}
+.qs-chip:hover{border-color:var(--ink-2)}
+.qs-chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.qs-link{font-weight:800;color:var(--blue-2);text-decoration:none;margin-left:4px}
+.qs-link:hover{text-decoration:underline}
+.mine{display:inline-flex;align-items:center;gap:8px;font-size:.875rem;font-weight:700;color:var(--ink-2);cursor:pointer}
+.mine input{width:18px;height:18px;accent-color:var(--blue)}
+.trust{display:flex;flex-wrap:wrap;gap:8px 22px;font-size:.8125rem;font-weight:700;color:var(--ink-2);list-style:none}
+.trust li{display:flex;align-items:center;gap:6px}
+.trust svg{width:16px;height:16px;fill:none;stroke:var(--ok);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+.bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid var(--line)}
+.bar p{font-size:.9375rem;color:var(--mute)}.bar p b{color:var(--ink)}
+.bar .f{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bar select{height:40px;border:1px solid var(--line-2);border-radius:10px;padding:0 10px;font:700 .8125rem 'Manrope',sans-serif;background:#fff;color:var(--ink)}
+.bar select.is-set{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+.clear{border:0;background:none;color:var(--blue-2);font-weight:800;font-size:.8125rem;cursor:pointer;padding:8px}
+.reqline{font-size:.875rem;color:var(--ink-2);background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-bottom:14px}
+.reqline button{border:0;background:none;color:var(--blue-2);font-weight:800;cursor:pointer;font-size:.875rem;padding:0;text-decoration:underline;text-underline-offset:2px}
+
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding-bottom:120px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px;position:relative;transition:box-shadow .18s,border-color .18s}
+.card:hover{box-shadow:0 18px 36px -26px rgba(11,21,48,.45)}
+.card.cmp{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}
+.ct{display:flex;gap:12px;align-items:center}
+.av{width:58px;height:58px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:var(--wash);color:var(--navy);font-weight:800;flex:0 0 58px}
+.ct h2{font-size:1.0625rem;letter-spacing:-.015em;line-height:1.25}
+.ct h2 a{text-decoration:none}.ct h2 a:hover{text-decoration:underline}
+.bdg{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.vb{font-size:.6875rem;font-weight:800;color:var(--blue-2);background:var(--wash);padding:2px 7px;border-radius:999px}
+.nb{font-size:.6875rem;font-weight:800;color:var(--ink-2);background:#f0f2f6;padding:2px 7px;border-radius:999px}
+.rb{font-size:.6875rem;font-weight:800;color:#7a5200;background:#fff4d6;padding:2px 7px;border-radius:999px}
+.acad{background:#f7f9fc;border:1px solid var(--line);border-radius:14px;padding:12px;display:grid;gap:6px;font-size:.8125rem}
+.acad div{display:flex;gap:8px;align-items:flex-start}
+.acad svg{width:16px;height:16px;flex:0 0 16px;margin-top:2px;fill:none;stroke:var(--navy);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.acad b{font-weight:700}
+.acad a{font-weight:700;text-decoration:underline;text-underline-offset:2px}
+.match{font-size:.8125rem;font-weight:800;color:var(--ok);background:var(--ok-wash);padding:6px 10px;border-radius:10px}
+.teach{display:flex;gap:6px;flex-wrap:wrap}
+.teach span{font-size:.75rem;font-weight:700;padding:4px 9px;border-radius:999px;border:1px solid var(--line-2);color:var(--ink-2)}
+.avail{display:flex;justify-content:space-between;align-items:center;font-size:.8125rem;color:var(--ink-2);gap:8px;flex-wrap:wrap}
+.avail b{font-weight:800}
+.foot{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:12px;border-top:1px solid var(--line)}
+.price{margin-right:auto}
+.price b{font-size:1.375rem;letter-spacing:-.02em}
+.price small{font-size:.75rem;color:var(--mute)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;border-radius:11px;font-weight:800;font-size:.875rem;text-decoration:none;border:1px solid transparent;cursor:pointer;white-space:nowrap}
+.btn.p{background:var(--blue);color:#fff}.btn.p:hover{background:var(--blue-2)}
+.btn.s{background:#fff;border-color:var(--line-2)}.btn.s:hover{border-color:var(--ink-2)}
+.cmpb{position:absolute;top:14px;right:14px;display:flex;align-items:center;gap:6px;font-size:.75rem;font-weight:800;color:var(--ink-2);cursor:pointer;min-height:32px}
+.cmpb input{width:16px;height:16px;accent-color:var(--blue)}
+.note{font-size:.75rem;color:var(--mute)}
+.skel{height:300px;border-radius:20px;background:linear-gradient(90deg,#e9eef5 25%,#f4f7fb 37%,#e9eef5 63%);background-size:400% 100%;animation:sh 1.3s ease infinite}
+@keyframes sh{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.empty{grid-column:1/-1;background:#fff;border:1px dashed var(--line-2);border-radius:20px;padding:36px 20px;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center}
+.empty h2{font-size:1.125rem}
+.empty p{color:var(--mute);max-width:46ch}
+.empty-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+
+.tray{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translate(-50%,140%);background:var(--navy);color:#fff;border-radius:18px;padding:10px 10px 10px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 20px 50px -18px rgba(8,16,40,.6);transition:transform .25s cubic-bezier(.2,.7,.2,1);z-index:900;max-width:calc(100% - 32px)}
+.tray.on{transform:translate(-50%,0)}
+.tray .pp{display:flex}
+.tray .pp > *{width:34px;height:34px;border-radius:50%;border:2px solid var(--navy);margin-left:-8px;background:#dfe9ff;color:var(--navy);font-size:.75rem;font-weight:800;display:grid;place-items:center;object-fit:cover}
+.tray .pp > *:first-child{margin-left:0}
+.tray p{font-size:.875rem;font-weight:700;white-space:nowrap}
+.tray button{border:0;border-radius:11px;height:44px;padding:0 16px;font-weight:800;cursor:pointer;white-space:nowrap}
+.tray .go{background:#fff;color:var(--navy)}
+.tray .go:disabled{opacity:.7;cursor:default}
+.tray .x{background:transparent;color:#b9c8ea}
+#cmpDlg{border:0;border-radius:22px;padding:0;width:min(980px,calc(100% - 24px));max-height:calc(100vh - 40px);margin:auto;box-shadow:0 30px 70px -20px rgba(8,16,40,.5)}
+#cmpDlg::backdrop{background:rgba(8,16,40,.45)}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2}
+.dh button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line-2);background:#fff;cursor:pointer}
+.tbl{overflow-x:auto}
+.tbl table{border-collapse:collapse;width:100%;min-width:560px;font-size:.875rem}
+.tbl th,.tbl td{padding:12px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th[scope=row]{color:var(--mute);font-weight:700;width:150px;background:#fafbfd}
+.tbl thead th{vertical-align:bottom}
+.ch{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.best{color:var(--ok);font-weight:800}
+
+/* Post-a-request form (unchanged behaviour) */
+.req-modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:1rem}
+.req-modal-overlay.open{display:flex}
+.req-modal{background:#fff;border-radius:18px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:24px;box-shadow:0 20px 50px -18px rgba(15,23,42,.35);position:relative}
+.req-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border:0;background:none;border-radius:10px;font-size:1rem;cursor:pointer;color:var(--mute)}
 .req-close:hover{background:#f4f6f9}
-.req-form-label{font-size:0.875rem;color:#0f172a}
-.req-form-input{border:1px solid #8792a2;border-radius:10px;font-size:0.9375rem;padding:10px 12px}
+.req-modal-title{font-size:1.25rem;font-weight:800;margin:0 40px 6px 0}
+.req-modal-sub{font-size:.9375rem;color:var(--ink-2);line-height:1.5;margin-bottom:1.1rem}
+.req-form-group{margin-bottom:.9rem}
+.req-form-label{display:block;font-size:.875rem;font-weight:700;color:var(--ink);margin-bottom:.35rem}
+.req-form-input{width:100%;border:1px solid #8792a2;border-radius:10px;font:500 .9375rem 'Manrope',sans-serif;padding:10px 12px;color:var(--ink);outline:none;background:#fff}
 select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
-.req-form-input:focus{border-color:#1a6bff;box-shadow:0 0 0 3px rgba(26,107,255,.25)}
-.req-submit-btn{min-height:48px;border-radius:10px;font-size:0.9375rem;background:#1a6bff}
-.req-submit-btn:hover{background:#1550d4}
-.req-alert.error{color:#b91c1c}
-@media(max-width:768px){
-  .hero-search{padding:32px 16px 28px}
-  .hero-search h1{font-size:1.75rem;line-height:2.25rem}
-  .search-bar{flex-direction:row}
-  .search-btn{padding:0 16px}
-  .filters{position:static;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;padding:12px 16px}
-  .filter-select{flex:none}
-  .qs-chip:nth-of-type(n+6){display:none}
-  .main{padding:16px 16px 40px}
+.req-form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,107,255,.25)}
+.req-form-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem}
+.req-submit-btn{width:100%;min-height:48px;background:var(--blue);color:#fff;border:0;border-radius:10px;font:800 .9375rem 'Manrope',sans-serif;cursor:pointer}
+.req-submit-btn:hover{background:var(--blue-2)}
+.req-alert{padding:.65rem .9rem;border-radius:8px;font-size:.82rem;font-weight:600;margin-bottom:.8rem;display:none}
+.req-alert.success{background:var(--ok-wash);color:var(--ok);display:block}
+.req-alert.error{background:#fef2f2;color:#b91c1c;display:block}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px;border-radius:8px}
+
+@media (max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:680px){
+  .two{grid-template-columns:1fr}
+  .two label + label{border-left:0;border-top:1px solid var(--line)}
+  .two input,.two select{font-size:16px}
+  .grid{grid-template-columns:1fr}
+  .bar{flex-direction:column;align-items:stretch}
+  .bar .f{display:grid;grid-template-columns:1fr 1fr}
+  .bar select{font-size:16px;height:44px}
+  .tray p{display:none}
   .req-modal-overlay{align-items:flex-end;padding:0}
   .req-modal{border-radius:16px 16px 0 0;max-height:92vh}
   .req-form-input{font-size:16px}
+  .req-form-row{grid-template-columns:1fr}
 }
-@media (prefers-reduced-motion:reduce){.skel i{animation:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
@@ -192,54 +176,36 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
 <header id="site-nav"></header>
 <script src="site-nav.js"></script>
 
-<div class="hero-search">
-  <h1>Find your perfect tutor</h1>
-  <p>Peer tutors for your exact courses — verified tutors first</p>
-  <div class="search-bar">
-    <div class="search-field"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/><path d="m21 21-4.3-4.3"/></svg><input type="search" class="search-input" id="searchInput" aria-label="Search tutors" enterkeyhint="search" placeholder="Subject, course code, professor or name"></div>
-    <button type="button" class="search-btn" onclick="filterTutors()">Search</button>
-  </div>
-  <div class="quick-subjects" id="quickSubjects" aria-label="Popular subjects"></div>
-  <div id="postRequestBanner" style="display:none;margin-top:1.1rem;">
-    <button type="button" class="post-req-btn" onclick="openRequestModal()">Can't find your subject? Post a request</button>
-  </div>
-</div>
-
-<div class="filters">
-  <select class="filter-select" id="filterPrice" aria-label="Price" onchange="filterTutors()">
-    <option value="">Any price</option>
-    <option value="0-20">Up to €20/hr</option>
-    <option value="20-40">€20–€40/hr</option>
-    <option value="40-60">€40–€60/hr</option>
-    <option value="60+">€60+/hr</option>
-  </select>
-  <select class="filter-select" id="filterDay" aria-label="Day" onchange="filterTutors()">
-    <option value="">Any day</option>
-    <option value="mon">Monday</option>
-    <option value="tue">Tuesday</option>
-    <option value="wed">Wednesday</option>
-    <option value="thu">Thursday</option>
-    <option value="fri">Friday</option>
-    <option value="sat">Saturday</option>
-    <option value="sun">Sunday</option>
-  </select>
-  <select class="filter-select" id="filterUniversity" aria-label="University" onchange="filterTutors()">
-    <option value="">Any university</option>
-    <option value="same">Same as mine</option>
-  </select>
-  <select class="filter-select" id="filterCountry" aria-label="Country" onchange="filterTutors()">
-    <option value="">Any country</option>
-    <option>Afghanistan</option><option>Albania</option><option>Algeria</option><option>Andorra</option><option>Angola</option><option>Argentina</option><option>Armenia</option><option>Australia</option><option>Austria</option><option>Azerbaijan</option><option>Bahrain</option><option>Bangladesh</option><option>Belarus</option><option>Belgium</option><option>Bolivia</option><option>Bosnia and Herzegovina</option><option>Brazil</option><option>Bulgaria</option><option>Cambodia</option><option>Cameroon</option><option>Canada</option><option>Chile</option><option>China</option><option>Colombia</option><option>Costa Rica</option><option>Croatia</option><option>Cuba</option><option>Cyprus</option><option>Czech Republic</option><option>Denmark</option><option>Ecuador</option><option>Egypt</option><option>Estonia</option><option>Ethiopia</option><option>Finland</option><option>France</option><option>Georgia</option><option>Germany</option><option>Ghana</option><option>Greece</option><option>Guatemala</option><option>Hungary</option><option>India</option><option>Indonesia</option><option>Iran</option><option>Iraq</option><option>Ireland</option><option>Israel</option><option>Italy</option><option>Jamaica</option><option>Japan</option><option>Jordan</option><option>Kazakhstan</option><option>Kenya</option><option>Kosovo</option><option>Kuwait</option><option>Latvia</option><option>Lebanon</option><option>Libya</option><option>Lithuania</option><option>Luxembourg</option><option>Malaysia</option><option>Malta</option><option>Mexico</option><option>Moldova</option><option>Mongolia</option><option>Montenegro</option><option>Morocco</option><option>Mozambique</option><option>Myanmar</option><option>Nepal</option><option>Netherlands</option><option>New Zealand</option><option>Nigeria</option><option>North Macedonia</option><option>Norway</option><option>Oman</option><option>Pakistan</option><option>Palestine</option><option>Panama</option><option>Paraguay</option><option>Peru</option><option>Philippines</option><option>Poland</option><option>Portugal</option><option>Qatar</option><option>Romania</option><option>Russia</option><option>Rwanda</option><option>Saudi Arabia</option><option>Senegal</option><option>Serbia</option><option>Singapore</option><option>Slovakia</option><option>Slovenia</option><option>Somalia</option><option>South Africa</option><option>South Korea</option><option>Spain</option><option>Sri Lanka</option><option>Sudan</option><option>Sweden</option><option>Switzerland</option><option>Syria</option><option>Taiwan</option><option>Tanzania</option><option>Thailand</option><option>Tunisia</option><option>Turkey</option><option>Uganda</option><option>Ukraine</option><option>United Arab Emirates</option><option>United Kingdom</option><option>United States</option><option>Uruguay</option><option>Uzbekistan</option><option>Venezuela</option><option>Vietnam</option><option>Yemen</option><option>Zambia</option><option>Zimbabwe</option>
-  </select>
-  <button type="button" class="clear-filters" id="clearFilters" onclick="clearFilters()">Clear filters</button>
-</div>
-
-<main class="main" id="main">
-  <div class="results-count" id="resultsCount" role="status" aria-live="polite">Loading tutors...</div>
-  <div class="grid" id="tutorGrid">
-    <div class="skel" aria-hidden="true"><div style="display:flex;gap:14px;align-items:center"><i style="width:56px;height:56px;border-radius:50%"></i><div style="flex:1;display:flex;flex-direction:column;gap:8px"><i style="width:60%"></i><i style="width:40%"></i></div></div><i></i><i style="width:80%"></i><i style="height:40px;margin-top:8px"></i></div><div class="skel" aria-hidden="true"><div style="display:flex;gap:14px;align-items:center"><i style="width:56px;height:56px;border-radius:50%"></i><div style="flex:1;display:flex;flex-direction:column;gap:8px"><i style="width:60%"></i><i style="width:40%"></i></div></div><i></i><i style="width:80%"></i><i style="height:40px;margin-top:8px"></i></div><div class="skel" aria-hidden="true"><div style="display:flex;gap:14px;align-items:center"><i style="width:56px;height:56px;border-radius:50%"></i><div style="flex:1;display:flex;flex-direction:column;gap:8px"><i style="width:60%"></i><i style="width:40%"></i></div></div><i></i><i style="width:80%"></i><i style="height:40px;margin-top:8px"></i></div>
-  </div>
+<main id="main" class="wrap">
+  <section class="hero" aria-labelledby="t">
+    <h1 id="t">Find someone who <em>already passed</em> your course</h1>
+    <form class="two" id="sf" role="search">
+      <label><span>What do you need help with?</span><input id="searchInput" type="search" placeholder="Subject, course code, professor or name" enterkeyhint="search" autocomplete="off"></label>
+      <label><span>Which university?</span><select id="filterUniversity"><option value="">Any university</option></select></label>
+      <button type="submit">Find tutors</button>
+    </form>
+    <div class="quick" id="quickSubjects" aria-label="Popular subjects"></div>
+    <label class="mine" id="mineWrap" hidden><input type="checkbox" id="mine">Only tutors from my university</label>
+    <ul class="trust">
+      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Pay only after your tutor accepts</li>
+      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Payment held until 48 hours after the lesson</li>
+      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Tutor cancels? Automatic full refund</li>
+    </ul>
+  </section>
+  <div class="bar"><p id="resultsCount" role="status" aria-live="polite">Loading tutors…</p>
+    <div class="f">
+      <select id="filterDay" aria-label="Available on"><option value="">Any day</option><option value="mon">Available Mon</option><option value="tue">Available Tue</option><option value="wed">Available Wed</option><option value="thu">Available Thu</option><option value="fri">Available Fri</option><option value="sat">Available Sat</option><option value="sun">Available Sun</option></select>
+      <select id="filterPrice" aria-label="Maximum price"><option value="">Any price</option></select>
+      <select id="filterCountry" aria-label="Country" hidden><option value="">Any country</option></select>
+      <select id="sortBy" aria-label="Sort"><option value="best">Recommended</option><option value="price-asc">Lowest price</option><option value="price-desc">Highest price</option><option value="days">Most available</option></select>
+      <button type="button" class="clear" id="clearFilters" hidden>Clear filters</button>
+    </div></div>
+  <div id="postRequestBanner" class="reqline" style="display:none">Can't find your subject? <button type="button" onclick="openRequestModal()">Post a request</button> and tutors who can help will reach out.</div>
+  <section class="grid" id="tutorGrid" aria-label="Tutors"><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div></section>
 </main>
+
+<div class="tray" id="tray" role="region" aria-label="Compare tutors"><div class="pp" id="pp"></div><p id="trayT"></p><button type="button" class="go" id="cmpGo">Compare</button><button type="button" class="x" id="cmpX">Clear</button></div>
+<dialog id="cmpDlg" aria-labelledby="cmpT"><div class="dh"><b id="cmpT">Compare tutors</b><button type="button" id="cmpClose" aria-label="Close">✕</button></div><div class="tbl" id="cmpTbl"></div></dialog>
 
 <!-- POST SUBJECT REQUEST MODAL -->
 <div class="req-modal-overlay" id="requestModal" onclick="if(event.target===this)closeRequestModal()">
@@ -297,172 +263,94 @@ const _sb = window.supabase.createClient(
   { realtime: { params: { eventsPerSecond: 0 } }, global: { fetch: window.fetch.bind(window) } }
 );
 
+const TUTOR_COLUMNS = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url';
+
 let allTutors = [];
+let compareIds = [];
+const DAYS = [['mon','Mon'],['tue','Tue'],['wed','Wed'],['thu','Thu'],['fri','Fri'],['sat','Sat'],['sun','Sun']];
+const TIME_LABELS = { morning: 'Mornings', afternoon: 'Afternoons', evening: 'Evenings', flexible: 'Flexible hours' };
+const LEVELS = { bachelor: "Bachelor's", master: "Master's", masters: "Master's", phd: 'PhD', doctorate: 'PhD' };
+const ICO = {
+  uni: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg>',
+  book: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>',
+  star: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>'
+};
 
 async function loadTutors() {
   const grid = document.getElementById('tutorGrid');
   try {
     // Public columns only — payout details and meeting links are never needed here
-    const { data: profiles } = await _sb.from('tutor_profiles').select('id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url');
+    const { data: profiles } = await _sb.from('tutor_profiles').select(TUTOR_COLUMNS);
     if (!profiles || profiles.length === 0) {
-      grid.innerHTML = '<div class="empty"><h2>No tutors yet</h2><p>Be the first to sign up as a tutor!</p></div>';
+      grid.innerHTML = '<div class="empty"><h2>No tutors yet</h2><p>Be the first to sign up as a tutor!</p><div class="empty-actions"><a class="btn p" href="onboarding.html?role=tutor">Start tutoring</a></div></div>';
       document.getElementById('resultsCount').textContent = '0 tutors found';
       return;
     }
-
     const userIds = profiles.map(p => p.user_id).filter(Boolean);
     // public_tutors view: tutor names/photos readable by everyone, students' data never exposed
-    const { data: users } = await _sb.from('public_tutors').select('id,full_name,avatar_url,country').in('id', userIds);
-    const { data: reviews } = await _sb.from('reviews').select('tutor_id,rating');
-    const { data: courseRows } = await _sb.from('tutor_courses').select('*').in('tutor_id', userIds);
-
-    const userMap = {};
-    (users || []).forEach(u => userMap[u.id] = u);
+    const [{ data: users }, { data: reviews }, { data: courseRows }] = await Promise.all([
+      _sb.from('public_tutors').select('id,full_name,avatar_url,country').in('id', userIds),
+      _sb.from('reviews').select('tutor_id,rating'),
+      _sb.from('tutor_courses').select('*').in('tutor_id', userIds)
+    ]);
+    const userMap = {}; (users || []).forEach(u => userMap[u.id] = u);
     const reviewMap = {};
-    (reviews || []).forEach(r => {
-      if (!reviewMap[r.tutor_id]) reviewMap[r.tutor_id] = { total: 0, count: 0 };
-      reviewMap[r.tutor_id].total += r.rating;
-      reviewMap[r.tutor_id].count++;
-    });
+    (reviews || []).forEach(r => { (reviewMap[r.tutor_id] = reviewMap[r.tutor_id] || { total: 0, count: 0 }); reviewMap[r.tutor_id].total += r.rating; reviewMap[r.tutor_id].count++; });
     // Fair ranking: a tutor's average is blended with the platform average, weighted like 3 extra
-    // reviews. One 5-star review can't outrank many great reviews, and ratings settle as reviews grow.
-    // Stars are only shown from 3 reviews; before that the tutor is labelled "New tutor".
+    // reviews. Stars are only shown from 3 reviews; before that the tutor is labelled "New tutor".
     const MIN_REVIEWS_SHOWN = 3, PRIOR_WEIGHT = 3;
     const allRatings = (reviews || []).map(r => r.rating);
     const globalMean = allRatings.length ? allRatings.reduce((a, b) => a + b, 0) / allRatings.length : 4.5;
-    const courseMap = {};
-    (courseRows || []).forEach(c => {
-      if (!courseMap[c.tutor_id]) courseMap[c.tutor_id] = [];
-      courseMap[c.tutor_id].push(c);
-    });
+    const courseMap = {}; (courseRows || []).forEach(c => { (courseMap[c.tutor_id] = courseMap[c.tutor_id] || []).push(c); });
 
     allTutors = profiles.map(tp => {
       const u = userMap[tp.user_id] || {};
       const rv = reviewMap[tp.user_id] || { total: 0, count: 0 };
-      return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || '', currency: tp.currency || 'GBP', avgRating: rv.count >= MIN_REVIEWS_SHOWN ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count, rankScore: (PRIOR_WEIGHT * globalMean + rv.total) / (PRIOR_WEIGHT + rv.count), courses: courseMap[tp.user_id] || [] };
+      const times = Array.isArray(tp.preferred_times) && tp.preferred_times.length ? tp.preferred_times : (tp.preferred_time ? [tp.preferred_time] : []);
+      const level = LEVELS[String(tp.degree_level || '').toLowerCase()] || '';
+      let study = [level, tp.major].filter(Boolean).join(' · ');
+      if (tp.study_year) study += (study ? ', ' : '') + 'year ' + tp.study_year;
+      return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || tp.country || '', currency: tp.currency || 'GBP',
+        avgRating: rv.count >= MIN_REVIEWS_SHOWN ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count,
+        rankScore: (PRIOR_WEIGHT * globalMean + rv.total) / (PRIOR_WEIGHT + rv.count), courses: courseMap[tp.user_id] || [],
+        subjects: Array.isArray(tp.subjects) ? tp.subjects.filter(Boolean) : [], availability: Array.isArray(tp.availability) ? tp.availability : [], times, study };
     });
-
     // Verified tutors first (nobody is hidden); original order otherwise
     allTutors.sort((a, b) => ((b.university_verified_at ? 1 : 0) - (a.university_verified_at ? 1 : 0)) || (b.rankScore - a.rankScore) || (b.reviewCount - a.reviewCount));
-    renderTutors(allTutors);
+    buildFilterOptions();
     renderQuickSubjects();
-
-    // Populate university filter from real tutor data (location field = their uni)
-    const unis = [...new Set(allTutors.map(t => t.location).filter(Boolean))].sort();
-    const uniSelect = document.getElementById('filterUniversity');
-    unis.forEach(u => {
-      const opt = document.createElement('option');
-      opt.value = u; opt.textContent = u;
-      uniSelect.appendChild(opt);
-    });
-
-  } catch(e) {
+  } catch (e) {
     console.error(e);
     grid.innerHTML = '<div class="empty"><h2>Could not load tutors</h2><p>Please refresh the page or try again in a moment.</p></div>';
     document.getElementById('resultsCount').textContent = '';
+    throw e;
   }
 }
 
-function renderTutors(tutors) {
-  document.getElementById('resultsCount').textContent = tutors.length + ' tutor' + (tutors.length !== 1 ? 's' : '') + ' found';
-  const grid = document.getElementById('tutorGrid');
-  if (!tutors.length) {
-    const canRequest = currentUserId && currentUserRole !== 'tutor';
-    grid.innerHTML = '<div class="empty"><h2>No tutors match yet</h2><p>Try another subject or fewer filters' + (canRequest ? ' — or post a request and tutors who can help will reach out.' : '.') + '</p><div class="empty-actions"><button type="button" class="book-btn secondary" onclick="clearFilters()">Clear search and filters</button>' + (canRequest ? '<button type="button" class="book-btn" onclick="openRequestModal()">Post a request</button>' : '') + '</div></div>';
-    return;
+// Options come from the tutors who actually exist, so no filter can lead to an empty list by design
+function buildFilterOptions() {
+  const uniSel = document.getElementById('filterUniversity');
+  [...new Set(allTutors.map(t => t.location).filter(Boolean))].sort().forEach(u => uniSel.insertAdjacentHTML('beforeend', `<option value="${__esc(u)}">${__esc(u)}</option>`));
+  const countries = [...new Set(allTutors.map(t => t.country).filter(Boolean))].sort();
+  const cSel = document.getElementById('filterCountry');
+  if (countries.length > 1) { countries.forEach(c => cSel.insertAdjacentHTML('beforeend', `<option value="${__esc(c)}">${__esc(c)}</option>`)); cSel.hidden = false; }
+  const rates = allTutors.map(t => Number(t.hourly_rate)).filter(r => r > 0);
+  if (rates.length) {
+    const min = Math.min(...rates), max = Math.max(...rates), sym = currSymbol(mostCommonCurrency());
+    [15, 20, 25, 30, 40, 60, 80].filter(x => x >= min && x < max).forEach(x => document.getElementById('filterPrice').insertAdjacentHTML('beforeend', `<option value="${x}">Up to ${__esc(sym)}${x}/h</option>`));
   }
-  const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-  grid.innerHTML = tutors.map(t => {
-    // When the search matches a course this tutor passed, that course is shown first and called out
-    const matched = q ? (t.courses || []).find(c => __courseMatches(c, q)) : null;
-    const courses = matched ? [matched].concat((t.courses || []).filter(c => c !== matched)) : (t.courses || []);
-    const initials = (t.fullName||'T').split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
-    const subjects = Array.isArray(t.subjects) ? t.subjects : [];
-    const sym = currSymbol(t.currency);
-    const rate = t.hourly_rate ? sym+t.hourly_rate : '';
-    const stars = t.avgRating ? '★'.repeat(Math.round(t.avgRating))+'☆'.repeat(5-Math.round(t.avgRating)) : '';
-    const extra = subjects.length > 4 ? subjects.length - 4 : 0;
-    return `<article class="tutor-card">
-      <div class="card-top">
-        <div class="tutor-av">${t.avatarUrl?`<img src="${__safeUrl(t.avatarUrl)}" alt="">`:initials}</div>
-        <div style="min-width:0">
-          <h2 class="tutor-name"><a class="tutor-link" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}">${__esc(t.fullName)}</a></h2>
-          <div class="tutor-meta">
-            ${t.university_verified_at ? `<span class="verified" title="University email verified${t.verified_university ? ' — ' + __esc(t.verified_university) : ''}">✓ Verified</span>` : ''}
-            ${(t.location||t.country) ? `<span>${__esc(t.location||t.country)}</span>` : ''}
-            ${t.avgRating ? `<span class="rating" aria-label="Rated ${__esc(t.avgRating)} out of 5 from ${__esc(t.reviewCount)} review${t.reviewCount===1?'':'s'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>${__esc(t.avgRating)} <span>(${__esc(t.reviewCount)})</span></span>` : `<span class="new-tutor" title="Fewer than 3 reviews so far">New tutor${t.reviewCount ? ' · ' + __esc(t.reviewCount) + ' review' + (t.reviewCount === 1 ? '' : 's') : ''}</span>`}
-          </div>
-        </div>
-      </div>
-      ${t.bio?`<p class="tutor-bio">${__esc(t.bio)}</p>`:''}
-      ${matched ? `<div class="course-match">✓ Passed ${__esc(matched.course_name || matched.course_code)}${__sameUni(matched.university || t.verified_university || t.location || '', currentStudentUni || '') ? ' at your university' : (matched.university ? ' at ' + __esc(matched.university) : '')}</div>` : ''}
-      ${courses.length > 0 ? `<div class="chips">${courses.slice(0,3).map(c=>`<a class="course-tag" href="course.html?c=${encodeURIComponent(c.course_key || '')}" title="${__esc(['Passed', c.course_name || c.course_code, c.university ? 'at ' + c.university : ''].filter(Boolean).join(' '))}">${__esc(c.course_name || c.course_code || 'Course')}</a>`).join('')}${courses.length > 3 ? `<span class="more-tag">+${courses.length - 3} more</span>` : ''}</div>` : ''}
-      ${subjects.length ? `<div class="subjects chips">${subjects.slice(0,4).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}${extra?`<span class="more-tag">+${extra} more</span>`:''}</div>` : ''}
-      <div class="card-footer">
-        <div class="tutor-rate">${rate ? `${__esc(rate)} <span>/ hour</span>` : `<span>Rate on request</span>`}</div>
-        ${t.user_id === currentUserId || currentUserRole === 'tutor'
-          ? `<a class="book-btn secondary" href="tutor-profile.html?id=${encodeURIComponent(t.user_id)}" style="text-decoration:none;">${t.user_id === currentUserId ? 'Your profile' : 'View profile'}</a>`
-          : `<a class="book-btn" href="book-session.html?tutor=${encodeURIComponent(t.user_id)}&name=${encodeURIComponent(t.fullName)}" style="text-decoration:none;" aria-label="Book a session with ${__esc(t.fullName)}">Book session</a>`}
-      </div>
-    </article>`;
-  }).join('');
+}
+function mostCommonCurrency() {
+  const c = {}; allTutors.forEach(t => c[t.currency] = (c[t.currency] || 0) + 1);
+  return Object.keys(c).sort((a, b) => c[b] - c[a])[0] || 'EUR';
 }
 
-const FILTER_IDS = ['filterPrice','filterDay','filterUniversity','filterCountry'];
-function clearFilters() {
-  document.getElementById('searchInput').value = '';
-  FILTER_IDS.forEach(id => { document.getElementById(id).value = ''; });
-  filterTutors();
-}
-function quickSubject(btn) {
-  const input = document.getElementById('searchInput');
-  input.value = btn.getAttribute('aria-pressed') === 'true' ? '' : btn.dataset.subject;
-  filterTutors();
-}
 function renderQuickSubjects() {
   const counts = {};
-  allTutors.forEach(t => (Array.isArray(t.subjects) ? t.subjects : []).forEach(sub => {
-    const k = String(sub).trim(); if (k) counts[k] = (counts[k] || 0) + 1;
-  }));
+  allTutors.forEach(t => t.subjects.forEach(sub => { const k = String(sub).trim(); if (k) counts[k] = (counts[k] || 0) + 1; }));
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8).map(e => e[0]);
   const box = document.getElementById('quickSubjects');
-  box.innerHTML = top.length ? '<span class="quick-label">Popular:</span>' + top.map(sub => `<button type="button" class="qs-chip" aria-pressed="false" data-subject="${__esc(sub)}" onclick="quickSubject(this)">${__esc(sub)}</button>`).join('') : '';
-  box.insertAdjacentHTML('beforeend', '<a class="qs-link" href="courses.html">Browse by course</a>');
-}
-function syncFilterUi(q) {
-  let any = !!q;
-  FILTER_IDS.forEach(id => { const el = document.getElementById(id); const on = !!el.value; el.classList.toggle('is-set', on); if (on) any = true; });
-  document.getElementById('clearFilters').classList.toggle('show', any);
-  document.querySelectorAll('.qs-chip').forEach(c => c.setAttribute('aria-pressed', q && c.dataset.subject.toLowerCase() === q ? 'true' : 'false'));
-}
-function filterTutors() {
-  const q = document.getElementById('searchInput').value.toLowerCase().trim();
-  syncFilterUi(q);
-  try { const u = new URL(location.href); q ? u.searchParams.set('q', q) : u.searchParams.delete('q'); history.replaceState(null, '', u); } catch (e) {}
-  const fmt = ''; // all sessions are online — no format filter
-  const price = document.getElementById('filterPrice').value;
-  const day = document.getElementById('filterDay').value;
-  const uniFilter = document.getElementById('filterUniversity').value;
-  const countryFilter = document.getElementById('filterCountry').value;
-  window.usTrack&&usTrack('tutor_search', { query: q.slice(0, 100), has_query: !!q, format: fmt || null, price: price || null, day: day || null, university: uniFilter || null, country: countryFilter || null });
-
-  renderTutors(__rankByCourse(allTutors.filter(t => {
-    const subjects = Array.isArray(t.subjects)?t.subjects:[];
-    const avail = Array.isArray(t.availability)?t.availability:[];
-    const courses = Array.isArray(t.courses)?t.courses:[];
-    const matchesCourse = courses.some(c => __courseMatches(c, q));
-    if(q && !subjects.some(s=>s.toLowerCase().includes(q)) && !matchesCourse && !(t.fullName||'').toLowerCase().includes(q) && !(t.location||'').toLowerCase().includes(q)) return false;
-    if(day && !avail.includes(day)) return false;
-    if(price){const r=t.hourly_rate||0;if(price==='0-20'&&r>20)return false;if(price==='20-40'&&(r<20||r>40))return false;if(price==='40-60'&&(r<40||r>60))return false;if(price==='60+'&&r<60)return false;}
-    if(uniFilter === 'same') {
-      // Filter to tutors at the current student's university (set after login)
-      if(!currentStudentUni || (t.location||'').toLowerCase() !== currentStudentUni.toLowerCase()) return false;
-    } else if(uniFilter) {
-      if((t.location||'') !== uniFilter) return false;
-    }
-    if(countryFilter && (t.country||'') !== countryFilter) return false;
-    return true;
-  }), q));
+  box.innerHTML = (top.length ? '<span class="ql">Popular:</span>' + top.map(sub => `<button type="button" class="qs-chip" aria-pressed="false" data-subject="${__esc(sub)}">${__esc(sub)}</button>`).join('') : '') + '<a class="qs-link" href="courses.html">Browse by course</a>';
 }
 
 // A course matches a search when its name, code, professor or university contains the words searched for
@@ -483,8 +371,148 @@ function __rankByCourse(list, q) {
   return list.map((t, i) => ({ t, i, s: score(t) })).sort((a, b) => (b.s - a.s) || (a.i - b.i)).map(x => x.t);
 }
 
+const FILTER_IDS = ['filterPrice', 'filterDay', 'filterUniversity', 'filterCountry'];
+function currentUniFilter() { return document.getElementById('mine').checked ? 'same' : document.getElementById('filterUniversity').value; }
 
-document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')filterTutors();});
+function filterTutors() {
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  const price = document.getElementById('filterPrice').value;
+  const day = document.getElementById('filterDay').value;
+  const uniFilter = currentUniFilter();
+  const countryFilter = document.getElementById('filterCountry').value;
+  const sort = document.getElementById('sortBy').value;
+  let any = !!q;
+  FILTER_IDS.forEach(id => { const el = document.getElementById(id); const on = !!el.value; el.classList.toggle('is-set', on); if (on) any = true; });
+  if (uniFilter === 'same') any = true;
+  document.getElementById('clearFilters').hidden = !any;
+  document.querySelectorAll('.qs-chip').forEach(c => c.setAttribute('aria-pressed', q && c.dataset.subject.toLowerCase() === q ? 'true' : 'false'));
+  try { const u = new URL(location.href); q ? u.searchParams.set('q', q) : u.searchParams.delete('q'); history.replaceState(null, '', u); } catch (e) {}
+  window.usTrack && usTrack('tutor_search', { query: q.slice(0, 100), has_query: !!q, format: null, price: price || null, day: day || null, university: uniFilter || null, country: countryFilter || null });
+
+  let list = __rankByCourse(allTutors.filter(t => {
+    const matchesCourse = t.courses.some(c => __courseMatches(c, q));
+    if (q && !t.subjects.some(s => s.toLowerCase().includes(q)) && !matchesCourse && !(t.fullName || '').toLowerCase().includes(q) && !(t.location || '').toLowerCase().includes(q)) return false;
+    if (day && !t.availability.includes(day)) return false;
+    if (price && Number(t.hourly_rate || 0) > Number(price)) return false;
+    if (uniFilter === 'same') { if (!currentStudentUni || !__sameUni(t.location || '', currentStudentUni)) return false; }
+    else if (uniFilter && (t.location || '') !== uniFilter) return false;
+    if (countryFilter && (t.country || '') !== countryFilter) return false;
+    return true;
+  }), q);
+  const rate = t => t.hourly_rate == null ? Infinity : Number(t.hourly_rate);
+  if (sort === 'price-asc') list = [...list].sort((a, b) => rate(a) - rate(b));
+  if (sort === 'price-desc') list = [...list].sort((a, b) => (Number(b.hourly_rate) || 0) - (Number(a.hourly_rate) || 0));
+  if (sort === 'days') list = [...list].sort((a, b) => b.availability.length - a.availability.length);
+  renderTutors(list, q);
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  FILTER_IDS.forEach(id => { document.getElementById(id).value = ''; });
+  document.getElementById('mine').checked = false;
+  filterTutors();
+}
+
+const daysLabel = t => t.availability.length === 7 ? 'Every day' : DAYS.filter(d => t.availability.includes(d[0])).map(d => d[1]).join(', ');
+const timesLabel = t => t.times.map(x => TIME_LABELS[x] || x).join(', ');
+const priceLabel = t => t.hourly_rate ? currSymbol(t.currency) + Number(t.hourly_rate).toString() : '';
+const avatarHtml = (t, cls) => { const u = t.avatarUrl ? __safeUrl(t.avatarUrl) : ''; const ini = (t.fullName || 'T').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(); return u && u !== '#' ? `<img class="${cls}" src="${u}" alt="" loading="lazy">` : `<span class="${cls}" aria-hidden="true">${__esc(ini)}</span>`; };
+const canBook = t => t.user_id !== currentUserId && currentUserRole !== 'tutor';
+const bookUrl = t => `book-session.html?tutor=${encodeURIComponent(t.user_id)}&name=${encodeURIComponent(t.fullName)}`;
+const profileUrl = t => `tutor-profile.html?id=${encodeURIComponent(t.user_id)}`;
+
+function whyMatch(t, q) {
+  if (!q) return '';
+  const c = t.courses.find(c => __courseMatches(c, q));
+  if (c) return 'Passed ' + (c.course_name || c.course_code) + (__sameUni(c.university || t.verified_university || t.location || '', currentStudentUni || '') ? ' at your university' : (c.university ? ' at ' + c.university : ''));
+  const s = t.subjects.find(s => s.toLowerCase().includes(q));
+  return s ? 'Teaches ' + s : '';
+}
+
+function renderTutors(tutors, q) {
+  q = q || '';
+  const uniF = currentUniFilter();
+  document.getElementById('resultsCount').innerHTML = '<b>' + tutors.length + '</b> tutor' + (tutors.length !== 1 ? 's' : '') + (q ? ' for “' + __esc(q) + '”' : '') + (uniF ? ' · ' + __esc(uniF === 'same' ? 'your university' : uniF) : '');
+  const grid = document.getElementById('tutorGrid');
+  if (!tutors.length) {
+    const canRequest = currentUserId && currentUserRole !== 'tutor';
+    grid.innerHTML = '<div class="empty"><h2>No tutors match yet</h2><p>Try another subject or fewer filters' + (canRequest ? ', or post a request and tutors who can help will reach out.' : '.') + '</p><div class="empty-actions"><button type="button" class="btn s" onclick="clearFilters()">Clear filters</button>' + (canRequest ? '<button type="button" class="btn p" onclick="openRequestModal()">Post a request</button>' : '') + '</div></div>';
+    syncCompare(); return;
+  }
+  grid.innerHTML = tutors.map(t => {
+    const on = compareIds.includes(t.user_id), why = whyMatch(t, q), p = priceLabel(t), own = t.user_id === currentUserId;
+    const courses = t.courses.slice(0, 2).map(c => c.course_key ? `<a href="course.html?c=${encodeURIComponent(c.course_key)}">${__esc(c.course_code || c.course_name)}</a>` : __esc(c.course_code || c.course_name)).join(', ');
+    return `<article class="card${on ? ' cmp' : ''}">
+      <label class="cmpb"><input type="checkbox" data-c="${__esc(t.user_id)}"${on ? ' checked' : ''}${!on && compareIds.length >= 3 ? ' disabled' : ''}>Compare</label>
+      <div class="ct">${avatarHtml(t, 'av')}<div style="min-width:0;padding-right:70px"><h2><a href="${profileUrl(t)}">${__esc(t.fullName)}</a></h2><div class="bdg">
+        ${t.university_verified_at ? `<span class="vb" title="University email verified${t.verified_university ? ' — ' + __esc(t.verified_university) : ''}">✓ Verified student</span>` : ''}
+        ${t.avgRating ? `<span class="rb" aria-label="Rated ${__esc(t.avgRating)} out of 5 from ${t.reviewCount} reviews">★ ${__esc(t.avgRating)} · ${t.reviewCount} reviews</span>` : '<span class="nb">New tutor</span>'}</div></div></div>
+      <div class="acad">${t.location ? `<div>${ICO.uni}<span>Studies at <b>${__esc(t.location)}</b></span></div>` : ''}${t.study ? `<div>${ICO.book}<span>${__esc(t.study)}</span></div>` : ''}${courses ? `<div>${ICO.star}<span>Passed ${courses}${t.courses.length > 2 ? ' +' + (t.courses.length - 2) : ''}</span></div>` : ''}${!t.location && !t.study && !courses ? '<div><span class="note">No academic details added yet</span></div>' : ''}</div>
+      ${why ? `<div class="match">✓ ${__esc(why)}</div>` : ''}
+      ${t.subjects.length ? `<div class="teach">${t.subjects.slice(0, 4).map(s => `<span>${__esc(s)}</span>`).join('')}${t.subjects.length > 4 ? `<span>+${t.subjects.length - 4} more</span>` : ''}</div>` : ''}
+      <div class="avail"><span>Available: <b>${__esc(daysLabel(t) || 'not set yet')}</b></span>${t.times.length ? `<span class="note">${__esc(timesLabel(t))}</span>` : ''}</div>
+      <div class="foot"><span class="price">${p ? `<b>${__esc(p)}</b> <small>/ hour</small>` : '<small>Rate on request</small>'}</span>
+        <a class="btn s" href="${profileUrl(t)}">${own ? 'Your profile' : 'Profile'}</a>
+        ${canBook(t) ? `<a class="btn p" href="${bookUrl(t)}" aria-label="Book a session with ${__esc(t.fullName)}">Book</a>` : ''}</div>
+    </article>`;
+  }).join('');
+  syncCompare();
+}
+
+function syncCompare() {
+  compareIds = compareIds.filter(id => allTutors.some(t => t.user_id === id));
+  const ts = compareIds.map(id => allTutors.find(t => t.user_id === id));
+  document.getElementById('pp').innerHTML = ts.map(t => avatarHtml(t, 'tav')).join('');
+  document.getElementById('trayT').textContent = ts.length + ' of 3 selected';
+  const go = document.getElementById('cmpGo');
+  go.disabled = ts.length < 2; go.textContent = ts.length < 2 ? 'Pick one more' : 'Compare ' + ts.length;
+  document.getElementById('tray').classList.toggle('on', ts.length > 0);
+}
+
+function openCompare() {
+  const ts = compareIds.map(id => allTutors.find(t => t.user_id === id)).filter(Boolean);
+  const rates = ts.map(t => Number(t.hourly_rate)).filter(r => r > 0), low = rates.length ? Math.min(...rates) : null;
+  const most = Math.max(...ts.map(t => t.availability.length));
+  const row = (h, f) => '<tr><th scope="row">' + h + '</th>' + ts.map(t => '<td>' + f(t) + '</td>').join('') + '</tr>';
+  document.getElementById('cmpTbl').innerHTML = '<table><thead><tr><th scope="col"><span class="note">Side by side</span></th>' +
+    ts.map(t => `<th scope="col"><div class="ch">${avatarHtml(t, 'av')}<a href="${profileUrl(t)}"><b>${__esc(t.fullName)}</b></a>${canBook(t) ? `<a class="btn p" href="${bookUrl(t)}">Book</a>` : ''}</div></th>`).join('') + '</tr></thead><tbody>' +
+    row('Price per hour', t => { const p = priceLabel(t); return p ? (Number(t.hourly_rate) === low && ts.length > 1 ? `<span class="best">${__esc(p)} · lowest</span>` : __esc(p)) : 'On request'; }) +
+    row('University', t => __esc(t.location || '—') + (t.university_verified_at ? '<br><span class="vb">✓ Verified</span>' : '')) +
+    row('Studies', t => __esc(t.study || '—')) +
+    row('Teaches', t => __esc(t.subjects.join(', ') || '—')) +
+    row('Courses passed', t => t.courses.length ? __esc(t.courses.map(c => (c.course_code || c.course_name) + (c.grade ? ' (' + c.grade + ')' : '')).join(', ')) + '<br><span class="note">Grades are self-reported</span>' : '—') +
+    row('Available', t => { const l = daysLabel(t) || 'Not set'; return t.availability.length === most && most > 0 && ts.length > 1 ? `<span class="best">${__esc(l)}</span>` : __esc(l); }) +
+    row('Preferred times', t => __esc(timesLabel(t) || '—')) +
+    row('Reviews', t => t.avgRating ? '★ ' + __esc(t.avgRating) + ' (' + t.reviewCount + ')' : 'New tutor') +
+    row('Lessons completed', t => String(t.sessions_count || 0)) + '</tbody></table>';
+  window.usTrack && usTrack('tutor_compare', { count: ts.length });
+  document.getElementById('cmpDlg').showModal();
+}
+
+// ── Events ──
+document.getElementById('sf').addEventListener('submit', e => { e.preventDefault(); filterTutors(); });
+document.getElementById('searchInput').addEventListener('input', function () { if (!this.value) filterTutors(); });
+['filterPrice', 'filterDay', 'filterCountry', 'sortBy'].forEach(id => document.getElementById(id).addEventListener('change', filterTutors));
+document.getElementById('filterUniversity').addEventListener('change', () => { document.getElementById('mine').checked = false; filterTutors(); });
+document.getElementById('mine').addEventListener('change', filterTutors);
+document.getElementById('clearFilters').addEventListener('click', clearFilters);
+document.getElementById('quickSubjects').addEventListener('click', e => {
+  const b = e.target.closest('.qs-chip'); if (!b) return;
+  const input = document.getElementById('searchInput');
+  input.value = b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.subject;
+  filterTutors();
+});
+document.getElementById('tutorGrid').addEventListener('change', e => {
+  const c = e.target.closest('input[data-c]'); if (!c) return;
+  const id = c.dataset.c, i = compareIds.indexOf(id);
+  if (c.checked && i < 0 && compareIds.length < 3) compareIds.push(id);
+  if (!c.checked && i > -1) compareIds.splice(i, 1);
+  filterTutors();
+  const again = document.querySelector('input[data-c="' + CSS.escape(id) + '"]'); if (again) again.focus();
+});
+document.getElementById('cmpGo').addEventListener('click', openCompare);
+document.getElementById('cmpX').addEventListener('click', () => { compareIds = []; filterTutors(); });
+document.getElementById('cmpClose').addEventListener('click', () => document.getElementById('cmpDlg').close());
 
 let currentUserId = null;
 let currentUserName = 'Student';
@@ -574,15 +602,14 @@ window.submitRequest = async function(){
   setTimeout(closeRequestModal, 1400);
 };
 
-document.addEventListener('DOMContentLoaded',async ()=>{
+document.addEventListener('DOMContentLoaded', async () => {
   const q0 = new URLSearchParams(location.search).get('q');
   if (q0) document.getElementById('searchInput').value = q0;
   const navReady = setNav();   // runs alongside the tutor fetch
-  loadTutors().then(async () => {
-    await navReady;            // so a tutor's own card shows "Your profile", not "Book session"
-    if (q0) filterTutors(); else if (currentUserId) renderTutors(allTutors);
-  });
-  await navReady;
+  try { await Promise.all([loadTutors(), navReady]); } catch (e) { return; }
+  if (currentStudentUni) document.getElementById('mineWrap').hidden = false;
+  // so a tutor's own card shows "Your profile", not "Book"
+  if (q0) filterTutors(); else renderTutors(allTutors, '');
   if (window.location.hash === '#request') {
     setTimeout(openRequestModal, 300); // small delay so currentUserId/role are set after setNav resolves
   }
