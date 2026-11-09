@@ -103,3 +103,13 @@ test('group-minimum refunds claim the payment before refunding', () => {
   const refund = src.indexOf('refundStripe(payment.stripe_payment_intent_id)');
   assert.ok(claim > 0 && refund > claim);
 });
+
+// ─── Tutor payout notification ──────────────────────────────────────────────────
+test('tutor is notified (in-app + email) after every successful payout', () => {
+  const job = readFileSync(new URL('../../supabase/functions/release-tutor-payout/index.ts', import.meta.url), 'utf8');
+  assert.equal((job.match(/await notifyTutorOfPayout\(/g) || []).length, 2, 'one-to-one and group loops');
+  assert.ok(job.includes("if (!r?.success) return;"), 'only on success');
+  const email = readFileSync(new URL('../../supabase/functions/send-email/index.ts', import.meta.url), 'utf8');
+  assert.ok(email.includes("case 'payout_sent':"));
+  assert.ok(!/USER_SENDABLE_TYPES = \[[^\]]*payout_sent/.test(email), 'browsers must not be able to send it');
+});

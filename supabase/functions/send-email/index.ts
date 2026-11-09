@@ -733,6 +733,19 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
         secondary: ['There is no limit on how many friends you can refer.'],
       };
 
+    case 'payout_sent':
+      return {
+        subject: `Payout sent: ${d.payoutAmount} for ${f.subject || 'your session'}`,
+        preheader: 'Your earnings are on their way to your bank account.',
+        tone: 'success', label: 'Payout sent', title: `${d.payoutAmount} is on its way to you`,
+        greeting: first(f.tutorName || d.tutorName),
+        intro: [`The 48-hour hold for your <strong>${f.subject || 'session'}</strong> has ended with no issue reported, so we have released your earnings.`],
+        callout: { tone: 'success', title: `${d.payoutAmount} paid out`, text: 'Banks usually take 1 to 3 business days to show the money in your account. You can follow it in your Stripe Express dashboard.' },
+        details: f.date ? sessionRows(f, { who: 'student', noAmount: true, extra: [['Your payout', String(d.payoutAmount)]] }) : [['Subject', f.subject || ''], ['Your payout', String(d.payoutAmount)]],
+        cta: { label: 'View my dashboard', url: `${tutorDash}?tab=overview` },
+        ref: f.ref,
+      };
+
     case 'dispute_opened_admin':
       return {
         subject: `[Admin] New dispute #${String(d.disputeId || '').slice(0, 8)}: ${f.subject}`,
@@ -962,7 +975,7 @@ Deno.serve(async (req) => {
     let role: 'student' | 'tutor' | null = raw.role === 'tutor' || raw.role === 'student' ? raw.role : null;
     if (!role && session && recipientId) role = recipientId === session.tutor_id ? 'tutor' : recipientId === session.student_id ? 'student' : null;
     if (!role) {
-      if (['booking_request', 'payment_received', 'payment_expired_tutor', 'group_session_cancelled_tutor', 'booking_accepted_tutor', 'request_nudge_tutor', 'request_expired_tutor'].includes(type)) role = 'tutor';
+      if (['booking_request', 'payment_received', 'payout_sent', 'payment_expired_tutor', 'group_session_cancelled_tutor', 'booking_accepted_tutor', 'request_nudge_tutor', 'request_expired_tutor'].includes(type)) role = 'tutor';
       else if (['booking_request_sent', 'awaiting_payment', 'booking_confirmed', 'booking_declined', 'payment_expired', 'payment_reminder', 'group_session_cancelled', 'rate_lesson', 'request_expired_student', 'course_request_match'].includes(type)) role = 'student';
     }
 

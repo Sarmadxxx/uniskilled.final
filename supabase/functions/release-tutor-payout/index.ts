@@ -86,6 +86,29 @@ async function qualifyReferralsForSession(supabase: any, supabaseUrl: string, se
   }
 }
 
+// Tells the tutor their money is on its way (in-app + email). Never fails the payout run.
+async function notifyTutorOfPayout(supabase: any, supabaseUrl: string, tutorId: string, r: any, subject: string, sessionId: string | null) {
+  if (!r?.success) return;
+  try {
+    const sym = String(r.currency || 'EUR').toUpperCase() === 'USD' ? '$' : '€';
+    const amountText = `${sym}${Number(r.amount || 0).toFixed(2)}`;
+    await supabase.from('notifications').insert({
+      user_id: tutorId, type: 'payout_sent',
+      title: `💸 Payout sent: ${amountText}`,
+      body: `Your earnings for ${subject || 'your session'} have been released. Banks usually take 1–3 business days.`,
+      link: 'tutor-dashboard.html?tab=overview', read: false,
+    });
+    const { data: tutorUser } = await supabase.from('users').select('email, full_name').eq('id', tutorId).maybeSingle();
+    if (tutorUser?.email) {
+      await sendEmail(supabaseUrl, 'payout_sent', tutorUser.email, {
+        ...(sessionId ? { sessionId } : {}), role: 'tutor', subject, tutorName: tutorUser.full_name || '', payoutAmount: amountText,
+      });
+    }
+  } catch (e) {
+    console.error('Tutor payout notification failed (non-critical):', e);
+  }
+}
+
 /**
  * Pays one payment row out to its tutor. Shared by one-to-one and group sessions.
  * Claims the row atomically first (status -> 'releasing'), so concurrent runs can't both pay it;
@@ -247,6 +270,7 @@ Deno.serve(withSentry('release-tutor-payout', async (req: Request) => {
       }
       const r = await releasePayment(supabase, payment, session.tutor_id, { kind: 'session_id', id: session.id });
       if (r) results.push(r);
+      await notifyTutorOfPayout(supabase, supabaseUrl, session.tutor_id, r, session.subject, session.id);
     }
 
     // ── Group sessions: each paid student's payment is released to the tutor ──
@@ -272,6 +296,8 @@ Deno.serve(withSentry('release-tutor-payout', async (req: Request) => {
         if (!tutorId) continue;
         const r = await releasePayment(supabase, payment, tutorId, { kind: 'group_session_id', id: payment.group_session_id });
         if (r) results.push(r);
+        const g = groups.find((x: any) => x.id === payment.group_session_id);
+        await notifyTutorOfPayout(supabase, supabaseUrl, tutorId, r, g?.subject ? `${g.subject} (group)` : 'your group session', null);
       }
     }
 
