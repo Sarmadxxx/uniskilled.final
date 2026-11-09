@@ -2,6 +2,7 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { withSentry } from './sentry.ts';
 import { sessionPaymentDecision, groupSeatPaymentDecision, isDuplicateKeyError, reviewReason, type PaymentDecision } from './confirm-logic.ts';
+import { disputeCreatedAction, disputeClosedAction, chargeRefundedAction, type ChargeAction } from './charge-logic.ts';
 
 const STRIPE_SECRET = Deno.env.get('STRIPE_SECRET_KEY') ?? '';
 const STRIPE_WEBHOOK_SECRET = Deno.env.get('STRIPE_WEBHOOK_SECRET') ?? '';
@@ -120,6 +121,46 @@ async function verifyStripeSignature(rawBody: string, sigHeader: string | null, 
 
 const toCents = (v: unknown) => Math.round(Number(v) * 100);
 
+async function handleChargeEvent(event: any, cors: Record<string, string>): Promise<Response> {
+  const ok = (b: unknown) => new Response(JSON.stringify(b), { headers: cors });
+  const obj = event.data?.object || {};
+  const paymentIntentId: string | null = typeof obj.payment_intent === 'string' ? obj.payment_intent : (obj.payment_intent?.id ?? null);
+  const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', SERVICE_KEY);
+
+  let payment: any = null;
+  if (paymentIntentId) {
+    const { data, error } = await supabase.from('payments')
+      .select('id, status, released_at, stripe_transfer_id').eq('stripe_payment_intent_id', paymentIntentId).maybeSingle();
+    if (error) {
+      console.error('Could not look up payment for charge event — Stripe will retry:', error.message);
+      return new Response(JSON.stringify({ error: 'lookup failed' }), { status: 500, headers: cors });
+    }
+    payment = data;
+  }
+
+  const amountText = `${(Number(obj.amount || 0) / 100).toFixed(2)} ${String(obj.currency || '').toUpperCase()}`;
+  let action: ChargeAction;
+  if (event.type === 'charge.dispute.created') action = disputeCreatedAction(payment, String(obj.id || ''), amountText);
+  else if (event.type === 'charge.dispute.closed') action = disputeClosedAction(payment, String(obj.id || ''), String(obj.status || ''));
+  else action = chargeRefundedAction(payment, Number(obj.amount_refunded || 0), Number(obj.amount || 0));
+
+  if (action.kind === 'ignore') return ok({ received: true, ignored: action.reason });
+
+  if (action.kind === 'update' && payment) {
+    // Only move the payment if it is still in the state we decided on (a payout or our own refund
+    // may have started in the meantime); a repeat delivery then simply changes nothing.
+    const { data: moved } = await supabase.from('payments')
+      .update({ status: action.status, flagged: true, flag_reason: action.flagReason })
+      .eq('id', payment.id).eq('status', payment.status).select('id');
+    if (!moved || moved.length === 0) return ok({ received: true, ignored: 'payment changed meanwhile' });
+  } else if (action.kind === 'alert_only' && payment && action.flagReason) {
+    await supabase.from('payments').update({ flagged: true, flag_reason: action.flagReason }).eq('id', payment.id);
+  }
+
+  if (action.alert) await alertAdminsForReview(supabase, '⚠️ Card payment needs attention', `${action.alert} Stripe payment ${paymentIntentId || 'unknown'}.`);
+  return ok({ received: true, handled: event.type });
+}
+
 Deno.serve(withSentry('stripe-webhook', async (req: Request) => {
   const cors = { 'Access-Control-Allow-Origin': '*' };
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
@@ -136,6 +177,12 @@ Deno.serve(withSentry('stripe-webhook', async (req: Request) => {
     }
 
     const event = JSON.parse(rawBody);
+
+    // Chargebacks and refunds made outside UniSkilled (Stripe dashboard): pause or stop the tutor
+    // payout so the platform isn't left paying for money the bank or the student took back.
+    if (['charge.dispute.created', 'charge.dispute.closed', 'charge.refunded'].includes(event.type)) {
+      return await handleChargeEvent(event, cors);
+    }
 
     // checkout.session.completed fires when checkout finishes; for delayed payment methods the
     // money only arrives later (checkout.session.async_payment_succeeded). Only confirm when paid.

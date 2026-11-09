@@ -58,7 +58,12 @@ cases(test, who, role, sql_tpl, expect) AS (VALUES
   ('Student cannot mark their own booking as confirmed',          'stu','authenticated', 'UPDATE public.sessions SET status = ''confirmed'' WHERE id = %L', 'blocked'),
   ('Tutor cannot mark a session completed (triggers payout)',     'tut','authenticated', 'UPDATE public.sessions SET status = ''completed'' WHERE id = %L', 'blocked'),
   ('Tutor cannot back-date completion to skip the 48h hold',      'tut','authenticated', 'UPDATE public.sessions SET completed_at = now() - interval ''30 days'' WHERE id = %L', 'blocked'),
-  ('Stranger cannot read someone else''s booking',                'str','authenticated', 'SELECT 1 FROM public.sessions WHERE id = %L', 'zero_rows'),
+  ('Tutor cannot change the agreed price of a booking',          'tut','authenticated', 'UPDATE public.sessions SET price = price + 50 WHERE id = %L', 'blocked'),
+  ('Tutor cannot mark a booking as paid',                         'tut','authenticated', 'UPDATE public.sessions SET payment_status = ''paid'' WHERE id = %L', 'blocked'),
+  ('Student cannot move their booking date directly (skips reschedule rules)', 'stu','authenticated', 'UPDATE public.sessions SET scheduled_date = scheduled_date + 1 WHERE id = %L', 'blocked'),
+  ('Student cannot reassign their booking to another tutor',     'stu','authenticated', 'UPDATE public.sessions SET tutor_id = student_id WHERE id = %L', 'blocked'),
+  ('Student cannot accept their own booking request',            'stu','authenticated', 'UPDATE public.sessions SET status = ''awaiting_payment'' WHERE id = %L', 'blocked'),
+  ('Stranger cannot read someone else''s booking',               'str','authenticated', 'SELECT 1 FROM public.sessions WHERE id = %L', 'zero_rows'),
   ('Stranger cannot modify someone else''s booking',              'str','authenticated', 'UPDATE public.sessions SET notes = ''x'' WHERE id = %L', 'zero_rows'),
   ('Anonymous visitor cannot read bookings',                      'none','anon',         'SELECT 1 FROM public.sessions WHERE id = %L', 'blocked_or_zero'),
   -- ── Creating bookings ──
