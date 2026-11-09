@@ -1,0 +1,32 @@
+# GitHub Pages builds the website from this repository with Jekyll.
+# Without this file it publishes EVERY file in the repo on uniskilled.com, including internal
+# documents (audit reports, database structure dumps, server-function source, tests).
+# The pages themselves are plain HTML and are copied unchanged.
+#
+# Note: this only hides these files from the website. The repository itself is still public
+# on GitHub; making it private is a separate decision (see ENGINEERING.md).
+exclude:
+  # Jekyll's own defaults (listing exclude replaces them, so they are repeated here)
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  # Internal: never needed by a visitor
+  - db/
+  - supabase/
+  - tests/
+  - scripts/
+  - "*.md"
+  - CHANGES.diff
+  - package.json
+  - package-lock.json
+  - playwright.config.ts
+  - netlify.toml
+  - playwright-report/
+  - test-results/

@@ -193,6 +193,33 @@ for helper in ('sentry.ts', 'paypal-gate.ts'):
     copies = {read(p) for p in glob.glob(f'supabase/functions/*/{helper}')}
     check(f'All copies of {helper} are identical', len(copies) <= 1, f'{len(copies)} different versions')
 
+# 12. Website publishing (_config.yml) ----------------------------------------------------------
+# GitHub Pages (Jekyll) publishes every repo file unless excluded. Internal files must be excluded,
+# and nothing a visitor's browser loads may be excluded (that would break the live site).
+import fnmatch
+cfg_yml = read('_config.yml') if os.path.exists('_config.yml') else ''
+excluded = [m.strip().strip('"\'') for m in re.findall(r'^\s*-\s*(.+)$', cfg_yml, re.M)]
+must_hide = ['db/', 'supabase/', 'tests/', '*.md', 'CHANGES.diff']
+check('Website: internal files excluded from publishing', all(p in excluded for p in must_hide),
+      'missing: ' + ', '.join(p for p in must_hide if p not in excluded))
+site_files = [p for p in glob.glob('*.html') + glob.glob('*.js') + glob.glob('*.css') + glob.glob('fonts/*.css')]
+refs = set()
+for p in site_files:
+    for u in re.findall(r'''(?:src|href)\s*=\s*["']([^"'#?]+)|url\(\s*["']?([^"')?#]+)|fetch\(\s*["']([^"'?#]+)''', read(p)):
+        u = next(x for x in u if x)
+        if re.match(r'^(https?:|//|data:|mailto:|tel:|javascript:)', u) or '${' in u:
+            continue
+        refs.add(os.path.normpath(os.path.join(os.path.dirname(p), u.lstrip('/'))) if not u.startswith('/') else os.path.normpath(u.lstrip('/')))
+def is_excluded(path):
+    for pat in excluded:
+        if pat.endswith('/') and (path + '/').startswith(pat):
+            return True
+        if fnmatch.fnmatch(path, pat):
+            return True
+    return False
+hidden_refs = sorted(r for r in refs if is_excluded(r))
+check(f'Website: no page loads an excluded file ({len(refs)} references)', not hidden_refs, ', '.join(hidden_refs[:8]))
+
 # Report -----------------------------------------------------------------------------------------
 for p in passes:
     print(f'PASS  {p}')
