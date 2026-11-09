@@ -141,13 +141,24 @@ Deno.serve(async (req: Request) => {
 
         let refundOk = false;
         let refundId: string | undefined;
-        if (payment?.paypal_capture_id) {
+        // Claim the payment atomically first (same as cancel-session / resolve-dispute), so an
+        // overlapping run can't refund it twice and the webhook sees this as our own refund.
+        let claimedForRefund = false;
+        if (payment) {
+          const { data: claimed } = await supabase.from('payments').update({ status: 'refund_processing' })
+            .eq('id', payment.id).eq('status', 'paid').select('id');
+          claimedForRefund = !!(claimed && claimed.length > 0);
+        }
+        if (payment && !claimedForRefund) {
+          // Another run is already refunding this seat; leave it to that run.
+        } else if (payment?.paypal_capture_id) {
           if (!token) token = await getToken();
           refundOk = (await refundCapture(token, payment.paypal_capture_id)).ok;
         } else if (payment?.stripe_payment_intent_id) {
           const r = await refundStripe(payment.stripe_payment_intent_id);
           refundOk = r.ok; refundId = r.refundId;
         }
+        if (payment && !claimedForRefund) continue;
         if (payment) {
           await supabase.from('payments').update({ status: refundOk ? 'refunded' : 'refund_failed', ...(refundId ? { stripe_refund_id: refundId } : {}) }).eq('id', payment.id);
           if (!refundOk) console.error(`Group refund FAILED — needs manual refund: payment ${payment.id}`);
