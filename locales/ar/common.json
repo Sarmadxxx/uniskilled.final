@@ -31,5 +31,12 @@
   "lang.banner.text": "يتوفّر UniSkilled باللغة العربية أيضًا.",
   "lang.banner.switch": "التبديل إلى العربية",
   "lang.banner.stay": "البقاء على الإنجليزية",
-  "lang.banner.close": "إغلاق"
+  "lang.banner.close": "إغلاق",
+  "langs.add": "إضافة لغة",
+  "langs.none": "لم تُضف أي لغة بعد.",
+  "langs.remove": "إزالة {{language}}",
+  "langs.levelFor": "مستوى {{language}}",
+  "langs.level.native": "اللغة الأم",
+  "langs.level.fluent": "بطلاقة",
+  "langs.level.conversational": "مستوى محادثة"
 }

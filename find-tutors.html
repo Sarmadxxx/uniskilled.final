@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="sentry.js"></script>
+<script src="i18n.js"></script>
 <link rel="icon" href="favicon.ico?v=20261101" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261101">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
@@ -12,13 +13,13 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_GB">
-<title>Find a Tutor — UniSkilled</title>
-<meta name="description" content="Browse university-verified peer tutors by subject, price and availability, and book an online session in minutes.">
+<title data-i18n="find-tutors.title">Find a Tutor — UniSkilled</title>
+<meta data-i18n-attr="content:find-tutors.meta.description" name="description" content="Browse university-verified peer tutors by subject, price and availability, and book an online session in minutes.">
 <link rel="canonical" href="https://uniskilled.com/find-tutors.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
-<meta property="og:title" content="Find a Tutor — UniSkilled">
-<meta property="og:description" content="Browse university-verified peer tutors by subject, price and availability, and book an online session in minutes.">
+<meta data-i18n-attr="content:find-tutors.meta.og-title" property="og:title" content="Find a Tutor — UniSkilled">
+<meta data-i18n-attr="content:find-tutors.meta.og-description" property="og:description" content="Browse university-verified peer tutors by subject, price and availability, and book an online session in minutes.">
 <meta property="og:url" content="https://uniskilled.com/find-tutors.html">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -148,72 +149,72 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
 <script src="language-picker.js"></script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to results</a>
+<a data-i18n="find-tutors.skip-to-results" class="skip-link" href="#main">Skip to results</a>
 <header id="site-nav"></header>
 <script src="site-nav.js"></script>
 
 <main id="main" class="wrap">
   <section class="hero" aria-labelledby="t">
-    <h1 id="t">Find someone who <em>already passed</em> your course</h1>
+    <h1 data-i18n="find-tutors.find-someone-who-already" id="t">Find someone who <em>already passed</em> your course</h1>
     <form class="two" id="sf" role="search">
-      <label><span>What do you need help with?</span><input id="searchInput" type="search" placeholder="Subject, course code, professor or name" enterkeyhint="search" autocomplete="off"></label>
-      <label><span>Which university?</span><select id="filterUniversity"><option value="">Any university</option></select></label>
-      <button type="submit">Find tutors</button>
+      <label><span data-i18n="find-tutors.what-do-you-need">What do you need help with?</span><input data-i18n-attr="placeholder:find-tutors.subject-course-code-professor.placeholder" id="searchInput" type="search" placeholder="Subject, course code, professor or name" enterkeyhint="search" autocomplete="off"></label>
+      <label><span data-i18n="find-tutors.which-university">Which university?</span><select id="filterUniversity"><option data-i18n="find-tutors.any-university" value="">Any university</option></select></label>
+      <button data-i18n="find-tutors.find-tutors" type="submit">Find tutors</button>
     </form>
-    <div class="quick" id="quickSubjects" aria-label="Popular subjects"></div>
-    <label class="mine" id="mineWrap" hidden><input type="checkbox" id="mine">Only tutors from my university</label>
+    <div data-i18n-attr="aria-label:find-tutors.popular-subjects.arialabel" class="quick" id="quickSubjects" aria-label="Popular subjects"></div>
+    <label data-i18n="find-tutors.only-tutors-from-my" class="mine" id="mineWrap" hidden><input type="checkbox" id="mine">Only tutors from my university</label>
     <ul class="trust">
-      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Pay only after your tutor accepts</li>
-      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Payment held until 48 hours after the lesson</li>
-      <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Tutor cancels? Automatic full refund</li>
+      <li data-i18n="find-tutors.pay-only-after-your"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Pay only after your tutor accepts</li>
+      <li data-i18n="find-tutors.payment-held-until-48"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Payment held until 48 hours after the lesson</li>
+      <li data-i18n="find-tutors.tutor-cancels-automatic-full"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Tutor cancels? Automatic full refund</li>
     </ul>
   </section>
-  <div class="bar"><p id="resultsCount" role="status" aria-live="polite">Loading tutors…</p>
+  <div class="bar"><p data-i18n="find-tutors.loading-tutors" id="resultsCount" role="status" aria-live="polite">Loading tutors…</p>
     <div class="f">
-      <select id="filterDay" aria-label="Available on"><option value="">Any day</option><option value="mon">Available Mon</option><option value="tue">Available Tue</option><option value="wed">Available Wed</option><option value="thu">Available Thu</option><option value="fri">Available Fri</option><option value="sat">Available Sat</option><option value="sun">Available Sun</option></select>
-      <select id="filterPrice" aria-label="Maximum price"><option value="">Any price</option></select>
-      <select id="filterLang" aria-label="Teaches in" hidden><option value="">Any language</option></select>
-      <select id="filterCountry" aria-label="Country" hidden><option value="">Any country</option></select>
-      <select id="sortBy" aria-label="Sort"><option value="best">Recommended</option><option value="price-asc">Lowest price</option><option value="price-desc">Highest price</option><option value="days">Most available</option></select>
-      <button type="button" class="clear" id="clearFilters" hidden>Clear filters</button>
+      <select data-i18n-attr="aria-label:find-tutors.available-on.arialabel" id="filterDay" aria-label="Available on"><option data-i18n="find-tutors.any-day" value="">Any day</option><option data-i18n="find-tutors.available-mon" value="mon">Available Mon</option><option data-i18n="find-tutors.available-tue" value="tue">Available Tue</option><option data-i18n="find-tutors.available-wed" value="wed">Available Wed</option><option data-i18n="find-tutors.available-thu" value="thu">Available Thu</option><option data-i18n="find-tutors.available-fri" value="fri">Available Fri</option><option data-i18n="find-tutors.available-sat" value="sat">Available Sat</option><option data-i18n="find-tutors.available-sun" value="sun">Available Sun</option></select>
+      <select data-i18n-attr="aria-label:find-tutors.maximum-price.arialabel" id="filterPrice" aria-label="Maximum price"><option data-i18n="find-tutors.any-price" value="">Any price</option></select>
+      <select data-i18n-attr="aria-label:find-tutors.teaches-in.arialabel" id="filterLang" aria-label="Teaches in" hidden><option data-i18n="find-tutors.any-language" value="">Any language</option></select>
+      <select data-i18n-attr="aria-label:find-tutors.country.arialabel" id="filterCountry" aria-label="Country" hidden><option data-i18n="find-tutors.any-country" value="">Any country</option></select>
+      <select data-i18n-attr="aria-label:find-tutors.sort.arialabel" id="sortBy" aria-label="Sort"><option data-i18n="find-tutors.recommended" value="best">Recommended</option><option data-i18n="find-tutors.lowest-price" value="price-asc">Lowest price</option><option data-i18n="find-tutors.highest-price" value="price-desc">Highest price</option><option data-i18n="find-tutors.most-available" value="days">Most available</option></select>
+      <button data-i18n="find-tutors.clear-filters" type="button" class="clear" id="clearFilters" hidden>Clear filters</button>
     </div></div>
-  <div id="postRequestBanner" class="reqline" style="display:none">Can't find your subject? <button type="button" onclick="openRequestModal()">Post a request</button> and tutors who can help will reach out.</div>
-  <section class="grid" id="tutorGrid" aria-label="Tutors"><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div></section>
+  <div data-i18n="find-tutors.cant-find-your-subject" id="postRequestBanner" class="reqline" style="display:none">Can't find your subject? <button type="button" onclick="openRequestModal()">Post a request</button> and tutors who can help will reach out.</div>
+  <section data-i18n-attr="aria-label:find-tutors.tutors.arialabel" class="grid" id="tutorGrid" aria-label="Tutors"><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div><div class="skel" aria-hidden="true"></div></section>
 </main>
 
 
 <!-- POST SUBJECT REQUEST MODAL -->
 <div class="req-modal-overlay" id="requestModal" onclick="if(event.target===this)closeRequestModal()">
   <div class="req-modal" role="dialog" aria-modal="true" aria-labelledby="reqModalTitle">
-    <button type="button" class="req-close" aria-label="Close" onclick="closeRequestModal()">✕</button>
-    <h2 class="req-modal-title" id="reqModalTitle">Request a subject</h2>
-    <div class="req-modal-sub">Can't find a tutor for what you need? Post a request and any tutor who can help will see it and reach out.</div>
+    <button data-i18n-attr="aria-label:find-tutors.close.arialabel" type="button" class="req-close" aria-label="Close" onclick="closeRequestModal()">✕</button>
+    <h2 data-i18n="find-tutors.request-a-subject" class="req-modal-title" id="reqModalTitle">Request a subject</h2>
+    <div data-i18n="find-tutors.cant-find-a-tutor" class="req-modal-sub">Can't find a tutor for what you need? Post a request and any tutor who can help will see it and reach out.</div>
     <div class="req-alert" id="reqAlert" role="alert"></div>
     <div class="req-form-group">
-      <label for="reqSubject" class="req-form-label">Subject you need help with *</label>
-      <input type="text" class="req-form-input" id="reqSubject" placeholder="e.g. Organic Chemistry, Arabic, Linear Algebra...">
+      <label data-i18n="find-tutors.subject-you-need-help" for="reqSubject" class="req-form-label">Subject you need help with *</label>
+      <input data-i18n-attr="placeholder:find-tutors.eg-organic-chemistry-arabic.placeholder" type="text" class="req-form-input" id="reqSubject" placeholder="e.g. Organic Chemistry, Arabic, Linear Algebra...">
     </div>
     <div class="req-form-group">
-      <label for="reqNotes" class="req-form-label">What specifically do you need help with?</label>
+      <label data-i18n="find-tutors.what-specifically-do-you" for="reqNotes" class="req-form-label">What specifically do you need help with?</label>
       <textarea class="req-form-input" id="reqNotes" placeholder="The more detail you give, the better tutors can judge if they can help." style="min-height:80px;resize:vertical;"></textarea>
     </div>
     <div class="req-form-row">
-      <div class="req-form-group"><label for="reqLevel" class="req-form-label">Level</label>
+      <div class="req-form-group"><label data-i18n="find-tutors.level" for="reqLevel" class="req-form-label">Level</label>
         <select class="req-form-input" id="reqLevel">
-          <option value="">Not specified</option>
-          <option>High school</option><option>Undergraduate</option><option>Masters</option><option>PhD</option>
+          <option data-i18n="find-tutors.not-specified" value="">Not specified</option>
+          <option data-i18n="find-tutors.high-school">High school</option><option data-i18n="find-tutors.undergraduate">Undergraduate</option><option data-i18n="find-tutors.masters">Masters</option><option data-i18n="find-tutors.phd">PhD</option>
         </select>
       </div>
-      <div class="req-form-group"><label for="reqFrequency" class="req-form-label">How often?</label>
+      <div class="req-form-group"><label data-i18n="find-tutors.how-often" for="reqFrequency" class="req-form-label">How often?</label>
         <select class="req-form-input" id="reqFrequency">
-          <option value="">Not specified</option>
-          <option>Once — specific topic</option><option>1x per week</option><option>2x per week</option><option>Flexible</option>
+          <option data-i18n="find-tutors.not-specified-2" value="">Not specified</option>
+          <option data-i18n="find-tutors.once-specific-topic">Once — specific topic</option><option data-i18n="find-tutors.1x-per-week">1x per week</option><option data-i18n="find-tutors.2x-per-week">2x per week</option><option data-i18n="find-tutors.flexible">Flexible</option>
         </select>
       </div>
     </div>
-    <div class="req-form-group"><label for="reqUniversity" class="req-form-label">University (optional)</label><input type="text" class="req-form-input" id="reqUniversity" maxlength="120" placeholder="e.g. Freie Universität Berlin"></div>
-    <div class="req-form-group"><label for="reqLanguage" class="req-form-label">Preferred language</label><input type="text" class="req-form-input" id="reqLanguage" placeholder="e.g. English, German"></div>
-    <button type="button" class="req-submit-btn" id="reqSubmitBtn" onclick="submitRequest()">Post request →</button>
+    <div class="req-form-group"><label data-i18n="find-tutors.university-optional" for="reqUniversity" class="req-form-label">University (optional)</label><input data-i18n-attr="placeholder:find-tutors.eg-freie-universitat-berlin.placeholder" type="text" class="req-form-input" id="reqUniversity" maxlength="120" placeholder="e.g. Freie Universität Berlin"></div>
+    <div class="req-form-group"><label data-i18n="find-tutors.preferred-language" for="reqLanguage" class="req-form-label">Preferred language</label><input data-i18n-attr="placeholder:find-tutors.eg-english-german.placeholder" type="text" class="req-form-input" id="reqLanguage" placeholder="e.g. English, German"></div>
+    <button data-i18n="find-tutors.post-request" type="button" class="req-submit-btn" id="reqSubmitBtn" onclick="submitRequest()">Post request →</button>
   </div>
 </div>
 
@@ -241,9 +242,14 @@ const _sb = window.supabase.createClient(
 const TUTOR_COLUMNS = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,video_link,rating_avg,review_count,sessions_count,university_verified_at,verified_university,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,session_length,availability,preferred_time,preferred_times,teaching_format,country,language,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url';
 
 let allTutors = [];
-const DAYS = [['mon','Mon'],['tue','Tue'],['wed','Wed'],['thu','Thu'],['fri','Fri'],['sat','Sat'],['sun','Sun']];
-const TIME_LABELS = { morning: 'Mornings', afternoon: 'Afternoons', evening: 'Evenings', flexible: 'Flexible hours' };
-const LEVELS = { bachelor: "Bachelor's", master: "Master's", masters: "Master's", phd: 'PhD', doctorate: 'PhD' };
+// Interface text: English is written here; other languages come from locales/<lang>/page.find-tutors.json
+const J = list => window.I18N ? I18N.join(list) : list.join(', ');   // Arabic uses ، between items
+const __pick = (en, v) => typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en;
+const T = (k, en, v) => window.I18N ? I18N.t('find.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? v[x] : m);
+const H = (k, en, v) => window.I18N ? I18N.h('find.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? __esc(v[x]) : m);
+const DAYS = [['mon',T('day.mon','Mon')],['tue',T('day.tue','Tue')],['wed',T('day.wed','Wed')],['thu',T('day.thu','Thu')],['fri',T('day.fri','Fri')],['sat',T('day.sat','Sat')],['sun',T('day.sun','Sun')]];
+const TIME_LABELS = { morning: T('time.morning', 'Mornings'), afternoon: T('time.afternoon', 'Afternoons'), evening: T('time.evening', 'Evenings'), flexible: T('time.flexible', 'Flexible hours') };
+const LEVELS = { bachelor: T('level.bachelor', "Bachelor's"), master: T('level.master', "Master's"), masters: T('level.master', "Master's"), phd: T('level.phd', 'PhD'), doctorate: T('level.phd', 'PhD') };
 const ICO = {
   uni: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/></svg>',
   book: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg>',
@@ -256,8 +262,8 @@ async function loadTutors() {
     // Public columns only — payout details and meeting links are never needed here
     const { data: profiles } = await _sb.from('tutor_profiles').select(TUTOR_COLUMNS);
     if (!profiles || profiles.length === 0) {
-      grid.innerHTML = '<div class="empty"><h2>No tutors yet</h2><p>Be the first to sign up as a tutor!</p><div class="empty-actions"><a class="btn p" href="onboarding.html?role=tutor">Start tutoring</a></div></div>';
-      document.getElementById('resultsCount').textContent = '0 tutors found';
+      grid.innerHTML = '<div class="empty"><h2>' + T('none.title', 'No tutors yet') + '</h2><p>' + T('none.text', 'Be the first to sign up as a tutor!') + '</p><div class="empty-actions"><a class="btn p" href="onboarding.html?role=tutor">' + T('none.cta', 'Start tutoring') + '</a></div></div>';
+      document.getElementById('resultsCount').textContent = T('none.count', '0 tutors found');
       return;
     }
     const userIds = profiles.map(p => p.user_id).filter(Boolean);
@@ -284,8 +290,8 @@ async function loadTutors() {
       const times = Array.isArray(tp.preferred_times) && tp.preferred_times.length ? tp.preferred_times : (tp.preferred_time ? [tp.preferred_time] : []);
       const level = LEVELS[String(tp.degree_level || '').toLowerCase()] || '';
       let study = [level, tp.major].filter(Boolean).join(' · ');
-      if (tp.study_year) study += (study ? ', ' : '') + 'year ' + tp.study_year;
-      return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || tp.country || '', currency: tp.currency || 'GBP',
+      if (tp.study_year) study += (study ? J(['', '']) : '') + T('year', 'year {{n}}', { n: tp.study_year });
+      return { ...tp, fullName: u.full_name || T('tutor', 'Tutor'), avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || tp.country || '', currency: tp.currency || 'GBP',
         avgRating: rv.count >= MIN_REVIEWS_SHOWN ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count,
         rankScore: (PRIOR_WEIGHT * globalMean + rv.total) / (PRIOR_WEIGHT + rv.count), courses: courseMap[tp.user_id] || [], langs: langMap[tp.user_id] || [],
         subjects: Array.isArray(tp.subjects) ? tp.subjects.filter(Boolean) : [], availability: Array.isArray(tp.availability) ? tp.availability : [], times, study };
@@ -296,7 +302,7 @@ async function loadTutors() {
     renderQuickSubjects();
   } catch (e) {
     console.error(e);
-    grid.innerHTML = '<div class="empty"><h2>Could not load tutors</h2><p>Please refresh the page or try again in a moment.</p></div>';
+    grid.innerHTML = '<div class="empty"><h2>' + T('error.title', 'Could not load tutors') + '</h2><p>' + T('error.text', 'Please refresh the page or try again in a moment.') + '</p></div>';
     document.getElementById('resultsCount').textContent = '';
     throw e;
   }
@@ -314,13 +320,13 @@ function buildFilterOptions() {
   if (langCodes.length && window.USKLangs) {
     const lSel = document.getElementById('filterLang');
     langCodes.map(c => [c, USKLangs.name(c)]).sort((a, b) => a[1].localeCompare(b[1]))
-      .forEach(([c, n]) => lSel.insertAdjacentHTML('beforeend', `<option value="${__esc(c)}">Teaches in ${__esc(n)}</option>`));
+      .forEach(([c, n]) => lSel.insertAdjacentHTML('beforeend', `<option value="${__esc(c)}">${H('teachesIn', 'Teaches in {{language}}', { language: n })}</option>`));
     lSel.hidden = false;
   }
   const rates = allTutors.map(t => Number(t.hourly_rate)).filter(r => r > 0);
   if (rates.length) {
     const min = Math.min(...rates), max = Math.max(...rates), sym = currSymbol(mostCommonCurrency());
-    [15, 20, 25, 30, 40, 60, 80].filter(x => x >= min && x < max).forEach(x => document.getElementById('filterPrice').insertAdjacentHTML('beforeend', `<option value="${x}">Up to ${__esc(sym)}${x}/h</option>`));
+    [15, 20, 25, 30, 40, 60, 80].filter(x => x >= min && x < max).forEach(x => document.getElementById('filterPrice').insertAdjacentHTML('beforeend', `<option value="${x}">${H('upTo', 'Up to {{price}}/h', { price: sym + x })}</option>`));
   }
 }
 function mostCommonCurrency() {
@@ -333,7 +339,7 @@ function renderQuickSubjects() {
   allTutors.forEach(t => t.subjects.forEach(sub => { const k = String(sub).trim(); if (k) counts[k] = (counts[k] || 0) + 1; }));
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).slice(0, 8).map(e => e[0]);
   const box = document.getElementById('quickSubjects');
-  box.innerHTML = (top.length ? '<span class="ql">Popular:</span>' + top.map(sub => `<button type="button" class="qs-chip" aria-pressed="false" data-subject="${__esc(sub)}">${__esc(sub)}</button>`).join('') : '') + '<a class="qs-link" href="courses.html">Browse by course</a>';
+  box.innerHTML = (top.length ? '<span class="ql">' + T('popular', 'Popular:') + '</span>' + top.map(sub => `<button type="button" class="qs-chip" aria-pressed="false" data-subject="${__esc(sub)}">${__esc(sub)}</button>`).join('') : '') + '<a class="qs-link" href="courses.html">' + T('byCourse', 'Browse by course') + '</a>';
 }
 
 // A course matches a search when its name, code, professor or university contains the words searched for
@@ -398,8 +404,8 @@ function clearFilters() {
   filterTutors();
 }
 
-const daysLabel = t => t.availability.length === 7 ? 'Every day' : DAYS.filter(d => t.availability.includes(d[0])).map(d => d[1]).join(', ');
-const timesLabel = t => t.times.map(x => TIME_LABELS[x] || x).join(', ');
+const daysLabel = t => t.availability.length === 7 ? T('everyDay', 'Every day') : J(DAYS.filter(d => t.availability.includes(d[0])).map(d => d[1]));
+const timesLabel = t => J(t.times.map(x => TIME_LABELS[x] || x));
 const priceLabel = t => t.hourly_rate ? currSymbol(t.currency) + Number(t.hourly_rate).toString() : '';
 const avatarHtml = (t, cls) => { const u = t.avatarUrl ? __safeUrl(t.avatarUrl) : ''; const ini = (t.fullName || 'T').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase(); return u && u !== '#' ? `<img class="${cls}" src="${u}" alt="" loading="lazy">` : `<span class="${cls}" aria-hidden="true">${__esc(ini)}</span>`; };
 const canBook = t => t.user_id !== currentUserId && currentUserRole !== 'tutor';
@@ -409,36 +415,36 @@ const profileUrl = t => `tutor-profile.html?id=${encodeURIComponent(t.user_id)}`
 function whyMatch(t, q) {
   if (!q) return '';
   const c = t.courses.find(c => __courseMatches(c, q));
-  if (c) return 'Passed ' + (c.course_name || c.course_code) + (__sameUni(c.university || t.verified_university || t.location || '', currentStudentUni || '') ? ' at your university' : (c.university ? ' at ' + c.university : ''));
+  if (c) { const course = c.course_name || c.course_code; return __sameUni(c.university || t.verified_university || t.location || '', currentStudentUni || '') ? T('why.passedHere', 'Passed {{course}} at your university', { course }) : c.university ? T('why.passedAt', 'Passed {{course}} at {{university}}', { course, university: c.university }) : T('why.passed', 'Passed {{course}}', { course }); }
   const s = t.subjects.find(s => s.toLowerCase().includes(q));
-  return s ? 'Teaches ' + s : '';
+  return s ? T('why.teaches', 'Teaches {{subject}}', { subject: s }) : '';
 }
 
 function renderTutors(tutors, q) {
   q = q || '';
   const uniF = currentUniFilter();
-  document.getElementById('resultsCount').innerHTML = '<b>' + tutors.length + '</b> tutor' + (tutors.length !== 1 ? 's' : '') + (q ? ' for “' + __esc(q) + '”' : '') + (uniF ? ' · ' + __esc(uniF === 'same' ? 'your university' : uniF) : '');
+  document.getElementById('resultsCount').innerHTML = H('count', { one: '<b>{{count}}</b> tutor', other: '<b>{{count}}</b> tutors' }, { count: tutors.length }) + (q ? H('count.for', ' for “{{q}}”', { q }) : '') + (uniF ? ' · ' + __esc(uniF === 'same' ? T('yourUni', 'your university') : uniF) : '');
   const grid = document.getElementById('tutorGrid');
   if (!tutors.length) {
     const canRequest = currentUserId && currentUserRole !== 'tutor';
-    grid.innerHTML = '<div class="empty"><h2>No tutors match yet</h2><p>Try another subject or fewer filters' + (canRequest ? ', or post a request and tutors who can help will reach out.' : '.') + '</p><div class="empty-actions"><button type="button" class="btn s" onclick="clearFilters()">Clear filters</button>' + (canRequest ? '<button type="button" class="btn p" onclick="openRequestModal()">Post a request</button>' : '') + '</div></div>';
+    grid.innerHTML = '<div class="empty"><h2>' + T('nomatch.title', 'No tutors match yet') + '</h2><p>' + (canRequest ? T('nomatch.textRequest', 'Try another subject or fewer filters, or post a request and tutors who can help will reach out.') : T('nomatch.text', 'Try another subject or fewer filters.')) + '</p><div class="empty-actions"><button type="button" class="btn s" onclick="clearFilters()">' + T('clear', 'Clear filters') + '</button>' + (canRequest ? '<button type="button" class="btn p" onclick="openRequestModal()">' + T('postRequest', 'Post a request') + '</button>' : '') + '</div></div>';
     return;
   }
   grid.innerHTML = tutors.map(t => {
     const why = whyMatch(t, q), p = priceLabel(t), own = t.user_id === currentUserId;
-    const courses = t.courses.slice(0, 2).map(c => c.course_key ? `<a href="course.html?c=${encodeURIComponent(c.course_key)}">${__esc(c.course_code || c.course_name)}</a>` : __esc(c.course_code || c.course_name)).join(', ');
+    const courses = J(t.courses.slice(0, 2).map(c => c.course_key ? `<a href="course.html?c=${encodeURIComponent(c.course_key)}">${__esc(c.course_code || c.course_name)}</a>` : __esc(c.course_code || c.course_name)));
     return `<article class="card">
       <div class="ct">${avatarHtml(t, 'av')}<div style="min-width:0"><h2><a href="${profileUrl(t)}">${__esc(t.fullName)}</a></h2><div class="bdg">
-        ${t.university_verified_at ? `<span class="vb" title="University email verified${t.verified_university ? ' — ' + __esc(t.verified_university) : ''}">✓ Verified student</span>` : ''}
-        ${t.avgRating ? `<span class="rb" aria-label="Rated ${__esc(t.avgRating)} out of 5 from ${t.reviewCount} reviews">★ ${__esc(t.avgRating)} · ${t.reviewCount} reviews</span>` : '<span class="nb">New tutor</span>'}</div></div></div>
-      <div class="acad">${t.location ? `<div>${ICO.uni}<span>Studies at <b>${__esc(t.location)}</b></span></div>` : ''}${t.study ? `<div>${ICO.book}<span>${__esc(t.study)}</span></div>` : ''}${courses ? `<div>${ICO.star}<span>Passed ${courses}${t.courses.length > 2 ? ' +' + (t.courses.length - 2) : ''}</span></div>` : ''}${!t.location && !t.study && !courses ? '<div><span class="note">No academic details added yet</span></div>' : ''}</div>
+        ${t.university_verified_at ? `<span class="vb" title="${t.verified_university ? H('verifiedAt', 'University email verified — {{university}}', { university: t.verified_university }) : T('verified.title', 'University email verified')}">✓ ${T('verified', 'Verified student')}</span>` : ''}
+        ${t.avgRating ? `<span class="rb" aria-label="${H('rated', 'Rated {{rating}} out of 5 from {{count}} reviews', { rating: t.avgRating, count: t.reviewCount })}">★ ${__esc(t.avgRating)} · ${H('reviews', { one: '{{count}} review', other: '{{count}} reviews' }, { count: t.reviewCount })}</span>` : '<span class="nb">' + T('new', 'New tutor') + '</span>'}</div></div></div>
+      <div class="acad">${t.location ? `<div>${ICO.uni}<span>${H('studiesAt', 'Studies at <b>{{university}}</b>', { university: t.location })}</span></div>` : ''}${t.study ? `<div>${ICO.book}<span>${__esc(t.study)}</span></div>` : ''}${courses ? `<div>${ICO.star}<span>${T('passedList', 'Passed {{courses}}', { courses })}${t.courses.length > 2 ? ' +' + (t.courses.length - 2) : ''}</span></div>` : ''}${!t.location && !t.study && !courses ? '<div><span class="note">' + T('noAcademic', 'No academic details added yet') + '</span></div>' : ''}</div>
       ${why ? `<div class="match">✓ ${__esc(why)}</div>` : ''}
-      ${t.subjects.length ? `<div class="teach">${t.subjects.slice(0, 4).map(s => `<span>${__esc(s)}</span>`).join('')}${t.subjects.length > 4 ? `<span>+${t.subjects.length - 4} more</span>` : ''}</div>` : ''}
-      ${t.langs.length && window.USKLangs ? `<div class="avail"><span>Teaches in: <b>${__esc(USKLangs.list(t.langs))}</b></span></div>` : ''}
-      <div class="avail"><span>Available: <b>${__esc(daysLabel(t) || 'not set yet')}</b></span>${t.times.length ? `<span class="note">${__esc(timesLabel(t))}</span>` : ''}</div>
-      <div class="foot"><span class="price">${p ? `<b>${__esc(p)}</b> <small>/ hour</small>` : '<small>Rate on request</small>'}</span>
-        <a class="btn s" href="${profileUrl(t)}">${own ? 'Your profile' : 'Profile'}</a>
-        ${canBook(t) ? `<a class="btn p" href="${bookUrl(t)}" aria-label="Book a session with ${__esc(t.fullName)}">Book</a>` : ''}</div>
+      ${t.subjects.length ? `<div class="teach">${t.subjects.slice(0, 4).map(s => `<span>${__esc(s)}</span>`).join('')}${t.subjects.length > 4 ? `<span>${H('more', '+{{n}} more', { n: t.subjects.length - 4 })}</span>` : ''}</div>` : ''}
+      ${t.langs.length && window.USKLangs ? `<div class="avail"><span>${H('teachesInList', 'Teaches in: <b>{{languages}}</b>', { languages: USKLangs.list(t.langs) })}</span></div>` : ''}
+      <div class="avail"><span>${H('available', 'Available: <b>{{days}}</b>', { days: daysLabel(t) || T('notSet', 'not set yet') })}</span>${t.times.length ? `<span class="note">${__esc(timesLabel(t))}</span>` : ''}</div>
+      <div class="foot"><span class="price">${p ? `<b>${__esc(p)}</b> <small>${T('perHour', '/ hour')}</small>` : '<small>' + T('rateOnRequest', 'Rate on request') + '</small>'}</span>
+        <a class="btn s" href="${profileUrl(t)}">${own ? T('yourProfile', 'Your profile') : T('profile', 'Profile')}</a>
+        ${canBook(t) ? `<a class="btn p" href="${bookUrl(t)}" aria-label="${H('bookWith', 'Book a session with {{name}}', { name: t.fullName })}">${T('book', 'Book')}</a>` : ''}</div>
     </article>`;
   }).join('');
 }
@@ -459,7 +465,7 @@ document.getElementById('quickSubjects').addEventListener('click', e => {
 });
 
 let currentUserId = null;
-let currentUserName = 'Student';
+let currentUserName = 'Student';   // stored with the request; not shown on this page
 let currentUserRole = null;
 let currentStudentUni = null;
 
@@ -514,11 +520,11 @@ window.submitRequest = async function(){
   const subject = document.getElementById('reqSubject').value.trim();
   if (!subject) {
     const a = document.getElementById('reqAlert');
-    a.textContent = 'Please enter a subject.'; a.className = 'req-alert error';
+    a.textContent = T('req.needSubject', 'Please enter a subject.'); a.className = 'req-alert error';
     return;
   }
   const btn = document.getElementById('reqSubmitBtn');
-  btn.disabled = true; btn.textContent = 'Posting...';
+  btn.disabled = true; btn.textContent = T('req.posting', 'Posting...');
   const { error } = await _sb.from('subject_requests').insert({
     student_id: currentUserId,
     student_name: currentUserName,
@@ -530,13 +536,13 @@ window.submitRequest = async function(){
     university: document.getElementById('reqUniversity').value.trim().slice(0, 120) || null,
     status: 'open'
   });
-  btn.disabled = false; btn.textContent = 'Post request →';
+  btn.disabled = false; btn.textContent = T('req.post', 'Post request →');
   const a = document.getElementById('reqAlert');
   if (error) {
-    a.textContent = 'Error: ' + error.message; a.className = 'req-alert error';
+    a.textContent = T('req.error', 'Error: {{message}}', { message: error.message }); a.className = 'req-alert error';
     return;
   }
-  a.textContent = 'Request posted! Tutors who can help will reach out.'; a.className = 'req-alert success';
+  a.textContent = T('req.posted', 'Request posted! Tutors who can help will reach out.'); a.className = 'req-alert success';
   document.getElementById('reqSubject').value = '';
   document.getElementById('reqNotes').value = '';
   document.getElementById('reqLevel').value = '';

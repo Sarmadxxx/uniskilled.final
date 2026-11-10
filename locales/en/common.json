@@ -31,5 +31,12 @@
   "lang.banner.text": "UniSkilled is also available in English.",
   "lang.banner.switch": "Switch to English",
   "lang.banner.stay": "Stay in English",
-  "lang.banner.close": "Close"
+  "lang.banner.close": "Close",
+  "langs.add": "Add a language",
+  "langs.none": "No languages added yet.",
+  "langs.remove": "Remove {{language}}",
+  "langs.levelFor": "Level for {{language}}",
+  "langs.level.native": "Native",
+  "langs.level.fluent": "Fluent",
+  "langs.level.conversational": "Conversational"
 }

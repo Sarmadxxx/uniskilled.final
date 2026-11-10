@@ -70,7 +70,17 @@ jobs:
       - name: Add the language folders
         run: node scripts/build-locales.mjs --site _site
 
-      - name: Prove every English file is byte-for-byte the same as the plain build
+      - name: Remove translation markers from the plain copy too (visitors never get them)
+        run: |
+          node --input-type=module -e "
+            import { stripMarkers } from './scripts/build-locales.mjs';
+            import { readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
+            import { join } from 'node:path';
+            const walk = d => readdirSync(d).flatMap(n => { const p = join(d, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
+            for (const f of walk('_site_english').filter(f => f.endsWith('.html'))) writeFileSync(f, stripMarkers(readFileSync(f, 'utf8')));
+          "
+
+      - name: Prove the language build changes no English file (byte for byte, markers aside)
         run: |
           langs=$(node -e "console.log(require('./locales/languages.json').languages.filter(l=>l.code!=='en').map(l=>l.code).join(' '))")
           excl=""; for l in $langs; do excl="$excl --exclude=$l"; done

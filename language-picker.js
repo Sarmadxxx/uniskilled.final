@@ -47,7 +47,7 @@
     });
     return out;
   }
-  function list(rows) { return clean(rows).map(function (r) { return name(r.code); }).join(', '); }
+  function list(rows) { var n = clean(rows).map(function (r) { return name(r.code); }); return root.I18N ? root.I18N.join(n) : n.join(', '); }
 
   var CSS = '.ulp{display:flex;flex-direction:column;gap:8px}' +
     '.ulp-row{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 12px;border:1px solid #e2e8f0;border-radius:10px;background:#fff}' +

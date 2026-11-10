@@ -136,6 +136,9 @@
     catch (e) { return (o.currency === 'USD' ? '$' : '€') + Number(amount).toFixed(2); }
   }
 
+  /** Join a list the local way: Arabic uses the Arabic comma (،), others ", " exactly as before. */
+  function join(list) { return (list || []).join(lang === 'ar' ? '، ' : ', '); }
+
   /** A language's name written in the reader's language, e.g. name('ar') on a German page → "Arabisch". */
   function languageName(code, inLang) {
     var l = inLang || lang;
@@ -182,6 +185,7 @@
     number: number,
     money: money,
     languageName: languageName,
+    join: join,
     path: path,
     saved: saved,
     save: save,

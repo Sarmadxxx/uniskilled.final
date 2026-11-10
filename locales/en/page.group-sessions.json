@@ -1,0 +1,29 @@
+{
+  "group-sessions.title": "Group Sessions — UniSkilled",
+  "group-sessions.group-sessions": "👥 Group Sessions",
+  "group-sessions.share-one-tutor-with": "Share one tutor with up to three classmates and split the cost. A session goes ahead once two students have paid.",
+  "group-sessions.meta.description": "Join a small-group tutoring session led by a verified university tutor and share the cost.",
+  "group-sessions.meta.og-title": "Group Sessions — UniSkilled",
+  "group-sessions.meta.og-description": "Join a small-group tutoring session led by a verified university tutor and share the cost.",
+  "groups.js.empty": "No open group sessions right now.",
+  "groups.js.empty.link": "Book a one-to-one tutor instead",
+  "groups.js.empty.rest": " or ask a tutor in Messages to open a group for your course.",
+  "groups.js.yours": "Your session",
+  "groups.js.studentsOnly": "Students only",
+  "groups.js.joined": "You're in",
+  "groups.js.pay": "Complete Payment",
+  "groups.js.full": "Full",
+  "groups.js.join": "Join · {{price}}",
+  "groups.js.with": "with {{name}}",
+  "groups.js.tutor": "Tutor",
+  "groups.js.minutes": "{{n}} min",
+  "groups.js.online": "Online",
+  "groups.js.toast.studentsOnly": "Only student accounts can join group sessions.",
+  "groups.js.toast.own": "You can't join your own group session.",
+  "groups.js.toast.already": "You've already joined this group session.",
+  "groups.js.toast.error": "Could not join this session. Please try again.",
+  "groups.js.spots": {
+    "one": "{{count}} spot left",
+    "other": "{{count}} spots left"
+  }
+}

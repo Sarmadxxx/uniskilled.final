@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="sentry.js"></script>
+<script src="i18n.js"></script>
 <link rel="icon" href="favicon.ico?v=20261101" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261101">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
@@ -12,13 +13,13 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_GB">
-<title>Group Sessions — UniSkilled</title>
-<meta name="description" content="Join a small-group tutoring session led by a verified university tutor and share the cost.">
+<title data-i18n="group-sessions.title">Group Sessions — UniSkilled</title>
+<meta data-i18n-attr="content:group-sessions.meta.description" name="description" content="Join a small-group tutoring session led by a verified university tutor and share the cost.">
 <link rel="canonical" href="https://uniskilled.com/group-sessions.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
-<meta property="og:title" content="Group Sessions — UniSkilled">
-<meta property="og:description" content="Join a small-group tutoring session led by a verified university tutor and share the cost.">
+<meta data-i18n-attr="content:group-sessions.meta.og-title" property="og:title" content="Group Sessions — UniSkilled">
+<meta data-i18n-attr="content:group-sessions.meta.og-description" property="og:description" content="Join a small-group tutoring session led by a verified university tutor and share the cost.">
 <meta property="og:url" content="https://uniskilled.com/group-sessions.html">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -63,8 +64,8 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 
 <main class="page" id="main">
   <div class="page-head">
-    <h1 class="page-title">👥 Group Sessions</h1>
-    <div class="page-sub">Share one tutor with up to three classmates and split the cost. A session goes ahead once two students have paid.</div>
+    <h1 data-i18n="group-sessions.group-sessions" class="page-title">👥 Group Sessions</h1>
+    <div data-i18n="group-sessions.share-one-tutor-with" class="page-sub">Share one tutor with up to three classmates and split the cost. A session goes ahead once two students have paid.</div>
   </div>
   <div id="groupSessionsList" aria-live="polite"><div class="spinner"></div></div>
 </main>
@@ -84,6 +85,9 @@ const _sb = window.supabase.createClient(
 );
 
 let currentUser = null;
+// Interface text: English is written here; other languages come from locales/<lang>/page.group-sessions.json
+const T = (k, en, v) => window.I18N ? I18N.t('groups.js.' + k, en, v) : (typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? v[x] : m);
+const H = (k, en, v) => window.I18N ? I18N.h('groups.js.' + k, en, v) : (typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? __esc(v[x]) : m);
 
 async function init() {
   const { data: { session } } = await _sb.auth.getSession();
@@ -91,9 +95,9 @@ async function init() {
   await loadGroupSessions();
 }
 
-const EMPTY_HTML = '<div class="empty-state">No open group sessions right now.<br>' +
-  '<a href="find-tutors.html" style="color:var(--blue,#1a6bff);font-weight:700;text-decoration:none;">Book a one-to-one tutor instead</a>' +
-  ' or ask a tutor in Messages to open a group for your course.</div>';
+const EMPTY_HTML = '<div class="empty-state">' + T('empty', 'No open group sessions right now.') + '<br>' +
+  '<a href="find-tutors.html" style="color:var(--blue,#1a6bff);font-weight:700;text-decoration:none;">' + T('empty.link', 'Book a one-to-one tutor instead') + '</a>' +
+  T('empty.rest', ' or ask a tutor in Messages to open a group for your course.') + '</div>';
 
 async function loadGroupSessions() {
   const list = document.getElementById('groupSessionsList');
@@ -133,35 +137,35 @@ async function loadGroupSessions() {
     const alreadyJoined = currentUser && participants.find(p => p.student_id === currentUser.id && (p.status === 'confirmed' || p.status === 'awaiting_payment'));
     const spotsLeft = gs.max_students - (seatMap[gs.id] ?? confirmed.length);
     const isFull = spotsLeft <= 0;
-    const date = new Date(gs.scheduled_date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
+    const date = window.I18N ? I18N.date(gs.scheduled_date, { weekday: 'short', month: 'short', day: 'numeric' }) : new Date(gs.scheduled_date).toLocaleDateString([], { weekday: 'short', month: 'short', day: 'numeric' });
 
     let btnHtml;
     if (currentUser && gs.tutor_id === currentUser.id) {
-      btnHtml = `<span class="gs-spots">Your session</span>`;
+      btnHtml = `<span class="gs-spots">${T('yours', 'Your session')}</span>`;
     } else if (currentUser && (currentUser.user_metadata || {}).role === 'tutor') {
-      btnHtml = `<span class="gs-spots">Students only</span>`;
+      btnHtml = `<span class="gs-spots">${T('studentsOnly', 'Students only')}</span>`;
     } else if (alreadyJoined) {
       btnHtml = alreadyJoined.status === 'confirmed'
-        ? `<span class="gs-spots">✓ You're in</span>`
-        : `<a href="complete-payment.html?group_participant=${__safeUrl(alreadyJoined.id)}" class="join-btn" style="text-decoration:none;display:inline-block;">Complete Payment</a>`;
+        ? `<span class="gs-spots">✓ ${T('joined', "You're in")}</span>`
+        : `<a href="complete-payment.html?group_participant=${__safeUrl(alreadyJoined.id)}" class="join-btn" style="text-decoration:none;display:inline-block;">${T('pay', 'Complete Payment')}</a>`;
     } else if (isFull) {
-      btnHtml = `<button class="join-btn" disabled>Full</button>`;
+      btnHtml = `<button class="join-btn" disabled>${T('full', 'Full')}</button>`;
     } else {
-      btnHtml = `<button class="join-btn" onclick="joinGroupSession('${gs.id}')">Join · ${__esc(gs.currency === 'USD' ? '$' : '€')}${__esc(gs.price_per_student)}</button>`;
+      btnHtml = `<button class="join-btn" onclick="joinGroupSession('${gs.id}')">${H('join', 'Join · {{price}}', { price: (gs.currency === 'USD' ? '$' : '€') + gs.price_per_student })}</button>`;
     }
 
     return `<div class="gs-card">
       <div class="gs-icon">👥</div>
       <div class="gs-info">
         <div class="gs-subject">${__esc(gs.subject)}</div>
-        <div class="gs-tutor">with ${__esc(gs.tutor_name || 'Tutor')}</div>
+        <div class="gs-tutor">${H('with', 'with {{name}}', { name: gs.tutor_name || T('tutor', 'Tutor') })}</div>
         <div class="gs-meta">
           <span>📅 ${__esc(date)} · ${__esc(gs.scheduled_time.slice(0,5) + __tzNote(gs.timezone))}</span>
-          <span>⏱️ ${__esc(gs.duration_minutes)} min</span>
-          <span>💻 Online</span>
+          <span>⏱️ ${H('minutes', '{{n}} min', { n: gs.duration_minutes })}</span>
+          <span>💻 ${T('online', 'Online')}</span>
         </div>
       </div>
-      <span class="gs-spots ${__esc(isFull ? 'full' : '')}">${__esc(isFull ? 'Full' : spotsLeft + ' spot' + (spotsLeft === 1 ? '' : 's') + ' left')}</span>
+      <span class="gs-spots ${__esc(isFull ? 'full' : '')}">${__esc(isFull ? T('full', 'Full') : T('spots', { one: '{{count}} spot left', other: '{{count}} spots left' }, { count: spotsLeft }))}</span>
       ${btnHtml}
     </div>`;
   }).join('');
@@ -169,9 +173,9 @@ async function loadGroupSessions() {
 
 async function joinGroupSession(groupSessionId) {
   if (!currentUser) { window.location.href = 'signin.html?redirect=' + encodeURIComponent('group-sessions.html'); return; }
-  if ((currentUser.user_metadata || {}).role === 'tutor') { showToast('Only student accounts can join group sessions.', 'info'); return; }
+  if ((currentUser.user_metadata || {}).role === 'tutor') { showToast(T('toast.studentsOnly', 'Only student accounts can join group sessions.'), 'info'); return; }
   const { data: own } = await _sb.from('group_sessions').select('tutor_id').eq('id', groupSessionId).maybeSingle();
-  if (own && own.tutor_id === currentUser.id) { showToast("You can't join your own group session.", 'info'); return; }
+  if (own && own.tutor_id === currentUser.id) { showToast(T('toast.own', "You can't join your own group session."), 'info'); return; }
   const { data: sp } = await _sb.from('users').select('full_name').eq('id', currentUser.id).maybeSingle();
   const studentName = sp?.full_name || 'Student';
 
@@ -185,9 +189,9 @@ async function joinGroupSession(groupSessionId) {
 
   if (error) {
     if (error.code === '23505') {
-      showToast("You've already joined this group session.", 'info');
+      showToast(T('toast.already', "You've already joined this group session."), 'info');
     } else {
-      showToast(__friendlyDbError(error, 'Could not join this session. Please try again.'), 'error');
+      showToast(__friendlyDbError(error, T('toast.error', 'Could not join this session. Please try again.')), 'error');
     }
     return;
   }

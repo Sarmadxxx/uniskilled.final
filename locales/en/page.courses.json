@@ -1,0 +1,34 @@
+{
+  "courses.title": "Courses — UniSkilled",
+  "courses.skip-to-content": "Skip to content",
+  "courses.courses": "Courses",
+  "courses.find-your-course-and": "Find your course and the student tutors who already passed it. Follow a course to see questions from classmates.",
+  "courses.search-courses": "Search courses",
+  "courses.meta.description": "Find a university course and the verified student tutors who already passed it. Follow a course to see classmates' questions.",
+  "courses.meta.og-title": "Courses — UniSkilled",
+  "courses.meta.og-description": "Find a university course and the student tutors who already passed it.",
+  "courses.course-code-course-name.placeholder": "Course code, course name or university",
+  "courses.loading-courses.arialabel": "Loading courses",
+  "courses.js.more": " +{{n}} more",
+  "courses.js.error": "Could not load courses. Please refresh the page or try again in a moment.",
+  "courses.js.nomatch": "No course matches “{{q}}” yet.",
+  "courses.js.nomatchLinks": "<a href=\"{{tutors}}\">Search tutors by subject instead</a> or <a href=\"{{request}}\">post a request</a>.",
+  "courses.js.none": "No courses yet. Tutors add the courses they passed to their profile, and they appear here.",
+  "courses.js.browse": "Browse tutors",
+  "courses.js.tutors": {
+    "one": "{{count}} tutor",
+    "other": "{{count}} tutors"
+  },
+  "courses.js.followers": {
+    "one": "{{count}} follower",
+    "other": "{{count}} followers"
+  },
+  "courses.js.questions": {
+    "one": "{{count}} question",
+    "other": "{{count}} questions"
+  },
+  "courses.js.found": {
+    "one": "{{count}} course found",
+    "other": "{{count}} courses found"
+  }
+}

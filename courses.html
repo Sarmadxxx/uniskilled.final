@@ -4,18 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="sentry.js"></script>
+<script src="i18n.js"></script>
 <link rel="icon" href="favicon.ico?v=20261101" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261101">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
-<title>Courses — UniSkilled</title>
-<meta name="description" content="Find a university course and the verified student tutors who already passed it. Follow a course to see classmates' questions.">
+<title data-i18n="courses.title">Courses — UniSkilled</title>
+<meta data-i18n-attr="content:courses.meta.description" name="description" content="Find a university course and the verified student tutors who already passed it. Follow a course to see classmates' questions.">
 <link rel="canonical" href="https://uniskilled.com/courses.html">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
-<meta property="og:title" content="Courses — UniSkilled">
-<meta property="og:description" content="Find a university course and the student tutors who already passed it.">
+<meta data-i18n-attr="content:courses.meta.og-title" property="og:title" content="Courses — UniSkilled">
+<meta data-i18n-attr="content:courses.meta.og-description" property="og:description" content="Find a university course and the student tutors who already passed it.">
 <meta property="og:url" content="https://uniskilled.com/courses.html">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta property="og:image:width" content="1200">
@@ -58,21 +59,21 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 <script src="analytics.js" defer></script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
+<a data-i18n="courses.skip-to-content" class="skip-link" href="#main">Skip to content</a>
 <header id="site-nav"></header>
 <script src="site-nav.js"></script>
 
 <main class="page" id="main">
-  <h1 class="page-title">Courses</h1>
-  <p class="page-sub">Find your course and the student tutors who already passed it. Follow a course to see questions from classmates.</p>
+  <h1 data-i18n="courses.courses" class="page-title">Courses</h1>
+  <p data-i18n="courses.find-your-course-and" class="page-sub">Find your course and the student tutors who already passed it. Follow a course to see questions from classmates.</p>
 
   <div class="search" role="search">
     <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-    <label for="q" class="sr-only" style="position:absolute;left:-9999px">Search courses</label>
-    <input id="q" type="search" placeholder="Course code, course name or university" autocomplete="off">
+    <label data-i18n="courses.search-courses" for="q" class="sr-only" style="position:absolute;left:-9999px">Search courses</label>
+    <input data-i18n-attr="placeholder:courses.course-code-course-name.placeholder" id="q" type="search" placeholder="Course code, course name or university" autocomplete="off">
   </div>
   <div class="count" id="count" aria-live="polite"></div>
-  <div id="list"><div class="spinner" role="status" aria-label="Loading courses"></div></div>
+  <div id="list"><div data-i18n-attr="aria-label:courses.loading-courses.arialabel" class="spinner" role="status" aria-label="Loading courses"></div></div>
 </main>
 
 <script>
@@ -82,20 +83,22 @@ const _sb = window.supabase.createClient(USK_CONFIG.url, USK_CONFIG.anonKey);
 
 let timer = null, lastRun = 0;
 
-function plural(n, one, many) { return n + ' ' + (n === 1 ? one : many); }
+// Interface text: English is written here; other languages come from locales/<lang>/page.courses.json
+const T = (k, en, v) => window.I18N ? I18N.t('courses.js.' + k, en, v) : (typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? v[x] : m);
+const H = (k, en, v) => window.I18N ? I18N.h('courses.js.' + k, en, v) : (typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? __esc(v[x]) : m);
 
 function courseCard(c) {
   const unis = c.universities || [];
-  const uniText = unis.length ? unis.slice(0, 2).join(' · ') + (unis.length > 2 ? ' +' + (unis.length - 2) + ' more' : '') : '';
+  const uniText = unis.length ? unis.slice(0, 2).join(' · ') + (unis.length > 2 ? T('more', ' +{{n}} more', { n: unis.length - 2 }) : '') : '';
   const showName = c.course_name && c.course_name.toLowerCase() !== String(c.label || '').toLowerCase();
   return `<a class="course" href="course.html?c=${encodeURIComponent(c.course_key)}">
     <div class="course-label">${__esc(c.label)}</div>
     ${showName ? `<div class="course-name">${__esc(c.course_name)}</div>` : ''}
     ${uniText ? `<div class="course-unis">${__esc(uniText)}</div>` : ''}
     <div class="course-stats">
-      <span class="pill${c.tutor_count ? '' : ' muted'}">${__esc(plural(c.tutor_count, 'tutor', 'tutors'))}</span>
-      ${c.follower_count ? `<span class="pill muted">${__esc(plural(c.follower_count, 'follower', 'followers'))}</span>` : ''}
-      ${c.question_count ? `<span class="pill muted">${__esc(plural(c.question_count, 'question', 'questions'))}</span>` : ''}
+      <span class="pill${c.tutor_count ? '' : ' muted'}">${__esc(T('tutors', { one: '{{count}} tutor', other: '{{count}} tutors' }, { count: c.tutor_count }))}</span>
+      ${c.follower_count ? `<span class="pill muted">${__esc(T('followers', { one: '{{count}} follower', other: '{{count}} followers' }, { count: c.follower_count }))}</span>` : ''}
+      ${c.question_count ? `<span class="pill muted">${__esc(T('questions', { one: '{{count}} question', other: '{{count}} questions' }, { count: c.question_count }))}</span>` : ''}
     </div>
   </a>`;
 }
@@ -111,15 +114,15 @@ async function load() {
   if (run !== lastRun) return; // a newer search is already on its way
   if (error) {
     count.textContent = '';
-    list.innerHTML = '<div class="empty">Could not load courses. Please refresh the page or try again in a moment.</div>';
+    list.innerHTML = '<div class="empty">' + T('error', 'Could not load courses. Please refresh the page or try again in a moment.') + '</div>';
     return;
   }
   const rows = data || [];
-  count.textContent = q ? plural(rows.length, 'course found', 'courses found') : '';
+  count.textContent = q ? T('found', { one: '{{count}} course found', other: '{{count}} courses found' }, { count: rows.length }) : '';
   if (!rows.length) {
     list.innerHTML = q
-      ? `<div class="empty">No course matches “${__esc(q)}” yet.<br><a href="find-tutors.html?q=${encodeURIComponent(q)}">Search tutors by subject instead</a> or <a href="find-tutors.html?q=${encodeURIComponent(q)}#request">post a request</a>.</div>`
-      : '<div class="empty">No courses yet. Tutors add the courses they passed to their profile, and they appear here.<br><a href="find-tutors.html">Browse tutors</a></div>';
+      ? `<div class="empty">${H('nomatch', 'No course matches “{{q}}” yet.', { q })}<br>${H('nomatchLinks', '<a href="{{tutors}}">Search tutors by subject instead</a> or <a href="{{request}}">post a request</a>.', { tutors: 'find-tutors.html?q=' + encodeURIComponent(q), request: 'find-tutors.html?q=' + encodeURIComponent(q) + '#request' })}</div>`
+      : '<div class="empty">' + T('none', 'No courses yet. Tutors add the courses they passed to their profile, and they appear here.') + '<br><a href="find-tutors.html">' + T('browse', 'Browse tutors') + '</a></div>';
     return;
   }
   list.innerHTML = `<div class="grid">${rows.map(courseCard).join('')}</div>`;

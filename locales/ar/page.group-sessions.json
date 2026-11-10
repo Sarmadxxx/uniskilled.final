@@ -1,0 +1,33 @@
+{
+  "group-sessions.title": "الجلسات الجماعية — UniSkilled",
+  "group-sessions.group-sessions": "👥 الجلسات الجماعية",
+  "group-sessions.share-one-tutor-with": "تشارك مدرّسًا واحدًا مع ما يصل إلى ثلاثة من زملائك وتقاسموا التكلفة. تُعقد الجلسة بمجرد أن يدفع طالبان.",
+  "group-sessions.meta.description": "انضم إلى جلسة دروس في مجموعة صغيرة يقودها مدرّس جامعي موثّق، وتقاسم التكلفة.",
+  "group-sessions.meta.og-title": "الجلسات الجماعية — UniSkilled",
+  "group-sessions.meta.og-description": "انضم إلى جلسة دروس في مجموعة صغيرة يقودها مدرّس جامعي موثّق، وتقاسم التكلفة.",
+  "groups.js.empty": "لا توجد جلسات جماعية متاحة حاليًا.",
+  "groups.js.empty.link": "احجز مدرّسًا لجلسة فردية بدلًا من ذلك",
+  "groups.js.empty.rest": " أو اطلب من أحد المدرّسين عبر الرسائل فتح مجموعة لمقررك.",
+  "groups.js.yours": "جلستك",
+  "groups.js.studentsOnly": "للطلاب فقط",
+  "groups.js.joined": "أنت مشترك",
+  "groups.js.pay": "إتمام الدفع",
+  "groups.js.full": "مكتملة",
+  "groups.js.join": "انضم · {{price}}",
+  "groups.js.with": "مع {{name}}",
+  "groups.js.tutor": "مدرّس",
+  "groups.js.minutes": "{{n}} دقيقة",
+  "groups.js.online": "عبر الإنترنت",
+  "groups.js.toast.studentsOnly": "يمكن لحسابات الطلاب فقط الانضمام إلى الجلسات الجماعية.",
+  "groups.js.toast.own": "لا يمكنك الانضمام إلى جلستك الجماعية.",
+  "groups.js.toast.already": "لقد انضممت بالفعل إلى هذه الجلسة الجماعية.",
+  "groups.js.toast.error": "تعذّر الانضمام إلى هذه الجلسة. يُرجى المحاولة مرة أخرى.",
+  "groups.js.spots": {
+    "zero": "{{count}} مقعد متبقٍّ",
+    "one": "{{count}} مقعد متبقٍّ",
+    "two": "{{count}} مقعدان متبقيان",
+    "few": "{{count}} مقاعد متبقية",
+    "many": "{{count}} مقعدًا متبقيًا",
+    "other": "{{count}} مقعد متبقٍّ"
+  }
+}
