@@ -64,6 +64,9 @@ jobs:
       - name: Keep a copy of the plain English build
         run: sudo cp -a _site _site_english && sudo chown -R "$USER" _site _site_english
 
+      - name: Install build tools (rtlcss, acorn)
+        run: npm ci
+
       - name: Add the language folders
         run: node scripts/build-locales.mjs --site _site
 

@@ -3,6 +3,8 @@
  *
  *   node scripts/build-locales.mjs --site _site            # after the normal (Jekyll) build
  *   node scripts/build-locales.mjs --site _site --preview  # also build languages not yet live
+ *   node scripts/build-locales.mjs --site _site --rtl-preview index.html,find-tutors.html --out /tmp/rtl
+ *        # mirrored (right-to-left) copies of English pages, for checking layouts; never published
  *
  * What it does, in order:
  *   1. English pages: removes the translation markers (data-i18n…) so every English file is
@@ -23,9 +25,10 @@
  * The logo is never touched: its <img>/<a> carry no markers, and in Arabic it stays on the left
  * (CSS keeps .snav-logo / [data-keep-ltr] in place; see locales/languages.json logoStaysLeft).
  */
-import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
 import { join, relative, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { rtlPage, flipSharedScripts } from './rtl.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -135,6 +138,9 @@ export function translatePage(source, dict, { lang, dir, robots, inlineKeys = []
 
 /** Pages under /de/ etc. load shared files from the site root, and link to English pages that have no translation. */
 export function rootRelative(html, translatedPages) {
+  // Videos and their posters are shared by all languages (not copied into language folders).
+  // Covers CSS url(media/…) and paths written in scripts ("media/…", 'media/…', `media/…`).
+  html = html.replace(/(url\(\s*['"]?|['"`])media\//g, '$1/media/');
   return html.replace(/(\s(?:src|href)=")(?![a-z]+:|\/|#|\{|\$)([^"]+)"/gi, (all, pre, url) => {
     const file = url.split(/[?#]/)[0];
     if (extname(file) === '.html' && translatedPages.has(file)) return all; // stays inside the language folder
@@ -195,11 +201,7 @@ export function build({ site, preview = false, root = ROOT, log = console.log })
       if (r.missing.length) { skipped[p] = r.missing; continue; }
       ready.add(p); results[p] = r.html;
     }
-    for (const [p, html] of Object.entries(results)) {
-      const out = join(site, L.code, p);
-      mkdirSync(dirname(out), { recursive: true });
-      writeFileSync(out, rootRelative(html, ready));
-    }
+    writeLanguage({ site, lang: L.code, dir: L.dir, pages, ready, results, shared });
     report[L.code] = { live: !!L.live, pages: [...ready], skipped };
     log(`${L.code}: ${ready.size} page(s) written${L.live ? '' : ' (hidden, noindex)'}; ${Object.keys(skipped).length} skipped for missing text`);
   }
@@ -207,11 +209,82 @@ export function build({ site, preview = false, root = ROOT, log = console.log })
   return report;
 }
 
+/** Files a language folder needs besides its pages: a copy of every shared file (scripts, images,
+ *  fonts, styles) so that paths a script builds relative to the page (e.g. the logo in site-nav.js)
+ *  work inside /de/, /ar/ … exactly as at the root. Videos (media/) are shared, not copied. */
+const NOT_MIRRORED = /^(media\/|CNAME$|sitemap\.xml$|robots\.txt$|i18n-build-report\.json$)/;
+export function mirrorStatic(site, lang, codes) {
+  let n = 0;
+  for (const f of walk(site)) {
+    const rel = relative(site, f);
+    if (rel.endsWith('.html') || NOT_MIRRORED.test(rel) || codes.some(c => rel === c || rel.startsWith(c + '/'))) continue;
+    const out = join(site, lang, rel);
+    mkdirSync(dirname(out), { recursive: true });
+    copyFileSync(f, out); n++;
+  }
+  return n;
+}
+
+/** A page not translated yet: /de/<page> sends the visitor to the English page, keeping ?query and #hash. */
+export function redirectStub(page) {
+  const target = '/' + page;
+  return '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="robots" content="noindex">\n' +
+    `<link rel="canonical" href="https://uniskilled.com${target}">\n` +
+    `<script>location.replace(${JSON.stringify(target)}+location.search+location.hash);</script>\n` +
+    `<meta http-equiv="refresh" content="0; url=${target}">\n<title>UniSkilled</title>\n</head>\n<body></body>\n</html>\n`;
+}
+
+/** Write one language folder: shared files, translated pages (mirrored for right-to-left), stubs for the rest. */
+export function writeLanguage({ site, lang, dir, pages, ready, results, shared, codes = ['en', 'de', 'ar', 'tr', 'fr', 'es'] }) {
+  if (!ready.size) return;
+  mirrorStatic(site, lang, codes);
+  let flipped = {};
+  if (dir === 'rtl') {
+    flipped = flipSharedScripts(shared);
+    for (const [name, code] of Object.entries(flipped)) writeFileSync(join(site, lang, name), code);
+  }
+  for (const p of pages) {
+    const out = join(site, lang, p);
+    if (!ready.has(p)) { writeFileSync(out, redirectStub(p)); continue; }
+    let page = rootRelative(results[p], ready);
+    if (dir === 'rtl') page = rtlPage(page, { lang, flippedScripts: new Set(Object.keys(flipped)) });
+    writeFileSync(out, page);
+  }
+}
+
+/** Mirrored copies of English pages (English text, Arabic layout) for checking; written to outDir/ar/. */
+export function rtlPreview({ site, pages, outDir, lang = 'ar' }) {
+  // Works on a copy so the source folder is never written to.
+  for (const f of walk(site)) {
+    const rel = relative(site, f);
+    if (/^(\.git|node_modules|db|supabase|tests|scripts|locales|test-results|playwright-report)\//.test(rel)) continue;
+    mkdirSync(dirname(join(outDir, rel)), { recursive: true });
+    copyFileSync(f, join(outDir, rel));
+  }
+  const all = readdirSync(outDir).filter(f => f.endsWith('.html')).sort();
+  const shared = {};
+  for (const f of readdirSync(outDir).filter(f => f.endsWith('.js'))) shared[f] = readFileSync(join(outDir, f), 'utf8');
+  const results = {};
+  for (const p of pages) {
+    const html = stripMarkers(readFileSync(join(outDir, p), 'utf8'));
+    results[p] = html.replace(/<html\b([^>]*)>/i, (a, attrs) => `<html lang="${lang}" dir="rtl"${attrs.replace(/\s(lang|dir)="[^"]*"/g, '')}>`);
+  }
+  writeLanguage({ site: outDir, lang, dir: 'rtl', pages: all, ready: new Set(pages), results, shared });
+  return Object.keys(flipSharedScripts(shared));
+}
+
 // ---------- CLI ---------------------------------------------------------------------------------
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2);
   const site = args[args.indexOf('--site') + 1];
   if (!site || !existsSync(site)) { console.error('Usage: node scripts/build-locales.mjs --site <built site dir> [--preview]'); process.exit(2); }
-  const report = build({ site, preview: args.includes('--preview') });
-  writeFileSync(join(site, '..', 'i18n-build-report.json'), JSON.stringify(report, null, 2));
+  if (args.includes('--rtl-preview')) {
+    const pages = args[args.indexOf('--rtl-preview') + 1].split(',');
+    const outDir = args[args.indexOf('--out') + 1];
+    const flipped = rtlPreview({ site, pages, outDir });
+    console.log(`RTL preview of ${pages.length} page(s) in ${outDir}/ar/ (mirrored scripts: ${flipped.join(', ') || 'none'})`);
+  } else {
+    const report = build({ site, preview: args.includes('--preview') });
+    writeFileSync(join(site, '..', 'i18n-build-report.json'), JSON.stringify(report, null, 2));
+  }
 }

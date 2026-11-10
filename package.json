@@ -11,6 +11,8 @@
     "test:i18n": "node --test tests/site/i18n.test.mjs"
   },
   "devDependencies": {
-    "@playwright/test": "1.64.1"
+    "@playwright/test": "1.64.1",
+    "acorn": "^8.19.0",
+    "rtlcss": "^4.3.0"
   }
 }
