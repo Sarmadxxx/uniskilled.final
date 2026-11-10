@@ -88,20 +88,7 @@ export function translatePage(source, dict, { lang, dir, robots, inlineKeys = []
     return v;
   };
 
-  // 1) Attributes: data-i18n-attr="placeholder:key;aria-label:key2"
-  html = html.replace(/<[a-zA-Z][^>]*\sdata-i18n-attr="([^"]*)"[^>]*>/g, (tagText, spec) => {
-    let out = tagText;
-    for (const pair of spec.split(';').map(s => s.trim()).filter(Boolean)) {
-      const [attr, key] = pair.split(':').map(s => s.trim());
-      const v = lookup(key);
-      if (v == null) continue;
-      const attrRe = new RegExp(`(\\s${attr.replace(/[-]/g, '\\-')}=")[^"]*(")`);
-      out = attrRe.test(out) ? out.replace(attrRe, `$1${escAttr(v)}$2`) : out;
-    }
-    return out;
-  });
-
-  // 2) Element text: <tag data-i18n="key">English</tag> → translation (may contain inline <b>, <a>…
+  // 1) Element text: <tag data-i18n="key">English</tag> → translation (may contain inline <b>, <a>…
   //    only when the English did; translators keep the same tags, checked by tests).
   const openRe = /<([a-zA-Z][a-zA-Z0-9-]*)\b[^>]*\sdata-i18n="([^"]+)"[^>]*>/g;
   let result = '', last = 0, m;
@@ -116,6 +103,19 @@ export function translatePage(source, dict, { lang, dir, robots, inlineKeys = []
   }
   html = result + html.slice(last);
 
+  // 2) Attributes (after element text, so markers inside translated blocks are handled too): data-i18n-attr="placeholder:key;aria-label:key2"
+  html = html.replace(/<[a-zA-Z][^>]*\sdata-i18n-attr="([^"]*)"[^>]*>/g, (tagText, spec) => {
+    let out = tagText;
+    for (const pair of spec.split(';').map(s => s.trim()).filter(Boolean)) {
+      const [attr, key] = pair.split(':').map(s => s.trim());
+      const v = lookup(key);
+      if (v == null) continue;
+      const attrRe = new RegExp(`(\\s${attr.replace(/[-]/g, '\\-')}=")[^"]*(")`);
+      out = attrRe.test(out) ? out.replace(attrRe, `$1${escAttr(v)}$2`) : out;
+    }
+    return out;
+  });
+
   // 3) Language and direction on <html>
   html = html.replace(/<html\b([^>]*)>/i, (all, attrs) => {
     let a = attrs.replace(/\s(lang|dir)="[^"]*"/g, '');
@@ -127,11 +127,15 @@ export function translatePage(source, dict, { lang, dir, robots, inlineKeys = []
     html = html.replace(/<head>/i, `<head>\n<meta name="robots" content="${robots}">`);
   }
 
-  // 5) Dictionary for text built in JavaScript (only the keys this page's scripts use)
+  // 5) Dictionary for text built in JavaScript, placed right before i18n.js (which reads it).
+  //    Pages that don't load i18n.js yet get it here, so the shared header can translate itself.
   const jsDict = {};
   for (const k of inlineKeys) if (dict[k] != null) jsDict[k] = dict[k];
   const boot = `<script>window.__I18N=${JSON.stringify({ lang, dict: jsDict }).replace(/</g, '\\u003c')};</script>`;
-  html = html.replace(/<\/head>/i, `${boot}\n</head>`);
+  const i18nTag = /<script src="\/?i18n\.js"><\/script>/i;
+  html = i18nTag.test(html)
+    ? html.replace(i18nTag, m => `${boot}\n${m}`)
+    : html.replace(/<\/head>/i, `${boot}\n<script src="i18n.js"></script>\n</head>`);
 
   return { html: stripMarkers(html), missing: [...missing], used: [...used] };
 }
@@ -146,6 +150,18 @@ export function rootRelative(html, translatedPages) {
     if (extname(file) === '.html' && translatedPages.has(file)) return all; // stays inside the language folder
     return `${pre}/${url}"`;
   });
+}
+
+/** Keys a page's JavaScript may need: everything in common.json (header, language picker) plus the
+ *  page's own file, except the keys already written into its HTML by the build. */
+export function pageScriptKeys(lang, page, html, root = ROOT) {
+  const name = page.replace(/\.html$/, '');
+  const read = f => { const p = join(root, 'locales', lang, f); return existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : {}; };
+  const inHtml = new Set();
+  for (const m of html.matchAll(/\sdata-i18n="([^"]+)"/g)) inHtml.add(m[1]);
+  for (const m of html.matchAll(/\sdata-i18n-attr="([^"]+)"/g)) for (const pair of m[1].split(';')) inHtml.add(pair.split(':')[1]);
+  return [...Object.keys(read('common.json')), ...Object.keys(read(`page.${name}.json`))]
+    .filter(k => !k.startsWith('_') && !inHtml.has(k));
 }
 
 /** Keys that a page's own JavaScript passes to I18N.t / I18N.h (literal first arguments only). */
@@ -185,7 +201,7 @@ export function build({ site, preview = false, root = ROOT, log = console.log })
   const report = {};
   for (const L of conf.languages) {
     if (L.code === conf.default) continue;
-    if (!L.live && !preview) continue;
+    // Languages not live yet are built too (noindex, not linked) so they can be reviewed at their real address.
     const dict = loadDictionary(L.code, root);
     const sources = Object.fromEntries(pages.map(p => [p, readFileSync(join(root, p), 'utf8')]));
     const ready = new Set(), skipped = {};
@@ -196,7 +212,7 @@ export function build({ site, preview = false, root = ROOT, log = console.log })
       const r = translatePage(src, dict, {
         lang: L.code, dir: L.dir,
         robots: L.live ? null : 'noindex, nofollow',
-        inlineKeys: scriptKeys(src, shared),
+        inlineKeys: pageScriptKeys(L.code, p, src, root),
       });
       if (r.missing.length) { skipped[p] = r.missing; continue; }
       ready.add(p); results[p] = r.html;

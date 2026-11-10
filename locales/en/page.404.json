@@ -1,0 +1,8 @@
+{
+  "404.title": "Page not found — UniSkilled",
+  "404.skip-to-content": "Skip to content",
+  "404.we-couldnt-find-that": "We couldn't find that page",
+  "404.the-link-may-be": "The link may be broken, or the page may have moved. Here are a few places to pick up from.",
+  "404.find-a-tutor-go": "<a class=\"btn btn-primary\" href=\"find-tutors.html\">Find a tutor</a>\n      <a class=\"btn btn-ghost\" href=\"./\">Go to homepage</a>",
+  "404.want-to-teach-become": "Want to teach? <a href=\"onboarding.html\">Become a tutor</a> · Need help? <a href=\"mailto:info@uniskilled.com\">info@uniskilled.com</a>"
+}

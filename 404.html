@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="sentry.js"></script>
+<script src="i18n.js"></script>
 <!-- GitHub Pages serves this file for any missing URL, at whatever path was requested.
      <base> makes every relative link (including the shared navbar's) resolve from the site root. -->
 <base href="/">
 <meta name="robots" content="noindex">
-<title>Page not found — UniSkilled</title>
+<title data-i18n="404.title">Page not found — UniSkilled</title>
 <link rel="icon" href="favicon.ico?v=20261101" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261101">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
@@ -38,20 +39,20 @@ p{color:var(--mid);font-size:1rem;line-height:1.6;margin-bottom:2rem}
 </head>
 <body>
 <!-- <base href="/"> would turn "#main" into a link to the homepage, so the jump is done in script -->
-<a class="skip-link" href="#main" onclick="event.preventDefault();var m=document.getElementById('main');m.tabIndex=-1;m.focus();">Skip to content</a>
+<a data-i18n="404.skip-to-content" class="skip-link" href="#main" onclick="event.preventDefault();var m=document.getElementById('main');m.tabIndex=-1;m.focus();">Skip to content</a>
 <header id="site-nav"></header>
 <script src="site-nav.js"></script>
 
 <main id="main">
   <div class="card">
     <span class="code">404</span>
-    <h1>We couldn't find that page</h1>
-    <p>The link may be broken, or the page may have moved. Here are a few places to pick up from.</p>
-    <div class="actions">
+    <h1 data-i18n="404.we-couldnt-find-that">We couldn't find that page</h1>
+    <p data-i18n="404.the-link-may-be">The link may be broken, or the page may have moved. Here are a few places to pick up from.</p>
+    <div data-i18n="404.find-a-tutor-go" class="actions">
       <a class="btn btn-primary" href="find-tutors.html">Find a tutor</a>
       <a class="btn btn-ghost" href="./">Go to homepage</a>
     </div>
-    <div class="more">
+    <div data-i18n="404.want-to-teach-become" class="more">
       Want to teach? <a href="onboarding.html">Become a tutor</a> · Need help? <a href="mailto:info@uniskilled.com">info@uniskilled.com</a>
     </div>
   </div>

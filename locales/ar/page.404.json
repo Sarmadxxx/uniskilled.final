@@ -1,0 +1,8 @@
+{
+  "404.title": "الصفحة غير موجودة — UniSkilled",
+  "404.skip-to-content": "الانتقال إلى المحتوى",
+  "404.we-couldnt-find-that": "لم نتمكن من العثور على هذه الصفحة",
+  "404.the-link-may-be": "ربما يكون الرابط معطّلًا، أو نُقلت الصفحة. إليك بعض الأماكن للمتابعة منها.",
+  "404.find-a-tutor-go": "<a class=\"btn btn-primary\" href=\"find-tutors.html\">ابحث عن مدرّس</a>\n      <a class=\"btn btn-ghost\" href=\"./\">الصفحة الرئيسية</a>",
+  "404.want-to-teach-become": "تريد أن تدرّس؟ <a href=\"onboarding.html\">كن مدرّسًا</a> · تحتاج إلى مساعدة؟ <a href=\"mailto:info@uniskilled.com\">info@uniskilled.com</a>"
+}

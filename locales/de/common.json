@@ -31,5 +31,12 @@
   "lang.banner.text": "UniSkilled gibt es auch auf Deutsch.",
   "lang.banner.switch": "Auf Deutsch wechseln",
   "lang.banner.stay": "Auf Englisch bleiben",
-  "lang.banner.close": "Schließen"
+  "lang.banner.close": "Schließen",
+  "langs.add": "Sprache hinzufügen",
+  "langs.none": "Noch keine Sprachen hinzugefügt.",
+  "langs.remove": "{{language}} entfernen",
+  "langs.levelFor": "Niveau für {{language}}",
+  "langs.level.native": "Muttersprache",
+  "langs.level.fluent": "Fließend",
+  "langs.level.conversational": "Gute Kenntnisse"
 }

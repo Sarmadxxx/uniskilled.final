@@ -31,5 +31,12 @@
   "lang.banner.text": "UniSkilled Türkçe olarak da kullanılabilir.",
   "lang.banner.switch": "Türkçeye geç",
   "lang.banner.stay": "İngilizce devam et",
-  "lang.banner.close": "Kapat"
+  "lang.banner.close": "Kapat",
+  "langs.add": "Dil ekleyin",
+  "langs.none": "Henüz dil eklenmedi.",
+  "langs.remove": "{{language}} dilini kaldırın",
+  "langs.levelFor": "{{language}} için seviye",
+  "langs.level.native": "Ana dil",
+  "langs.level.fluent": "Akıcı",
+  "langs.level.conversational": "Konuşma düzeyi"
 }

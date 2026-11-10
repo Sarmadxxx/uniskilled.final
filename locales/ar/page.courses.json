@@ -1,0 +1,50 @@
+{
+  "courses.title": "المقررات — UniSkilled",
+  "courses.skip-to-content": "الانتقال إلى المحتوى",
+  "courses.courses": "المقررات",
+  "courses.find-your-course-and": "ابحث عن مقررك وعن المدرّسين من الطلاب الذين اجتازوه بالفعل. تابع المقرر لترى أسئلة زملائك.",
+  "courses.search-courses": "البحث في المقررات",
+  "courses.meta.description": "ابحث عن مقرر جامعي وعن المدرّسين من الطلاب الموثّقين الذين اجتازوه بالفعل. تابع المقرر لترى أسئلة زملائك.",
+  "courses.meta.og-title": "المقررات — UniSkilled",
+  "courses.meta.og-description": "ابحث عن مقرر جامعي وعن المدرّسين من الطلاب الذين اجتازوه بالفعل.",
+  "courses.course-code-course-name.placeholder": "رمز المقرر أو اسمه أو الجامعة",
+  "courses.loading-courses.arialabel": "جارٍ تحميل المقررات",
+  "courses.js.more": " +{{n}} أخرى",
+  "courses.js.error": "تعذّر تحميل المقررات. يُرجى تحديث الصفحة أو المحاولة مرة أخرى بعد قليل.",
+  "courses.js.nomatch": "لا يوجد مقرر يطابق «{{q}}» بعد.",
+  "courses.js.nomatchLinks": "<a href=\"{{tutors}}\">ابحث عن مدرّسين حسب المادة بدلًا من ذلك</a> أو <a href=\"{{request}}\">انشر طلبًا</a>.",
+  "courses.js.none": "لا توجد مقررات بعد. يضيف المدرّسون المقررات التي اجتازوها إلى ملفاتهم، فتظهر هنا.",
+  "courses.js.browse": "تصفّح المدرّسين",
+  "courses.js.tutors": {
+    "zero": "{{count}} مدرّس",
+    "one": "{{count}} مدرّس",
+    "two": "{{count}} مدرّسان",
+    "few": "{{count}} مدرّسين",
+    "many": "{{count}} مدرّسًا",
+    "other": "{{count}} مدرّس"
+  },
+  "courses.js.followers": {
+    "zero": "{{count}} متابع",
+    "one": "{{count}} متابع",
+    "two": "{{count}} متابعان",
+    "few": "{{count}} متابعين",
+    "many": "{{count}} متابعًا",
+    "other": "{{count}} متابع"
+  },
+  "courses.js.questions": {
+    "zero": "{{count}} سؤال",
+    "one": "{{count}} سؤال",
+    "two": "{{count}} سؤالان",
+    "few": "{{count}} أسئلة",
+    "many": "{{count}} سؤالًا",
+    "other": "{{count}} سؤال"
+  },
+  "courses.js.found": {
+    "zero": "لم يُعثر على مقررات ({{count}})",
+    "one": "تم العثور على {{count}} مقرر",
+    "two": "تم العثور على {{count}} مقررين",
+    "few": "تم العثور على {{count}} مقررات",
+    "many": "تم العثور على {{count}} مقررًا",
+    "other": "تم العثور على {{count}} مقرر"
+  }
+}
