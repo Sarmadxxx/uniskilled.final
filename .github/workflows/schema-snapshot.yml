@@ -29,11 +29,11 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Skip when the secret isn't set yet
         if: env.DATABASE_URL == ''
         run: echo "Add the DATABASE_URL repository secret to enable daily structure snapshots."
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         if: env.DATABASE_URL != ''
         with:
           version: latest

@@ -48,10 +48,10 @@ jobs:
     timeout-minutes: 15
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
 
@@ -88,7 +88,7 @@ jobs:
 
       - name: Package for GitHub Pages
         if: (github.event_name == 'workflow_dispatch' && inputs.confirm == 'publish') || (contains(fromJSON('["push","workflow_run"]'), github.event_name) && vars.PAGES_FROM_ACTIONS == 'true')
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./_site
 
@@ -105,4 +105,4 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
