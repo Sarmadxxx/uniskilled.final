@@ -1,0 +1,308 @@
+{
+  "_about": "UniSkilled's agreed terminology. Every translation (human or AI) must use these terms. Status 'draft' = proposed, waiting for the reviewer named in locales/review.json. Change a term here first, then in the dictionaries; tests/i18n_checks.mjs checks the dictionaries use these terms.",
+  "version": 1,
+  "style": {
+    "en": "British English spelling as on the site today. Plain, warm, direct.",
+    "de": "Formal 'Sie' throughout, polite and respectful (decision 10 Nov 2026), including payment, account and legal text. No colloquial contractions (geht’s, funktioniert’s). Gender-inclusive with a colon in plurals and roles (Tutor:innen); 'Studierende' for students. A tutoring session is a 'Stunde'.",
+    "ar": "Modern Standard Arabic, no dialect. Imperatives in the masculine singular as standard in Arabic interfaces (ابحث، ابدأ). Western digits 0–9. Brand, people's names and course names stay in Latin script, isolated with <bdi>. Arabic quotation marks « ».",
+    "tr": "Polite 'siz' form in sentences and buttons (başlayın, kullanın); short menu labels in the plain infinitive-style form common in Turkish interfaces (Giriş yap). Turkish dotted/dotless i must be preserved (İ/ı).",
+    "fr": "Formal 'vous' throughout, polite and respectful (decision 10 Nov 2026); no colloquial forms such as 'ça'. Narrow no-break space (U+202F) before : ; ! ? and inside « ». No inclusive point médian (readability); 'tuteur' as the generic role name.",
+    "es": "Formal 'usted' throughout, polite and respectful (decision 10 Nov 2026); imperatives in the usted form (utilice, elija). Neutral international Spanish understood in Spain and Latin America; no regional slang. Quotation marks « »."
+  },
+  "terms": [
+    {
+      "id": "brand",
+      "en": "UniSkilled",
+      "de": "UniSkilled",
+      "ar": "UniSkilled",
+      "tr": "UniSkilled",
+      "fr": "UniSkilled",
+      "es": "UniSkilled",
+      "note": "Never translated, never transliterated."
+    },
+    {
+      "id": "tutor",
+      "en": "tutor",
+      "de": "Tutor:in (pl. Tutor:innen)",
+      "ar": "مدرّس (pl. مدرّسون)",
+      "tr": "eğitmen",
+      "fr": "tuteur",
+      "es": "tutor",
+      "note": "A university student who teaches. Not 'teacher/Lehrer/معلم/öğretmen/professeur/profesor'."
+    },
+    {
+      "id": "student",
+      "en": "student",
+      "de": "Studierende:r (pl. Studierende)",
+      "ar": "طالب (pl. طلاب)",
+      "tr": "öğrenci",
+      "fr": "étudiant",
+      "es": "estudiante",
+      "note": "Someone who books sessions."
+    },
+    {
+      "id": "session",
+      "en": "session",
+      "de": "Stunde (Einzelstunde)",
+      "ar": "جلسة",
+      "tr": "ders",
+      "fr": "séance",
+      "es": "sesión",
+      "note": "One tutoring appointment. Avoid 'Sitzung' (sounds like a meeting/therapy)."
+    },
+    {
+      "id": "group_session",
+      "en": "group session",
+      "de": "Gruppenstunde",
+      "ar": "جلسة جماعية",
+      "tr": "grup dersi",
+      "fr": "séance de groupe",
+      "es": "sesión grupal",
+      "note": "Up to 4 students."
+    },
+    {
+      "id": "learning_session",
+      "en": "learning session",
+      "de": "Lernstunde",
+      "ar": "جلسة تعلّم",
+      "tr": "çalışma dersi",
+      "fr": "séance d’apprentissage",
+      "es": "sesión de aprendizaje"
+    },
+    {
+      "id": "booking",
+      "en": "booking",
+      "de": "Buchung",
+      "ar": "حجز",
+      "tr": "rezervasyon",
+      "fr": "réservation",
+      "es": "reserva"
+    },
+    {
+      "id": "booking_request",
+      "en": "booking request",
+      "de": "Buchungsanfrage",
+      "ar": "طلب حجز",
+      "tr": "rezervasyon talebi",
+      "fr": "demande de réservation",
+      "es": "solicitud de reserva"
+    },
+    {
+      "id": "payment_held",
+      "en": "payment held",
+      "de": "Zahlung wird zurückgehalten",
+      "ar": "الدفعة محفوظة",
+      "tr": "ödeme güvende tutulur",
+      "fr": "paiement retenu",
+      "es": "pago retenido",
+      "note": "Approved wording (27 Oct): describe as 'payment held' for 48 hours after the session. Never 'escrow' or 'refund guarantee' in any language."
+    },
+    {
+      "id": "payment_protection",
+      "en": "payment protection",
+      "de": "Zahlungsschutz",
+      "ar": "حماية الدفع",
+      "tr": "ödeme koruması",
+      "fr": "protection des paiements",
+      "es": "protección de pagos"
+    },
+    {
+      "id": "earnings",
+      "en": "earnings",
+      "de": "Einnahmen",
+      "ar": "الأرباح",
+      "tr": "kazançlar",
+      "fr": "revenus",
+      "es": "ganancias",
+      "note": "The tutor's own share, not the full price."
+    },
+    {
+      "id": "payout",
+      "en": "payout",
+      "de": "Auszahlung",
+      "ar": "تحويل الأرباح",
+      "tr": "ödeme aktarımı",
+      "fr": "versement",
+      "es": "pago al tutor"
+    },
+    {
+      "id": "platform_fee",
+      "en": "platform fee",
+      "de": "Plattformgebühr",
+      "ar": "رسوم المنصة",
+      "tr": "platform ücreti",
+      "fr": "frais de plateforme",
+      "es": "comisión de la plataforma"
+    },
+    {
+      "id": "refund",
+      "en": "refund",
+      "de": "Rückerstattung",
+      "ar": "استرداد المبلغ",
+      "tr": "iade",
+      "fr": "remboursement",
+      "es": "reembolso"
+    },
+    {
+      "id": "cancel",
+      "en": "cancel",
+      "de": "stornieren",
+      "ar": "إلغاء",
+      "tr": "iptal etmek",
+      "fr": "annuler",
+      "es": "cancelar"
+    },
+    {
+      "id": "reschedule",
+      "en": "reschedule",
+      "de": "verschieben",
+      "ar": "إعادة الجدولة",
+      "tr": "yeniden planlamak",
+      "fr": "reprogrammer",
+      "es": "reprogramar"
+    },
+    {
+      "id": "university_verification",
+      "en": "university verification",
+      "de": "Hochschulverifizierung",
+      "ar": "التحقّق الجامعي",
+      "tr": "üniversite doğrulaması",
+      "fr": "vérification universitaire",
+      "es": "verificación universitaria"
+    },
+    {
+      "id": "university_verified",
+      "en": "university-verified",
+      "de": "hochschulverifiziert",
+      "ar": "موثّق جامعيًا",
+      "tr": "üniversitesi doğrulanmış",
+      "fr": "vérifié par l’université",
+      "es": "verificado por la universidad",
+      "note": "Applies to tutors only (decision 9 Oct)."
+    },
+    {
+      "id": "subject",
+      "en": "subject",
+      "de": "Fach",
+      "ar": "مادة",
+      "tr": "konu",
+      "fr": "matière",
+      "es": "materia"
+    },
+    {
+      "id": "course",
+      "en": "course (university course hub)",
+      "de": "Kurs",
+      "ar": "مقرر",
+      "tr": "üniversite dersi",
+      "fr": "cours",
+      "es": "asignatura"
+    },
+    {
+      "id": "student_marketplace",
+      "en": "student marketplace",
+      "de": "Marktplatz für Studierende",
+      "ar": "منصة الطلاب",
+      "tr": "öğrenci pazaryeri",
+      "fr": "place de marché étudiante",
+      "es": "plataforma de estudiantes"
+    },
+    {
+      "id": "availability",
+      "en": "availability",
+      "de": "Verfügbarkeit",
+      "ar": "أوقات التوفّر",
+      "tr": "müsaitlik",
+      "fr": "disponibilités",
+      "es": "disponibilidad"
+    },
+    {
+      "id": "report_issue",
+      "en": "report an issue",
+      "de": "Problem melden",
+      "ar": "الإبلاغ عن مشكلة",
+      "tr": "sorun bildir",
+      "fr": "signaler un problème",
+      "es": "informar de un problema"
+    },
+    {
+      "id": "teaches_in",
+      "en": "teaches in",
+      "de": "unterrichtet auf",
+      "ar": "لغة التدريس",
+      "tr": "ders dili",
+      "fr": "enseigne en",
+      "es": "enseña en",
+      "note": "The languages a tutor teaches in. Never confuse with 'website language'."
+    },
+    {
+      "id": "website_language",
+      "en": "website language",
+      "de": "Sprache der Website",
+      "ar": "لغة الموقع",
+      "tr": "site dili",
+      "fr": "langue du site",
+      "es": "idioma del sitio"
+    },
+    {
+      "id": "dashboard",
+      "en": "dashboard",
+      "de": "Dashboard",
+      "ar": "لوحة التحكم",
+      "tr": "panel",
+      "fr": "tableau de bord",
+      "es": "panel"
+    },
+    {
+      "id": "sign_in",
+      "en": "sign in",
+      "de": "anmelden",
+      "ar": "تسجيل الدخول",
+      "tr": "giriş yap",
+      "fr": "se connecter",
+      "es": "iniciar sesión"
+    },
+    {
+      "id": "sign_up",
+      "en": "sign up",
+      "de": "registrieren",
+      "ar": "إنشاء حساب",
+      "tr": "kaydol",
+      "fr": "s’inscrire",
+      "es": "registrarse"
+    }
+  ],
+  "banned": {
+    "_about": "Words that must never appear in a language's interface text (case-insensitive). Approved 27 Oct: no 'escrow' or 'refund guarantee'; tutors are never called teachers.",
+    "en": [
+      "escrow",
+      "refund guarantee",
+      "teacher"
+    ],
+    "de": [
+      "Treuhand",
+      "Geld-zurück-Garantie",
+      "Lehrer",
+      "Sitzung"
+    ],
+    "ar": [
+      "معلّم",
+      "معلم",
+      "ضمان استرداد"
+    ],
+    "tr": [
+      "öğretmen",
+      "emanet hesabı"
+    ],
+    "fr": [
+      "séquestre",
+      "garantie de remboursement",
+      "professeur"
+    ],
+    "es": [
+      "depósito en garantía",
+      "garantía de reembolso",
+      "profesor"
+    ]
+  }
+}

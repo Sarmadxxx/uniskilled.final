@@ -1,0 +1,8 @@
+{
+  "_about": "Review status per area and language: draft | reviewed | legal-reviewed. Areas listed in 'gated' only go live in a language once 'reviewed' (or 'legal-reviewed' for legal); until then those pages show English. Change a status only after a native speaker has checked the whole area.",
+  "gated": { "booking": "reviewed", "payment": "reviewed", "account": "reviewed", "emails": "reviewed", "legal": "legal-reviewed" },
+  "status": {
+    "common": { "de": "draft", "ar": "draft", "tr": "draft", "fr": "draft", "es": "draft" }
+  },
+  "reviewers": { "ar": "Sarmad Ali", "de": "Sarmad Ali", "tr": "to be appointed", "fr": "to be appointed", "es": "to be appointed" }
+}

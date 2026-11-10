@@ -199,7 +199,7 @@ for helper in ('sentry.ts', 'paypal-gate.ts'):
 import fnmatch
 cfg_yml = read('_config.yml') if os.path.exists('_config.yml') else ''
 excluded = [m.strip().strip('"\'') for m in re.findall(r'^\s*-\s*(.+)$', cfg_yml, re.M)]
-must_hide = ['db/', 'supabase/', 'tests/', '*.md', 'CHANGES.diff']
+must_hide = ['db/', 'supabase/', 'tests/', 'locales/', '*.md', 'CHANGES.diff']
 check('Website: internal files excluded from publishing', all(p in excluded for p in must_hide),
       'missing: ' + ', '.join(p for p in must_hide if p not in excluded))
 site_files = [p for p in glob.glob('*.html') + glob.glob('*.js') + glob.glob('*.css') + glob.glob('fonts/*.css')]

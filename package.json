@@ -7,7 +7,8 @@
     "test:static": "python3 tests/static_checks.py",
     "test:logic": "node --experimental-strip-types --test tests/functions/*.test.ts && node --test tests/site/*.test.mjs",
     "test:types": "deno check --config tests/typecheck/deno.json supabase/functions/*/index.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:i18n": "node --test tests/site/i18n.test.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.64.1"
