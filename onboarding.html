@@ -219,6 +219,7 @@ body:not([data-role="tutor"]) .why [data-for-role="tutor"],body[data-role="tutor
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
+<script src="language-picker.js"></script>
 </head>
 <body>
 <header class="top"><div class="in">
@@ -328,7 +329,7 @@ body:not([data-role="tutor"]) .why [data-for-role="tutor"],body[data-role="tutor
         <div class="form-group"><label for="gender" class="form-label">Gender</label><select id="gender" class="form-select"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option><option value="other">Other</option></select></div>
         <div class="form-group"><label for="country" class="form-label">Country *</label><input type="text" id="country" class="form-input" autocomplete="country-name" placeholder="e.g. Germany"></div>
       </div>
-      <div class="form-group"><label for="language" class="form-label">Primary language *</label><input type="text" id="language" class="form-input" placeholder="e.g. English, German..."></div>
+      <div class="form-group"><span class="form-label" id="langLabel">Languages you speak *</span><div id="langPicker" role="group" aria-labelledby="langLabel"></div></div>
       <div class="section-title">Academic details</div>
       <div class="form-group"><label for="university" class="form-label">University *</label><input type="text" id="university" class="form-input" autocomplete="organization" placeholder="e.g. University of Edinburgh"></div>
       <div class="form-row">
@@ -470,6 +471,8 @@ const SUPABASE_ANON_KEY = USK_CONFIG.anonKey;
 const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let selectedRole = null;
+// Languages the person speaks (students) or teaches in (tutors) — separate from the website language.
+const langPicker = window.USKLangs ? USKLangs.mount(document.getElementById('langPicker'), { value: [] }) : null;
 let subjects = [];
 let availability = [];
 let certificates = [];
@@ -543,6 +546,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (role === 'tutor') {
         document.getElementById('degreeLabel').textContent = 'Subject / Expertise *';
+        document.getElementById('langLabel').textContent = 'Languages you teach in *';
         document.getElementById('yearGroup').style.display = 'none';
         document.getElementById('s3title').textContent = 'Subjects, pricing & availability';
         document.getElementById('s3subtitle').textContent = 'Add what you teach, your rate, certificates and when you are free.';
@@ -551,6 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('tutorExtra').style.display = 'block';
       } else {
         document.getElementById('degreeLabel').textContent = 'Degree / Course *';
+        document.getElementById('langLabel').textContent = 'Languages you speak *';
         document.getElementById('yearGroup').style.display = '';
         document.getElementById('s3title').textContent = 'Subjects & availability';
         document.getElementById('s3subtitle').textContent = 'What do you want to learn? When are you free?';
@@ -637,12 +642,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const firstName = document.getElementById('firstName').value.trim();
     const lastName = document.getElementById('lastName').value.trim();
     const country = document.getElementById('country').value.trim();
-    const language = document.getElementById('language').value.trim();
     const university = document.getElementById('university').value.trim();
     const degree = document.getElementById('degree').value.trim();
     if (!firstName || !lastName) { showAlert('Please enter your full name.', 'error'); return; }
     if (!country) { showAlert('Please enter your country.', 'error'); return; }
-    if (!language) { showAlert('Please enter your primary language.', 'error'); return; }
+    if (!langPicker || !langPicker.get().length) { showAlert(selectedRole === 'tutor' ? 'Please add at least one language you teach in.' : 'Please add at least one language you speak.', 'error'); return; }
     if (!university) { showAlert('Please enter your university.', 'error'); return; }
     if (!degree) { showAlert('Please enter your ' + (selectedRole === 'tutor' ? 'subject or expertise.' : 'degree or course.'), 'error'); return; }
     setStep(3);
@@ -696,7 +700,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const fullName = firstName + ' ' + lastName;
     const gender = document.getElementById('gender').value;
     const country = document.getElementById('country').value.trim();
-    const language = document.getElementById('language').value.trim();
+    // Languages the person speaks / teaches in (fixed list with levels). The old free-text field
+    // users.language still gets the first language's English name, for anything that reads it.
+    const languages = langPicker ? langPicker.get() : [];
+    const language = languages.length ? USKLangs.name(languages[0].code) : '';
     const university = document.getElementById('university').value.trim();
     const degree = document.getElementById('degree').value.trim();
     const yearOfStudy = document.getElementById('yearOfStudy').value;
@@ -714,7 +721,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data: {
           full_name: fullName, role: selectedRole,
           profile: {
-            gender: gender || null, country: country || null, language: language || null,
+            gender: gender || null, country: country || null, language: language || null, languages: languages,
             university: university || null, degree: degree || null,
             year_of_study: yearOfStudy || null,
             subjects: subjects, availability: availability, preferred_times: preferredTimes,
