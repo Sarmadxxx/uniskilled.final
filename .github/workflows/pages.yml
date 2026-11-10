@@ -1,0 +1,105 @@
+name: Website build (with languages)
+
+# Builds uniskilled.com exactly the way GitHub Pages builds it today (the same Jekyll build
+# action GitHub uses), then adds the language folders (/de/, /ar/, …) on top.
+#
+# On every pull request: build + prove the English site is unchanged. Nothing is published.
+#
+# Until you switch it on, this workflow NEVER publishes; GitHub keeps publishing from main as today.
+# Switching on (once, when the first language is ready):
+#   1. Actions → "Website build (with languages)" → Run workflow → type "publish".
+#      It first downloads every file of the live site and stops if any English file would differ.
+#   2. Settings → Pages → Build and deployment → Source: "GitHub Actions".
+#   3. Settings → Secrets and variables → Actions → Variables → PAGES_FROM_ACTIONS = true.
+#      From then on every merge to main is published automatically, as today.
+# Going back: Pages source → "Deploy from a branch" (main, / root) and delete PAGES_FROM_ACTIONS.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  # The daily sitemap commit is made with GitHub's own token, which does not trigger push workflows;
+  # this picks it up so the new sitemap is published too (only once PAGES_FROM_ACTIONS is on).
+  workflow_run:
+    workflows: ["Update sitemap"]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "publish" to put this build live on uniskilled.com'
+        required: true
+        default: 'check only'
+      allow_changes:
+        description: 'Allow English files to differ from the live site (only for an approved change)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build site + language folders, prove English unchanged
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event_name == 'workflow_run' && 'main' || '' }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+
+      - name: Build exactly as GitHub Pages does today (Jekyll)
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+
+      - name: Keep a copy of the plain English build
+        run: sudo cp -a _site _site_english && sudo chown -R "$USER" _site _site_english
+
+      - name: Add the language folders
+        run: node scripts/build-locales.mjs --site _site
+
+      - name: Prove every English file is byte-for-byte the same as the plain build
+        run: |
+          langs=$(node -e "console.log(require('./locales/languages.json').languages.filter(l=>l.code!=='en').map(l=>l.code).join(' '))")
+          excl=""; for l in $langs; do excl="$excl --exclude=$l"; done
+          if diff -r $excl _site_english _site; then
+            echo "English site unchanged."
+          else
+            echo "::error::An English file changed during the language build. Nothing may change in English."
+            exit 1
+          fi
+          echo "Language folders built:"; for l in $langs; do [ -d "_site/$l" ] && echo " /$l/: $(find _site/$l -name '*.html' | wc -l) page(s)"; done; true
+
+      - name: Compare with the live site before publishing
+        if: github.event_name == 'workflow_dispatch' && inputs.confirm == 'publish'
+        run: node scripts/compare-live.mjs --site _site ${{ inputs.allow_changes && '--allow-changes' || '' }}
+
+      - name: Package for GitHub Pages
+        if: (github.event_name == 'workflow_dispatch' && inputs.confirm == 'publish') || (contains(fromJSON('["push","workflow_run"]'), github.event_name) && vars.PAGES_FROM_ACTIONS == 'true')
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./_site
+
+  deploy:
+    name: Publish to uniskilled.com
+    needs: build
+    if: github.ref == 'refs/heads/main' && ((github.event_name == 'workflow_dispatch' && inputs.confirm == 'publish') || (contains(fromJSON('["push","workflow_run"]'), github.event_name) && vars.PAGES_FROM_ACTIONS == 'true'))
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

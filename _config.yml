@@ -22,6 +22,8 @@ exclude:
   - supabase/
   - tests/
   - scripts/
+  # Translation dictionaries: the language build copies what each page needs into the page itself.
+  - locales/
   - "*.md"
   - CHANGES.diff
   - package.json

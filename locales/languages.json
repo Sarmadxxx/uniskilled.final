@@ -1,0 +1,12 @@
+{
+  "_about": "The languages UniSkilled supports. 'live': false = the build makes the pages but keeps them hidden (not linked, noindex) until reviewed. Add a language: copy a block, add locales/<code>/, run npm run test:i18n and translate what it lists as missing.",
+  "default": "en",
+  "languages": [
+    { "code": "en", "nativeName": "English",  "englishName": "English", "dir": "ltr", "intl": null,           "font": "Manrope",              "live": true },
+    { "code": "de", "nativeName": "Deutsch",  "englishName": "German",  "dir": "ltr", "intl": "de-DE",        "font": "Manrope",              "live": false },
+    { "code": "ar", "nativeName": "العربية",  "englishName": "Arabic",  "dir": "rtl", "intl": "ar-u-nu-latn", "font": "IBM Plex Sans Arabic", "live": false, "logoStaysLeft": true },
+    { "code": "tr", "nativeName": "Türkçe",   "englishName": "Turkish", "dir": "ltr", "intl": "tr-TR",        "font": "Manrope",              "live": false },
+    { "code": "fr", "nativeName": "Français", "englishName": "French",  "dir": "ltr", "intl": "fr-FR",        "font": "Manrope",              "live": false },
+    { "code": "es", "nativeName": "Español",  "englishName": "Spanish", "dir": "ltr", "intl": "es-ES",        "font": "Manrope",              "live": false }
+  ]
+}
