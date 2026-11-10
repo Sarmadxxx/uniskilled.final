@@ -158,7 +158,7 @@
   var LANGS = [
     { code: 'en', name: 'English', live: true },
     { code: 'de', name: 'Deutsch', live: false },
-    { code: 'ar', name: 'العربية', live: false },
+    { code: 'ar', name: 'العربية', live: true },
     { code: 'tr', name: 'Türkçe', live: false },
     { code: 'fr', name: 'Français', live: false },
     { code: 'es', name: 'Español', live: false }

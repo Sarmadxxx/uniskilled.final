@@ -7,6 +7,7 @@ import { readFileSync, existsSync, mkdirSync, cpSync, rmSync } from 'node:fs';
 
 const ROOT = join(__dirname, '..', '..');
 const SITE = join(ROOT, 'test-results', 'built-site');
+const AR_LIVE = JSON.parse(readFileSync(join(ROOT, 'locales', 'languages.json'), 'utf8')).languages.find((l: any) => l.code === 'ar').live;
 const PAGES = ['index.html', 'about.html', 'find-tutors.html', 'courses.html', 'group-sessions.html', '404.html'];
 
 test.beforeAll(() => {
@@ -42,7 +43,9 @@ for (const p of PAGES) {
     await page.waitForTimeout(400);
     expect(await page.getAttribute('html', 'lang')).toBe('ar');
     expect(await page.getAttribute('html', 'dir')).toBe('rtl');
-    expect(await page.locator('meta[name="robots"]').getAttribute('content')).toContain('noindex');   // hidden until approved
+    if (AR_LIVE && p === '404.html') expect(await page.locator('meta[name="robots"]').getAttribute('content')).toContain('noindex'); // error page: never indexed, as in English
+    else if (AR_LIVE) await expect(page.locator('meta[name="robots"]')).toHaveCount(0);                   // live: open to search engines
+    else expect(await page.locator('meta[name="robots"]').getAttribute('content')).toContain('noindex'); // hidden until approved
     expect(crashes).toEqual([]);
     expect(missing).toEqual([]);
     // Header is in Arabic and the logo stays on the left
@@ -82,11 +85,40 @@ test('phone: language sheet opens from the menu', async ({ page, isMobile }) => 
   await expect(sheet).toHaveCount(0);
 });
 
-test('English pages: no language button while English is the only live language', async ({ page }) => {
+test('English pages: language button only once another language is live', async ({ page, isMobile }) => {
   await page.route(/posthog\.com|sentry\.io/, (r) => r.abort());
   await page.route(/supabase\.co\//, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
   await page.goto('/index.html');
   await expect(page.locator('#site-nav')).toBeVisible();
-  await expect(page.locator('.snav-lang-btn')).toHaveCount(0);
+  // An English-speaking browser never gets the "view in Arabic" suggestion.
   await expect(page.locator('.snav-lang-bar')).toHaveCount(0);
+  if (!AR_LIVE) { await expect(page.locator('.snav-lang-btn')).toHaveCount(0); return; }
+  if (isMobile) {
+    await page.click('.snav-burger');
+    await page.click('.snav-lang-row');
+    await expect(page.locator('.snav-sheet .snav-lang-opt')).toHaveCount(2);
+  } else {
+    const btn = page.locator('.snav-lang-btn');
+    await expect(btn).toHaveText(/EN/);
+    await btn.click();
+    await expect(page.locator('#snavLangPanel .snav-lang-opt')).toHaveCount(2);
+    await expect(page.locator('#snavLangPanel .snav-lang-opt').nth(1)).toContainText('العربية');
+  }
+});
+
+test('English pages: an Arabic-speaking browser gets a one-time suggestion', async ({ browser }) => {
+  test.skip(!AR_LIVE, 'only once Arabic is live');
+  const ctx = await browser.newContext({ locale: 'ar-SA' });
+  const page = await ctx.newPage();
+  await page.route(/posthog\.com|sentry\.io/, (r) => r.abort());
+  await page.route(/supabase\.co\//, (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+  await page.goto('/index.html');
+  const bar = page.locator('.snav-lang-bar');
+  await expect(bar).toBeVisible();
+  await expect(bar.locator('a')).toHaveAttribute('href', /ar\//);
+  await bar.locator('button').last().click();
+  await expect(bar).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('.snav-lang-bar')).toHaveCount(0);
+  await ctx.close();
 });
