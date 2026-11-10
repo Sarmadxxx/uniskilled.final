@@ -118,6 +118,23 @@ test('French typography: narrow no-break space before : ; ! ? and inside « »',
   }
 });
 
+test('formal, respectful register: German Sie, French vous, Spanish usted (decision 10 Nov)', () => {
+  const informal = {
+    de: /(^|[^\p{L}])(du|dich|dir|dein|deine|deinen|deinem|deiner|deines|euch|euer|eure)(?=[^\p{L}]|$)|[a-zäöü]’s\b/iu,
+    fr: /(^|[^\p{L}])(tu|toi|ton|tes|ça)(?=[^\p{L}]|$)/iu,
+    es: /(^|[^\p{L}])(tú|tu|tus|te|ti|contigo|vosotros|vuestro|vuestra|usa|elige|haz|busca|escribe)(?=[^\p{L}]|$)/iu,
+  };
+  for (const [lang, re] of Object.entries(informal)) for (const f of areas(lang)) {
+    for (const [k, v] of Object.entries(readArea(lang, f))) {
+      if (k.startsWith('_')) continue;
+      for (const form of values(v)) {
+        const m = String(form).replace(/\{\{[^}]*\}\}/g, '').match(re);
+        assert.ok(!m, `${lang} ${k}: informal wording "${m && m[0].trim()}" — use the formal form`);
+      }
+    }
+  }
+});
+
 test('glossary: every term has all six languages', () => {
   for (const t of glossary.terms) for (const c of codes) assert.ok(t[c], `glossary ${t.id}: missing ${c}`);
   const brand = glossary.terms.find(t => t.id === 'brand');

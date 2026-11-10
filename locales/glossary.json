@@ -3,11 +3,11 @@
   "version": 1,
   "style": {
     "en": "British English spelling as on the site today. Plain, warm, direct.",
-    "de": "Informal 'du' throughout (student audience), including payment and account text; legal pages use the formal register customary for German terms. Gender-inclusive with a colon in plurals and roles (Tutor:innen); 'Studierende' for students. A tutoring session is a 'Stunde'.",
+    "de": "Formal 'Sie' throughout, polite and respectful (decision 10 Nov 2026), including payment, account and legal text. No colloquial contractions (geht’s, funktioniert’s). Gender-inclusive with a colon in plurals and roles (Tutor:innen); 'Studierende' for students. A tutoring session is a 'Stunde'.",
     "ar": "Modern Standard Arabic, no dialect. Imperatives in the masculine singular as standard in Arabic interfaces (ابحث، ابدأ). Western digits 0–9. Brand, people's names and course names stay in Latin script, isolated with <bdi>. Arabic quotation marks « ».",
     "tr": "Polite 'siz' form in sentences and buttons (başlayın, kullanın); short menu labels in the plain infinitive-style form common in Turkish interfaces (Giriş yap). Turkish dotted/dotless i must be preserved (İ/ı).",
-    "fr": "'vous' throughout. Narrow no-break space (U+202F) before : ; ! ? and inside « ». No inclusive point médian (readability); 'tuteur' as the generic role name.",
-    "es": "'tú' throughout, neutral international Spanish understood in Spain and Latin America; no regional slang. Quotation marks « »."
+    "fr": "Formal 'vous' throughout, polite and respectful (decision 10 Nov 2026); no colloquial forms such as 'ça'. Narrow no-break space (U+202F) before : ; ! ? and inside « ». No inclusive point médian (readability); 'tuteur' as the generic role name.",
+    "es": "Formal 'usted' throughout, polite and respectful (decision 10 Nov 2026); imperatives in the usted form (utilice, elija). Neutral international Spanish understood in Spain and Latin America; no regional slang. Quotation marks « »."
   },
   "terms": [
     {
