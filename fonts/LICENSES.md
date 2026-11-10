@@ -486,3 +486,7 @@ INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
 DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
 OTHER DEALINGS IN THE FONT SOFTWARE.
+
+## IBM Plex Sans Arabic (Arabic pages only)
+
+Copyright 2019 IBM Corp. SIL Open Font License 1.1 — full text in `LICENSE-IBM-Plex-Sans-Arabic.txt`. Files: `ibm-plex-sans-arabic-arabic-{400,500,600,700}-normal.woff2`, from @fontsource/ibm-plex-sans-arabic 5.3.0. Loaded only by `fonts/arabic.css` on /ar/ pages.

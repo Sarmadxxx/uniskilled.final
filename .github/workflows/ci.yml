@@ -25,6 +25,8 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: '22'
+      - name: Install test tools (rtlcss, acorn, Playwright; nothing is shipped to visitors)
+        run: npm ci
       - name: Site checks (JavaScript syntax, links, secrets, config, legal text)
         run: python3 tests/static_checks.py
       - name: Payment and payout decision tests
