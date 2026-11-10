@@ -43,7 +43,8 @@ for (const p of PAGES) {
     await page.waitForTimeout(400);
     expect(await page.getAttribute('html', 'lang')).toBe('ar');
     expect(await page.getAttribute('html', 'dir')).toBe('rtl');
-    if (AR_LIVE) await expect(page.locator('meta[name="robots"]')).toHaveCount(0);                        // live: open to search engines
+    if (AR_LIVE && p === '404.html') expect(await page.locator('meta[name="robots"]').getAttribute('content')).toContain('noindex'); // error page: never indexed, as in English
+    else if (AR_LIVE) await expect(page.locator('meta[name="robots"]')).toHaveCount(0);                   // live: open to search engines
     else expect(await page.locator('meta[name="robots"]').getAttribute('content')).toContain('noindex'); // hidden until approved
     expect(crashes).toEqual([]);
     expect(missing).toEqual([]);
