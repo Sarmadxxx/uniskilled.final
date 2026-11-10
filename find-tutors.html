@@ -145,6 +145,7 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
+<script src="language-picker.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to results</a>
@@ -171,6 +172,7 @@ select.req-form-input,input.req-form-input{height:44px;padding:0 12px}
     <div class="f">
       <select id="filterDay" aria-label="Available on"><option value="">Any day</option><option value="mon">Available Mon</option><option value="tue">Available Tue</option><option value="wed">Available Wed</option><option value="thu">Available Thu</option><option value="fri">Available Fri</option><option value="sat">Available Sat</option><option value="sun">Available Sun</option></select>
       <select id="filterPrice" aria-label="Maximum price"><option value="">Any price</option></select>
+      <select id="filterLang" aria-label="Teaches in" hidden><option value="">Any language</option></select>
       <select id="filterCountry" aria-label="Country" hidden><option value="">Any country</option></select>
       <select id="sortBy" aria-label="Sort"><option value="best">Recommended</option><option value="price-asc">Lowest price</option><option value="price-desc">Highest price</option><option value="days">Most available</option></select>
       <button type="button" class="clear" id="clearFilters" hidden>Clear filters</button>
@@ -260,10 +262,11 @@ async function loadTutors() {
     }
     const userIds = profiles.map(p => p.user_id).filter(Boolean);
     // public_tutors view: tutor names/photos readable by everyone, students' data never exposed
-    const [{ data: users }, { data: reviews }, { data: courseRows }] = await Promise.all([
+    const [{ data: users }, { data: reviews }, { data: courseRows }, langMap] = await Promise.all([
       _sb.from('public_tutors').select('id,full_name,avatar_url,country').in('id', userIds),
       _sb.from('reviews').select('tutor_id,rating'),
-      _sb.from('tutor_courses').select('*').in('tutor_id', userIds)
+      _sb.from('tutor_courses').select('*').in('tutor_id', userIds),
+      window.USKLangs ? USKLangs.load(_sb, userIds) : Promise.resolve({})   // languages each tutor teaches in
     ]);
     const userMap = {}; (users || []).forEach(u => userMap[u.id] = u);
     const reviewMap = {};
@@ -284,7 +287,7 @@ async function loadTutors() {
       if (tp.study_year) study += (study ? ', ' : '') + 'year ' + tp.study_year;
       return { ...tp, fullName: u.full_name || 'Tutor', avatarUrl: tp.avatar_url || u.avatar_url || null, country: u.country || tp.country || '', currency: tp.currency || 'GBP',
         avgRating: rv.count >= MIN_REVIEWS_SHOWN ? (rv.total / rv.count).toFixed(1) : null, reviewCount: rv.count,
-        rankScore: (PRIOR_WEIGHT * globalMean + rv.total) / (PRIOR_WEIGHT + rv.count), courses: courseMap[tp.user_id] || [],
+        rankScore: (PRIOR_WEIGHT * globalMean + rv.total) / (PRIOR_WEIGHT + rv.count), courses: courseMap[tp.user_id] || [], langs: langMap[tp.user_id] || [],
         subjects: Array.isArray(tp.subjects) ? tp.subjects.filter(Boolean) : [], availability: Array.isArray(tp.availability) ? tp.availability : [], times, study };
     });
     // Verified tutors first (nobody is hidden); original order otherwise
@@ -306,6 +309,14 @@ function buildFilterOptions() {
   const countries = [...new Set(allTutors.map(t => t.country).filter(Boolean))].sort();
   const cSel = document.getElementById('filterCountry');
   if (countries.length > 1) { countries.forEach(c => cSel.insertAdjacentHTML('beforeend', `<option value="${__esc(c)}">${__esc(c)}</option>`)); cSel.hidden = false; }
+  // Teaches in: the languages tutors actually teach in, named in the visitor's language
+  const langCodes = [...new Set(allTutors.flatMap(t => t.langs.map(l => l.code)))];
+  if (langCodes.length && window.USKLangs) {
+    const lSel = document.getElementById('filterLang');
+    langCodes.map(c => [c, USKLangs.name(c)]).sort((a, b) => a[1].localeCompare(b[1]))
+      .forEach(([c, n]) => lSel.insertAdjacentHTML('beforeend', `<option value="${__esc(c)}">Teaches in ${__esc(n)}</option>`));
+    lSel.hidden = false;
+  }
   const rates = allTutors.map(t => Number(t.hourly_rate)).filter(r => r > 0);
   if (rates.length) {
     const min = Math.min(...rates), max = Math.max(...rates), sym = currSymbol(mostCommonCurrency());
@@ -343,7 +354,7 @@ function __rankByCourse(list, q) {
   return list.map((t, i) => ({ t, i, s: score(t) })).sort((a, b) => (b.s - a.s) || (a.i - b.i)).map(x => x.t);
 }
 
-const FILTER_IDS = ['filterPrice', 'filterDay', 'filterUniversity', 'filterCountry'];
+const FILTER_IDS = ['filterPrice', 'filterDay', 'filterUniversity', 'filterCountry', 'filterLang'];
 function currentUniFilter() { return document.getElementById('mine').checked ? 'same' : document.getElementById('filterUniversity').value; }
 
 function filterTutors() {
@@ -352,6 +363,7 @@ function filterTutors() {
   const day = document.getElementById('filterDay').value;
   const uniFilter = currentUniFilter();
   const countryFilter = document.getElementById('filterCountry').value;
+  const langFilter = document.getElementById('filterLang').value;
   const sort = document.getElementById('sortBy').value;
   let any = !!q;
   FILTER_IDS.forEach(id => { const el = document.getElementById(id); const on = !!el.value; el.classList.toggle('is-set', on); if (on) any = true; });
@@ -359,7 +371,7 @@ function filterTutors() {
   document.getElementById('clearFilters').hidden = !any;
   document.querySelectorAll('.qs-chip').forEach(c => c.setAttribute('aria-pressed', q && c.dataset.subject.toLowerCase() === q ? 'true' : 'false'));
   try { const u = new URL(location.href); q ? u.searchParams.set('q', q) : u.searchParams.delete('q'); history.replaceState(null, '', u); } catch (e) {}
-  window.usTrack && usTrack('tutor_search', { query: q.slice(0, 100), has_query: !!q, format: null, price: price || null, day: day || null, university: uniFilter || null, country: countryFilter || null });
+  window.usTrack && usTrack('tutor_search', { query: q.slice(0, 100), has_query: !!q, format: null, price: price || null, day: day || null, university: uniFilter || null, country: countryFilter || null, teaches_in: langFilter || null });
 
   let list = __rankByCourse(allTutors.filter(t => {
     const matchesCourse = t.courses.some(c => __courseMatches(c, q));
@@ -369,6 +381,7 @@ function filterTutors() {
     if (uniFilter === 'same') { if (!currentStudentUni || !__sameUni(t.location || '', currentStudentUni)) return false; }
     else if (uniFilter && (t.location || '') !== uniFilter) return false;
     if (countryFilter && (t.country || '') !== countryFilter) return false;
+    if (langFilter && !t.langs.some(l => l.code === langFilter)) return false;
     return true;
   }), q);
   const rate = t => t.hourly_rate == null ? Infinity : Number(t.hourly_rate);
@@ -421,6 +434,7 @@ function renderTutors(tutors, q) {
       <div class="acad">${t.location ? `<div>${ICO.uni}<span>Studies at <b>${__esc(t.location)}</b></span></div>` : ''}${t.study ? `<div>${ICO.book}<span>${__esc(t.study)}</span></div>` : ''}${courses ? `<div>${ICO.star}<span>Passed ${courses}${t.courses.length > 2 ? ' +' + (t.courses.length - 2) : ''}</span></div>` : ''}${!t.location && !t.study && !courses ? '<div><span class="note">No academic details added yet</span></div>' : ''}</div>
       ${why ? `<div class="match">✓ ${__esc(why)}</div>` : ''}
       ${t.subjects.length ? `<div class="teach">${t.subjects.slice(0, 4).map(s => `<span>${__esc(s)}</span>`).join('')}${t.subjects.length > 4 ? `<span>+${t.subjects.length - 4} more</span>` : ''}</div>` : ''}
+      ${t.langs.length && window.USKLangs ? `<div class="avail"><span>Teaches in: <b>${__esc(USKLangs.list(t.langs))}</b></span></div>` : ''}
       <div class="avail"><span>Available: <b>${__esc(daysLabel(t) || 'not set yet')}</b></span>${t.times.length ? `<span class="note">${__esc(timesLabel(t))}</span>` : ''}</div>
       <div class="foot"><span class="price">${p ? `<b>${__esc(p)}</b> <small>/ hour</small>` : '<small>Rate on request</small>'}</span>
         <a class="btn s" href="${profileUrl(t)}">${own ? 'Your profile' : 'Profile'}</a>
@@ -433,7 +447,7 @@ function renderTutors(tutors, q) {
 // ── Events ──
 document.getElementById('sf').addEventListener('submit', e => { e.preventDefault(); filterTutors(); });
 document.getElementById('searchInput').addEventListener('input', function () { if (!this.value) filterTutors(); });
-['filterPrice', 'filterDay', 'filterCountry', 'sortBy'].forEach(id => document.getElementById(id).addEventListener('change', filterTutors));
+['filterPrice', 'filterDay', 'filterCountry', 'filterLang', 'sortBy'].forEach(id => document.getElementById(id).addEventListener('change', filterTutors));
 document.getElementById('filterUniversity').addEventListener('change', () => { document.getElementById('mine').checked = false; filterTutors(); });
 document.getElementById('mine').addEventListener('change', filterTutors);
 document.getElementById('clearFilters').addEventListener('click', clearFilters);

@@ -244,6 +244,7 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
 <script src="reviews-ui.js?v=1"></script>
+<script src="language-picker.js"></script>
 <script src="analytics.js" defer></script>
 </head>
 <body>
@@ -456,7 +457,6 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
         <div class="form-group"><label for="inputGender" class="form-label">Gender</label><select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option></select></div>
         <div class="form-group"><label for="inputCountry" class="form-label">Country</label><input type="text" class="form-input" id="inputCountry" placeholder="e.g. Germany"></div>
       </div>
-      <div class="form-group"><label for="inputLanguage" class="form-label">Language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button>
@@ -529,12 +529,8 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
           <button class="avail-toggle level-toggle" data-level="professional" style="width:auto;padding:0 0.9rem;">Professional / Adult</button>
         </div>
       </div>
-      <div class="form-group"><label class="form-label">Languages you teach in</label>
-        <div class="tag-wrap" id="languagesModal"></div>
-        <div class="tag-add">
-          <input type="text" class="form-input" id="languageInput" placeholder="e.g. English, Turkish...">
-          <button class="btn btn-primary" onclick="addLanguage()">+ Add</button>
-        </div>
+      <div class="form-group"><span class="form-label" id="teachLangsLabel">Languages you teach in</span>
+        <div id="languagesModal" role="group" aria-labelledby="teachLangsLabel"></div>
       </div>
       <div class="form-group"><label for="inputVideoLink" class="form-label">Intro video link (optional)</label><input type="text" class="form-input" id="inputVideoLink" placeholder="YouTube or Loom link"></div>
     </div>
@@ -669,7 +665,8 @@ let courses = [];
 let availability = [];
 let certificates = [];
 let teachingLevels = [];
-let teachLanguages = [];
+let teachLanguages = [];   // [{ code, level }] from user_languages (fixed list, not free text)
+let langPickerTP = null;
 let selectedRating = 0;
 let profileData = null;
 let tutorData = null;
@@ -817,7 +814,7 @@ async function loadProfile() {
   availability = Array.isArray(tp?.availability) ? tp.availability : [];
   certificates = Array.isArray(tp?.certificates) ? tp.certificates : [];
   teachingLevels = Array.isArray(tp?.teaching_levels) ? tp.teaching_levels : [];
-  teachLanguages = Array.isArray(tp?.languages) ? tp.languages : [];
+  teachLanguages = ((await USKLangs.load(_supabase, [tutorId]))[tutorId]) || [];
 
   const { data: tc } = await _supabase.from('tutor_courses').select('*').eq('tutor_id', tutorId).order('created_at', { ascending: true });
   courses = tc || [];
@@ -854,7 +851,7 @@ async function loadProfile() {
 
   const metaParts = [];
   if (p?.country) metaParts.push(`📍 ${p.country}`);
-  if (p?.language) metaParts.push(`🌐 ${p.language}`);
+  if (teachLanguages.length) metaParts.push(`🌐 ${USKLangs.list(teachLanguages)}`);
   metaParts.push('💻 Online sessions'); // all sessions are online
   document.getElementById('profileMeta').innerHTML = metaParts.map(m => `<span>${__esc(m)}</span>`).join('');
 
@@ -963,7 +960,7 @@ async function loadProfile() {
     ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:${teachLanguages.length ? '0.8rem' : '0'};">${teachingLevels.map(l => `<span class="subject-tag">${__esc(levelLabels[l] || l)}</span>`).join('')}</div>`
     : '';
   const langsHtml = teachLanguages.length > 0
-    ? `<div class="info-row"><span class="info-label">Languages</span><span class="info-value">${teachLanguages.join(', ')}</span></div>`
+    ? `<div class="info-row"><span class="info-label">Teaches in</span><span class="info-value">${__esc(teachLanguages.map(l => USKLangs.name(l.code) + ' (' + USKLangs.levelLabel(l.level) + ')').join(', '))}</span></div>`
     : '';
   const videoHtml = tp?.video_link
     ? `<div class="info-row"><span class="info-label">Intro video</span><span class="info-value"><a href="${__safeUrl(tp.video_link)}" target="_blank" style="color:var(--blue);">▶ Watch</a></span></div>`
@@ -1100,8 +1097,7 @@ async function saveBio() {
   const fullName = (firstName + ' ' + lastName).trim();
   const gender = document.getElementById('inputGender').value;
   const country = document.getElementById('inputCountry').value.trim();
-  const language = document.getElementById('inputLanguage').value.trim();
-  const { error: e1 } = await _supabase.from('users').update({ full_name: fullName || profileData?.full_name, gender: gender || null, country: country || null, language: language || null }).eq('id', currentUserId);
+  const { error: e1 } = await _supabase.from('users').update({ full_name: fullName || profileData?.full_name, gender: gender || null, country: country || null }).eq('id', currentUserId);
   const { error: e2 } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, bio: bio || null }, { onConflict: 'user_id' });
   if (e1 || e2) { showAlert('alertBio', 'Error saving.', 'error'); return; }
   showAlert('alertBio', 'Saved!', 'success');
@@ -1333,24 +1329,17 @@ async function saveTeaching() {
 }
 
 function renderLanguagesModal() {
-  document.getElementById('languagesModal').innerHTML = teachLanguages.map((l, i) =>
-    `<span class="tag-item">${__esc(l)}<button onclick="teachLanguages.splice(${i},1);renderLanguagesModal()">×</button></span>`
-  ).join('');
+  // Start from what is saved, so changes left by a cancelled edit don't carry over
+  if (!langPickerTP) langPickerTP = USKLangs.mount(document.getElementById('languagesModal'), { value: teachLanguages });
+  else langPickerTP.set(teachLanguages);
 }
-window.addLanguage = function() {
-  const inp = document.getElementById('languageInput');
-  const val = inp.value.trim();
-  if (val && !teachLanguages.includes(val)) {
-    teachLanguages.push(val);
-    renderLanguagesModal();
-  }
-  inp.value = '';
-};
 async function saveLevels() {
   const videoLink = document.getElementById('inputVideoLink').value.trim();
-  const data = { user_id: currentUserId, teaching_levels: teachingLevels.length > 0 ? teachingLevels : null, languages: teachLanguages.length > 0 ? teachLanguages : null, video_link: videoLink || null };
+  const data = { user_id: currentUserId, teaching_levels: teachingLevels.length > 0 ? teachingLevels : null, video_link: videoLink || null };
   const { error } = await _supabase.from('tutor_profiles').upsert(data, { onConflict: 'user_id' });
   if (error) { showAlert('alertLevels', 'Error: ' + error.message, 'error'); return; }
+  const { error: langErr } = await USKLangs.save(_supabase, langPickerTP ? langPickerTP.get() : teachLanguages);
+  if (langErr) { showAlert('alertLevels', 'Error: ' + langErr.message, 'error'); return; }
   showAlert('alertLevels', 'Saved!', 'success');
   setTimeout(async () => { closeModal('modalLevels'); await loadProfile(); }, 700);
 }
@@ -1449,7 +1438,6 @@ function openModal(id) {
     document.getElementById('inputLast').value = name.slice(1).join(' ') || '';
     document.getElementById('inputGender').value = profileData?.gender || '';
     document.getElementById('inputCountry').value = profileData?.country || '';
-    document.getElementById('inputLanguage').value = profileData?.language || '';
   }
   if (id === 'modalSubjects') {
     renderSubjectsModal();
@@ -1519,7 +1507,6 @@ document.addEventListener('DOMContentLoaded', () => {
   init();
   document.getElementById('subjectInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addSubject(); });
   document.getElementById('courseCodeInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addCourse(); });
-  document.getElementById('languageInput')?.addEventListener('keydown', e => { if (e.key === 'Enter') addLanguage(); });
 });
 
 

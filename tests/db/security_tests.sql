@@ -52,6 +52,14 @@ WITH ids AS (
   ORDER BY s.created_at DESC LIMIT 1
 ),
 cases(test, who, role, sql_tpl, expect) AS (VALUES
+  -- ── Spoken / teaching languages (user_languages, 10 Nov 2026) ──
+  ('Languages: stranger cannot add a language to the tutor',       'str','authenticated', 'INSERT INTO public.user_languages (user_id, lang, level) VALUES (%L, ''fr'', ''fluent'')', 'blocked'),
+  ('Languages: stranger cannot delete the tutor''s languages',     'str','authenticated', 'DELETE FROM public.user_languages WHERE user_id = %L', 'blocked_or_zero'),
+  ('Languages: tutor cannot write the table directly',             'tut','authenticated', 'INSERT INTO public.user_languages (user_id, lang, level) VALUES (%L, ''fr'', ''fluent'')', 'blocked'),
+  ('Languages: stranger cannot read a student''s private languages','str','authenticated', 'SELECT 1 FROM public.user_languages ul WHERE ul.user_id = %L AND NOT public.is_listed_tutor(ul.user_id)', 'zero_rows'),
+  ('Languages: anonymous visitor cannot change any languages',     'none','anon',         'SELECT public.set_my_languages(''[{"code":"fr","level":"fluent"}]''::jsonb)', 'blocked'),
+  ('Languages: tutor can set their own list',                      'tut','authenticated', 'SELECT public.set_my_languages(''[{"code":"en","level":"fluent"}]''::jsonb)', 'allowed'),
+  ('Languages: tutor cannot save an unknown level',                'tut','authenticated', 'SELECT public.set_my_languages(''[{"code":"en","level":"expert"}]''::jsonb)', 'blocked'),
   -- ── Booking & payment tampering (sessions) ──
   ('Student cannot change the price of their own booking',        'stu','authenticated', 'UPDATE public.sessions SET price = price + 1 WHERE id = %L', 'blocked'),
   ('Student cannot mark their own booking as paid',               'stu','authenticated', 'UPDATE public.sessions SET payment_status = ''paid'' WHERE id = %L', 'blocked'),
@@ -106,6 +114,8 @@ run AS (
       CASE c.who WHEN 'stu' THEN i.stu WHEN 'tut' THEN i.tut WHEN 'str' THEN i.str ELSE NULL END,
       c.role,
       CASE
+        WHEN c.test LIKE 'Languages:%' AND c.sql_tpl LIKE '%%L%'
+          THEN format(c.sql_tpl, CASE WHEN c.test ILIKE '%student%' THEN i.stu ELSE i.tut END)
         WHEN c.test LIKE 'Student cannot create%' OR c.test LIKE 'Student cannot book below%'
           THEN format(c.sql_tpl, i.stu, coalesce(nullif(i.any_tutor, i.stu), i.tut))
         WHEN c.test LIKE 'Signed-in user cannot insert a payment%'

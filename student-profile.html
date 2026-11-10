@@ -195,6 +195,7 @@ body{background:#f4f6f9}
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="analytics.js" defer></script>
+<script src="language-picker.js"></script>
 </head>
 <body>
 <header id="site-nav" data-nav="app"></header>
@@ -295,7 +296,7 @@ body{background:#f4f6f9}
           <select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Other</option></select>
         </div>
       </div>
-      <div class="form-group"><label for="inputLanguage" class="form-label">Preferred language</label><input type="text" class="form-input" id="inputLanguage" placeholder="e.g. English, German, Arabic"></div>
+      <div class="form-group"><span class="form-label" id="spokenLangsLabel">Languages you speak</span><div id="spokenLangs" role="group" aria-labelledby="spokenLangsLabel"></div></div>
     </div>
     <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button><button class="btn btn-primary" onclick="saveBio()">Save</button></div>
   </div>
@@ -375,10 +376,12 @@ async function init(){
   await loadProfile();
 }
 
+let myLanguages=[],spokenPicker=null; // languages this student speaks (private to them)
 async function loadProfile(){
   const {data:u}=await _sb.from('users').select('id,full_name,avatar_url,cover_url,bio,country,city,language,timezone,website_url,linkedin_url,github_url,roles,role,gender,created_at').eq('id',currentUserId).maybeSingle();
   const {data:sp}=await _sb.from('student_profiles').select('*').eq('user_id',currentUserId).maybeSingle();
   userData=u||{};profileData=sp||{};
+  myLanguages=((await USKLangs.load(_sb,[currentUserId]))[currentUserId])||[];
   const fullName=u?.full_name||'Student';
   const initials=fullName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
   const av=document.getElementById('avatarEl');
@@ -393,7 +396,7 @@ async function loadProfile(){
   const meta=[];
   if(u?.country)meta.push(`<span>🌍 ${__esc(u.country)}</span>`);
   if(sp?.graduation_year)meta.push(`<span>🎓 Graduating ${__esc(sp.graduation_year)}</span>`);
-  if(u?.language)meta.push(`<span>💬 ${__esc(u.language)}</span>`);
+  if(myLanguages.length)meta.push(`<span>💬 ${__esc(USKLangs.list(myLanguages))}</span>`);
   document.getElementById('profileMeta').innerHTML=meta.join('');
   const subjects=Array.isArray(sp?.subjects)?sp.subjects:[];
   document.getElementById('profileTags').innerHTML=subjects.slice(0,5).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('');
@@ -416,7 +419,7 @@ async function loadProfile(){
   const personal=[];
   if(u?.country)personal.push(`<div class="info-row"><span class="info-label">Country</span><span class="info-value">${__esc(u.country)}</span></div>`);
   if(u?.gender)personal.push(`<div class="info-row"><span class="info-label">Gender</span><span class="info-value">${__esc(u.gender)}</span></div>`);
-  if(u?.language)personal.push(`<div class="info-row"><span class="info-label">Language</span><span class="info-value">${__esc(u.language)}</span></div>`);
+  if(myLanguages.length)personal.push(`<div class="info-row"><span class="info-label">Languages</span><span class="info-value">${__esc(myLanguages.map(l=>USKLangs.name(l.code)+' ('+USKLangs.levelLabel(l.level)+')').join(', '))}</span></div>`);
   document.getElementById('personalBody').innerHTML=personal.length?personal.join(''):'<span class="empty" style="font-size:0.82rem;">Not set yet.</span>';
   const checks=[u?.full_name,u?.avatar_url,sp?.bio,sp?.university,sp?.degree,subjects.length>0,avail.length>0,u?.country];
   const done=checks.filter(Boolean).length;
@@ -439,11 +442,12 @@ async function saveBio(){
   const bio=document.getElementById('inputBio').value.trim();
   const country=document.getElementById('inputCountry').value;
   const gender=document.getElementById('inputGender').value;
-  const language=document.getElementById('inputLanguage').value.trim();
   const alertEl=document.getElementById('alertBio');
   const fullName=[firstName,lastName].filter(Boolean).join(' ')||userData?.full_name||'Student';
-  const {error:uErr}=await _sb.from('users').update({full_name:fullName,country:country||null,gender:gender||null,language:language||null}).eq('id',currentUserId);
+  const {error:uErr}=await _sb.from('users').update({full_name:fullName,country:country||null,gender:gender||null}).eq('id',currentUserId);
   if(uErr){alertEl.textContent=uErr.message;alertEl.className='alert-inline error';return;}
+  const {error:lErr}=await USKLangs.save(_sb,spokenPicker?spokenPicker.get():myLanguages);
+  if(lErr){alertEl.textContent=lErr.message;alertEl.className='alert-inline error';return;}
   const {error:spErr}=await _sb.from('student_profiles').upsert({user_id:currentUserId,bio:bio||null},{onConflict:'user_id'});
   if(spErr){alertEl.textContent=spErr.message;alertEl.className='alert-inline error';return;}
   closeModal('modalBio');showToast('Profile saved ✓');await loadProfile();
@@ -529,7 +533,7 @@ function openModal(id){
   __lastFocus=document.activeElement;
   document.getElementById(id).classList.add('open');
   setTimeout(()=>{const ov=document.getElementById(id);if(!ov.classList.contains('open'))return;const f=__focusables(ov.querySelector('.modal-body')||ov);(f[0]||ov.querySelector('.modal-x')).focus();},0);
-  if(id==='modalBio'){const name=(userData?.full_name||'').split(' ');document.getElementById('inputFirstName').value=name[0]||'';document.getElementById('inputLastName').value=name.slice(1).join(' ')||'';document.getElementById('inputBio').value=profileData?.bio||'';document.getElementById('inputCountry').value=userData?.country||'';document.getElementById('inputGender').value=userData?.gender||'';document.getElementById('inputLanguage').value=userData?.language||'';document.getElementById('alertBio').style.display='none';}
+  if(id==='modalBio'){const name=(userData?.full_name||'').split(' ');document.getElementById('inputFirstName').value=name[0]||'';document.getElementById('inputLastName').value=name.slice(1).join(' ')||'';document.getElementById('inputBio').value=profileData?.bio||'';document.getElementById('inputCountry').value=userData?.country||'';document.getElementById('inputGender').value=userData?.gender||'';if(!spokenPicker)spokenPicker=USKLangs.mount(document.getElementById('spokenLangs'),{value:myLanguages});else spokenPicker.set(myLanguages);document.getElementById('alertBio').style.display='none';}
   if(id==='modalAcademic'){document.getElementById('inputUniversity').value=profileData?.university||'';document.getElementById('inputDegree').value=profileData?.degree||'';document.getElementById('inputMajor').value=profileData?.major||'';document.getElementById('inputYear').value=profileData?.year_of_study||'';document.getElementById('inputGradYear').value=profileData?.graduation_year||'';document.getElementById('alertAcademic').style.display='none';}
   if(id==='modalSubjects'){renderSubjectTags();document.getElementById('alertSubjects').style.display='none';}
   if(id==='modalAvailability'){document.getElementById('inputPrefTime').value=profileData?.preferred_time||'';initDayGrid();}
