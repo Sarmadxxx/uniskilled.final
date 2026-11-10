@@ -10,28 +10,28 @@
   "status": {
     "common": {
       "de": "draft",
-      "ar": "draft",
+      "ar": "reviewed",
       "tr": "draft",
       "fr": "draft",
       "es": "draft"
     },
     "page.index": {
-      "ar": "draft"
+      "ar": "reviewed"
     },
     "page.about": {
-      "ar": "draft"
+      "ar": "reviewed"
     },
     "page.find-tutors": {
-      "ar": "draft"
+      "ar": "reviewed"
     },
     "page.courses": {
-      "ar": "draft"
+      "ar": "reviewed"
     },
     "page.group-sessions": {
-      "ar": "draft"
+      "ar": "reviewed"
     },
     "page.404": {
-      "ar": "draft"
+      "ar": "reviewed"
     }
   },
   "reviewers": {
