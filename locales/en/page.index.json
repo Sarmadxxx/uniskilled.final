@@ -98,5 +98,6 @@
   "index.subject-course-code-professor.placeholder": "Subject, course code, professor or name",
   "index.popular-searches.arialabel": "Popular searches",
   "index.why-uniskilled.arialabel": "Why UniSkilled",
-  "index.js.heroPlaceholderShort": "Course, subject or tutor name"
+  "index.js.heroPlaceholderShort": "Course, subject or tutor name",
+  "index.company-details": "UniSkilled is operated by UNISKILLED LTD, registered in England and Wales, company number 17574736. Registered office: <span dir=\"ltr\">65 London Wall, London EC2M 5TU, United Kingdom</span>."
 }

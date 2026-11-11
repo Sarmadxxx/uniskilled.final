@@ -364,6 +364,7 @@ export const AR: Dict = {
   "You only get this email once for each request.": "لا تصلك هذه الرسالة إلا مرة واحدة لكل طلب.",
   "at": "الساعة",
   "{{0}}, {{1}}": "{{0}}، {{1}}",
+  "{{0}}, registered in England and Wales, company number {{1}}. Registered office: <span dir=\"ltr\">{{2}}</span>.": "{{0}}، شركة مسجّلة في إنجلترا وويلز، رقمها لدى سجل الشركات {{1}}. العنوان المسجّل: <span dir=\"ltr\">{{2}}</span>.",
   // Outcome sentences written by resolve-dispute
   "The tutor will be paid as normal.": "سيحصل المدرّس على أجره كالمعتاد.",
   "The student has been fully refunded.": "تم استرداد المبلغ كاملاً للطالب.",
