@@ -10,7 +10,7 @@
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
-<title>Messages — UniSkilled</title>
+<title data-i18n="messages.title">Messages — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -241,28 +241,28 @@ body{font-family:'Manrope',system-ui,sans-serif;background:var(--canvas);color:v
 </svg>
 
 <main class="chat-layout">
-<h1 class="sr-only">Messages</h1>
+<h1 data-i18n="messages.messages" class="sr-only">Messages</h1>
   <!-- Conversations list -->
   <section class="conv-list" id="convList" aria-labelledby="convHeading">
     <div class="conv-top">
-      <h2 id="convHeading">Messages</h2>
+      <h2 data-i18n="messages.messages-2" id="convHeading">Messages</h2>
       <div class="conv-search">
         <svg class="ico" aria-hidden="true"><use href="#i-search"/></svg>
-        <input id="convSearch" type="search" placeholder="Search conversations" aria-label="Search conversations" autocomplete="off">
+        <input data-i18n-attr="placeholder:messages.search-conversations.placeholder;aria-label:messages.search-conversations-2.arialabel" id="convSearch" type="search" placeholder="Search conversations" aria-label="Search conversations" autocomplete="off">
       </div>
     </div>
-    <div id="convItems" role="list" aria-label="Conversations"><div class="empty-conv">Loading…</div></div>
+    <div data-i18n-attr="aria-label:messages.conversations.arialabel" id="convItems" role="list" aria-label="Conversations"><div data-i18n="messages.loading" class="empty-conv">Loading…</div></div>
   </section>
 
   <!-- Chat area -->
-  <section class="chat-area" id="chatArea" aria-label="Conversation">
+  <section data-i18n-attr="aria-label:messages.conversation.arialabel" class="chat-area" id="chatArea" aria-label="Conversation">
     <div class="no-conv" id="noChatSelected">
       <div class="bubble-ico"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg></div>
-      <h2>Select a conversation</h2>
-      <div style="font-size:0.875rem;">Choose a conversation from the list to start messaging</div>
+      <h2 data-i18n="messages.select-a-conversation">Select a conversation</h2>
+      <div data-i18n="messages.choose-a-conversation-from" style="font-size:0.875rem;">Choose a conversation from the list to start messaging</div>
     </div>
     <div id="activeChatHeader" class="chat-header" style="display:none;">
-      <button type="button" class="back-to-list" onclick="backToConvList()" aria-label="Back to conversations"><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg></button>
+      <button data-i18n-attr="aria-label:messages.back-to-conversations.arialabel" type="button" class="back-to-list" onclick="backToConvList()" aria-label="Back to conversations"><svg class="ico" aria-hidden="true"><use href="#i-back"/></svg></button>
       <div class="av md" id="activeChatAv" aria-hidden="true">?</div>
       <div class="head-info">
         <h2 id="activeChatName"></h2>
@@ -270,34 +270,34 @@ body{font-family:'Manrope',system-ui,sans-serif;background:var(--canvas);color:v
       </div>
       <div class="head-actions" id="headActions"></div>
     </div>
-    <div id="trustBanner">
+    <div data-i18n="messages.payments-through-uniskilled-are" id="trustBanner">
       <svg class="ico" aria-hidden="true"><use href="#i-shield"/></svg>
       <span><strong>Payments through UniSkilled are protected</strong> — held safely and refundable. Payments made outside UniSkilled aren't covered by this guarantee — no refund protection, no dispute support.</span>
     </div>
-    <div class="chat-messages" id="chatMessages" style="display:none;" role="log" aria-live="polite" aria-label="Messages" tabindex="0"></div>
-    <button type="button" class="jump" id="jumpBtn" onclick="scrollToBottom(true)"><svg class="ico" style="width:16px;height:16px" aria-hidden="true"><use href="#i-down"/></svg><span id="jumpLbl">Latest messages</span></button>
+    <div data-i18n-attr="aria-label:messages.messages-3.arialabel" class="chat-messages" id="chatMessages" style="display:none;" role="log" aria-live="polite" aria-label="Messages" tabindex="0"></div>
+    <button data-i18n="messages.latest-messages" type="button" class="jump" id="jumpBtn" onclick="scrollToBottom(true)"><svg class="ico" style="width:16px;height:16px" aria-hidden="true"><use href="#i-down"/></svg><span id="jumpLbl">Latest messages</span></button>
     <div id="contactWarning" role="alert"></div>
-    <div class="drop" id="dropZone">Drop a photo or file to send</div>
-    <div class="picker" id="reactPicker" role="group" aria-label="Choose a reaction"></div>
+    <div data-i18n="messages.drop-a-photo-or" class="drop" id="dropZone">Drop a photo or file to send</div>
+    <div data-i18n-attr="aria-label:messages.choose-a-reaction.arialabel" class="picker" id="reactPicker" role="group" aria-label="Choose a reaction"></div>
     <div class="composer" id="chatInputArea" style="display:none;">
-      <div class="quick" id="quickReplies" aria-label="Quick replies"></div>
-      <div class="cbar" id="replyBar"><div class="ctext"><b id="replyWho"></b><span id="replySnippet"></span></div><button type="button" class="x" onclick="cancelReply()" aria-label="Cancel reply"><svg class="ico" style="width:18px;height:18px" aria-hidden="true"><use href="#i-x"/></svg></button></div>
-      <div class="cbar" id="attachBar"><span id="attachThumb"></span><div class="ctext"><b id="attachName"></b><span id="attachSize"></span></div><button type="button" class="x" onclick="clearAttachment()" aria-label="Remove attachment"><svg class="ico" style="width:18px;height:18px" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div data-i18n-attr="aria-label:messages.quick-replies.arialabel" class="quick" id="quickReplies" aria-label="Quick replies"></div>
+      <div class="cbar" id="replyBar"><div class="ctext"><b id="replyWho"></b><span id="replySnippet"></span></div><button data-i18n-attr="aria-label:messages.cancel-reply.arialabel" type="button" class="x" onclick="cancelReply()" aria-label="Cancel reply"><svg class="ico" style="width:18px;height:18px" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div class="cbar" id="attachBar"><span id="attachThumb"></span><div class="ctext"><b id="attachName"></b><span id="attachSize"></span></div><button data-i18n-attr="aria-label:messages.remove-attachment.arialabel" type="button" class="x" onclick="clearAttachment()" aria-label="Remove attachment"><svg class="ico" style="width:18px;height:18px" aria-hidden="true"><use href="#i-x"/></svg></button></div>
       <div class="chat-input-area">
-        <button type="button" class="attach-btn" id="attachBtn" aria-label="Attach a photo or file" title="Photo or file (JPG, PNG, WebP, PDF, Word · up to 10 MB)"><svg class="ico" aria-hidden="true"><use href="#i-clip"/></svg></button>
+        <button data-i18n-attr="title:messages.photo-or-file-jpg.title;aria-label:messages.attach-a-photo-or.arialabel" type="button" class="attach-btn" id="attachBtn" aria-label="Attach a photo or file" title="Photo or file (JPG, PNG, WebP, PDF, Word · up to 10 MB)"><svg class="ico" aria-hidden="true"><use href="#i-clip"/></svg></button>
         <input type="file" id="fileInput" accept="image/jpeg,image/png,image/webp,application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" hidden>
         <div class="input-wrap">
-          <textarea class="chat-input" id="msgInput" rows="1" placeholder="Type a message…" maxlength="1000" aria-label="Message"></textarea>
+          <textarea data-i18n-attr="placeholder:messages.type-a-message.placeholder;aria-label:messages.message.arialabel" class="chat-input" id="msgInput" rows="1" placeholder="Type a message…" maxlength="1000" aria-label="Message"></textarea>
           <span class="counter" id="charCount" aria-live="polite"></span>
         </div>
-        <button type="button" class="send-btn" id="sendBtn" aria-label="Send message" disabled><svg class="ico" aria-hidden="true"><use href="#i-send"/></svg></button>
+        <button data-i18n-attr="aria-label:messages.send-message.arialabel" type="button" class="send-btn" id="sendBtn" aria-label="Send message" disabled><svg class="ico" aria-hidden="true"><use href="#i-send"/></svg></button>
       </div>
-      <div class="hint">Enter to send · Shift + Enter for a new line</div>
+      <div data-i18n="messages.enter-to-send-shift" class="hint">Enter to send · Shift + Enter for a new line</div>
     </div>
   </section>
 </main>
-<dialog id="lightbox" aria-label="Photo">
-  <div class="lb-bar"><a id="lbOpen" href="#" target="_blank" rel="noopener noreferrer">Open full size</a><button type="button" onclick="document.getElementById('lightbox').close()">Close</button></div>
+<dialog data-i18n-attr="aria-label:messages.photo.arialabel" id="lightbox" aria-label="Photo">
+  <div data-i18n="messages.open-full-sizeclose" class="lb-bar"><a id="lbOpen" href="#" target="_blank" rel="noopener noreferrer">Open full size</a><button type="button" onclick="document.getElementById('lightbox').close()">Close</button></div>
   <img id="lbImg" alt="">
 </dialog>
 
@@ -308,6 +308,14 @@ function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 function __viewerTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Berlin';}catch(e){return 'Europe/Berlin';}}
 function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').pop().replace(/_/g,' ')+' time)':'';}
+// Text shown by this page's script, in the page's language (English unchanged; locales/*/page.messages.json).
+function __pick(en, v) { return typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en; }
+function T(k, en, v) { return window.I18N ? I18N.t('messages.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? v[x] : m; }); }
+function H(k, en, v) { return window.I18N ? I18N.h('messages.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? __esc(v[x]) : m; }); }
+const NON_EN = !!(window.I18N && I18N.lang && I18N.lang !== 'en');
+const __D = (d, o) => NON_EN ? I18N.date(d, o) : d.toLocaleDateString([], o);
+// Previews we store in English ("📷 Photo") shown in the reader's language.
+const __pv = v => NON_EN && v === '📷 Photo' ? '📷 ' + T('photo', 'Photo') : v;
 function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
 
 const SUPABASE_URL=USK_CONFIG.url;
@@ -349,25 +357,25 @@ function avatarHtml(id,name,cls){
   return `<div class="av ${cls||''}" aria-hidden="true">${img&&img!=='#'?`<img src="${img}" alt="" loading="lazy" onerror="this.remove()">`:''}${img&&img!=='#'?'':__esc(initialsOf(name))}</div>`;
 }
 function sameDay(a,b){return a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
-function timeStr(d){return d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
+function timeStr(d){return NON_EN?I18N.time(d,{hour:'2-digit',minute:'2-digit'}):d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});}
 function relTime(iso){
   if(!iso)return '';
   const d=new Date(iso),now=new Date();
   const diff=(now-d)/1000;
-  if(diff<60)return 'now';
-  if(diff<3600)return Math.floor(diff/60)+'m';
+  if(diff<60)return T('now','now');
+  if(diff<3600)return T('minutes-ago','{{n}}m',{n:Math.floor(diff/60)});
   if(sameDay(d,now))return timeStr(d);
   const y=new Date(now);y.setDate(now.getDate()-1);
-  if(sameDay(d,y))return 'Yesterday';
-  if(diff<6*86400)return d.toLocaleDateString([],{weekday:'short'});
-  return d.toLocaleDateString([],{day:'numeric',month:'short'});
+  if(sameDay(d,y))return T('yesterday','Yesterday');
+  if(diff<6*86400)return __D(d,{weekday:'short'});
+  return __D(d,{day:'numeric',month:'short'});
 }
 function dayLabel(d){
   const now=new Date();
-  if(sameDay(d,now))return 'Today';
+  if(sameDay(d,now))return T('today','Today');
   const y=new Date(now);y.setDate(now.getDate()-1);
-  if(sameDay(d,y))return 'Yesterday';
-  return d.toLocaleDateString([],{weekday:'long',day:'numeric',month:'long',year:d.getFullYear()===now.getFullYear()?undefined:'numeric'});
+  if(sameDay(d,y))return T('yesterday','Yesterday');
+  return __D(d,{weekday:'long',day:'numeric',month:'long',year:d.getFullYear()===now.getFullYear()?undefined:'numeric'});
 }
 // Escape first, then turn plain https links into safe links.
 function linkify(text){
@@ -441,25 +449,25 @@ function renderConvList(){
   const convItems=document.getElementById('convItems');
   if(!allConvs.length){
     convItems.innerHTML = currentRole==='tutor'
-      ? '<div class="empty-conv">No conversations yet.<br>Students who message you or book a session will appear here. <a href="tutor-profile.html">Check your profile</a> is complete.</div>'
-      : '<div class="empty-conv">No conversations yet.<br><a href="find-tutors.html">Find a tutor</a> and message them from their profile.</div>';
+      ? '<div class="empty-conv">'+H('empty-tutor','No conversations yet.<br>Students who message you or book a session will appear here. <a href="tutor-profile.html">Check your profile</a> is complete.')+'</div>'
+      : '<div class="empty-conv">'+H('empty-student','No conversations yet.<br><a href="find-tutors.html">Find a tutor</a> and message them from their profile.')+'</div>';
     return;
   }
   const q=(document.getElementById('convSearch').value||'').trim().toLowerCase();
   const rows=allConvs.map(c=>{
     const otherId=c.participant_1===currentUser.id?c.participant_2:c.participant_1;
     const otherName=c.participant_1===currentUser.id?c.participant_2_name:c.participant_1_name;
-    return {c,otherId,otherName:otherName||'Unknown'};
+    return {c,otherId,otherName:otherName||T('unknown','Unknown')};
   }).filter(r=>!q||r.otherName.toLowerCase().includes(q)||String(r.c.last_message||'').toLowerCase().includes(q));
-  if(!rows.length){convItems.innerHTML='<div class="empty-conv">No conversations match “'+__esc(q)+'”.</div>';return;}
+  if(!rows.length){convItems.innerHTML='<div class="empty-conv">'+H('no-match','No conversations match “{{q}}”.',{q:q})+'</div>';return;}
   convItems.innerHTML=rows.map(({c,otherId,otherName})=>{
     const unread = unreadMap[c.id]||0;
-    const preview = c.last_message ? c.last_message : 'No messages yet';
+    const preview = c.last_message ? __pv(c.last_message) : T('no-messages','No messages yet');
     return`<div role="listitem"><button type="button" class="conv-item ${unread>0?'unread':''} ${c.id===currentConvId?'active':''}" id="conv-${__esc(c.id)}" ${c.id===currentConvId?'aria-current="true"':''} onclick="openConv('${__jsStr(c.id)}','${__jsStr(otherId)}','${__jsStr(otherName)}')">
       ${avatarHtml(otherId,otherName)}
       <div class="conv-info">
         <div class="conv-row"><span class="conv-name">${__esc(otherName)}</span><span class="conv-time">${__esc(relTime(c.last_message_at))}</span></div>
-        <div class="conv-row"><span class="conv-preview">${__esc(preview)}</span>${unread>0?`<span class="unread-badge">${__esc(unread>99?'99+':unread)}<span class="sr-only"> unread</span></span>`:''}</div>
+        <div class="conv-row"><span class="conv-preview">${__esc(preview)}</span>${unread>0?`<span class="unread-badge">${__esc(unread>99?'99+':unread)}<span class="sr-only">${H('unread',' unread')}</span></span>`:''}</div>
       </div>
     </button></div>`;
   }).join('');
@@ -471,12 +479,12 @@ function setHeader(otherId,otherName){
   document.getElementById('activeChatAv').outerHTML=avatarHtml(otherId,otherName,'md').replace('class="av md"','class="av md" id="activeChatAv"');
   const sub=document.getElementById('activeChatSub');
   sub.classList.remove('typing');
-  sub.dataset.base=isTutor?'Tutor':(currentRole==='tutor'?'Student':'');
+  sub.dataset.base=isTutor?T('tutor','Tutor'):(currentRole==='tutor'?T('student','Student'):'');
   sub.textContent=sub.dataset.base;
   const acts=document.getElementById('headActions');
   if(isTutor&&currentRole!=='tutor'){
-    acts.innerHTML=`<a class="hbtn ghost" href="tutor-profile.html?id=${encodeURIComponent(otherId)}">View profile</a>
-      <a class="hbtn primary" href="book-session.html?tutor=${encodeURIComponent(otherId)}"><svg class="ico" style="width:16px;height:16px" aria-hidden="true"><use href="#i-cal"/></svg><span>Book<span class="lbl-long"> a session</span></span></a>`;
+    acts.innerHTML=`<a class="hbtn ghost" href="tutor-profile.html?id=${encodeURIComponent(otherId)}">${H('view-profile','View profile')}</a>
+      <a class="hbtn primary" href="book-session.html?tutor=${encodeURIComponent(otherId)}"><svg class="ico" style="width:16px;height:16px" aria-hidden="true"><use href="#i-cal"/></svg><span>${H('book','Book<span class="lbl-long"> a session</span>')}</span></a>`;
   }else acts.innerHTML='';
 }
 
@@ -558,7 +566,7 @@ async function openConv(convId, otherId, otherName){
 function showTyping(on){
   const sub=document.getElementById('activeChatSub');
   const row=document.getElementById('typingRow');
-  if(on){sub.textContent='typing…';sub.classList.add('typing');}
+  if(on){sub.textContent=T('typing','typing…');sub.classList.add('typing');}
   else{sub.textContent=sub.dataset.base||'';sub.classList.remove('typing');}
   if(row){
     const c=document.getElementById('chatMessages');
@@ -615,7 +623,7 @@ async function loadMessages(convId){
   const fu=list.find(m=>m.receiver_id===currentUser.id&&!m.read);
   firstUnreadId=fu?fu.id:null;
   if(!list.length){
-    container.innerHTML=`<div class="thread-empty" id="threadEmpty">${avatarHtml(currentOther.id,currentOther.name)}<h3>Say hello to ${__esc(currentOther.name)}</h3><div style="font-size:0.875rem;max-width:36ch">Start with what you need help with — a subject, a deadline or a time that suits you.</div></div>`;
+    container.innerHTML=`<div class="thread-empty" id="threadEmpty">${avatarHtml(currentOther.id,currentOther.name)}<h3>${H('say-hello','Say hello to {{name}}',{name:currentOther.name})}</h3><div style="font-size:0.875rem;max-width:36ch">${H('say-hello-sub','Start with what you need help with — a subject, a deadline or a time that suits you.')}</div></div>`;
   }
   list.forEach(m=>appendMessage(m,false));
   ensureTypingRow();
@@ -631,7 +639,7 @@ function ensureTypingRow(){
   const c=document.getElementById('chatMessages');
   let row=document.getElementById('typingRow');
   if(!row){row=document.createElement('div');row.id='typingRow';row.className='typing-row';}
-  row.innerHTML=`${currentOther?avatarHtml(currentOther.id,currentOther.name,'sm'):''}<div class="dots" aria-label="${__esc((currentOther&&currentOther.name)||'')} is typing"><span></span><span></span><span></span></div>`;
+  row.innerHTML=`${currentOther?avatarHtml(currentOther.id,currentOther.name,'sm'):''}<div class="dots" aria-label="${H('is-typing','{{name}} is typing',{name:(currentOther&&currentOther.name)||''})}"><span></span><span></span><span></span></div>`;
   row.classList.remove('show');
   c.appendChild(row);
 }
@@ -649,32 +657,32 @@ function appendMessage(msg,scroll=true,opts){
     const s=document.createElement('div');s.className='day-sep';s.textContent=dayLabel(d);ins(s);lastMsg=null;
   }
   if(firstUnreadId&&msg.id===firstUnreadId){
-    const s=document.createElement('div');s.className='new-sep';s.textContent='New messages';ins(s);lastMsg=null;
+    const s=document.createElement('div');s.className='new-sep';s.textContent=T('new-messages','New messages');ins(s);lastMsg=null;
   }
   const grouped=lastMsg&&lastMsg.sender_id===msg.sender_id&&(d-new Date(lastMsg.created_at))<5*60*1000&&!msg.reply_to;
   if(grouped&&lastMsg._row)lastMsg._row.classList.add('next-same');
 
   const row=document.createElement('div');
   row.className='row '+(isSent?'me':'them')+(grouped?' grouped':'')+(opts&&opts.pending?' pending':'');
-  const who=isSent?'You':(msg.sender_name||(currentOther&&currentOther.name)||'');
+  const who=isSent?T('you','You'):(msg.sender_name||(currentOther&&currentOther.name)||'');
   // quoted reply
   let quote='';
   if(msg.reply_to){
     const o=msgById[msg.reply_to];
-    const qWho=o?(o.sender_id===currentUser.id?'You':(o.sender_name||(currentOther&&currentOther.name)||'')):'';
-    quote=`<button type="button" class="quote" data-goto="${__esc(msg.reply_to)}"><b>${o?__esc(qWho):'Original message'}</b><span>${o?__esc(previewOf(o)):'Not available'}</span></button>`;
+    const qWho=o?(o.sender_id===currentUser.id?T('you','You'):(o.sender_name||(currentOther&&currentOther.name)||'')):'';
+    quote=`<button type="button" class="quote" data-goto="${__esc(msg.reply_to)}"><b>${o?__esc(qWho):H('original','Original message')}</b><span>${o?__esc(previewOf(o)):H('not-available','Not available')}</span></button>`;
   }
   // attachment
   let att='';const hasImg=msg.attachment_path&&/^image\//.test(msg.attachment_type||'');
   if(msg.attachment_path||(opts&&opts.localFile)){
     const isImg=hasImg||(opts&&opts.localFile&&/^image\//.test(opts.localFile.type));
-    if(isImg)att=`<button type="button" class="att-img" aria-label="Open photo${msg.attachment_name?': '+__esc(msg.attachment_name):''}"><img alt="${__esc(msg.attachment_name||'Photo')}"></button>`;
-    else{const nm=msg.attachment_name||(opts&&opts.localFile&&opts.localFile.name)||'File';const sz=msg.attachment_size||(opts&&opts.localFile&&opts.localFile.size);
+    if(isImg)att=`<button type="button" class="att-img" aria-label="${msg.attachment_name?H('open-photo-named','Open photo: {{name}}',{name:msg.attachment_name}):H('open-photo','Open photo')}"><img alt="${__esc(msg.attachment_name||T('photo','Photo'))}"></button>`;
+    else{const nm=msg.attachment_name||(opts&&opts.localFile&&opts.localFile.name)||T('file','File');const sz=msg.attachment_size||(opts&&opts.localFile&&opts.localFile.size);
       att=`<a class="att-file" href="#" ${msg.attachment_path?'':'aria-disabled="true"'}><span class="fi"><svg class="ico" aria-hidden="true"><use href="#i-file"/></svg></span><span><span class="fn">${__esc(nm)}</span><span class="fs">${__esc(fileKind(msg.attachment_type||(opts&&opts.localFile&&opts.localFile.type)))}${sz?' · '+__esc(fmtSize(sz)):''}</span></span></a>`;}
   }
   const text=msg.content?`<span class="msg-text">${linkify(msg.content)}</span>`:'';
   const media=att&&/att-img/.test(att);
-  row.innerHTML=`${isSent?'':avatarHtml(msg.sender_id,who,'sm')}<div class="bcol"><div class="msg${media?' media':''}"><span class="sr-only">${__esc(who)}: </span>${quote}${att}${text}<time class="msg-time" datetime="${__esc(msg.created_at)}">${__esc(timeStr(d))}</time></div><div class="reacts"></div></div><div class="acts"><button type="button" class="a-react" aria-label="React to this message" title="React"><svg class="ico" aria-hidden="true"><use href="#i-smile"/></svg></button><button type="button" class="a-reply" aria-label="Reply to this message" title="Reply"><svg class="ico" aria-hidden="true"><use href="#i-reply"/></svg></button></div>`;
+  row.innerHTML=`${isSent?'':avatarHtml(msg.sender_id,who,'sm')}<div class="bcol"><div class="msg${media?' media':''}"><span class="sr-only">${__esc(who)}: </span>${quote}${att}${text}<time class="msg-time" datetime="${__esc(msg.created_at)}">${__esc(timeStr(d))}</time></div><div class="reacts"></div></div><div class="acts"><button type="button" class="a-react" aria-label="${H('react-aria','React to this message')}" title="${H('react','React')}"><svg class="ico" aria-hidden="true"><use href="#i-smile"/></svg></button><button type="button" class="a-reply" aria-label="${H('reply-aria','Reply to this message')}" title="${H('reply','Reply')}"><svg class="ico" aria-hidden="true"><use href="#i-reply"/></svg></button></div>`;
   ins(row);
   const rec=Object.assign({},msg,{_row:row});
   lastMsg=rec;
@@ -719,11 +727,11 @@ function wireRow(row,msg){
 function previewOf(m){
   if(!m)return '';
   if(m.content)return m.content;
-  if(m.attachment_path)return /^image\//.test(m.attachment_type||'')?'📷 Photo':'📎 '+(m.attachment_name||'File');
+  if(m.attachment_path)return /^image\//.test(m.attachment_type||'')?'📷 '+T('photo','Photo'):'📎 '+(m.attachment_name||T('file','File'));
   return '';
 }
 function fmtSize(n){n=Number(n)||0;if(n<1024)return n+' B';if(n<1048576)return Math.round(n/1024)+' KB';return (n/1048576).toFixed(1)+' MB';}
-function fileKind(t){return t==='application/pdf'?'PDF':(/wordprocessingml/.test(t||'')?'Word document':(/^image\//.test(t||'')?'Photo':'File'));}
+function fileKind(t){return t==='application/pdf'?'PDF':(/wordprocessingml/.test(t||'')?T('word-doc','Word document'):(/^image\//.test(t||'')?T('photo','Photo'):T('file','File')));}
 
 async function signedUrl(path){
   if(!path)return '';
@@ -740,7 +748,7 @@ async function openLightbox(m){
   const lb=document.getElementById('lightbox');
   const u=await signedUrl(m.attachment_path);if(!u)return;
   document.getElementById('lbImg').src=u;
-  document.getElementById('lbImg').alt=m.attachment_name||'Photo';
+  document.getElementById('lbImg').alt=m.attachment_name||T('photo','Photo');
   document.getElementById('lbOpen').href=u;
   if(lb.showModal)lb.showModal();else window.open(u,'_blank','noopener');
 }
@@ -762,7 +770,7 @@ function goToMessage(id){
 function startReply(m){
   if(!m)return;
   replyTo=m;
-  document.getElementById('replyWho').textContent='Replying to '+(m.sender_id===currentUser.id?'yourself':(m.sender_name||(currentOther&&currentOther.name)||''));
+  document.getElementById('replyWho').textContent=m.sender_id===currentUser.id?T('replying-self','Replying to yourself'):T('replying-to','Replying to {{name}}',{name:m.sender_name||(currentOther&&currentOther.name)||''});
   document.getElementById('replySnippet').textContent=previewOf(m);
   document.getElementById('replyBar').classList.add('show');
   document.querySelectorAll('.row.show-acts').forEach(r=>r.classList.remove('show-acts'));
@@ -791,7 +799,7 @@ function renderReacts(msgId){
   Object.entries(map).forEach(([u,e])=>{counts[e]=counts[e]||{n:0,mine:false};counts[e].n++;if(u===currentUser.id)counts[e].mine=true;});
   box.innerHTML=REACTIONS.filter(e=>counts[e]).map(e=>{
     const c=counts[e];
-    const label=c.mine?(c.n>1?'You and '+(currentOther?currentOther.name:'1 other'):'You')+' reacted '+e+'. Tap to remove':((currentOther?currentOther.name:'Someone')+' reacted '+e);
+    const label=c.mine?(c.n>1?(currentOther?T('react-you-and','You and {{name}} reacted {{e}}. Tap to remove',{name:currentOther.name,e:e}):T('react-you-other','You and 1 other reacted {{e}}. Tap to remove',{e:e})):T('react-you','You reacted {{e}}. Tap to remove',{e:e})):(currentOther?T('react-them','{{name}} reacted {{e}}',{name:currentOther.name,e:e}):T('react-someone','Someone reacted {{e}}',{e:e}));
     return `<button type="button" class="react-pill${c.mine?' mine':''}" data-e="${__esc(e)}" aria-label="${__esc(label)}" title="${__esc(label)}"><span aria-hidden="true">${e}</span>${c.n>1?'<span aria-hidden="true">'+c.n+'</span>':''}</button>`;
   }).join('');
   box.querySelectorAll('.react-pill').forEach(b=>b.addEventListener('click',()=>react(msgId,b.dataset.e)));
@@ -809,7 +817,7 @@ function openPicker(msgId,anchor){
   if(pickerFor===msgId&&pk.classList.contains('open')){closePicker();return;}
   pickerFor=msgId;
   const mine=(reactMap[msgId]||{})[currentUser.id];
-  pk.innerHTML=REACTIONS.map(e=>`<button type="button" data-e="${__esc(e)}" class="${mine===e?'mine':''}" aria-label="React ${e}" aria-pressed="${mine===e}">${e}</button>`).join('');
+  pk.innerHTML=REACTIONS.map(e=>`<button type="button" data-e="${__esc(e)}" class="${mine===e?'mine':''}" aria-label="${H('react-with','React {{e}}',{e:e})}" aria-pressed="${mine===e}">${e}</button>`).join('');
   pk.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>react(msgId,b.dataset.e)));
   pk.classList.add('open');
   const area=document.getElementById('chatArea').getBoundingClientRect();
@@ -827,9 +835,9 @@ function setAttachment(file){
   const w=document.getElementById('contactWarning');
   if(!file)return;
   const t=file.type||(/\.docx$/i.test(file.name)?'application/vnd.openxmlformats-officedocument.wordprocessingml.document':'');
-  if(!FILE_TYPES[t]){w.textContent='⚠️ You can send photos (JPG, PNG, WebP), PDFs and Word documents.';w.style.display='block';return;}
-  if(file.size>MAX_FILE){w.textContent='⚠️ That file is '+fmtSize(file.size)+'. Files can be up to 10 MB.';w.style.display='block';return;}
-  if(file.size===0){w.textContent='⚠️ That file is empty.';w.style.display='block';return;}
+  if(!FILE_TYPES[t]){w.textContent='⚠️ '+T('bad-type','You can send photos (JPG, PNG, WebP), PDFs and Word documents.');w.style.display='block';return;}
+  if(file.size>MAX_FILE){w.textContent='⚠️ '+T('too-big','That file is {{size}}. Files can be up to 10 MB.',{size:fmtSize(file.size)});w.style.display='block';return;}
+  if(file.size===0){w.textContent='⚠️ '+T('empty-file','That file is empty.');w.style.display='block';return;}
   w.style.display='none';
   attachFile=file;attachFile._type=t;
   const th=document.getElementById('attachThumb');
@@ -856,7 +864,7 @@ function updateSeen(){
   c.querySelectorAll('.seen').forEach(e=>e.remove());
   if(!lastMsg||lastMsg.sender_id!==currentUser.id||!lastMsg.id||!myMsgs[lastMsg.id])return;
   const s=document.createElement('div');s.className='seen';
-  s.textContent=myMsgs[lastMsg.id].read?'Seen':'Sent';
+  s.textContent=myMsgs[lastMsg.id].read?T('seen','Seen'):T('sent','Sent');
   lastMsg._row.after(s);
 }
 
@@ -877,8 +885,8 @@ function renderQuickReplies(list){
   const iSpoke=(list||[]).some(m=>m.sender_id===currentUser.id);
   if(iSpoke){box.innerHTML='';box.style.display='none';return;}
   const opts=currentRole==='tutor'
-    ? ['Hi! Thanks for your message.','Which topic do you need help with?','You can book a session from my profile.']
-    : ['Hi! Are you available this week?','Could you help me prepare for an exam?','What would a first session look like?'];
+    ? [T('qr-t1','Hi! Thanks for your message.'),T('qr-t2','Which topic do you need help with?'),T('qr-t3','You can book a session from my profile.')]
+    : [T('qr-s1','Hi! Are you available this week?'),T('qr-s2','Could you help me prepare for an exam?'),T('qr-s3','What would a first session look like?')];
   box.style.display='flex';
   box.innerHTML=opts.map(o=>`<button type="button" data-q="${__esc(o)}">${__esc(o)}</button>`).join('');
   box.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
@@ -892,10 +900,10 @@ function renderQuickReplies(list){
 // number, email, or social handle to move the conversation off-platform.
 function detectContactInfo(text) {
   const patterns = [
-    { re: /[\w.+-]+@[\w-]+\.[a-z]{2,}/i, label: 'an email address' },
-    { re: /(?:\+?\d[\s.-]?){7,}/, label: 'a phone number' },
-    { re: /\b(?:wa\.me|t\.me|instagram\.com|snapchat\.com|discord\.gg)\/\S+/i, label: 'a social media link' },
-    { re: /\b(?:whatsapp|whats app|telegram|snap(?:chat)?|insta(?:gram)?|discord|tiktok|imessage|line id|wechat)\b.{0,15}[@#]?[\w.]{3,}/i, label: 'a social media handle' },
+    { re: /[\w.+-]+@[\w-]+\.[a-z]{2,}/i, label: T('c-email','an email address') },
+    { re: /(?:\+?\d[\s.-]?){7,}/, label: T('c-phone','a phone number') },
+    { re: /\b(?:wa\.me|t\.me|instagram\.com|snapchat\.com|discord\.gg)\/\S+/i, label: T('c-link','a social media link') },
+    { re: /\b(?:whatsapp|whats app|telegram|snap(?:chat)?|insta(?:gram)?|discord|tiktok|imessage|line id|wechat)\b.{0,15}[@#]?[\w.]{3,}/i, label: T('c-handle','a social media handle') },
   ];
   for (const p of patterns) {
     if (p.re.test(text)) return p.label;
@@ -915,7 +923,7 @@ async function sendMessage(retry){
   const warningEl = document.getElementById('contactWarning');
   const detected = content?detectContactInfo(content):null;
   if (detected) {
-    warningEl.textContent = `⚠️ It looks like your message may contain ${detected}. For your safety and to keep your booking protections active, contact details can't be shared in chat — you'll be able to exchange them once your session is confirmed. Please edit your message to send it.`;
+    warningEl.textContent = '⚠️ ' + T('contact-warning', 'It looks like your message may contain {{what}}. For your safety and to keep your booking protections active, contact details can\'t be shared in chat — you\'ll be able to exchange them once your session is confirmed. Please edit your message to send it.', { what: detected });
     warningEl.style.display = 'block';
     return;
   }
@@ -936,10 +944,10 @@ async function sendMessage(retry){
     if(convId!==currentConvId)return;
     pendingRow.classList.remove('pending');pendingRow.classList.add('failed');
     const note=document.createElement('div');note.className='fail-note';
-    note.innerHTML='Not sent · <button type="button">Retry</button>';
+    note.innerHTML=H('not-sent','Not sent')+' · <button type="button">'+H('retry','Retry')+'</button>';
     note.querySelector('button').addEventListener('click',()=>sendMessage({content,file,reply,row:pendingRow}));
     pendingRow.after(note);
-    warningEl.textContent = '⚠️ ' + __friendlyDbError(err, 'Your message could not be sent. Please try again.');
+    warningEl.textContent = '⚠️ ' + (window.I18N ? I18N.server(__friendlyDbError(err, T('send-failed', 'Your message could not be sent. Please try again.'))) : __friendlyDbError(err, 'Your message could not be sent. Please try again.'));
     warningEl.style.display = 'block';
     scrollToBottom(false,true);
   };
@@ -957,7 +965,7 @@ async function sendMessage(retry){
   // Upload the file first (private folder; only the two of you can open it)
   if(file){
     const {error:upErr}=await _sb.storage.from('messages').upload(path,file,{contentType:fType,upsert:false});
-    if(upErr){fail({message:/size|large/i.test(upErr.message||'')?'That file is too large (max 10 MB).':''});return;}
+    if(upErr){fail({message:/size|large/i.test(upErr.message||'')?T('too-large','That file is too large (max 10 MB).'):''});return;}
   }
 
   const row={
@@ -1071,7 +1079,7 @@ function toggleMobileNav(btn, force) {
   n.style.display = open ? 'flex' : 'none';
   btn.textContent = open ? '✕' : '☰';
   btn.setAttribute('aria-expanded', open);
-  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  btn.setAttribute('aria-label', open ? (window.I18N ? I18N.t('nav.closeMenu', 'Close menu') : 'Close menu') : (window.I18N ? I18N.t('nav.openMenu', 'Open menu') : 'Open menu'));
 }
 document.addEventListener('click', e => {
   const n = document.getElementById('mobileNav'); if (!n || n.style.display !== 'flex') return;
