@@ -353,6 +353,7 @@ test('translated pages: every visible text, label and placeholder is marked for 
       const m = marked || a('data-i18n') != null;
       const covered = (a('data-i18n-attr') || '').split(';').map(x => x.split(':')[0]);
       if (!m) for (const k of ATTRS) { const v = a(k); if (v && words(v) && !covered.includes(k)) missed.push(`<${n.nodeName} ${k}="${v}">`); }
+      if (!m && n.nodeName === 'input' && /^(button|submit|reset)$/i.test(a('type') || '') || (n.nodeName === 'input' && a('readonly') != null)) { const v = a('value'); if (v && words(v) && !covered.includes('value')) missed.push(`<input value="${v}">`); }
       if (n.nodeName === '#text' && !m && words(n.value)) missed.push(n.value.trim().slice(0, 60));
       if (SKIP.has(n.nodeName)) return;
       for (const c of n.childNodes || []) visit(c, m);

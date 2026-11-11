@@ -132,5 +132,6 @@
   "student-dashboard.js.st.completed": "completed",
   "student-dashboard.js.st.cancelled": "cancelled",
   "student-dashboard.js.st.declined": "declined",
-  "student-dashboard.js.st.refunded": "refunded"
+  "student-dashboard.js.st.refunded": "refunded",
+  "student-dashboard.loading-your-link.value": "Loading your link..."
 }

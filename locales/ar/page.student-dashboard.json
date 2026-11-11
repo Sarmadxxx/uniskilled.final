@@ -140,5 +140,6 @@
   "student-dashboard.js.st.completed": "مكتملة",
   "student-dashboard.js.st.cancelled": "ملغاة",
   "student-dashboard.js.st.declined": "مرفوضة",
-  "student-dashboard.js.st.refunded": "مستردّة"
+  "student-dashboard.js.st.refunded": "مستردّة",
+  "student-dashboard.loading-your-link.value": "جارٍ تحميل رابطك..."
 }
