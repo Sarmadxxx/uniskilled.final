@@ -88,6 +88,161 @@
     return T('g.earlier', 'Earlier');
   }
 
+  // ── Stored notifications in the reader's language ────────────────────────────────────────
+  // Notifications are saved in English by whoever creates them (pages, server functions, database).
+  // On non-English pages each known wording is recognised and shown in the reader's language,
+  // keeping the names, subjects and amounts inside it. Unknown text is shown exactly as stored.
+  // English pages never use this: they show the stored text as before.
+  var MESSAGES = [
+    ["t.referral-credit", "🎁 You earned a €10 referral credit!"],
+    ["t.payout-sent", "💸 Payout sent: {{amount}}"],
+    ["t.resched-req", "🔄 New time requested"],
+    ["t.resched-declined", "New time declined"],
+    ["t.rescheduled", "🔄 Session rescheduled"],
+    ["t.tutor-answered", "✅ A verified tutor answered your post"],
+    ["t.new-comment", "💬 New comment on your post"],
+    ["t.uni-verified", "✅ University verified"],
+    ["t.referral-joined", "🎉 Someone joined using your link!"],
+    ["t.dispute-resolved-mine", "✅ Your dispute has been resolved"],
+    ["t.dispute-resolved", "Dispute resolved"],
+    ["t.payment-confirmed", "✅ Payment confirmed!"],
+    ["t.payment-received", "💰 Payment received!"],
+    ["t.issue-reported", "⚠️ An issue has been reported"],
+    ["t.report-submitted", "Your report has been submitted"],
+    ["t.payment-expired", "⏰ Payment window expired"],
+    ["t.slot-reopened", "Slot reopened"],
+    ["t.payment-due", "⏳ Payment due soon"],
+    ["t.rate", "⭐ How was your lesson?"],
+    ["t.gs-cancelled-refunded", "↩️ Group session cancelled — refunded"],
+    ["t.gs-cancelled-x", "❌ Group session cancelled"],
+    ["t.gs-cancelled", "Group session cancelled"],
+    ["t.booking-cancelled-x", "❌ Booking cancelled"],
+    ["t.booking-cancelled", "Booking cancelled"],
+    ["t.session-cancelled-x", "❌ Session cancelled"],
+    ["t.session-cancelled", "Session cancelled"],
+    ["t.new-request", "📅 New session request — {{subject}}"],
+    ["t.gs-created", "🚀 A group session was just created for you!"],
+    ["t.tutor-accepted", "🎉 Your tutor accepted!"],
+    ["t.declined", "❌ Session declined"],
+    ["t.tutor-found", "🎉 A tutor found you!"],
+    ["t.lesson-started", "📹 {{name}} has started the lesson"],
+    ["t.in-classroom", "📹 {{name}} is in the classroom"],
+    ["t.new-message", "New message from {{name}}"],
+    ["t.liked", "❤️ Someone liked your post"],
+    ["t.new-review", "⭐ New {{n}}-star review"],
+    ["t.cert-request", "Certificate request"],
+    ["t.cert-shared", "Certificates shared with you"],
+    ["t.cert-declined", "Certificate request declined"],
+    ["t.lesson-1h", "⏰ Your lesson starts in 1 hour"],
+    ["t.req-released-student", "Request released — no answer from the tutor"],
+    ["t.req-released-tutor", "Request released without an answer"],
+    ["t.waiting", "⏳ A student is waiting for your answer"],
+    ["t.course-match", "🎓 A tutor for {{subject}} just joined"],
+    ["b.referral-credit", "The person you referred just completed their first session on UniSkilled. €10 has been added to your account credit."],
+    ["b.payout-sent", "Your earnings for {{subject}} have been released. Banks usually take 1–3 business days."],
+    ["b.resched-req", "{{name}} asked to move your {{subject}} session to {{date}} at {{time}}. Accept or decline it on your dashboard."],
+    ["b.resched-declined", "{{name}} couldn't make {{date}} at {{time}}. Your {{subject}} session stays at its current time."],
+    ["b.rescheduled-mine", "Your {{subject}} session is now on {{date}} at {{time}}."],
+    ["b.rescheduled", "{{name}} accepted. Your {{subject}} session is now on {{date}} at {{time}}."],
+    ["b.feed-reply", "{{name}} replied: \"{{text}}\""],
+    ["b.uni-verified", "Your profile now shows the Verified badge for {{uni}}."],
+    ["b.referral-joined-student", "A new student signed up using your referral link. You'll earn a credit once they complete their first session."],
+    ["b.referral-joined-tutor", "A new tutor signed up using your referral link. You'll earn a credit once they complete their first session."],
+    ["b.dispute-released", "We've reviewed the {{subject}} session. The tutor will be paid as normal."],
+    ["b.dispute-refunded", "We've reviewed the {{subject}} session. The student has been fully refunded."],
+    ["b.dispute-partial", "We've reviewed the {{subject}} session. The student has been refunded {{amount}} {{currency}}."],
+    ["b.gs-confirmed", "You're in for the {{subject}} group session with {{name}}. If the group doesn't reach 2 paid students by 12 hours before the session, you'll be automatically refunded."],
+    ["b.gs-paid", "{{name}} has joined and paid for your {{subject}} group session."],
+    ["b.confirmed-credit", "Your session with {{name}} is all set. A {{amount}} credit was applied."],
+    ["b.confirmed-discount", "Your session with {{name}} is all set. A {{amount}} discount was applied."],
+    ["b.confirmed", "Your session with {{name}} is all set."],
+    ["b.paid", "{{name}} has completed payment for your {{subject}} session."],
+    ["b.dispute-against", "A dispute has been opened regarding your {{subject}} session. Our team will review it before any payout."],
+    ["b.dispute-opener", "We've received your report about the {{subject}} session. We'll review it and follow up."],
+    ["b.spot-expired", "Your window to pay for the {{subject}} session spot has passed."],
+    ["b.expired-student", "Your window to pay for the {{subject}} session with {{name}} has passed."],
+    ["b.expired-tutor", "{{name}} did not complete payment in time for the {{subject}} session."],
+    ["b.due-soon", "Your {{subject}} session with {{name}} isn't confirmed yet. Complete payment before the deadline to keep it."],
+    ["b.rate", "Rate your {{subject}} lesson with {{name}}. It takes 20 seconds."],
+    ["b.gs-min-refunded", "The {{subject}} group session didn't reach the minimum of 2 students, so it's been cancelled. Your payment has been refunded."],
+    ["b.gs-min-manual", "The {{subject}} group session didn't reach the minimum of 2 students, so it's been cancelled. Our team will process your refund manually."],
+    ["b.gs-min-tutor", "Your {{subject}} group session didn't reach 2 paid students in time, so it's been automatically cancelled."],
+    ["b.unpaid-cancel-mine", "You cancelled the {{subject}} booking. Nothing was charged."],
+    ["b.unpaid-cancel", "{{name}} cancelled the {{subject}} booking before it was paid. Nothing was charged."],
+    ["b.cancel-mine-refund", "You cancelled the {{subject}} session. A full refund has been issued."],
+    ["b.cancel-mine-norefund", "You cancelled the {{subject}} session. No refund applies for this cancellation."],
+    ["b.cancel-refund", "{{name}} cancelled the {{subject}} session. A full refund has been issued."],
+    ["b.cancel-norefund", "{{name}} cancelled the {{subject}} session. No refund applies for this cancellation."],
+    ["b.new-request", "{{name}} would like to book a {{subject}} session for {{price}}. No payment has been taken yet."],
+    ["b.gs-created", "{{name}} created a {{subject}} group session on {{date}} at {{time}} — the exact thing you requested. Join now before spots fill up."],
+    ["b.accepted-hours", "{{name}} accepted your {{subject}} request. Complete payment within {{count}} hours to lock it in."],
+    ["b.accepted-minutes", "{{name}} accepted your {{subject}} request. Complete payment within {{count}} minutes to lock it in."],
+    ["b.declined", "Your {{subject}} session request was declined."],
+    ["b.tutor-found", "{{name}} can help with {{subject}}. Check your messages to get started."],
+    ["b.lesson-ready-tutor", "Your {{subject}} lesson is ready. Click to join the classroom."],
+    ["b.lesson-ready", "Your {{subject}} lesson is ready. Click to join."],
+    ["b.liked", "{{name}} found your post helpful."],
+    ["b.new-review", "{{name}} rated your {{subject}} lesson."],
+    ["b.cert-request", "{{name}} asked to see your certificates."],
+    ["b.cert-shared", "{{name}} shared their certificates with you."],
+    ["b.cert-declined", "{{name}} declined your request to see their certificates."],
+    ["b.lesson-soon", "Your {{subject}} lesson starts soon. The lesson room opens 10 minutes before."],
+    ["b.released-student", "Your {{subject}} request got no answer in time, so we released it. You have not been charged. Book another tutor anytime."],
+    ["b.released-tutor", "A {{subject}} request was not answered in time and was released."],
+    ["b.nudge", "Please accept or decline the {{subject}} request by {{deadline}}, or it is released automatically."],
+    ["b.course-match", "You asked for help with {{subject}}. A tutor who teaches it is now available."]
+  ];
+  var COMPILED = null;
+  function rxEsc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+  function compileMessages() {
+    COMPILED = MESSAGES.map(function (m) {
+      var names = [];
+      var src = '^' + m[1].split(/(\{\{\w+\}\})/).map(function (part) {
+        var v = part.match(/^\{\{(\w+)\}\}$/);
+        if (v) { names.push(v[1]); return '([\\s\\S]+?)'; }
+        return rxEsc(part);
+      }).join('') + '$';
+      return { key: m[0], en: m[1], re: new RegExp(src), names: names };
+    });
+  }
+  var FALLBACK_WORDS = { 'A student': 'vf.a-student', 'Someone': 'vf.someone', 'The tutor': 'vf.the-tutor', 'Your student': 'vf.your-student', 'your session': 'vf.your-session', 'group': 'vf.group' };
+  var DATE_WORDS = null;
+  function dateWords() {
+    if (DATE_WORDS) return DATE_WORDS;
+    DATE_WORDS = {};
+    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    try {
+      months.forEach(function (m, i) { DATE_WORDS[m] = I18N.date(new Date(2026, i, 15), { month: 'long' }); });
+      days.forEach(function (d, i) { DATE_WORDS[d] = I18N.date(new Date(2026, 10, 16 + i), { weekday: 'long' }); });   // 16 Nov 2026 is a Monday
+    } catch (e) { /* keep English words */ }
+    return DATE_WORDS;
+  }
+  function localizeValue(name, v) {
+    if (FALLBACK_WORDS[v]) return T(FALLBACK_WORDS[v], v);
+    if (name === 'date' || name === 'time' || name === 'deadline') {
+      var w = dateWords();
+      v = v.replace(/\(([^()]+) time\)/, function (m, city) { return '(' + T('tz', '{{zone}} time', { zone: city }) + ')'; })
+        .replace(/\b(January|February|March|April|May|June|July|August|September|October|November|December|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b/g, function (x) { return w[x] || x; })
+        .replace(/\bat\b/, T('at', 'at'))
+        .replace(/, /g, T('comma', ', '));
+    }
+    return v;
+  }
+  function tr(text) {
+    if (!NON_EN || !text) return text;
+    if (!COMPILED) compileMessages();
+    for (var i = 0; i < COMPILED.length; i++) {
+      var c = COMPILED[i], m = c.re.exec(text);
+      if (!m) continue;
+      var vars = {};
+      c.names.forEach(function (n, j) { vars[n] = localizeValue(n, m[j + 1]); });
+      return T('msg.' + c.key, c.en, vars);
+    }
+    return text;
+  }
+  window.USKNotifyText = tr;   // for tests
+
   // ── State ────────────────────────────────────────────────────────────────────────────────
   var S = { sb: null, userId: null, role: 'student', items: [], unread: 0, filter: 'all', open: false, onSectionCounts: null, baseTitle: document.title, fulls: [], pageSize: 30, exhausted: false };
 
@@ -216,8 +371,8 @@
     var act = actionLabel(n, S.role);
     return '<div class="usk-item' + (n.read ? '' : ' unread') + '" role="link" tabindex="0" data-id="' + esc(n.id) + '">' +
       '<div class="usk-ico" style="background:' + c.bg + ';color:' + c.color + '">' + svg(c.icon) + '</div>' +
-      '<div class="usk-main"><div class="usk-title">' + esc(n.title || T('notification', 'Notification')) + '</div>' +
-      (n.body ? '<div class="usk-body">' + esc(n.body) + '</div>' : '') +
+      '<div class="usk-main"><div class="usk-title">' + esc(tr(n.title) || T('notification', 'Notification')) + '</div>' +
+      (n.body ? '<div class="usk-body">' + esc(tr(n.body)) + '</div>' : '') +
       '<div class="usk-meta"><span class="usk-tag" style="background:' + c.bg + ';color:' + c.color + '">' + esc(c.label) + '</span>' +
       '<time datetime="' + esc(n.created_at) + '" title="' + esc(NON_EN ? I18N.dateTime(n.created_at) : new Date(n.created_at).toLocaleString()) + '">' + esc(ago(n.created_at)) + '</time></div></div>' +
       (act ? '<button type="button" class="usk-act" data-act="open">' + esc(act) + '</button>' : '') +
@@ -388,8 +543,8 @@
     t.setAttribute('role', 'status');
     var act = actionLabel(n, S.role) || T('act.view', 'View');
     t.innerHTML = '<div class="usk-ico" style="background:' + c.bg + ';color:' + c.color + '">' + svg(c.icon) + '</div>' +
-      '<div class="usk-main"><div class="usk-title">' + esc(n.title || T('new', 'New notification')) + '</div>' +
-      (n.body ? '<div class="usk-body">' + esc(n.body) + '</div>' : '') +
+      '<div class="usk-main"><div class="usk-title">' + esc(tr(n.title) || T('new', 'New notification')) + '</div>' +
+      (n.body ? '<div class="usk-body">' + esc(tr(n.body)) + '</div>' : '') +
       '<button type="button" class="usk-act" style="margin:8px 0 0">' + esc(act) + '</button></div>' +
       '<button type="button" class="usk-x" aria-label="' + esc(T('dismiss', 'Dismiss')) + '">×</button>';
     t.addEventListener('click', function (e) {
@@ -408,7 +563,7 @@
   function desktopAlert(n) {
     if (!('Notification' in window) || Notification.permission !== 'granted' || !document.hidden) return;
     try {
-      var d = new Notification(n.title || 'UniSkilled', { body: n.body || '', icon: 'icon-192.png', tag: n.id });
+      var d = new Notification(tr(n.title) || 'UniSkilled', { body: tr(n.body) || '', icon: 'icon-192.png', tag: n.id });
       d.onclick = function () { window.focus(); openItem(n); d.close(); };
     } catch (e) { /* some browsers only allow this from a service worker */ }
   }
