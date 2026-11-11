@@ -209,3 +209,7 @@
   direction: ltr;
   unicode-bidi: isolate;
 }
+
+/* Sign-up and classroom header: the "Already have an account? Sign in" line reads right to left
+   (the logo beside it stays on the left). */
+header.top p { direction: rtl !important; unicode-bidi: isolate !important; }

@@ -50,6 +50,9 @@
     },
     "page.tutor-dashboard": {
       "ar": "reviewed"
+    },
+    "page.onboarding": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
