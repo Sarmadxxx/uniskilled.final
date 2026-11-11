@@ -32,6 +32,12 @@
     },
     "page.404": {
       "ar": "reviewed"
+    },
+    "page.signin": {
+      "ar": "reviewed"
+    },
+    "page.tutor-profile": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
