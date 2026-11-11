@@ -38,5 +38,37 @@
   "langs.levelFor": "مستوى {{language}}",
   "langs.level.native": "اللغة الأم",
   "langs.level.fluent": "بطلاقة",
-  "langs.level.conversational": "مستوى محادثة"
+  "langs.level.conversational": "مستوى محادثة",
+  "reviews.student": "طالب",
+  "reviews.new-tutor": "مدرّس جديد",
+  "reviews.count": {
+    "zero": "{{count}} مراجعة",
+    "one": "{{count}} مراجعة",
+    "two": "{{count}} مراجعتان",
+    "few": "{{count}} مراجعات",
+    "many": "{{count}} مراجعة",
+    "other": "{{count}} مراجعة"
+  },
+  "reviews.count-avg": {
+    "zero": "{{count}} مراجعة",
+    "one": "{{count}} مراجعة",
+    "two": "{{count}} مراجعتان",
+    "few": "{{count}} مراجعات",
+    "many": "{{count}} مراجعة",
+    "other": "{{count}} مراجعة"
+  },
+  "reviews.new": "جديد",
+  "reviews.reply-from-tutor": "ردّ المدرّس",
+  "reviews.edit-reply": "تعديل ردّك",
+  "reviews.reply-publicly": "الردّ علنًا",
+  "reviews.reply-placeholder": "اشكر الطالب أو أضف توضيحًا. ردّك يظهر للجميع.",
+  "reviews.publish-reply": "نشر الردّ",
+  "reviews.remove-reply": "إزالة الردّ",
+  "reviews.cancel": "إلغاء",
+  "reviews.verified-lesson-title": "حجز هذا الطالب درسًا مع هذا المدرّس ودفع ثمنه",
+  "reviews.verified-lesson": "درس موثّق",
+  "reviews.edited": "مُعدَّلة",
+  "reviews.stars": "{{n}} من 5",
+  "reviews.save-failed": "تعذّر حفظ ردّك. يُرجى المحاولة مرة أخرى.",
+  "reviews.confirm-remove": "هل تريد إزالة ردّك العلني؟"
 }

@@ -8,7 +8,7 @@ import { readFileSync, existsSync, mkdirSync, cpSync, rmSync } from 'node:fs';
 const ROOT = join(__dirname, '..', '..');
 const SITE = join(ROOT, 'test-results', 'built-site');
 const AR_LIVE = JSON.parse(readFileSync(join(ROOT, 'locales', 'languages.json'), 'utf8')).languages.find((l: any) => l.code === 'ar').live;
-const PAGES = ['index.html', 'about.html', 'find-tutors.html', 'courses.html', 'group-sessions.html', '404.html'];
+const PAGES = ['index.html', 'about.html', 'find-tutors.html', 'courses.html', 'group-sessions.html', '404.html', 'signin.html'];
 
 test.beforeAll(() => {
   if (existsSync(join(SITE, 'ar', 'index.html'))) return;

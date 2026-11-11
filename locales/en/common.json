@@ -38,5 +38,29 @@
   "langs.levelFor": "Level for {{language}}",
   "langs.level.native": "Native",
   "langs.level.fluent": "Fluent",
-  "langs.level.conversational": "Conversational"
+  "langs.level.conversational": "Conversational",
+  "reviews.student": "Student",
+  "reviews.new-tutor": "New tutor",
+  "reviews.count": {
+    "one": "{{count}} review",
+    "other": "{{count}} reviews"
+  },
+  "reviews.count-avg": {
+    "one": "{{count}} reviews",
+    "other": "{{count}} reviews"
+  },
+  "reviews.new": "New",
+  "reviews.reply-from-tutor": "Reply from the tutor",
+  "reviews.edit-reply": "Edit your reply",
+  "reviews.reply-publicly": "Reply publicly",
+  "reviews.reply-placeholder": "Thank the student or add context. Your reply is public.",
+  "reviews.publish-reply": "Publish reply",
+  "reviews.remove-reply": "Remove reply",
+  "reviews.cancel": "Cancel",
+  "reviews.verified-lesson-title": "This student booked and paid for a lesson with this tutor",
+  "reviews.verified-lesson": "Verified lesson",
+  "reviews.edited": "edited",
+  "reviews.stars": "{{n}} out of 5",
+  "reviews.save-failed": "Your reply couldn't be saved. Please try again.",
+  "reviews.confirm-remove": "Remove your public reply?"
 }

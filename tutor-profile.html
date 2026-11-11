@@ -4,22 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="sentry.js"></script>
+<script src="i18n.js"></script>
 <link rel="icon" href="favicon.ico?v=20261101" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261101">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
-<meta name="description" id="metaDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
+<meta data-i18n-attr="content:tutor-profile.meta.description" name="description" id="metaDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
-<meta property="og:title" id="ogTitle" content="Tutor Profile — UniSkilled">
-<meta property="og:description" id="ogDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
+<meta data-i18n-attr="content:tutor-profile.meta.og-title" property="og:title" id="ogTitle" content="Tutor Profile — UniSkilled">
+<meta data-i18n-attr="content:tutor-profile.meta.og-description" property="og:description" id="ogDesc" content="View this university-verified tutor&#x27;s subjects, rate, availability and reviews, and request a session on UniSkilled.">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_GB">
-<title>Tutor Profile — UniSkilled</title>
+<title data-i18n="tutor-profile.title">Tutor Profile — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -255,7 +256,7 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- COVER -->
 <div class="cover-wrap" id="coverWrap">
   <div id="coverContent" class="cover-default"></div>
-  <button class="cover-edit" id="coverEditBtn" style="display:none;" onclick="document.getElementById('coverInput').click()">📷 Change cover</button>
+  <button data-i18n="tutor-profile.change-cover" class="cover-edit" id="coverEditBtn" style="display:none;" onclick="document.getElementById('coverInput').click()">📷 Change cover</button>
   <input type="file" id="coverInput" accept="image/*" style="display:none;">
 </div>
 
@@ -270,10 +271,10 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
       </div>
       <div class="identity-info">
         <div class="identity-name-row">
-          <h1 class="profile-name" id="profileName">Loading...</h1>
-          <div class="verified-badge" id="verifiedBadge" style="display:none;">✓ Verified Tutor</div>
+          <h1 data-i18n="tutor-profile.loading" class="profile-name" id="profileName">Loading...</h1>
+          <div data-i18n="tutor-profile.verified-tutor" class="verified-badge" id="verifiedBadge" style="display:none;">✓ Verified Tutor</div>
         </div>
-        <a id="verifyNudge" href="tutor-dashboard.html#verify" style="display:none;margin-top:0.35rem;font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;" class="hit">Get your Verified badge — verify your university email →</a>
+        <a data-i18n="tutor-profile.get-your-verified-badge" id="verifyNudge" href="tutor-dashboard.html#verify" style="display:none;margin-top:0.35rem;font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;" class="hit">Get your Verified badge — verify your university email →</a>
         <div class="profile-title" id="profileTitle"></div>
         <div class="profile-meta" id="profileMeta"></div>
         <div class="profile-tags" id="profileTags"></div>
@@ -281,10 +282,10 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
       <div class="profile-actions" id="profileActions"></div>
     </div>
     <div class="profile-stats" id="profileStats">
-      <div class="stat-item"><div class="stat-num" id="statSessions">0</div><div class="stat-lbl">Sessions</div></div>
-      <div class="stat-item"><div class="stat-num" id="statRating">New</div><div class="stat-lbl">Rating</div></div>
-      <div class="stat-item"><div class="stat-num" id="statReviews">0</div><div class="stat-lbl">Reviews</div></div>
-      <div class="stat-item"><div class="stat-num" id="statMemberSince" style="font-size:0.95rem;">—</div><div class="stat-lbl">Member since</div></div>
+      <div class="stat-item"><div class="stat-num" id="statSessions">0</div><div data-i18n="tutor-profile.sessions" class="stat-lbl">Sessions</div></div>
+      <div class="stat-item"><div data-i18n="tutor-profile.new" class="stat-num" id="statRating">New</div><div data-i18n="tutor-profile.rating" class="stat-lbl">Rating</div></div>
+      <div class="stat-item"><div class="stat-num" id="statReviews">0</div><div data-i18n="tutor-profile.reviews" class="stat-lbl">Reviews</div></div>
+      <div class="stat-item"><div class="stat-num" id="statMemberSince" style="font-size:0.95rem;">—</div><div data-i18n="tutor-profile.member-since" class="stat-lbl">Member since</div></div>
     </div>
   </div>
 </div>
@@ -296,21 +297,21 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- ABOUT -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">About</h2>
-        <button class="edit-btn owner-only" onclick="openModal('modalBio')" style="display:none;">✏️ Edit</button>
+        <h2 data-i18n="tutor-profile.about" class="card-title">About</h2>
+        <button data-i18n="tutor-profile.edit" class="edit-btn owner-only" onclick="openModal('modalBio')" style="display:none;">✏️ Edit</button>
       </div>
       <div class="card-body">
-        <p class="about-text" id="bioText"><span class="empty">No bio added yet.</span></p>
+        <p data-i18n="tutor-profile.no-bio-added-yet" class="about-text" id="bioText"><span class="empty">No bio added yet.</span></p>
       </div>
     </div>
 
     <!-- SUBJECTS -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Subjects I teach</h2>
-        <button class="edit-btn owner-only" onclick="openModal('modalSubjects')" style="display:none;">✏️ Edit</button>
+        <h2 data-i18n="tutor-profile.subjects-i-teach" class="card-title">Subjects I teach</h2>
+        <button data-i18n="tutor-profile.edit-2" class="edit-btn owner-only" onclick="openModal('modalSubjects')" style="display:none;">✏️ Edit</button>
       </div>
-      <div class="card-body" id="subjectsBody">
+      <div data-i18n="tutor-profile.no-subjects-added-yet" class="card-body" id="subjectsBody">
         <span class="empty">No subjects added yet.</span>
       </div>
     </div>
@@ -318,22 +319,22 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- COURSES -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Courses I've passed</h2>
-        <button class="edit-btn owner-only" onclick="openModal('modalCourses')" style="display:none;">✏️ Edit</button>
+        <h2 data-i18n="tutor-profile.courses-ive-passed" class="card-title">Courses I've passed</h2>
+        <button data-i18n="tutor-profile.edit-3" class="edit-btn owner-only" onclick="openModal('modalCourses')" style="display:none;">✏️ Edit</button>
       </div>
-      <div class="card-body" id="coursesBody">
+      <div data-i18n="tutor-profile.no-courses-added-yet" class="card-body" id="coursesBody">
         <span class="empty">No courses added yet.</span>
       </div>
-      <p class="owner-only" style="display:none;font-size:0.75rem;color:var(--mid);margin:0 1.4rem 1.2rem;">Add the exact courses you passed and where. Students search for their own course, so this is how they find you.</p>
+      <p data-i18n="tutor-profile.add-the-exact-courses" class="owner-only" style="display:none;font-size:0.75rem;color:var(--mid);margin:0 1.4rem 1.2rem;">Add the exact courses you passed and where. Students search for their own course, so this is how they find you.</p>
     </div>
 
     <!-- ACADEMIC -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Academic background</h2>
-        <button class="edit-btn owner-only" onclick="openModal('modalAcademic')" style="display:none;">✏️ Edit</button>
+        <h2 data-i18n="tutor-profile.academic-background" class="card-title">Academic background</h2>
+        <button data-i18n="tutor-profile.edit-4" class="edit-btn owner-only" onclick="openModal('modalAcademic')" style="display:none;">✏️ Edit</button>
       </div>
-      <div class="card-body" id="academicBody">
+      <div data-i18n="tutor-profile.no-academic-info-added" class="card-body" id="academicBody">
         <span class="empty">No academic info added yet.</span>
       </div>
     </div>
@@ -341,10 +342,10 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- CERTIFICATES -->
     <div class="card" id="certificates">
       <div class="card-head">
-        <h2 class="card-title">Certificates &amp; grades</h2>
-        <button class="edit-btn owner-only" onclick="openModal('modalCerts')" style="display:none;">✏️ Edit</button>
+        <h2 data-i18n="tutor-profile.certificates-grades" class="card-title">Certificates &amp; grades</h2>
+        <button data-i18n="tutor-profile.edit-5" class="edit-btn owner-only" onclick="openModal('modalCerts')" style="display:none;">✏️ Edit</button>
       </div>
-      <div class="card-body" id="certsBody">
+      <div data-i18n="tutor-profile.no-certificates-added-yet" class="card-body" id="certsBody">
         <span class="empty">No certificates added yet.</span>
       </div>
       <div class="card-body owner-only" id="certsAccess" style="display:none;border-top:1px solid var(--border);"></div>
@@ -353,10 +354,10 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- TEACHING LEVELS & LANGUAGES -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Levels &amp; languages</h2>
-        <button class="edit-btn owner-only" onclick="openModal('modalLevels')" style="display:none;">✏️ Edit</button>
+        <h2 data-i18n="tutor-profile.levels-languages" class="card-title">Levels &amp; languages</h2>
+        <button data-i18n="tutor-profile.edit-6" class="edit-btn owner-only" onclick="openModal('modalLevels')" style="display:none;">✏️ Edit</button>
       </div>
-      <div class="card-body" id="levelsBody">
+      <div data-i18n="tutor-profile.not-set-yet" class="card-body" id="levelsBody">
         <span class="empty">Not set yet.</span>
       </div>
     </div>
@@ -364,9 +365,9 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- TRACK RECORD -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Track record</h2>
+        <h2 data-i18n="tutor-profile.track-record" class="card-title">Track record</h2>
       </div>
-      <div class="card-body" id="trackRecordBody">
+      <div data-i18n="tutor-profile.no-completed-sessions-yet" class="card-body" id="trackRecordBody">
         <span class="empty">No completed sessions yet.</span>
       </div>
     </div>
@@ -374,10 +375,10 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- MEETING LINK (owner only — never shown to visitors) -->
     <div class="card owner-only" style="display:none;">
       <div class="card-head">
-        <h2 class="card-title">Backup meeting link</h2>
-        <button class="edit-btn owner-only" onclick="openMeetingLinkModal()" style="display:none;">✏️ Edit</button>
+        <h2 data-i18n="tutor-profile.backup-meeting-link" class="card-title">Backup meeting link</h2>
+        <button data-i18n="tutor-profile.edit-7" class="edit-btn owner-only" onclick="openMeetingLinkModal()" style="display:none;">✏️ Edit</button>
       </div>
-      <div class="card-body" id="meetingLinkBody">
+      <div data-i18n="tutor-profile.not-set-yet-2" class="card-body" id="meetingLinkBody">
         <span class="empty">Not set yet.</span>
       </div>
     </div>
@@ -385,16 +386,16 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- REVIEWS -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Student reviews</h2>
+        <h2 data-i18n="tutor-profile.student-reviews" class="card-title">Student reviews</h2>
         <div style="font-size:0.85rem;font-weight:700;color:var(--yellow);" id="avgRatingDisplay"></div>
       </div>
       <div id="reviewsBody">
-        <div class="reviews-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg><span><strong>No reviews yet.</strong> Only students who completed a paid session with this tutor on UniSkilled can leave a review.</span></div>
+        <div data-i18n="tutor-profile.no-reviews-yet-only" class="reviews-empty"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg><span><strong>No reviews yet.</strong> Only students who completed a paid session with this tutor on UniSkilled can leave a review.</span></div>
       </div>
       <div id="reviewFormWrap" style="display:none;border-top:1px solid var(--border);padding:1.4rem;">
-        <div style="font-weight:700;font-size:0.88rem;margin-bottom:0.4rem;">Had a lesson with this tutor?</div>
-        <p style="font-size:0.83rem;color:var(--mid);line-height:1.55;margin-bottom:0.8rem;">Each lesson can be rated once, by the student who had it. Rate your finished lessons from your dashboard.</p>
-        <a class="btn btn-primary" href="student-dashboard.html" style="width:100%;text-align:center;text-decoration:none;display:block;">Rate my lessons</a>
+        <div data-i18n="tutor-profile.had-a-lesson-with" style="font-weight:700;font-size:0.88rem;margin-bottom:0.4rem;">Had a lesson with this tutor?</div>
+        <p data-i18n="tutor-profile.each-lesson-can-be" style="font-size:0.83rem;color:var(--mid);line-height:1.55;margin-bottom:0.8rem;">Each lesson can be rated once, by the student who had it. Rate your finished lessons from your dashboard.</p>
+        <a data-i18n="tutor-profile.rate-my-lessons" class="btn btn-primary" href="student-dashboard.html" style="width:100%;text-align:center;text-decoration:none;display:block;">Rate my lessons</a>
       </div>
     </div>
 
@@ -407,22 +408,22 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <div class="card">
       <div class="card-body">
         <div class="rate-big" id="rateDisplay">—</div>
-        <div class="rate-sub">per hour</div>
+        <div data-i18n="tutor-profile.per-hour" class="rate-sub">per hour</div>
         <div id="bookActions"></div>
-        <div class="book-trust" id="bookTrust"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg><span>You're not charged until the tutor accepts. Payment is held for 48 hours after the session.</span></div>
+        <div data-i18n="tutor-profile.youre-not-charged-until" class="book-trust" id="bookTrust"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg><span>You're not charged until the tutor accepts. Payment is held for 48 hours after the session.</span></div>
       </div>
     </div>
 
     <!-- AVAILABILITY -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Availability</h2>
+        <h2 data-i18n="tutor-profile.availability" class="card-title">Availability</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalTeaching')" style="display:none;">✏️</button>
       </div>
       <div class="card-body">
         <div class="avail-grid" id="availGrid">
-          <div class="avail-chip off">Mo</div><div class="avail-chip off">Tu</div><div class="avail-chip off">We</div>
-          <div class="avail-chip off">Th</div><div class="avail-chip off">Fr</div><div class="avail-chip off">Sa</div><div class="avail-chip off">Su</div>
+          <div data-i18n="tutor-profile.mo" class="avail-chip off">Mo</div><div data-i18n="tutor-profile.tu" class="avail-chip off">Tu</div><div data-i18n="tutor-profile.we" class="avail-chip off">We</div>
+          <div data-i18n="tutor-profile.th" class="avail-chip off">Th</div><div data-i18n="tutor-profile.fr" class="avail-chip off">Fr</div><div data-i18n="tutor-profile.sa" class="avail-chip off">Sa</div><div data-i18n="tutor-profile.su" class="avail-chip off">Su</div>
         </div>
         <div style="font-size:0.78rem;color:var(--mid);margin-top:0.7rem;" id="prefTimeDisplay"></div>
       </div>
@@ -431,10 +432,10 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
     <!-- TEACHING -->
     <div class="card">
       <div class="card-head">
-        <h2 class="card-title">Teaching</h2>
+        <h2 data-i18n="tutor-profile.teaching" class="card-title">Teaching</h2>
         <button class="edit-btn owner-only" onclick="openModal('modalTeaching')" style="display:none;">✏️</button>
       </div>
-      <div class="card-body" id="teachingBody">
+      <div data-i18n="tutor-profile.not-set-yet-3" class="card-body" id="teachingBody">
         <span class="empty">Not set yet.</span>
       </div>
     </div>
@@ -447,18 +448,18 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- Bio -->
 <div class="modal-overlay" id="modalBio">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Edit About</div><button class="modal-close" onclick="closeModal('modalBio')">✕</button></div>
+    <div class="modal-head"><div data-i18n="tutor-profile.edit-about" class="modal-title">Edit About</div><button class="modal-close" onclick="closeModal('modalBio')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertBio"></div>
-      <div class="form-group"><label for="inputBio" class="form-label">Bio</label><textarea class="form-textarea" id="inputBio" rows="5" placeholder="Tell students about yourself..."></textarea></div>
-      <div class="form-group"><label for="inputFirst" class="form-label">First name</label><input type="text" class="form-input" id="inputFirst" placeholder="First name"></div>
-      <div class="form-group"><label for="inputLast" class="form-label">Last name</label><input type="text" class="form-input" id="inputLast" placeholder="Last name"></div>
+      <div class="form-group"><label data-i18n="tutor-profile.bio" for="inputBio" class="form-label">Bio</label><textarea class="form-textarea" id="inputBio" rows="5" placeholder="Tell students about yourself..."></textarea></div>
+      <div class="form-group"><label data-i18n="tutor-profile.first-name" for="inputFirst" class="form-label">First name</label><input data-i18n-attr="placeholder:tutor-profile.first-name-2.placeholder" type="text" class="form-input" id="inputFirst" placeholder="First name"></div>
+      <div class="form-group"><label data-i18n="tutor-profile.last-name" for="inputLast" class="form-label">Last name</label><input data-i18n-attr="placeholder:tutor-profile.last-name-2.placeholder" type="text" class="form-input" id="inputLast" placeholder="Last name"></div>
       <div class="form-row">
-        <div class="form-group"><label for="inputGender" class="form-label">Gender</label><select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option value="male">Male</option><option value="female">Female</option><option value="non-binary">Non-binary</option></select></div>
-        <div class="form-group"><label for="inputCountry" class="form-label">Country</label><input type="text" class="form-input" id="inputCountry" placeholder="e.g. Germany"></div>
+        <div class="form-group"><label data-i18n="tutor-profile.gender" for="inputGender" class="form-label">Gender</label><select class="form-select" id="inputGender"><option data-i18n="tutor-profile.prefer-not-to-say" value="">Prefer not to say</option><option data-i18n="tutor-profile.male" value="male">Male</option><option data-i18n="tutor-profile.female" value="female">Female</option><option data-i18n="tutor-profile.non-binary" value="non-binary">Non-binary</option></select></div>
+        <div class="form-group"><label data-i18n="tutor-profile.country" for="inputCountry" class="form-label">Country</label><input data-i18n-attr="placeholder:tutor-profile.eg-germany.placeholder" type="text" class="form-input" id="inputCountry" placeholder="e.g. Germany"></div>
       </div>
     </div>
-    <div class="modal-footer">
+    <div data-i18n="tutor-profile.cancel-save" class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button>
       <button class="btn btn-primary" onclick="saveBio()">Save</button>
     </div>
@@ -468,16 +469,16 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- Subjects -->
 <div class="modal-overlay" id="modalSubjects">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Subjects I Teach</div><button class="modal-close" onclick="closeModal('modalSubjects')">✕</button></div>
+    <div class="modal-head"><div data-i18n="tutor-profile.subjects-i-teach-2" class="modal-title">Subjects I Teach</div><button class="modal-close" onclick="closeModal('modalSubjects')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertSubjects"></div>
       <div class="tag-wrap" id="subjectsModal"></div>
       <div class="tag-add">
-        <input type="text" class="form-input" id="subjectInput" placeholder="Add a subject...">
-        <button class="btn btn-primary" onclick="addSubject()">+ Add</button>
+        <input data-i18n-attr="placeholder:tutor-profile.add-a-subject.placeholder" type="text" class="form-input" id="subjectInput" placeholder="Add a subject...">
+        <button data-i18n="tutor-profile.add" class="btn btn-primary" onclick="addSubject()">+ Add</button>
       </div>
     </div>
-    <div class="modal-footer">
+    <div data-i18n="tutor-profile.cancel-save-2" class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalSubjects')">Cancel</button>
       <button class="btn btn-primary" onclick="saveSubjects()">Save</button>
     </div>
@@ -487,27 +488,27 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- Courses -->
 <div class="modal-overlay" id="modalCourses">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Courses I've passed</div><button class="modal-close" onclick="closeModal('modalCourses')">✕</button></div>
+    <div class="modal-head"><div data-i18n="tutor-profile.courses-ive-passed-2" class="modal-title">Courses I've passed</div><button class="modal-close" onclick="closeModal('modalCourses')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertCourses"></div>
       <div id="coursesModalList" style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1rem;"></div>
       <div style="display:flex;flex-direction:column;gap:0.6rem;padding-top:0.8rem;border-top:1px solid var(--border);">
-        <label for="courseNameInput" class="sr-only" style="position:absolute;left:-9999px;">Course name</label>
-        <input type="text" class="form-input" id="courseNameInput" maxlength="120" placeholder="Course name * — e.g. Statistics I">
+        <label data-i18n="tutor-profile.course-name" for="courseNameInput" class="sr-only" style="position:absolute;left:-9999px;">Course name</label>
+        <input data-i18n-attr="placeholder:tutor-profile.course-name-eg-statistics.placeholder" type="text" class="form-input" id="courseNameInput" maxlength="120" placeholder="Course name * — e.g. Statistics I">
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-          <input type="text" class="form-input" id="courseCodeInput" maxlength="40" placeholder="Course code (optional)" aria-label="Course code (optional)" style="flex:1;min-width:200px;">
-          <input type="text" class="form-input" id="courseSemesterInput" maxlength="30" placeholder="Passed in, e.g. WS 2024/25" aria-label="Semester you passed it (optional)" style="flex:1;min-width:200px;">
+          <input data-i18n-attr="placeholder:tutor-profile.course-code-optional.placeholder;aria-label:tutor-profile.course-code-optional-2.arialabel" type="text" class="form-input" id="courseCodeInput" maxlength="40" placeholder="Course code (optional)" aria-label="Course code (optional)" style="flex:1;min-width:200px;">
+          <input data-i18n-attr="placeholder:tutor-profile.passed-in-eg-ws.placeholder;aria-label:tutor-profile.semester-you-passed-it.arialabel" type="text" class="form-input" id="courseSemesterInput" maxlength="30" placeholder="Passed in, e.g. WS 2024/25" aria-label="Semester you passed it (optional)" style="flex:1;min-width:200px;">
         </div>
-        <input type="text" class="form-input" id="courseUniInput" maxlength="120" placeholder="University" aria-label="University where you took the course">
+        <input data-i18n-attr="placeholder:tutor-profile.university.placeholder;aria-label:tutor-profile.university-where-you-took.arialabel" type="text" class="form-input" id="courseUniInput" maxlength="120" placeholder="University" aria-label="University where you took the course">
         <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-          <input type="text" class="form-input" id="courseGradeInput" maxlength="20" placeholder="Your grade (optional), e.g. 1.3" aria-label="Your grade (optional)" style="flex:1;min-width:200px;">
-          <input type="text" class="form-input" id="courseProfInput" maxlength="80" placeholder="Professor (optional)" aria-label="Professor (optional)" style="flex:1;min-width:200px;">
+          <input data-i18n-attr="placeholder:tutor-profile.your-grade-optional-eg.placeholder;aria-label:tutor-profile.your-grade-optional.arialabel" type="text" class="form-input" id="courseGradeInput" maxlength="20" placeholder="Your grade (optional), e.g. 1.3" aria-label="Your grade (optional)" style="flex:1;min-width:200px;">
+          <input data-i18n-attr="placeholder:tutor-profile.professor-optional.placeholder;aria-label:tutor-profile.professor-optional-2.arialabel" type="text" class="form-input" id="courseProfInput" maxlength="80" placeholder="Professor (optional)" aria-label="Professor (optional)" style="flex:1;min-width:200px;">
         </div>
-        <div style="font-size:0.75rem;color:var(--mid);line-height:1.45;">Your grade is optional and shown as "self-reported". Only add details that are true; false course or grade details can lead to removal from UniSkilled.</div>
-        <button class="btn btn-outline" onclick="addCourse()" style="width:100%;">+ Add course</button>
+        <div data-i18n="tutor-profile.your-grade-is-optional" style="font-size:0.75rem;color:var(--mid);line-height:1.45;">Your grade is optional and shown as "self-reported". Only add details that are true; false course or grade details can lead to removal from UniSkilled.</div>
+        <button data-i18n="tutor-profile.add-course" class="btn btn-outline" onclick="addCourse()" style="width:100%;">+ Add course</button>
       </div>
     </div>
-    <div class="modal-footer">
+    <div data-i18n="tutor-profile.cancel-save-3" class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalCourses')">Cancel</button>
       <button class="btn btn-primary" onclick="saveCourses()">Save</button>
     </div>
@@ -517,24 +518,24 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- Levels & Languages -->
 <div class="modal-overlay" id="modalLevels">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Levels & Languages</div><button class="modal-close" onclick="closeModal('modalLevels')">✕</button></div>
+    <div class="modal-head"><div data-i18n="tutor-profile.levels-languages-2" class="modal-title">Levels & Languages</div><button class="modal-close" onclick="closeModal('modalLevels')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertLevels"></div>
       <div class="form-group">
-        <label class="form-label">Teaching levels (select all that apply)</label>
-        <div id="levelsToggleGrid" style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+        <label data-i18n="tutor-profile.teaching-levels-select-all" class="form-label">Teaching levels (select all that apply)</label>
+        <div data-i18n="tutor-profile.high-school-undergrad-graduate" id="levelsToggleGrid" style="display:flex;flex-wrap:wrap;gap:0.5rem;">
           <button class="avail-toggle level-toggle" data-level="high_school" style="width:auto;padding:0 0.9rem;">High School</button>
           <button class="avail-toggle level-toggle" data-level="undergrad" style="width:auto;padding:0 0.9rem;">Undergrad</button>
           <button class="avail-toggle level-toggle" data-level="graduate" style="width:auto;padding:0 0.9rem;">Graduate</button>
           <button class="avail-toggle level-toggle" data-level="professional" style="width:auto;padding:0 0.9rem;">Professional / Adult</button>
         </div>
       </div>
-      <div class="form-group"><span class="form-label" id="teachLangsLabel">Languages you teach in</span>
+      <div class="form-group"><span data-i18n="tutor-profile.languages-you-teach-in" class="form-label" id="teachLangsLabel">Languages you teach in</span>
         <div id="languagesModal" role="group" aria-labelledby="teachLangsLabel"></div>
       </div>
-      <div class="form-group"><label for="inputVideoLink" class="form-label">Intro video link (optional)</label><input type="text" class="form-input" id="inputVideoLink" placeholder="YouTube or Loom link"></div>
+      <div class="form-group"><label data-i18n="tutor-profile.intro-video-link-optional" for="inputVideoLink" class="form-label">Intro video link (optional)</label><input data-i18n-attr="placeholder:tutor-profile.youtube-or-loom-link.placeholder" type="text" class="form-input" id="inputVideoLink" placeholder="YouTube or Loom link"></div>
     </div>
-    <div class="modal-footer">
+    <div data-i18n="tutor-profile.cancel-save-4" class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalLevels')">Cancel</button>
       <button class="btn btn-primary" onclick="saveLevels()">Save</button>
     </div>
@@ -544,24 +545,24 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- Academic -->
 <div class="modal-overlay" id="modalAcademic">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Academic Background</div><button class="modal-close" onclick="closeModal('modalAcademic')">✕</button></div>
+    <div class="modal-head"><div data-i18n="tutor-profile.academic-background-2" class="modal-title">Academic Background</div><button class="modal-close" onclick="closeModal('modalAcademic')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertAcademic"></div>
-      <div class="form-group"><label for="inputUniversity" class="form-label">University</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
+      <div class="form-group"><label data-i18n="tutor-profile.university-2" for="inputUniversity" class="form-label">University</label><input data-i18n-attr="placeholder:tutor-profile.eg-tu-berlin.placeholder" type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
       <div class="form-row">
-        <div class="form-group"><label for="inputDegree" class="form-label">Degree level</label>
-          <select class="form-select" id="inputDegree"><option value="">Select</option><option value="bachelor">Bachelor's</option><option value="master">Master's</option><option value="phd">PhD</option><option value="other">Other</option></select>
+        <div class="form-group"><label data-i18n="tutor-profile.degree-level" for="inputDegree" class="form-label">Degree level</label>
+          <select class="form-select" id="inputDegree"><option data-i18n="tutor-profile.select" value="">Select</option><option data-i18n="tutor-profile.bachelors" value="bachelor">Bachelor's</option><option data-i18n="tutor-profile.masters" value="master">Master's</option><option data-i18n="tutor-profile.phd" value="phd">PhD</option><option data-i18n="tutor-profile.other" value="other">Other</option></select>
         </div>
-        <div class="form-group"><label for="inputMajor" class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. Mathematics"></div>
+        <div class="form-group"><label data-i18n="tutor-profile.major" for="inputMajor" class="form-label">Major</label><input data-i18n-attr="placeholder:tutor-profile.eg-mathematics.placeholder" type="text" class="form-input" id="inputMajor" placeholder="e.g. Mathematics"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label for="inputYear" class="form-label">Year / Status</label>
-          <select class="form-select" id="inputYear"><option value="">Select</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option><option value="5">5th Year+</option><option value="graduate">Graduate</option><option value="phd">PhD Candidate</option></select>
+        <div class="form-group"><label data-i18n="tutor-profile.year-status" for="inputYear" class="form-label">Year / Status</label>
+          <select class="form-select" id="inputYear"><option data-i18n="tutor-profile.select-2" value="">Select</option><option data-i18n="tutor-profile.1st-year" value="1">1st Year</option><option data-i18n="tutor-profile.2nd-year" value="2">2nd Year</option><option data-i18n="tutor-profile.3rd-year" value="3">3rd Year</option><option data-i18n="tutor-profile.4th-year" value="4">4th Year</option><option data-i18n="tutor-profile.5th-year" value="5">5th Year+</option><option data-i18n="tutor-profile.graduate" value="graduate">Graduate</option><option data-i18n="tutor-profile.phd-candidate" value="phd">PhD Candidate</option></select>
         </div>
-        <div class="form-group"><label for="inputGrade" class="form-label">Grade / GPA</label><input type="text" class="form-input" id="inputGrade" placeholder="e.g. First, 3.8"></div>
+        <div class="form-group"><label data-i18n="tutor-profile.grade-gpa" for="inputGrade" class="form-label">Grade / GPA</label><input data-i18n-attr="placeholder:tutor-profile.eg-first-38.placeholder" type="text" class="form-input" id="inputGrade" placeholder="e.g. First, 3.8"></div>
       </div>
     </div>
-    <div class="modal-footer">
+    <div data-i18n="tutor-profile.cancel-save-5" class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalAcademic')">Cancel</button>
       <button class="btn btn-primary" onclick="saveAcademic()">Save</button>
     </div>
@@ -571,37 +572,37 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- Teaching & Rate -->
 <div class="modal-overlay" id="modalTeaching">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Teaching & Rate</div><button class="modal-close" onclick="closeModal('modalTeaching')">✕</button></div>
+    <div class="modal-head"><div data-i18n="tutor-profile.teaching-rate" class="modal-title">Teaching & Rate</div><button class="modal-close" onclick="closeModal('modalTeaching')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertTeaching"></div>
       <div class="form-row">
         <div class="form-row">
-          <div class="form-group"><label for="inputRate" class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="20" min="15"><div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum booking value is €15.</div><div style="font-size:0.75rem;color:var(--mid);margin-top:0.2rem;" id="rateGuide">Typical rates: €18–30/hr for university-student tutors, €30–50/hr for graduates and exam specialists.</div></div>
-          <div class="form-group"><label for="inputCurrency" class="form-label">Currency</label>
+          <div class="form-group"><label data-i18n="tutor-profile.hourly-rate" for="inputRate" class="form-label">Hourly rate</label><input type="number" class="form-input" id="inputRate" placeholder="20" min="15"><div data-i18n="tutor-profile.uniskilled-minimum-booking-value" style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;" id="rateMinHint">UniSkilled minimum booking value is €15.</div><div data-i18n="tutor-profile.typical-rates-1830hr-for" style="font-size:0.75rem;color:var(--mid);margin-top:0.2rem;" id="rateGuide">Typical rates: €18–30/hr for university-student tutors, €30–50/hr for graduates and exam specialists.</div></div>
+          <div class="form-group"><label data-i18n="tutor-profile.currency" for="inputCurrency" class="form-label">Currency</label>
             <select class="form-select" id="inputCurrency">
-              <option value="EUR">€ — Euro (EUR)</option>
-          <option value="USD">$ — US Dollar (USD)</option>
+              <option data-i18n="tutor-profile.euro-eur" value="EUR">€ — Euro (EUR)</option>
+          <option data-i18n="tutor-profile.us-dollar-usd" value="USD">$ — US Dollar (USD)</option>
             </select>
           </div>
         </div>
-        <div class="form-group"><label for="inputSessionLen" class="form-label">Session length</label>
-          <select class="form-select" id="inputSessionLen"><option value="60">60 min</option><option value="90">90 min</option><option value="120">120 min</option><option value="flexible">Flexible</option></select>
+        <div class="form-group"><label data-i18n="tutor-profile.session-length" for="inputSessionLen" class="form-label">Session length</label>
+          <select class="form-select" id="inputSessionLen"><option data-i18n="tutor-profile.60-min" value="60">60 min</option><option data-i18n="tutor-profile.90-min" value="90">90 min</option><option data-i18n="tutor-profile.120-min" value="120">120 min</option><option data-i18n="tutor-profile.flexible" value="flexible">Flexible</option></select>
         </div>
       </div>
-      <div class="form-group"><label for="inputPrefTime" class="form-label">Preferred time</label>
-        <select class="form-select" id="inputPrefTime"><option value="">Any time</option><option value="morning">Morning (8am–12pm)</option><option value="afternoon">Afternoon (12pm–5pm)</option><option value="evening">Evening (5pm–10pm)</option><option value="flexible">Flexible</option></select>
+      <div class="form-group"><label data-i18n="tutor-profile.preferred-time" for="inputPrefTime" class="form-label">Preferred time</label>
+        <select class="form-select" id="inputPrefTime"><option data-i18n="tutor-profile.any-time" value="">Any time</option><option data-i18n="tutor-profile.morning-8am12pm" value="morning">Morning (8am–12pm)</option><option data-i18n="tutor-profile.afternoon-12pm5pm" value="afternoon">Afternoon (12pm–5pm)</option><option data-i18n="tutor-profile.evening-5pm10pm" value="evening">Evening (5pm–10pm)</option><option data-i18n="tutor-profile.flexible-2" value="flexible">Flexible</option></select>
       </div>
-      <div class="form-group"><label class="form-label">Available days</label>
-        <div class="avail-toggle-grid">
+      <div class="form-group"><label data-i18n="tutor-profile.available-days" class="form-label">Available days</label>
+        <div data-i18n="tutor-profile.montue-wedthu-frisat-sun" class="avail-toggle-grid">
           <button class="avail-toggle" data-day="mon">Mon</button><button class="avail-toggle" data-day="tue">Tue</button>
           <button class="avail-toggle" data-day="wed">Wed</button><button class="avail-toggle" data-day="thu">Thu</button>
           <button class="avail-toggle" data-day="fri">Fri</button><button class="avail-toggle" data-day="sat">Sat</button>
           <button class="avail-toggle" data-day="sun">Sun</button>
         </div>
       </div>
-      <div class="form-group"><label for="inputMaxStudents" class="form-label">Max students/week</label><input type="number" class="form-input" id="inputMaxStudents" placeholder="5" min="1" max="50"></div>
+      <div data-i18n="tutor-profile.max-studentsweek" class="form-group"><label for="inputMaxStudents" class="form-label">Max students/week</label><input type="number" class="form-input" id="inputMaxStudents" placeholder="5" min="1" max="50"></div>
     </div>
-    <div class="modal-footer">
+    <div data-i18n="tutor-profile.cancel-save-6" class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalTeaching')">Cancel</button>
       <button class="btn btn-primary" onclick="saveTeaching()">Save</button>
     </div>
@@ -611,21 +612,21 @@ body{background:#f4f6f9;--blue-pale:#eef4ff}
 <!-- Certificates -->
 <div class="modal-overlay" id="modalCerts">
   <div class="modal">
-    <div class="modal-head"><div class="modal-title">Certificates & Grades</div><button class="modal-close" onclick="closeModal('modalCerts')">✕</button></div>
+    <div class="modal-head"><div data-i18n="tutor-profile.certificates-grades-2" class="modal-title">Certificates & Grades</div><button class="modal-close" onclick="closeModal('modalCerts')">✕</button></div>
     <div class="modal-body">
       <div class="alert-bar" id="alertCerts"></div>
       <div id="certsModalList" style="margin-bottom:1rem;"></div>
       <div style="background:var(--off);border-radius:10px;padding:1rem;">
         <div class="form-row" style="margin-bottom:0.7rem;">
-          <div class="form-group" style="margin:0;"><label for="certSubjectInput" class="form-label">Subject</label><input type="text" class="form-input" id="certSubjectInput" placeholder="e.g. Linear Algebra"></div>
-          <div class="form-group" style="margin:0;"><label for="certGradeInput" class="form-label">Grade</label><input type="text" class="form-input" id="certGradeInput" placeholder="e.g. A, 95%"></div>
+          <div class="form-group" style="margin:0;"><label data-i18n="tutor-profile.subject" for="certSubjectInput" class="form-label">Subject</label><input data-i18n-attr="placeholder:tutor-profile.eg-linear-algebra.placeholder" type="text" class="form-input" id="certSubjectInput" placeholder="e.g. Linear Algebra"></div>
+          <div data-i18n="tutor-profile.grade" class="form-group" style="margin:0;"><label for="certGradeInput" class="form-label">Grade</label><input type="text" class="form-input" id="certGradeInput" placeholder="e.g. A, 95%"></div>
         </div>
-        <div class="form-group"><label for="certFileInput" class="form-label">Upload proof (optional)</label><input type="file" id="certFileInput" accept="image/jpeg,image/png,application/pdf" class="form-input" style="padding:0.4rem;"></div>
-        <button class="btn btn-outline" onclick="addCert()" style="width:100%;">+ Add certificate</button>
-        <div style="font-size:0.72rem;color:var(--mid);margin-top:0.5rem;">After adding, don't forget to click <strong>Save</strong> below to actually store it on your profile.</div>
+        <div data-i18n="tutor-profile.upload-proof-optional" class="form-group"><label for="certFileInput" class="form-label">Upload proof (optional)</label><input type="file" id="certFileInput" accept="image/jpeg,image/png,application/pdf" class="form-input" style="padding:0.4rem;"></div>
+        <button data-i18n="tutor-profile.add-certificate" class="btn btn-outline" onclick="addCert()" style="width:100%;">+ Add certificate</button>
+        <div data-i18n="tutor-profile.after-adding-dont-forget" style="font-size:0.72rem;color:var(--mid);margin-top:0.5rem;">After adding, don't forget to click <strong>Save</strong> below to actually store it on your profile.</div>
       </div>
     </div>
-    <div class="modal-footer">
+    <div data-i18n="tutor-profile.cancel-save-7" class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalCerts')">Cancel</button>
       <button class="btn btn-primary" onclick="saveCerts()">Save</button>
     </div>
@@ -638,8 +639,14 @@ function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 function __viewerTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Berlin';}catch(e){return 'Europe/Berlin';}}
-function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').pop().replace(/_/g,' ')+' time)':'';}
+function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+T('tz-time','{{zone}} time',{zone:String(tz).split('/').pop().replace(/_/g,' ')})+')':'';}
 function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
+
+// Interface text: English is written here; other languages come from locales/<lang>/page.tutor-profile.json
+const __pick = (en, v) => typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en;
+const T = (k, en, v) => window.I18N ? I18N.t('tutor-profile.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? v[x] : m);
+const H = (k, en, v) => window.I18N ? I18N.h('tutor-profile.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? __esc(v[x]) : m);
+const J = list => window.I18N ? I18N.join(list) : list.join(', ');
 
 
 const CURRENCY_SYMBOLS = {
@@ -694,8 +701,8 @@ async function init() {
       document.getElementById('avatarWrap').style.cursor = 'pointer';
       document.getElementById('avatarWrap').onclick = () => document.getElementById('avatarInput').click();
       document.getElementById('profileActions').innerHTML = `
-        <button class="btn btn-outline" onclick="openModal('modalBio')">✏️ Edit profile</button>
-        <a href="tutor-dashboard.html" class="btn btn-primary">← Dashboard</a>`;
+        <button class="btn btn-outline" onclick="openModal('modalBio')">✏️ ${H('edit-profile', 'Edit profile')}</button>
+        <a href="tutor-dashboard.html" class="btn btn-primary">${window.I18N && I18N.dir === 'rtl' ? '→' : '←'} ${H('dashboard', 'Dashboard')}</a>`;
     } else {
       document.getElementById('avatarWrap').style.cursor = 'default';
       if (role === 'student') document.getElementById('reviewFormWrap').style.display = 'block';
@@ -749,11 +756,11 @@ async function init() {
 }
 
 function showTutorNotFound() {
-  document.title = 'Tutor not found — UniSkilled';
+  document.title = T('not-found-title', 'Tutor not found — UniSkilled');
   const m = document.createElement('meta'); m.name = 'robots'; m.content = 'noindex'; document.head.appendChild(m);
-  document.getElementById('profileName').textContent = 'Tutor not found';
+  document.getElementById('profileName').textContent = T('not-found', 'Tutor not found');
   const t = document.getElementById('profileTitle');
-  if (t) t.innerHTML = 'This profile may have been removed. <a href="find-tutors.html" style="color:var(--blue);font-weight:700;">Browse all tutors →</a>';
+  if (t) t.innerHTML = H('not-found-text', 'This profile may have been removed. <a href="find-tutors.html" style="color:var(--blue);font-weight:700;">Browse all tutors →</a>');
   document.querySelectorAll('.verified-badge').forEach(el => el.style.display = 'none');
 }
 
@@ -761,12 +768,12 @@ function showTutorNotFound() {
 function applyTutorSeo(fullName, p, tp, subjects) {
   const subj = (subjects || []).slice(0, 3);
   const place = tp?.location || p?.country || '';
-  const title = fullName + (subj.length ? ' — ' + subj.join(', ') + ' Tutor' : ' — Tutor') + ' | UniSkilled';
+  const title = subj.length ? T('seo-title-subjects', '{{name}} — {{subjects}} Tutor | UniSkilled', { name: fullName, subjects: J(subj) }) : T('seo-title', '{{name}} — Tutor | UniSkilled', { name: fullName });
   const sym = currSymbol(tp?.currency || 'EUR');
   const bioBit = (p?.bio || '').replace(/\s+/g, ' ').trim().slice(0, 110);
   const desc = (bioBit ? bioBit + (bioBit.length >= 110 ? '… ' : ' ') : '') +
-    (tp?.university_verified_at ? 'University-verified tutor' : 'Tutor') + (subj.length ? ' for ' + subj.join(', ') : '') + (place ? ' · ' + place : '') +
-    (tp?.hourly_rate ? ' · from ' + sym + tp.hourly_rate + '/hr' : '') + '. Book securely on UniSkilled.';
+    (tp?.university_verified_at ? T('seo-verified', 'University-verified tutor') : T('seo-tutor', 'Tutor')) + (subj.length ? T('seo-for', ' for {{subjects}}', { subjects: J(subj) }) : '') + (place ? ' · ' + place : '') +
+    (tp?.hourly_rate ? ' · ' + T('seo-from', 'from {{price}}/hr', { price: sym + tp.hourly_rate }) : '') + T('seo-book', '. Book securely on UniSkilled.');
   const url = 'https://uniskilled.com/tutor-profile.html?id=' + encodeURIComponent(tutorId);
   document.title = title;
   const set = (id, attr, v) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, v); };
@@ -808,7 +815,7 @@ async function loadProfile() {
   if (!p && !tp) { showTutorNotFound(); return; }
   profileData = p; tutorData = tp;
 
-  const fullName = (p && p.full_name) || 'Tutor';
+  const fullName = (p && p.full_name) || T('tutor', 'Tutor');
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
   subjects = Array.isArray(tp?.subjects) ? tp.subjects : [];
   availability = Array.isArray(tp?.availability) ? tp.availability : [];
@@ -827,8 +834,8 @@ async function loadProfile() {
   const vb = document.getElementById('verifiedBadge');
   if (tp?.university_verified_at) {
     vb.style.display = '';
-    vb.textContent = '✓ Verified' + (tp.verified_university ? ' · ' + tp.verified_university : ' Tutor');
-    vb.title = 'University email confirmed';
+    vb.textContent = tp.verified_university ? T('verified-at', '✓ Verified · {{university}}', { university: tp.verified_university }) : T('verified-tutor', '✓ Verified Tutor');
+    vb.title = T('verified-title', 'University email confirmed');
   } else if (isOwner) {
     document.getElementById('verifyNudge').style.display = 'inline-block';
   }
@@ -841,18 +848,18 @@ async function loadProfile() {
 
   // Cover
   if (tp?.cover_url) {
-    document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(tp.cover_url)}" alt="Cover photo" style="width:100%;height:100%;object-fit:cover;">`;
+    document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(tp.cover_url)}" alt="${H('cover-alt', 'Cover photo')}" style="width:100%;height:100%;object-fit:cover;">`;
   }
 
   // Header
   document.getElementById('profileName').textContent = fullName;
-  const titleParts = [tp?.degree_level ? cap(tp.degree_level) + "'s student" : '', tp?.major || '', tp?.location || ''].filter(Boolean);
+  const titleParts = [tp?.degree_level ? T('degree-student.' + tp.degree_level, cap(tp.degree_level) + "'s student") : '', tp?.major || '', tp?.location || ''].filter(Boolean);
   document.getElementById('profileTitle').textContent = titleParts.join(' · ');
 
   const metaParts = [];
   if (p?.country) metaParts.push(`📍 ${p.country}`);
   if (teachLanguages.length) metaParts.push(`🌐 ${USKLangs.list(teachLanguages)}`);
-  metaParts.push('💻 Online sessions'); // all sessions are online
+  metaParts.push('💻 ' + T('online-sessions', 'Online sessions')); // all sessions are online
   document.getElementById('profileMeta').innerHTML = metaParts.map(m => `<span>${__esc(m)}</span>`).join('');
 
   document.getElementById('profileTags').innerHTML = subjects.map(s => `<span class="subject-tag">${__esc(s)}</span>`).join('');
@@ -865,16 +872,16 @@ async function loadProfile() {
 
   // Book/Edit actions
   const bookDiv = document.getElementById('bookActions');
-  const certLink = `<a href="tutor-certificate.html?tutor=${__safeUrl(tutorId)}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">View teaching certificate</a>`;
-  const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">Manage availability</a>`;
+  const certLink = `<a href="tutor-certificate.html?tutor=${__safeUrl(tutorId)}" target="_blank" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">${H('view-certificate', 'View teaching certificate')}</a>`;
+  const availabilityLink = `<a href="manage-availability.html" style="display:block;text-align:center;font-size:0.82rem;font-weight:700;color:var(--blue);margin-top:0.2rem;padding:0.5rem 0;text-decoration:none;">${H('manage-availability', 'Manage availability')}</a>`;
   if (isOwner) {
-    bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">Edit rate &amp; availability</button>` + availabilityLink + certLink;
+    bookDiv.innerHTML = `<button class="btn btn-primary" onclick="openModal('modalTeaching')" style="width:100%;">${H('edit-rate', 'Edit rate &amp; availability')}</button>` + availabilityLink + certLink;
   } else if (currentUserId && viewerRole === 'tutor') {
-    bookDiv.innerHTML = `<a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">Send message</a>` + certLink;
+    bookDiv.innerHTML = `<a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">${H('send-message', 'Send message')}</a>` + certLink;
   } else if (currentUserId) {
-    bookDiv.innerHTML = `<a href="book-session.html?tutor=${__safeUrl(tutorId)}&name=${__safeUrl(encodeURIComponent(fullName))}" class="book-btn">Book a session</a><a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">Send message</a>` + certLink;
+    bookDiv.innerHTML = `<a href="book-session.html?tutor=${__safeUrl(tutorId)}&name=${__safeUrl(encodeURIComponent(fullName))}" class="book-btn">${H('book', 'Book a session')}</a><a href="messages.html?with=${__safeUrl(tutorId)}" class="msg-btn">${H('send-message', 'Send message')}</a>` + certLink;
   } else {
-    bookDiv.innerHTML = `<a href="signin.html" class="book-btn">Sign in to book</a>` + certLink;
+    bookDiv.innerHTML = `<a href="signin.html" class="book-btn">${H('sign-in-to-book', 'Sign in to book')}</a>` + certLink;
   }
   // Payment promise for people who can book (students and signed-out visitors)
   if (!isOwner && viewerRole !== 'tutor') {
@@ -896,28 +903,28 @@ async function loadProfile() {
     ? subjectEntries.map(([subj, count]) => `
         <div style="margin-bottom:0.7rem;">
           <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:0.3rem;">
-            <span style="font-weight:600;color:var(--ink);">${__esc(subj)}</span>
-            <span style="color:var(--mid);">${__esc(count)} session${__esc(count === 1 ? '' : 's')}</span>
+            <span style="font-weight:600;color:var(--ink);">${__esc(subj === 'Other' ? T('other-subject', 'Other') : subj)}</span>
+            <span style="color:var(--mid);">${H('sessions-count', { one: '{{count}} session', other: '{{count}} sessions' }, { count })}</span>
           </div>
           <div style="background:var(--off);border-radius:100px;height:6px;overflow:hidden;">
             <div style="background:var(--blue);height:100%;width:${(count / maxCount * 100).toFixed(0)}%;border-radius:100px;"></div>
           </div>
         </div>`).join('')
-    : '<span class="empty">No completed sessions yet.</span>';
+    : '<span class="empty">' + H('no-sessions', 'No completed sessions yet.') + '</span>';
 
   // Member since
   if (p?.created_at) {
     const joined = new Date(p.created_at);
-    document.getElementById('statMemberSince').textContent = joined.toLocaleDateString([], { month: 'short', year: 'numeric' });
+    document.getElementById('statMemberSince').textContent = (window.I18N && I18N.lang !== 'en' ? I18N.date(joined, { month: 'short', year: 'numeric' }) : joined.toLocaleDateString([], { month: 'short', year: 'numeric' }));
   }
 
   // Bio
-  document.getElementById('bioText').innerHTML = tp?.bio ? `<span class="about-text">${__esc(tp.bio)}</span>` : '<span class="empty">No bio added yet.</span>';
+  document.getElementById('bioText').innerHTML = tp?.bio ? `<span class="about-text">${__esc(tp.bio)}</span>` : '<span class="empty">' + H('no-bio', 'No bio added yet.') + '</span>';
 
   // Subjects
   document.getElementById('subjectsBody').innerHTML = subjects.length > 0
     ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s => `<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>`
-    : '<span class="empty">No subjects added yet.</span>';
+    : '<span class="empty">' + H('no-subjects', 'No subjects added yet.') + '</span>';
 
   // Courses the tutor has passed (students can book a lesson for a course straight from here)
   const canBookCourse = !isOwner && viewerRole !== 'tutor';
@@ -925,7 +932,7 @@ async function loadProfile() {
   document.getElementById('coursesBody').innerHTML = courses.length > 0
     ? `<div style="display:flex;flex-direction:column;gap:0.6rem;">${courses.map(c => {
         const title = __courseTitle(c);
-        const meta = [c.university || courseUniDefault, c.semester ? 'passed ' + c.semester : ''].filter(Boolean).join(' · ');
+        const meta = [c.university || courseUniDefault, c.semester ? T('passed-in', 'passed {{semester}}', { semester: c.semester }) : ''].filter(Boolean).join(' · ');
         const bookHref = currentUserId
           ? `book-session.html?tutor=${encodeURIComponent(tutorId)}&name=${encodeURIComponent(fullName)}&subject=${encodeURIComponent(c.course_name || c.course_code || '')}`
           : 'signin.html';
@@ -935,60 +942,60 @@ async function loadProfile() {
           <div style="flex:1;min-width:180px;">
             <div style="font-weight:700;font-size:0.85rem;">${c.course_key ? `<a href="course.html?c=${encodeURIComponent(c.course_key)}" style="color:inherit;text-decoration:underline;text-decoration-color:#c9d8f5;text-underline-offset:3px;">${__esc(title)}</a>` : __esc(title)}</div>
             ${meta ? `<div style="font-size:0.75rem;color:var(--mid);">${__esc(meta)}</div>` : ''}
-            ${c.grade ? `<div style="font-size:0.75rem;color:#065f46;font-weight:600;">Grade ${__esc(c.grade)} <span style="color:var(--mid);font-weight:400;">(self-reported)</span></div>` : ''}
-            ${c.professor_name ? `<div style="font-size:0.75rem;color:var(--mid);">Prof. ${__esc(c.professor_name)}</div>` : ''}
+            ${c.grade ? `<div style="font-size:0.75rem;color:#065f46;font-weight:600;">${H('grade-self', 'Grade {{grade}} <span style="color:var(--mid);font-weight:400;">(self-reported)</span>', { grade: c.grade })}</div>` : ''}
+            ${c.professor_name ? `<div style="font-size:0.75rem;color:var(--mid);">${H('prof', 'Prof. {{name}}', { name: c.professor_name })}</div>` : ''}
           </div>
-          ${canBookCourse ? `<a href="${__safeUrl(bookHref)}" style="font-size:0.8rem;font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap;">Book this course →</a>` : ''}
+          ${canBookCourse ? `<a href="${__safeUrl(bookHref)}" style="font-size:0.8rem;font-weight:700;color:var(--blue);text-decoration:none;white-space:nowrap;">${H('book-course', 'Book this course →')}</a>` : ''}
         </div>`; }).join('')}</div>`
-    : '<span class="empty">No courses added yet.</span>';
+    : '<span class="empty">' + H('no-courses', 'No courses added yet.') + '</span>';
 
   // Academic
   const acadItems = [
-    tp?.degree_level ? ['Degree', cap(tp.degree_level) + "'s"] : null,
-    tp?.major ? ['Major', tp.major] : null,
-    tp?.location ? ['University', tp.location] : null,
-    tp?.study_year ? ['Year', tp.study_year] : null,
-    tp?.overall_grade ? ['Grade', tp.overall_grade] : null,
+    tp?.degree_level ? [T('label.degree', 'Degree'), T('degree.' + tp.degree_level, cap(tp.degree_level) + "'s")] : null,
+    tp?.major ? [T('label.major', 'Major'), tp.major] : null,
+    tp?.location ? [T('label.university', 'University'), tp.location] : null,
+    tp?.study_year ? [T('label.year', 'Year'), T('year.' + tp.study_year, tp.study_year)] : null,
+    tp?.overall_grade ? [T('label.grade', 'Grade'), tp.overall_grade] : null,
   ].filter(Boolean);
   document.getElementById('academicBody').innerHTML = acadItems.length > 0
     ? acadItems.map(([l, v]) => `<div class="info-row"><span class="info-label">${__esc(l)}</span><span class="info-value">${__esc(v)}</span></div>`).join('')
-    : '<span class="empty">No academic info added yet.</span>';
+    : '<span class="empty">' + H('no-academic', 'No academic info added yet.') + '</span>';
 
   // Levels & Languages
-  const levelLabels = {high_school:'High School', undergrad:'Undergrad', graduate:'Graduate', professional:'Professional / Adult'};
+  const levelLabels = {high_school:T('level.high_school', 'High School'), undergrad:T('level.undergrad', 'Undergrad'), graduate:T('level.graduate', 'Graduate'), professional:T('level.professional', 'Professional / Adult')};
   const levelsHtml = teachingLevels.length > 0
     ? `<div style="display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:${teachLanguages.length ? '0.8rem' : '0'};">${teachingLevels.map(l => `<span class="subject-tag">${__esc(levelLabels[l] || l)}</span>`).join('')}</div>`
     : '';
   const langsHtml = teachLanguages.length > 0
-    ? `<div class="info-row"><span class="info-label">Teaches in</span><span class="info-value">${__esc(teachLanguages.map(l => USKLangs.name(l.code) + ' (' + USKLangs.levelLabel(l.level) + ')').join(', '))}</span></div>`
+    ? `<div class="info-row"><span class="info-label">${H('teaches-in', 'Teaches in')}</span><span class="info-value">${__esc(J(teachLanguages.map(l => USKLangs.name(l.code) + ' (' + USKLangs.levelLabel(l.level) + ')')))}</span></div>`
     : '';
   const videoHtml = tp?.video_link
-    ? `<div class="info-row"><span class="info-label">Intro video</span><span class="info-value"><a href="${__safeUrl(tp.video_link)}" target="_blank" style="color:var(--blue);">▶ Watch</a></span></div>`
+    ? `<div class="info-row"><span class="info-label">${H('intro-video', 'Intro video')}</span><span class="info-value"><a href="${__safeUrl(tp.video_link)}" target="_blank" style="color:var(--blue);">▶ ${H('watch', 'Watch')}</a></span></div>`
     : '';
-  document.getElementById('levelsBody').innerHTML = (levelsHtml + langsHtml + videoHtml) || '<span class="empty">Not set yet.</span>';
+  document.getElementById('levelsBody').innerHTML = (levelsHtml + langsHtml + videoHtml) || '<span class="empty">' + H('not-set', 'Not set yet.') + '</span>';
 
   // Certs (files are private: see renderCertificates)
   renderCertificates();
 
   // Availability
   const days = ['mon','tue','wed','thu','fri','sat','sun'];
-  const labels = ['Mo','Tu','We','Th','Fr','Sa','Su'];
-  const dayNames = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+  const labels = [T('d.mo','Mo'),T('d.tu','Tu'),T('d.we','We'),T('d.th','Th'),T('d.fr','Fr'),T('d.sa','Sa'),T('d.su','Su')];
+  const dayNames = [T('day.mon','Monday'),T('day.tue','Tuesday'),T('day.wed','Wednesday'),T('day.thu','Thursday'),T('day.fri','Friday'),T('day.sat','Saturday'),T('day.sun','Sunday')];
   document.getElementById('availGrid').innerHTML = days.map((d, i) => {
     const on = availability.includes(d);
-    return `<div class="avail-chip ${on ? 'on' : 'off'}" role="img" aria-label="${dayNames[i]}: ${on ? 'available' : 'not available'}"><span aria-hidden="true">${__esc(labels[i])}</span>${on ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>' : ''}</div>`;
+    return `<div class="avail-chip ${on ? 'on' : 'off'}" role="img" aria-label="${__esc(dayNames[i])}: ${on ? H('available', 'available') : H('not-available', 'not available')}"><span aria-hidden="true">${__esc(labels[i])}</span>${on ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>' : ''}</div>`;
   }).join('');
-  if (tp?.preferred_time) document.getElementById('prefTimeDisplay').textContent = 'Preferred: ' + tp.preferred_time;
+  if (tp?.preferred_time) document.getElementById('prefTimeDisplay').textContent = T('preferred', 'Preferred: {{time}}', { time: T('time.' + tp.preferred_time, tp.preferred_time) });
 
   // Teaching
   const teachItems = [
-    ['Format', 'Online'],
-    tp?.session_length ? ['Session', tp.session_length === 'flexible' ? 'Flexible' : tp.session_length + ' min'] : null,
-    tp?.max_students ? ['Max students/week', tp.max_students] : null,
+    [T('label.format', 'Format'), T('online', 'Online')],
+    tp?.session_length ? [T('label.session', 'Session'), tp.session_length === 'flexible' ? T('flexible', 'Flexible') : T('minutes', '{{n}} min', { n: tp.session_length })] : null,
+    tp?.max_students ? [T('label.max-students', 'Max students/week'), tp.max_students] : null,
   ].filter(Boolean);
   document.getElementById('teachingBody').innerHTML = teachItems.length > 0
     ? teachItems.map(([l, v]) => `<div class="info-row"><span class="info-label">${__esc(l)}</span><span class="info-value">${__esc(v)}</span></div>`).join('')
-    : '<span class="empty">Not set yet.</span>';
+    : '<span class="empty">' + H('not-set', 'Not set yet.') + '</span>';
 }
 
 async function loadMeetingLink() {
@@ -997,17 +1004,17 @@ async function loadMeetingLink() {
   const { data: tp } = await _supabase.rpc('get_my_tutor_private').maybeSingle();
   if (tp?.meeting_link) {
     const display = tp.meeting_link.replace('https://','').slice(0,50) + (tp.meeting_link.length > 53 ? '…' : '');
-    body.innerHTML = `<div class="info-row"><span class="info-label">Link</span><span class="info-value"><a href="${__safeUrl(tp.meeting_link)}" target="_blank" style="color:var(--blue);word-break:break-all;">🔗 ${__esc(display)}</a></span></div><div style="font-size:0.78rem;color:var(--mid);margin-top:0.5rem;">Students use this link to join confirmed sessions with you.</div>`;
+    body.innerHTML = `<div class="info-row"><span class="info-label">${H('link', 'Link')}</span><span class="info-value"><a href="${__safeUrl(tp.meeting_link)}" target="_blank" style="color:var(--blue);word-break:break-all;">🔗 ${__esc(display)}</a></span></div><div style="font-size:0.78rem;color:var(--mid);margin-top:0.5rem;">${H('link-note', 'Students use this link to join confirmed sessions with you.')}</div>`;
   } else {
-    body.innerHTML = '<span class="empty">Optional. Lessons take place in the UniSkilled classroom. You can add a Zoom or Google Meet link as a backup in case of connection problems.</span>';
+    body.innerHTML = '<span class="empty">' + H('meeting-empty', 'Optional. Lessons take place in the UniSkilled classroom. You can add a Zoom or Google Meet link as a backup in case of connection problems.') + '</span>';
   }
 }
 
 async function saveMeetingLink() {
   const link = document.getElementById('inputMeetingLink').value.trim();
-  if (link && !link.startsWith('https://')) { showToast('Enter a full link starting with https://', 'error'); return; }
+  if (link && !link.startsWith('https://')) { showToast(T('link-https', 'Enter a full link starting with https://'), 'error'); return; }
   const { error } = await _supabase.rpc('set_my_meeting_link', { p_link: link || null });
-  if (error) { showToast(error.code === '22023' ? error.message : __friendlyDbError(error, 'Could not save your meeting link. Please try again.'), 'error'); return; }
+  if (error) { showToast(error.code === '22023' ? error.message : __friendlyDbError(error, T('link-failed', 'Could not save your meeting link. Please try again.')), 'error'); return; }
   closeModal('modalMeetingLink');
   await loadMeetingLink();
 }
@@ -1033,13 +1040,13 @@ async function loadReviews() {
 }
 
 async function submitReview() {
-  if (!selectedRating) { showAlert('reviewAlert', 'Please select a rating.', 'error'); return; }
+  if (!selectedRating) { showAlert('reviewAlert', T('review.rating', 'Please select a rating.'), 'error'); return; }
   const comment = document.getElementById('reviewText').value.trim();
-  if (!comment) { showAlert('reviewAlert', 'Please write a comment.', 'error'); return; }
+  if (!comment) { showAlert('reviewAlert', T('review.comment', 'Please write a comment.'), 'error'); return; }
   const { data: u } = await _supabase.from('users').select('full_name').eq('id', currentUserId).maybeSingle();
   const { error } = await _supabase.from('reviews').insert({ tutor_id: tutorId, student_id: currentUserId, student_name: u?.full_name || 'Student', rating: selectedRating, comment });
-  if (error) { showAlert('reviewAlert', /row-level security|violates/i.test(error.message || '') ? 'You can review this tutor after completing a session with them.' : 'Could not submit your review. Please try again.', 'error'); return; }
-  showAlert('reviewAlert', 'Review submitted! Thank you.', 'success');
+  if (error) { showAlert('reviewAlert', /row-level security|violates/i.test(error.message || '') ? T('review.after-session', 'You can review this tutor after completing a session with them.') : T('review.failed', 'Could not submit your review. Please try again.'), 'error'); return; }
+  showAlert('reviewAlert', T('review.sent', 'Review submitted! Thank you.'), 'success');
   document.getElementById('reviewText').value = '';
   selectedRating = 0;
   document.querySelectorAll('.star-btn').forEach(b => b.classList.remove('on'));
@@ -1049,7 +1056,7 @@ async function submitReview() {
 // AVATAR & COVER UPLOAD
 async function uploadAvatar() {
   const file = this.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${__safeUrl(e.target.result)}" alt="Preview">`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = e => { document.getElementById('avatarEl').innerHTML = `<img src="${__safeUrl(e.target.result)}" alt="${H('preview', 'Preview')}">`; }; r.readAsDataURL(file);
 
   const fd = new FormData();
   fd.append('user_id', currentUserId);
@@ -1061,16 +1068,16 @@ async function uploadAvatar() {
     if (res.ok && result.fileUrl) {
       await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, avatar_url: result.fileUrl }, { onConflict: 'user_id' });
     } else {
-      showToast('Photo upload failed. Please try again, or try a different image.', 'error');
+      showToast(T('upload.photo', 'Photo upload failed. Please try again, or try a different image.'), 'error');
     }
   } catch (e) {
-    showToast('Photo upload failed — check your connection and try again.', 'error');
+    showToast(T('upload.photo-net', 'Photo upload failed — check your connection and try again.'), 'error');
   }
 }
 
 async function uploadCover() {
   const file = this.files[0]; if (!file) return;
-  const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(e.target.result)}" alt="Preview" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
+  const r = new FileReader(); r.onload = e => { document.getElementById('coverContent').innerHTML = `<img src="${__safeUrl(e.target.result)}" alt="${H('preview', 'Preview')}" style="width:100%;height:100%;object-fit:cover;">`; }; r.readAsDataURL(file);
 
   const fd = new FormData();
   fd.append('user_id', currentUserId);
@@ -1082,10 +1089,10 @@ async function uploadCover() {
     if (res.ok && result.fileUrl) {
       await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, cover_url: result.fileUrl }, { onConflict: 'user_id' });
     } else {
-      showToast('Cover photo upload failed. Please try again, or try a different image.', 'error');
+      showToast(T('upload.cover', 'Cover photo upload failed. Please try again, or try a different image.'), 'error');
     }
   } catch (e) {
-    showToast('Cover photo upload failed — check your connection and try again.', 'error');
+    showToast(T('upload.cover-net', 'Cover photo upload failed — check your connection and try again.'), 'error');
   }
 }
 
@@ -1099,15 +1106,15 @@ async function saveBio() {
   const country = document.getElementById('inputCountry').value.trim();
   const { error: e1 } = await _supabase.from('users').update({ full_name: fullName || profileData?.full_name, gender: gender || null, country: country || null }).eq('id', currentUserId);
   const { error: e2 } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, bio: bio || null }, { onConflict: 'user_id' });
-  if (e1 || e2) { showAlert('alertBio', 'Error saving.', 'error'); return; }
-  showAlert('alertBio', 'Saved!', 'success');
+  if (e1 || e2) { showAlert('alertBio', T('error-saving', 'Error saving.'), 'error'); return; }
+  showAlert('alertBio', T('saved', 'Saved!'), 'success');
   setTimeout(async () => { closeModal('modalBio'); await loadProfile(); }, 700);
 }
 
 async function saveSubjects() {
   const { error } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, subjects }, { onConflict: 'user_id' });
-  if (error) { showAlert('alertSubjects', 'Error: ' + error.message, 'error'); return; }
-  showAlert('alertSubjects', 'Saved!', 'success');
+  if (error) { showAlert('alertSubjects', T('error', 'Error: {{message}}', { message: error.message }), 'error'); return; }
+  showAlert('alertSubjects', T('saved', 'Saved!'), 'success');
   setTimeout(async () => { closeModal('modalSubjects'); await loadProfile(); }, 700);
 }
 
@@ -1121,7 +1128,7 @@ const __certPath = c => (String(c.fileUrl || '').startsWith('private:') ? String
 
 async function renderCertificates() {
   const body = document.getElementById('certsBody');
-  if (!certificates.length) { body.innerHTML = '<span class="empty">No certificates added yet.</span>'; renderCertAccess(); return; }
+  if (!certificates.length) { body.innerHTML = '<span class="empty">' + H('no-certs', 'No certificates added yet.') + '</span>'; renderCertAccess(); return; }
   const hasFiles = certificates.some(c => c.fileUrl);
   certCanView = false; certMyRequest = null;
   if (hasFiles && currentUserId) {
@@ -1143,14 +1150,14 @@ async function renderCertificates() {
     const iconClass = c.fileUrl && isPdf ? 'cert-icon pdf' : 'cert-icon';
     let rightSide = '';
     if (c.fileUrl) {
-      if (certCanView) rightSide = `<button type="button" class="cert-view-btn" onclick="openCertificate(${i})" style="cursor:pointer;font-family:inherit;">${__esc(isPdf ? '📄' : '🖼️')} View ${__esc(isPdf ? 'PDF' : 'Image')}</button>`;
-      else rightSide = '<span class="cert-missing">🔒 File</span>';
-    } else if (c.fileName) rightSide = '<span class="cert-missing">File pending</span>';
+      if (certCanView) rightSide = `<button type="button" class="cert-view-btn" onclick="openCertificate(${i})" style="cursor:pointer;font-family:inherit;">${__esc(isPdf ? '📄' : '🖼️')} ${isPdf ? H('view-pdf', 'View PDF') : H('view-image', 'View Image')}</button>`;
+      else rightSide = '<span class="cert-missing">🔒 ' + H('file', 'File') + '</span>';
+    } else if (c.fileName) rightSide = '<span class="cert-missing">' + H('file-pending', 'File pending') + '</span>';
     return `<div class="cert-row">
       <div class="${__esc(iconClass)}">${__esc(icon)}</div>
       <div style="flex:1;">
         <div class="cert-name">${__esc(c.subject)}</div>
-        <div class="cert-grade">${__esc(c.grade ? 'Grade: ' + c.grade : 'No grade specified')}</div>
+        <div class="cert-grade">${c.grade ? H('grade-colon', 'Grade: {{grade}}', { grade: c.grade }) : H('no-grade', 'No grade specified')}</div>
       </div>
       ${rightSide}
     </div>`;
@@ -1159,11 +1166,11 @@ async function renderCertificates() {
   // Why a file is locked, and what the viewer can do about it
   if (hasFiles && !certCanView) {
     let note = '';
-    if (!currentUserId) note = `Certificate files are shown to signed-in students. <a href="${__safeUrl(signinHref)}" style="color:var(--blue);font-weight:700;">Sign in</a>`;
-    else if (viewerRole !== 'student') note = 'Certificate files are shown to students only.';
-    else if (certMyRequest === 'pending') note = 'You asked to see this tutor’s certificate files. You’ll get a notification when they answer.';
-    else if (certMyRequest === 'declined') note = 'This tutor didn’t share their certificate files with you. <button type="button" onclick="requestCertificates()" style="background:none;border:0;color:var(--blue);font-weight:700;cursor:pointer;font-family:inherit;padding:0;">Ask again</button>';
-    else note = 'This tutor shares certificate files with students on request. <button type="button" class="btn btn-outline" onclick="requestCertificates()" style="margin-top:0.5rem;">Ask to see certificates</button>';
+    if (!currentUserId) note = H('cert.signin', 'Certificate files are shown to signed-in students. <a href="{{href}}" style="color:var(--blue);font-weight:700;">Sign in</a>', { href: signinHref });
+    else if (viewerRole !== 'student') note = H('cert.students-only', 'Certificate files are shown to students only.');
+    else if (certMyRequest === 'pending') note = H('cert.pending', 'You asked to see this tutor’s certificate files. You’ll get a notification when they answer.');
+    else if (certMyRequest === 'declined') note = H('cert.declined', 'This tutor didn’t share their certificate files with you. <button type="button" onclick="requestCertificates()" style="background:none;border:0;color:var(--blue);font-weight:700;cursor:pointer;font-family:inherit;padding:0;">Ask again</button>');
+    else note = H('cert.on-request', 'This tutor shares certificate files with students on request. <button type="button" class="btn btn-outline" onclick="requestCertificates()" style="margin-top:0.5rem;">Ask to see certificates</button>');
     body.insertAdjacentHTML('beforeend', `<div id="certNote" style="font-size:0.8rem;color:var(--mid);margin-top:0.75rem;line-height:1.5;">${note}</div>`);
   }
   renderCertAccess();
@@ -1176,7 +1183,7 @@ async function openCertificate(i) {
   const { data, error } = await _supabase.storage.from('tutor-certificates').createSignedUrl(path, 120);
   if (error || !data?.signedUrl) {
     if (win) win.close();
-    alert('This file can’t be opened right now. Please try again.');
+    alert(T('cert.open-failed', 'This file can’t be opened right now. Please try again.'));
     return;
   }
   if (win) win.location.href = data.signedUrl; else location.href = data.signedUrl;
@@ -1188,7 +1195,7 @@ async function requestCertificates() {
   const res = certMyRequest === 'declined'
     ? await _supabase.from('certificate_access_requests').update({ status: 'pending' }).eq('tutor_id', tutorId).eq('student_id', currentUserId)
     : await _supabase.from('certificate_access_requests').insert({ tutor_id: tutorId, student_id: currentUserId });
-  if (res.error) { if (note) note.textContent = 'That didn’t work. Please try again.'; return; }
+  if (res.error) { if (note) note.textContent = T('try-again', 'That didn’t work. Please try again.'); return; }
   window.usTrack && usTrack('certificate_access_requested', {});
   await renderCertificates();
 }
@@ -1204,26 +1211,26 @@ async function renderCertAccess() {
   const pending = certRequests.filter(r => r.status === 'pending');
   const approved = certRequests.filter(r => r.status === 'approved');
   const row = (r, actions) => `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;flex-wrap:wrap;">
-      <span style="flex:1;min-width:140px;font-size:0.85rem;font-weight:600;">${__esc(r.student_name || 'Student')}</span>${actions}</div>`;
+      <span style="flex:1;min-width:140px;font-size:0.85rem;font-weight:600;">${__esc(r.student_name || T('student', 'Student'))}</span>${actions}</div>`;
   box.innerHTML = `
-    <div style="font-size:0.85rem;font-weight:800;margin-bottom:0.2rem;">Who can open your certificate files?</div>
-    <div style="font-size:0.75rem;color:var(--mid);margin-bottom:0.6rem;">Names and grades stay on your profile. The files themselves are never public.</div>
+    <div style="font-size:0.85rem;font-weight:800;margin-bottom:0.2rem;">${H('cert.who', 'Who can open your certificate files?')}</div>
+    <div style="font-size:0.75rem;color:var(--mid);margin-bottom:0.6rem;">${H('cert.private', 'Names and grades stay on your profile. The files themselves are never public.')}</div>
     <label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.85rem;margin-bottom:0.4rem;cursor:pointer;">
-      <input type="radio" name="certVis" value="students" ${certVisibility === 'students' ? 'checked' : ''} onchange="setCertVisibility(this.value)" style="margin-top:3px;"> All signed-in students</label>
+      <input type="radio" name="certVis" value="students" ${certVisibility === 'students' ? 'checked' : ''} onchange="setCertVisibility(this.value)" style="margin-top:3px;"> ${H('cert.all-students', 'All signed-in students')}</label>
     <label style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.85rem;cursor:pointer;">
-      <input type="radio" name="certVis" value="on_request" ${certVisibility === 'on_request' ? 'checked' : ''} onchange="setCertVisibility(this.value)" style="margin-top:3px;"> Only students I approve</label>
+      <input type="radio" name="certVis" value="on_request" ${certVisibility === 'on_request' ? 'checked' : ''} onchange="setCertVisibility(this.value)" style="margin-top:3px;"> ${H('cert.approved-only', 'Only students I approve')}</label>
     <div id="certVisMsg" role="status" style="font-size:0.75rem;color:var(--green);min-height:1em;margin-top:0.3rem;"></div>
-    ${pending.length ? `<div style="font-size:0.85rem;font-weight:800;margin-top:0.8rem;">Requests</div>${pending.map(r => row(r,
-      `<button type="button" class="btn btn-primary" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="answerCertRequest('${__esc(r.id)}','approved')">Share</button>
-       <button type="button" class="btn btn-outline" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="answerCertRequest('${__esc(r.id)}','declined')">Decline</button>`)).join('')}` : ''}
-    ${approved.length ? `<div style="font-size:0.85rem;font-weight:800;margin-top:0.8rem;">Shared with</div>${approved.map(r => row(r,
-      `<button type="button" class="btn btn-outline" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="removeCertAccess('${__esc(r.id)}')">Stop sharing</button>`)).join('')}` : ''}`;
+    ${pending.length ? `<div style="font-size:0.85rem;font-weight:800;margin-top:0.8rem;">${H('cert.requests', 'Requests')}</div>${pending.map(r => row(r,
+      `<button type="button" class="btn btn-primary" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="answerCertRequest('${__esc(r.id)}','approved')">${H('cert.share', 'Share')}</button>
+       <button type="button" class="btn btn-outline" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="answerCertRequest('${__esc(r.id)}','declined')">${H('cert.decline', 'Decline')}</button>`)).join('')}` : ''}
+    ${approved.length ? `<div style="font-size:0.85rem;font-weight:800;margin-top:0.8rem;">${H('cert.shared-with', 'Shared with')}</div>${approved.map(r => row(r,
+      `<button type="button" class="btn btn-outline" style="padding:0.35rem 0.8rem;font-size:0.78rem;" onclick="removeCertAccess('${__esc(r.id)}')">${H('cert.stop', 'Stop sharing')}</button>`)).join('')}` : ''}`;
 }
 
 async function setCertVisibility(v) {
   const msg = document.getElementById('certVisMsg');
   const { error } = await _supabase.from('tutor_profiles').update({ certificate_visibility: v }).eq('user_id', currentUserId);
-  if (msg) { msg.style.color = error ? '#b91c1c' : 'var(--green)'; msg.textContent = error ? 'Couldn’t save. Please try again.' : 'Saved'; }
+  if (msg) { msg.style.color = error ? '#b91c1c' : 'var(--green)'; msg.textContent = error ? T('save-failed', 'Couldn’t save. Please try again.') : T('saved-short', 'Saved'); }
   if (!error) { certVisibility = v; window.usTrack && usTrack('certificate_visibility_set', { value: v }); }
 }
 async function answerCertRequest(id, status) {
@@ -1237,24 +1244,24 @@ async function removeCertAccess(id) {
 
 function __courseTitle(c) {
   const name = (c.course_name || '').trim(), code = (c.course_code || '').trim();
-  return name && code ? `${name} (${code})` : (name || code || 'Course');
+  return name && code ? `${name} (${code})` : (name || code || T('course', 'Course'));
 }
 
 // Courses modal
 function renderCoursesModal() {
   document.getElementById('coursesModalList').innerHTML = courses.length > 0
     ? courses.map((c, i) => {
-      const meta = [c.university, c.semester ? 'passed ' + c.semester : '', c.grade ? 'grade ' + c.grade : ''].filter(Boolean).join(' · ');
+      const meta = [c.university, c.semester ? T('passed-in', 'passed {{semester}}', { semester: c.semester }) : '', c.grade ? T('grade-lower', 'grade {{grade}}', { grade: c.grade }) : ''].filter(Boolean).join(' · ');
       return `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0.8rem;background:var(--off);border-radius:8px;">
         <div>
           <div style="font-weight:700;font-size:0.83rem;">${__esc(__courseTitle(c))}</div>
           ${meta ? `<div style="font-size:0.73rem;color:var(--mid);">${__esc(meta)}</div>` : ''}
-          ${c.professor_name ? `<div style="font-size:0.73rem;color:var(--mid);">Prof. ${__esc(c.professor_name)}</div>` : ''}
+          ${c.professor_name ? `<div style="font-size:0.73rem;color:var(--mid);">${H('prof', 'Prof. {{name}}', { name: c.professor_name })}</div>` : ''}
         </div>
-        <button onclick="courses.splice(${i},1);renderCoursesModal()" aria-label="Remove ${__esc(__courseTitle(c))}" style="background:none;border:none;color:var(--mid);font-size:1.1rem;cursor:pointer;">×</button>
+        <button onclick="courses.splice(${i},1);renderCoursesModal()" aria-label="${H('remove-x', 'Remove {{name}}', { name: __courseTitle(c) })}" style="background:none;border:none;color:var(--mid);font-size:1.1rem;cursor:pointer;">×</button>
       </div>`; }).join('')
-    : '<span class="empty">No courses added yet.</span>';
+    : '<span class="empty">' + H('no-courses', 'No courses added yet.') + '</span>';
   // Default the university to the tutor's own (verified university first)
   const uni = document.getElementById('courseUniInput');
   if (uni && !uni.value) uni.value = tutorData?.verified_university || tutorData?.location || '';
@@ -1262,7 +1269,7 @@ function renderCoursesModal() {
 window.addCourse = function() {
   const val = id => document.getElementById(id).value.trim();
   const name = val('courseNameInput'), code = val('courseCodeInput');
-  if (!name && !code) { showAlert('alertCourses', 'Please enter the course name.', 'error'); return; }
+  if (!name && !code) { showAlert('alertCourses', T('course-name-needed', 'Please enter the course name.'), 'error'); return; }
   courses.push({
     course_name: name || null, course_code: code || null,
     university: val('courseUniInput').slice(0, 120) || null,
@@ -1283,16 +1290,16 @@ async function saveCourses() {
       tutor_id: currentUserId, course_code: c.course_code, course_name: c.course_name,
       professor_name: c.professor_name, university: c.university, semester: c.semester, grade: c.grade,
     })));
-    if (error) { showAlert('alertCourses', __friendlyDbError(error, 'Could not save your courses. Please check them and try again.'), 'error'); return; }
+    if (error) { showAlert('alertCourses', __friendlyDbError(error, T('courses-failed', 'Could not save your courses. Please check them and try again.')), 'error'); return; }
   }
   // Delete exactly the saved courses the tutor removed in this window (by id), nothing else.
   const keep = new Set(courses.filter(c => c.id).map(c => c.id));
   const removed = (window.__courseIdsLoaded || []).filter(id => !keep.has(id));
   if (removed.length > 0) {
     const { error: delErr } = await _supabase.from('tutor_courses').delete().eq('tutor_id', currentUserId).in('id', removed);
-    if (delErr) { showAlert('alertCourses', 'Your new courses were saved, but removing some old ones failed. Please try again.', 'error'); return; }
+    if (delErr) { showAlert('alertCourses', T('courses-partial', 'Your new courses were saved, but removing some old ones failed. Please try again.'), 'error'); return; }
   }
-  showAlert('alertCourses', 'Saved!', 'success');
+  showAlert('alertCourses', T('saved', 'Saved!'), 'success');
   window.usTrack && usTrack('tutor_courses_saved', { count: courses.length });
   setTimeout(async () => { closeModal('modalCourses'); await loadProfile(); }, 700);
 }
@@ -1300,16 +1307,16 @@ async function saveCourses() {
 async function saveAcademic() {
   const data = { user_id: currentUserId, location: document.getElementById('inputUniversity').value.trim() || null, degree_level: document.getElementById('inputDegree').value || null, major: document.getElementById('inputMajor').value.trim() || null, study_year: document.getElementById('inputYear').value || null, overall_grade: document.getElementById('inputGrade').value.trim() || null };
   const { error } = await _supabase.from('tutor_profiles').upsert(data, { onConflict: 'user_id' });
-  if (error) { showAlert('alertAcademic', 'Error: ' + error.message, 'error'); return; }
-  showAlert('alertAcademic', 'Saved!', 'success');
+  if (error) { showAlert('alertAcademic', T('error', 'Error: {{message}}', { message: error.message }), 'error'); return; }
+  showAlert('alertAcademic', T('saved', 'Saved!'), 'success');
   setTimeout(async () => { closeModal('modalAcademic'); await loadProfile(); }, 700);
 }
 
 function updateRateMinHint() {
   const isUsd = document.getElementById('inputCurrency').value === 'USD';
   document.getElementById('inputRate').min = isUsd ? 17 : 15;
-  document.getElementById('rateMinHint').textContent = `UniSkilled minimum booking value is ${isUsd ? '$17' : '€15'}.`;
-  const g = document.getElementById('rateGuide'); if (g) g.textContent = isUsd ? 'Typical rates: $20–35/hr for university-student tutors, $35–55/hr for graduates and exam specialists.' : 'Typical rates: €18–30/hr for university-student tutors, €30–50/hr for graduates and exam specialists.';
+  document.getElementById('rateMinHint').textContent = T('min-booking', 'UniSkilled minimum booking value is {{min}}.', { min: isUsd ? '$17' : '€15' });
+  const g = document.getElementById('rateGuide'); if (g) g.textContent = isUsd ? T('rates-usd', 'Typical rates: $20–35/hr for university-student tutors, $35–55/hr for graduates and exam specialists.') : T('rates-eur', 'Typical rates: €18–30/hr for university-student tutors, €30–50/hr for graduates and exam specialists.');
 }
 document.getElementById('inputCurrency')?.addEventListener('change', updateRateMinHint);
 
@@ -1318,13 +1325,13 @@ async function saveTeaching() {
   const selectedCurrency = document.getElementById('inputCurrency').value || 'EUR';
   const minRate = selectedCurrency === 'USD' ? 17 : 15;
   if (rateVal !== null && rateVal < minRate) {
-    showToast(`The minimum hourly rate on UniSkilled is ${selectedCurrency === 'USD' ? '$17' : '€15'} (so a 60-minute session meets the ${selectedCurrency === 'USD' ? '$17' : '€15'} minimum booking value). Please update your rate.`, 'error');
+    showToast(T('min-rate', 'The minimum hourly rate on UniSkilled is {{min}} (so a 60-minute session meets the {{min}} minimum booking value). Please update your rate.', { min: selectedCurrency === 'USD' ? '$17' : '€15' }), 'error');
     return;
   }
   const data = { user_id: currentUserId, hourly_rate: rateVal, currency: selectedCurrency, session_length: document.getElementById('inputSessionLen').value || null, teaching_format: 'online', preferred_time: document.getElementById('inputPrefTime').value || null, max_students: document.getElementById('inputMaxStudents').value ? parseInt(document.getElementById('inputMaxStudents').value) : null, availability: availability.length > 0 ? availability : null };
   const { error } = await _supabase.from('tutor_profiles').upsert(data, { onConflict: 'user_id' });
-  if (error) { showAlert('alertTeaching', 'Error: ' + error.message, 'error'); return; }
-  showAlert('alertTeaching', 'Saved!', 'success');
+  if (error) { showAlert('alertTeaching', T('error', 'Error: {{message}}', { message: error.message }), 'error'); return; }
+  showAlert('alertTeaching', T('saved', 'Saved!'), 'success');
   setTimeout(async () => { closeModal('modalTeaching'); await loadProfile(); }, 700);
 }
 
@@ -1337,10 +1344,10 @@ async function saveLevels() {
   const videoLink = document.getElementById('inputVideoLink').value.trim();
   const data = { user_id: currentUserId, teaching_levels: teachingLevels.length > 0 ? teachingLevels : null, video_link: videoLink || null };
   const { error } = await _supabase.from('tutor_profiles').upsert(data, { onConflict: 'user_id' });
-  if (error) { showAlert('alertLevels', 'Error: ' + error.message, 'error'); return; }
+  if (error) { showAlert('alertLevels', T('error', 'Error: {{message}}', { message: error.message }), 'error'); return; }
   const { error: langErr } = await USKLangs.save(_supabase, langPickerTP ? langPickerTP.get() : teachLanguages);
-  if (langErr) { showAlert('alertLevels', 'Error: ' + langErr.message, 'error'); return; }
-  showAlert('alertLevels', 'Saved!', 'success');
+  if (langErr) { showAlert('alertLevels', T('error', 'Error: {{message}}', { message: langErr.message }), 'error'); return; }
+  showAlert('alertLevels', T('saved', 'Saved!'), 'success');
   setTimeout(async () => { closeModal('modalLevels'); await loadProfile(); }, 700);
 }
 
@@ -1354,7 +1361,7 @@ function addCert() {
     // just use the filename (without extension) as a sensible default.
     sub = file.name.replace(/\.[^/.]+$/, '').replace(/[_-]+/g, ' ');
   }
-  if (!sub) { showAlert('alertCerts', 'Please enter a certificate name or subject, or choose a file.', 'error'); return; }
+  if (!sub) { showAlert('alertCerts', T('cert.name-needed', 'Please enter a certificate name or subject, or choose a file.'), 'error'); return; }
 
   certificates.push({ subject: sub, grade: grade || null, file, fileName: file ? file.name : null, fileUrl: null });
   renderCertsModal();
@@ -1368,7 +1375,7 @@ function renderCertsModal() {
   document.getElementById('certsModalList').innerHTML = certificates.map((c, i) => `
     <div style="display:flex;align-items:center;gap:0.7rem;background:var(--off);border-radius:9px;padding:0.7rem;margin-bottom:0.5rem;">
       <span>🏅</span>
-      <div style="flex:1;"><div style="font-weight:700;font-size:0.83rem;">${__esc(c.subject)}</div><div style="font-size:0.73rem;color:var(--green);">${__esc(c.grade ? 'Grade: ' + c.grade : 'No grade specified')}${__esc(c.fileName ? ' · 📎 ' + c.fileName : '')}</div></div>
+      <div style="flex:1;"><div style="font-weight:700;font-size:0.83rem;">${__esc(c.subject)}</div><div style="font-size:0.73rem;color:var(--green);">${c.grade ? H('grade-colon', 'Grade: {{grade}}', { grade: c.grade }) : H('no-grade', 'No grade specified')}${__esc(c.fileName ? ' · 📎 ' + c.fileName : '')}</div></div>
       <button onclick="certificates.splice(${i},1);renderCertsModal();" style="background:none;border:none;cursor:pointer;color:var(--light);font-size:1rem;">×</button>
     </div>`).join('');
 }
@@ -1417,14 +1424,14 @@ async function saveCerts() {
   }
   const clean = certificates.map(({ subject, grade, fileUrl, fileName }) => ({ subject, grade, fileUrl: fileUrl || null, fileName: fileName || null }));
   const { error } = await _supabase.from('tutor_profiles').upsert({ user_id: currentUserId, certificates: clean }, { onConflict: 'user_id' });
-  if (error) { showAlert('alertCerts', 'Error: ' + error.message, 'error'); return; }
+  if (error) { showAlert('alertCerts', T('error', 'Error: {{message}}', { message: error.message }), 'error'); return; }
   certificates = clean;
   renderCertsModal();
   if (uploadFailures > 0) {
-    showAlert('alertCerts', `Saved, but ${uploadFailures} file${uploadFailures > 1 ? 's' : ''} couldn't upload. Please try that file again.`, 'error');
+    showAlert('alertCerts', T('cert.upload-failed', { one: "Saved, but {{count}} file couldn't upload. Please try that file again.", other: "Saved, but {{count}} files couldn't upload. Please try that file again." }, { count: uploadFailures }), 'error');
     return;
   }
-  showAlert('alertCerts', 'Saved!', 'success');
+  showAlert('alertCerts', T('saved', 'Saved!'), 'success');
   setTimeout(async () => { closeModal('modalCerts'); await loadProfile(); }, 700);
 }
 
@@ -1525,18 +1532,18 @@ function profileSignOut() {
 <div class="modal-overlay" id="modalMeetingLink" onclick="if(event.target===this)closeModal('modalMeetingLink')">
   <div class="modal">
     <div class="modal-head">
-      <div class="modal-title">Meeting Link</div>
+      <div data-i18n="tutor-profile.meeting-link" class="modal-title">Meeting Link</div>
       <button class="modal-x" onclick="closeModal('modalMeetingLink')">✕</button>
     </div>
     <div class="modal-body">
-      <p style="font-size:0.83rem;color:var(--mid);line-height:1.6;margin-bottom:1.2rem;">Lessons take place in the built-in UniSkilled classroom, so no link is needed. Optionally add a Zoom or Google Meet link: it is only shown inside the classroom as a backup if the connection has problems.</p>
+      <p data-i18n="tutor-profile.lessons-take-place-in" style="font-size:0.83rem;color:var(--mid);line-height:1.6;margin-bottom:1.2rem;">Lessons take place in the built-in UniSkilled classroom, so no link is needed. Optionally add a Zoom or Google Meet link: it is only shown inside the classroom as a backup if the connection has problems.</p>
       <div class="form-group">
-        <label for="inputMeetingLink" class="form-label">Your meeting link</label>
-        <input type="url" class="form-input" id="inputMeetingLink" placeholder="https://zoom.us/j/your-personal-room">
-        <div style="font-size:0.75rem;color:var(--mid);margin-top:0.4rem;">💡 Test the link in a private browser window after saving, so you know it opens your room.</div>
+        <label data-i18n="tutor-profile.your-meeting-link" for="inputMeetingLink" class="form-label">Your meeting link</label>
+        <input data-i18n-attr="placeholder:tutor-profile.httpszoomusjyour-personal-room.placeholder" type="url" class="form-input" id="inputMeetingLink" placeholder="https://zoom.us/j/your-personal-room">
+        <div data-i18n="tutor-profile.test-the-link-in" style="font-size:0.75rem;color:var(--mid);margin-top:0.4rem;">💡 Test the link in a private browser window after saving, so you know it opens your room.</div>
       </div>
     </div>
-    <div class="modal-footer">
+    <div data-i18n="tutor-profile.cancel-save-8" class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modalMeetingLink')">Cancel</button>
       <button class="btn btn-primary" onclick="saveMeetingLink()">Save</button>
     </div>
