@@ -392,7 +392,7 @@ body:not([data-role="tutor"]) .why [data-for-role="tutor"],body[data-role="tutor
         <div class="cert-list" id="courseList"></div>
         <div class="course-add-grid">
           <div class="form-group" style="margin:0;"><label for="courseName" class="form-label">Course name</label><input type="text" class="form-input" id="courseName" maxlength="120" placeholder="e.g. Calculus II"></div>
-          <div class="form-group" style="margin:0;"><label for="courseCode" class="form-label">Course code</label><input type="text" class="form-input" id="courseCode" maxlength="40" placeholder="e.g. MATH 201"></div>
+          <div class="form-group" style="margin:0;"><label for="courseCode" class="form-label">Course code (optional)</label><input type="text" class="form-input" id="courseCode" maxlength="40" placeholder="e.g. MATH 201"></div>
           <div class="form-group" style="margin:0;"><label for="courseProf" class="form-label">Professor (optional)</label><input type="text" class="form-input" id="courseProf" maxlength="80" placeholder="e.g. Prof. Chen"></div>
           <div class="form-group" style="margin:0;"><label for="courseSemester" class="form-label">Semester taken (optional)</label><input type="text" class="form-input" id="courseSemester" maxlength="30" placeholder="e.g. Winter 2025/26"></div>
           <div class="form-group" style="margin:0;"><label for="courseGrade" class="form-label">Your grade (optional)</label><input type="text" class="form-input" id="courseGrade" maxlength="20" placeholder="e.g. 1.3"></div>
@@ -624,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('addCourseBtn').addEventListener('click', function() {
     const val = id => document.getElementById(id).value.trim();
     const name = val('courseName'), code = val('courseCode');
-    if (name || code) {
+    if (name) {
       courses.push({
         course_name: name || null, course_code: code || null,
         professor_name: val('courseProf') || null,
@@ -635,7 +635,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ['courseName', 'courseCode', 'courseProf', 'courseSemester', 'courseGrade'].forEach(id => { document.getElementById(id).value = ''; });
       hideAlert();
     } else {
-      showAlert('Please enter the course name or code.', 'error');
+      showAlert('Please enter the course name.', 'error');
     }
   });
 
