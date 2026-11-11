@@ -119,6 +119,16 @@
   /** HTML-safe: values are escaped; the template itself is trusted (it comes from our own files). */
   function h(key, en, vars) { return fill(resolve(key, en, vars), vars, true); }
 
+  /** A message written by our server (always English). Known messages are looked up by their wording
+   *  under "server.<slug>" in common.json; anything unknown is shown exactly as received. English: unchanged. */
+  function serverSlug(msg) { return String(msg).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 90); }
+  function server(msg) {
+    if (msg == null || lang === DEFAULT || conf.pseudo) return msg;
+    var entry = dict['server.' + serverSlug(msg)];
+    var v = entry != null ? pick(entry, lang, {}) : null;
+    return v ? v : msg;
+  }
+
   // ---- Formatting: dates, times, numbers, money -----------------------------------------------
   function locales() { return conf.intl ? [conf.intl] : []; }   // [] = browser default (English as before)
   function toDate(d) { return d instanceof Date ? d : new Date(d); }
@@ -182,6 +192,8 @@
     date: date,
     time: time,
     dateTime: dateTime,
+    server: server,
+    serverSlug: serverSlug,
     number: number,
     money: money,
     languageName: languageName,

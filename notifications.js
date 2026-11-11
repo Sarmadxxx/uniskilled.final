@@ -13,6 +13,11 @@
  */
 (function () {
   'use strict';
+  // Interface text: English is written here; other languages come from locales/<lang>/common.json (notify.*).
+  // The notifications themselves (title/body) are stored text and are shown as stored.
+  function pick(en, v) { return typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en; }
+  function T(k, en, v) { return window.I18N ? I18N.t('notify.' + k, en, v) : pick(en, v).replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? v[x] : m; }); }
+  var NON_EN = !!(window.I18N && I18N.lang !== 'en');
 
   // ── Classification ───────────────────────────────────────────────────────────────────────
   // section: where in the dashboard it belongs. cat: colour + filter chip.
@@ -32,14 +37,14 @@
   }
 
   var CAT = {
-    bookings: { label: 'Bookings', color: '#1a6bff', bg: '#eaf1ff', icon: '<path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/>' },
-    payments: { label: 'Payments', color: '#047857', bg: '#e7f8f0', icon: '<path d="M2 6h20v12H2z"/><path d="M2 10h20M6 15h4"/>' },
-    messages: { label: 'Messages', color: '#7c3aed', bg: '#f1ebff', icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' },
-    reviews: { label: 'Reviews', color: '#b45309', bg: '#fdf3e2', icon: '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>' },
-    alert: { label: 'Needs attention', color: '#dc2626', bg: '#fdecec', icon: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>' },
-    other: { label: 'Updates', color: '#475569', bg: '#eef2f6', icon: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>' },
+    bookings: { label: T('cat.bookings', 'Bookings'), color: '#1a6bff', bg: '#eaf1ff', icon: '<path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/>' },
+    payments: { label: T('cat.payments', 'Payments'), color: '#047857', bg: '#e7f8f0', icon: '<path d="M2 6h20v12H2z"/><path d="M2 10h20M6 15h4"/>' },
+    messages: { label: T('cat.messages', 'Messages'), color: '#7c3aed', bg: '#f1ebff', icon: '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>' },
+    reviews: { label: T('cat.reviews', 'Reviews'), color: '#b45309', bg: '#fdf3e2', icon: '<path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/>' },
+    alert: { label: T('cat.alert', 'Needs attention'), color: '#dc2626', bg: '#fdecec', icon: '<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>' },
+    other: { label: T('cat.other', 'Updates'), color: '#475569', bg: '#eef2f6', icon: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>' },
   };
-  var FILTERS = [['all', 'All'], ['unread', 'Unread'], ['bookings', 'Bookings'], ['payments', 'Payments'], ['messages', 'Messages'], ['alert', 'Attention']];
+  var FILTERS = [['all', T('f.all', 'All')], ['unread', T('f.unread', 'Unread')], ['bookings', T('cat.bookings', 'Bookings')], ['payments', T('cat.payments', 'Payments')], ['messages', T('cat.messages', 'Messages')], ['alert', T('f.alert', 'Attention')]];
 
   // Where a notification should take the person.
   var TUTOR_TABS = { requests: 'requests', sessions: 'sessions', groupSessions: 'groupSessions', reviews: 'reviews', referrals: 'referrals', subjectRequests: 'subjectRequests' };
@@ -55,11 +60,11 @@
   }
   function actionLabel(n, role) {
     var t = String(n.type || '');
-    if (t === 'booking_request' || t === 'request_nudge' || t === 'reschedule_requested') return 'Respond';
-    if (t === 'awaiting_payment' || t === 'payment_reminder') return 'Pay now';
-    if (t === 'call_started' || t === 'session_reminder') return 'Join';
-    if (t === 'rate_reminder') return 'Rate';
-    if (t === 'new_message') return 'Reply';
+    if (t === 'booking_request' || t === 'request_nudge' || t === 'reschedule_requested') return T('act.respond', 'Respond');
+    if (t === 'awaiting_payment' || t === 'payment_reminder') return T('act.pay', 'Pay now');
+    if (t === 'call_started' || t === 'session_reminder') return T('act.join', 'Join');
+    if (t === 'rate_reminder') return T('act.rate', 'Rate');
+    if (t === 'new_message') return T('act.reply', 'Reply');
     return '';
   }
 
@@ -68,19 +73,19 @@
   function svg(paths, size) { return '<svg viewBox="0 0 24 24" width="' + (size || 18) + '" height="' + (size || 18) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + paths + '</svg>'; }
   function ago(iso) {
     var s = (Date.now() - new Date(iso).getTime()) / 1000;
-    if (s < 45) return 'just now';
-    if (s < 3600) return Math.round(s / 60) + ' min ago';
-    if (s < 86400) return Math.round(s / 3600) + ' h ago';
-    if (s < 7 * 86400) return Math.round(s / 86400) + ' d ago';
-    return new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short' });
+    if (s < 45) return T('ago.now', 'just now');
+    if (s < 3600) return T('ago.min', '{{count}} min ago', { count: Math.round(s / 60) });
+    if (s < 86400) return T('ago.h', '{{count}} h ago', { count: Math.round(s / 3600) });
+    if (s < 7 * 86400) return T('ago.d', '{{count}} d ago', { count: Math.round(s / 86400) });
+    return NON_EN ? I18N.date(iso, { day: 'numeric', month: 'short' }) : new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'short' });
   }
   function dayGroup(iso) {
     var d = new Date(iso), now = new Date();
     var start = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    if (d.getTime() >= start) return 'Today';
-    if (d.getTime() >= start - 86400000) return 'Yesterday';
-    if (d.getTime() >= start - 6 * 86400000) return 'This week';
-    return 'Earlier';
+    if (d.getTime() >= start) return T('g.today', 'Today');
+    if (d.getTime() >= start - 86400000) return T('g.yesterday', 'Yesterday');
+    if (d.getTime() >= start - 6 * 86400000) return T('g.week', 'This week');
+    return T('g.earlier', 'Earlier');
   }
 
   // ── State ────────────────────────────────────────────────────────────────────────────────
@@ -211,12 +216,12 @@
     var act = actionLabel(n, S.role);
     return '<div class="usk-item' + (n.read ? '' : ' unread') + '" role="link" tabindex="0" data-id="' + esc(n.id) + '">' +
       '<div class="usk-ico" style="background:' + c.bg + ';color:' + c.color + '">' + svg(c.icon) + '</div>' +
-      '<div class="usk-main"><div class="usk-title">' + esc(n.title || 'Notification') + '</div>' +
+      '<div class="usk-main"><div class="usk-title">' + esc(n.title || T('notification', 'Notification')) + '</div>' +
       (n.body ? '<div class="usk-body">' + esc(n.body) + '</div>' : '') +
       '<div class="usk-meta"><span class="usk-tag" style="background:' + c.bg + ';color:' + c.color + '">' + esc(c.label) + '</span>' +
-      '<time datetime="' + esc(n.created_at) + '" title="' + esc(new Date(n.created_at).toLocaleString()) + '">' + esc(ago(n.created_at)) + '</time></div></div>' +
+      '<time datetime="' + esc(n.created_at) + '" title="' + esc(NON_EN ? I18N.dateTime(n.created_at) : new Date(n.created_at).toLocaleString()) + '">' + esc(ago(n.created_at)) + '</time></div></div>' +
       (act ? '<button type="button" class="usk-act" data-act="open">' + esc(act) + '</button>' : '') +
-      (!n.read ? '<button type="button" class="usk-read" data-act="read" title="Mark as read" aria-label="Mark as read">' + svg('<path d="M20 6 9 17l-5-5"/>', 16) + '</button>' : '') +
+      (!n.read ? '<button type="button" class="usk-read" data-act="read" title="' + esc(T('mark-read', 'Mark as read')) + '" aria-label="' + esc(T('mark-read', 'Mark as read')) + '">' + svg('<path d="M20 6 9 17l-5-5"/>', 16) + '</button>' : '') +
       '</div>';
   }
   function filtered(filter) {
@@ -229,7 +234,7 @@
   function listHtml(filter) {
     var rows = filtered(filter);
     if (!rows.length) {
-      var msg = filter === 'unread' ? ["You're all caught up", 'No unread notifications.'] : ['Nothing here yet', 'Booking requests, payments and messages will show up here.'];
+      var msg = filter === 'unread' ? [T('empty.caught-up', "You're all caught up"), T('empty.no-unread', 'No unread notifications.')] : [T('empty.nothing', 'Nothing here yet'), T('empty.will-show', 'Booking requests, payments and messages will show up here.')];
       return '<div class="usk-empty">' + svg(CAT.other.icon, 32) + '<b>' + esc(msg[0]) + '</b>' + esc(msg[1]) + '</div>';
     }
     var out = '', last = '';
@@ -238,7 +243,7 @@
       if (g !== last) { out += '<div class="usk-group">' + esc(g) + '</div>'; last = g; }
       out += itemHtml(n);
     });
-    if (!S.exhausted) out += '<button type="button" class="usk-more" data-act="more">Show older notifications</button>';
+    if (!S.exhausted) out += '<button type="button" class="usk-more" data-act="more">' + esc(T('older', 'Show older notifications')) + '</button>';
     return out;
   }
   function chipsHtml(filter) {
@@ -256,14 +261,14 @@
       if (!c) { c = document.createElement('span'); c.className = 'usk-count'; b.appendChild(c); }
       c.textContent = S.unread > 99 ? '99+' : String(S.unread);
     } else if (c) c.remove();
-    b.setAttribute('aria-label', S.unread ? 'Notifications, ' + S.unread + ' unread' : 'Notifications');
+    b.setAttribute('aria-label', S.unread ? T('bell-unread', 'Notifications, {{count}} unread', { count: S.unread }) : T('title', 'Notifications'));
     var base = S.baseTitle.replace(/^\(\d+\+?\)\s*/, '');
     document.title = (S.unread ? '(' + (S.unread > 99 ? '99+' : S.unread) + ') ' : '') + base;
   }
   function renderPanel() {
     var p = document.getElementById('uskPanel');
     if (!p) return;
-    p.querySelector('.usk-sub').textContent = S.unread ? S.unread + ' unread' : 'All caught up';
+    p.querySelector('.usk-sub').textContent = S.unread ? T('unread', '{{count}} unread', { count: S.unread }) : T('all-caught-up', 'All caught up');
     p.querySelector('[data-act="all"]').disabled = !S.unread;
     p.querySelector('.usk-chips').innerHTML = chipsHtml(S.filter);
     p.querySelector('.usk-list').innerHTML = listHtml(S.filter);
@@ -294,7 +299,7 @@
     var btn = e.target.closest('[data-act]');
     var act = btn && btn.getAttribute('data-act');
     if (act === 'all') { markAllRead(); return; }
-    if (act === 'more') { btn.disabled = true; btn.textContent = 'Loading…'; loadMore(); return; }
+    if (act === 'more') { btn.disabled = true; btn.textContent = T('loading', 'Loading…'); loadMore(); return; }
     if (act === 'close') { closePanel(); return; }
     if (act === 'desktop') { askDesktop(); return; }
     var row = e.target.closest('.usk-item');
@@ -313,16 +318,16 @@
     p.id = 'uskPanel';
     p.className = 'usk-panel';
     p.setAttribute('role', 'dialog');
-    p.setAttribute('aria-label', 'Notifications');
+    p.setAttribute('aria-label', T('title', 'Notifications'));
     p.hidden = true;
     p.innerHTML =
-      '<div class="usk-head"><div><h2>Notifications</h2><div class="usk-sub"></div></div>' +
-      '<div style="display:flex;align-items:center;gap:2px"><button type="button" class="usk-link" data-act="all">Mark all as read</button>' +
-      '<button type="button" class="usk-x" data-act="close" aria-label="Close">×</button></div></div>' +
-      '<div class="usk-chips" role="toolbar" aria-label="Filter notifications"></div>' +
+      '<div class="usk-head"><div><h2>' + esc(T('title', 'Notifications')) + '</h2><div class="usk-sub"></div></div>' +
+      '<div style="display:flex;align-items:center;gap:2px"><button type="button" class="usk-link" data-act="all">' + esc(T('mark-all', 'Mark all as read')) + '</button>' +
+      '<button type="button" class="usk-x" data-act="close" aria-label="' + esc(T('close', 'Close')) + '">×</button></div></div>' +
+      '<div class="usk-chips" role="toolbar" aria-label="' + esc(T('filter', 'Filter notifications')) + '"></div>' +
       '<div class="usk-list"></div>' +
-      '<div class="usk-foot"><button type="button" class="usk-link" data-act="desktop" style="display:none">🔔 Turn on desktop alerts</button>' +
-      '<a class="usk-link" style="text-decoration:none;margin-left:auto" href="' + (S.role === 'tutor' ? 'tutor-dashboard.html?tab=notifications' : 'student-dashboard.html#notifsCard') + '">See all →</a></div>';
+      '<div class="usk-foot"><button type="button" class="usk-link" data-act="desktop" style="display:none">🔔 ' + esc(T('desktop', 'Turn on desktop alerts')) + '</button>' +
+      '<a class="usk-link" style="text-decoration:none;margin-left:auto" href="' + (S.role === 'tutor' ? 'tutor-dashboard.html?tab=notifications' : 'student-dashboard.html#notifsCard') + '">' + esc(T('see-all', 'See all →')) + '</a></div>';
     p.addEventListener('click', function (e) { onClick(e, S); });
     p.addEventListener('keydown', onKey);
     document.body.appendChild(p);
@@ -381,12 +386,12 @@
     var t = document.createElement('div');
     t.className = 'usk-toast';
     t.setAttribute('role', 'status');
-    var act = actionLabel(n, S.role) || 'View';
+    var act = actionLabel(n, S.role) || T('act.view', 'View');
     t.innerHTML = '<div class="usk-ico" style="background:' + c.bg + ';color:' + c.color + '">' + svg(c.icon) + '</div>' +
-      '<div class="usk-main"><div class="usk-title">' + esc(n.title || 'New notification') + '</div>' +
+      '<div class="usk-main"><div class="usk-title">' + esc(n.title || T('new', 'New notification')) + '</div>' +
       (n.body ? '<div class="usk-body">' + esc(n.body) + '</div>' : '') +
       '<button type="button" class="usk-act" style="margin:8px 0 0">' + esc(act) + '</button></div>' +
-      '<button type="button" class="usk-x" aria-label="Dismiss">×</button>';
+      '<button type="button" class="usk-x" aria-label="' + esc(T('dismiss', 'Dismiss')) + '">×</button>';
     t.addEventListener('click', function (e) {
       if (e.target.closest('.usk-x')) { t.remove(); return; }
       openItem(n);
@@ -449,7 +454,7 @@
       if (!el) return;
       injectStyles();
       el.classList.add('usk-full');
-      el.innerHTML = '<div class="usk-chips" role="toolbar" aria-label="Filter notifications"></div><div class="usk-list"></div>';
+      el.innerHTML = '<div class="usk-chips" role="toolbar" aria-label="' + esc(T('filter', 'Filter notifications')) + '"></div><div class="usk-list"></div>';
       var scope = { el: el, filter: (opts && opts.filter) || 'all' };
       el.addEventListener('click', function (e) { onClick(e, scope); });
       el.addEventListener('keydown', onKey);

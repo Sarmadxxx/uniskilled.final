@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="sentry.js"></script>
+<script src="i18n.js"></script>
 <link rel="icon" href="favicon.ico?v=20261101" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261101">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
-<title>Book a Session — UniSkilled</title>
+<title data-i18n="book-session.title">Book a Session — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -130,50 +131,50 @@ body{background:#f4f6f9;color:#0f172a}
 <script src="site-nav.js"></script>
 <main class="bk-wrap" id="main">
   <div class="bk-head">
-    <a href="javascript:history.back()">← Back</a>
-    <h1>Request a session</h1>
-    <p>Choose a time and your price. The tutor accepts or declines — you only pay after they accept.</p>
+    <a data-i18n="book-session.back" href="javascript:history.back()">← Back</a>
+    <h1 data-i18n="book-session.request-a-session">Request a session</h1>
+    <p data-i18n="book-session.choose-a-time-and">Choose a time and your price. The tutor accepts or declines — you only pay after they accept.</p>
   </div>
   <div class="bk-grid">
     <div class="bk-card">
       <section class="bk-section" aria-labelledby="stepWhat">
-        <h2 class="bk-step" id="stepWhat"><span>1</span>What and when</h2>
+        <h2 data-i18n="book-session.1what-and-when" class="bk-step" id="stepWhat"><span>1</span>What and when</h2>
         <div class="form-group">
-          <label for="subject" class="form-label">Subject *</label>
-          <input type="text" id="subject" class="form-input" placeholder="e.g. Linear Algebra, Python basics...">
+          <label data-i18n="book-session.subject" for="subject" class="form-label">Subject *</label>
+          <input data-i18n-attr="placeholder:book-session.eg-linear-algebra-python.placeholder" type="text" id="subject" class="form-input" placeholder="e.g. Linear Algebra, Python basics...">
         </div>
         <div class="form-row">
-          <div class="form-group">
+          <div data-i18n="book-session.date" class="form-group">
             <label for="date" class="form-label">Date *</label>
             <input type="date" id="date" class="form-input">
           </div>
-          <div class="form-group">
+          <div data-i18n="book-session.time" class="form-group">
             <label for="time" class="form-label">Time *</label>
             <input type="time" id="time" class="form-input">
           </div>
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="duration" class="form-label">Duration</label>
+            <label data-i18n="book-session.duration" for="duration" class="form-label">Duration</label>
             <select id="duration" class="form-select">
-              <option value="60">60 minutes</option>
-              <option value="90">90 minutes</option>
-              <option value="120">120 minutes</option>
+              <option data-i18n="book-session.60-minutes" value="60">60 minutes</option>
+              <option data-i18n="book-session.90-minutes" value="90">90 minutes</option>
+              <option data-i18n="book-session.120-minutes" value="120">120 minutes</option>
             </select>
           </div>
           <div class="form-group">
-            <span class="form-label">Format</span>
-            <div class="form-input" style="display:flex;align-items:center;background:var(--off,#f8fafc);color:var(--ink2,#334155);">💻 Online (video call)</div>
+            <span data-i18n="book-session.format" class="form-label">Format</span>
+            <div data-i18n="book-session.online-video-call" class="form-input" style="display:flex;align-items:center;background:var(--off,#f8fafc);color:var(--ink2,#334155);">💻 Online (video call)</div>
           </div>
         </div>
         <div id="blockedWarning" class="blocked" role="alert"></div>
       </section>
 
       <section class="bk-section" aria-labelledby="stepPrice">
-        <h2 class="bk-step" id="stepPrice"><span>2</span>Your price</h2>
+        <h2 data-i18n="book-session.2your-price" class="bk-step" id="stepPrice"><span>2</span>Your price</h2>
         <div id="priceDisplay" style="display:none;" class="price-breakdown">
           <div class="form-group">
-            <label for="offerPrice" class="form-label" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+            <label data-i18n="book-session.your-offer-for-this" for="offerPrice" class="form-label" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
               <span>Your offer for this session</span>
               <span style="font-weight:500;color:#5b6474;font-size:0.8125rem;">Listed rate: <span id="listedRateHint"></span></span>
             </label>
@@ -187,52 +188,52 @@ body{background:#f4f6f9;color:#0f172a}
       </section>
 
       <section class="bk-section" aria-labelledby="stepNotes">
-        <h2 class="bk-step" id="stepNotes"><span>3</span>Anything the tutor should know?</h2>
+        <h2 data-i18n="book-session.3anything-the-tutor-should" class="bk-step" id="stepNotes"><span>3</span>Anything the tutor should know?</h2>
         <div class="form-group">
-          <label for="examDate" class="form-label">Exam date (optional)</label>
+          <label data-i18n="book-session.exam-date-optional" for="examDate" class="form-label">Exam date (optional)</label>
           <input type="date" id="examDate" class="form-input" aria-describedby="examDateHint">
-          <div class="hint" id="examDateHint" style="margin-top:6px;">Preparing for an exam? Add the date so your tutor can plan the lessons around it.</div>
+          <div data-i18n="book-session.preparing-for-an-exam" class="hint" id="examDateHint" style="margin-top:6px;">Preparing for an exam? Add the date so your tutor can plan the lessons around it.</div>
         </div>
         <div class="form-group">
-          <label for="notes" class="form-label">Notes for tutor (optional)</label>
-          <textarea id="notes" class="form-textarea" placeholder="What do you want to cover? Any specific topics or questions?"></textarea>
+          <label data-i18n="book-session.notes-for-tutor-optional" for="notes" class="form-label">Notes for tutor (optional)</label>
+          <textarea data-i18n-attr="placeholder:book-session.what-do-you-want.placeholder" id="notes" class="form-textarea" placeholder="What do you want to cover? Any specific topics or questions?"></textarea>
         </div>
       </section>
     </div>
 
-    <aside class="bk-aside" aria-label="Booking summary">
+    <aside data-i18n-attr="aria-label:book-session.booking-summary.arialabel" class="bk-aside" aria-label="Booking summary">
       <div class="bk-card">
         <div class="tutor-info" id="tutorInfo">
           <div class="tutor-av" id="tutorAv">?</div>
           <div style="min-width:0">
-            <div style="font-weight:800;" id="tutorName">Loading...</div>
+            <div data-i18n="book-session.loading" style="font-weight:800;" id="tutorName">Loading...</div>
             <div id="tutorSubjects"></div>
             <div style="font-weight:700;margin-top:2px;" id="tutorRate"></div>
           </div>
         </div>
         <div class="sum" id="bookingSummary">
-          <div class="sum-row"><span>Subject</span><span id="sumSubject">—</span></div>
-          <div class="sum-row"><span>When</span><span id="sumWhen">—</span></div>
-          <div class="sum-row"><span>Length</span><span id="sumLength">60 min · Online</span></div>
+          <div data-i18n="book-session.subject-2" class="sum-row"><span>Subject</span><span id="sumSubject">—</span></div>
+          <div data-i18n="book-session.when" class="sum-row"><span>When</span><span id="sumWhen">—</span></div>
+          <div data-i18n="book-session.length60-min-online" class="sum-row"><span>Length</span><span id="sumLength">60 min · Online</span></div>
           <div id="sumPrice" style="display:none;flex-direction:column;gap:10px;">
-            <div class="sum-row muted"><span>Platform fee (included)</span><span id="priceFee">—</span></div>
-            <div class="sum-row muted"><span>Tutor receives</span><span id="priceTutor">—</span></div>
-            <div class="sum-row total"><span>Total if accepted</span><span id="priceCharge">—</span></div>
+            <div data-i18n="book-session.platform-fee-included" class="sum-row muted"><span>Platform fee (included)</span><span id="priceFee">—</span></div>
+            <div data-i18n="book-session.tutor-receives" class="sum-row muted"><span>Tutor receives</span><span id="priceTutor">—</span></div>
+            <div data-i18n="book-session.total-if-accepted" class="sum-row total"><span>Total if accepted</span><span id="priceCharge">—</span></div>
           </div>
         </div>
         <div class="sum-act">
           <div id="alert" class="alert" role="alert"></div>
           <button type="button" class="btn-submit" id="submitBtn" onclick="submitBooking()">
-            <span id="btnText">Send request</span>
+            <span data-i18n="book-session.send-request" id="btnText">Send request</span>
             <div class="spinner" id="spinner"></div>
           </button>
-          <div class="no-charge"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 16v-4M12 8h.01"/></svg><span><strong>You won't be charged yet.</strong> This sends a request to the tutor. If they accept, you'll have up to 24 hours to pay and lock in the session (or until 1 hour before it starts, if that's sooner).</span></div>
-          <p class="terms">By requesting a session you agree to our <a href="legal.html" target="_blank">Terms of Service</a> and <a href="legal.html#refund" target="_blank">Refund Policy</a>.</p>
+          <div data-i18n="book-session.you-wont-be-charged" class="no-charge"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 16v-4M12 8h.01"/></svg><span><strong>You won't be charged yet.</strong> This sends a request to the tutor. If they accept, you'll have up to 24 hours to pay and lock in the session (or until 1 hour before it starts, if that's sooner).</span></div>
+          <p data-i18n="book-session.by-requesting-a-session" class="terms">By requesting a session you agree to our <a href="legal.html" target="_blank">Terms of Service</a> and <a href="legal.html#refund" target="_blank">Refund Policy</a>.</p>
         </div>
       </div>
       <div class="bk-card trust">
-        <div class="trust-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg><span><strong>Payment protected.</strong> Once you pay, your money is held for 48 hours after the session — full refund if something goes wrong.</span></div>
-        <div class="trust-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span><strong>Never lose money to a no-show.</strong> If your tutor cancels, you're refunded automatically. If they don't show up, report it from your dashboard within 48 hours for a full refund.</span></div>
+        <div data-i18n="book-session.payment-protected-once-you" class="trust-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg><span><strong>Payment protected.</strong> Once you pay, your money is held for 48 hours after the session — full refund if something goes wrong.</span></div>
+        <div data-i18n="book-session.never-lose-money-to" class="trust-item"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span><strong>Never lose money to a no-show.</strong> If your tutor cancels, you're refunded automatically. If they don't show up, report it from your dashboard within 48 hours for a full refund.</span></div>
       </div>
     </aside>
   </div>
@@ -244,8 +245,12 @@ function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 function __viewerTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Berlin';}catch(e){return 'Europe/Berlin';}}
-function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').pop().replace(/_/g,' ')+' time)':'';}
+function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+T('tz-time','{{zone}} time',{zone:String(tz).split('/').pop().replace(/_/g,' ')})+')':'';}
 function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
+
+// Interface text: English is written here; other languages come from locales/<lang>/page.book-session.json
+// (Messages saved for the tutor — chat message, notification, email — stay English until per-recipient language exists.)
+const T = (k, en, v) => window.I18N ? I18N.t('book-session.js.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? v[x] : m);
 
 const SUPABASE_URL=USK_CONFIG.url;
 const SUPABASE_KEY=USK_CONFIG.anonKey;
@@ -296,7 +301,7 @@ async function init(){
   const {data:u}=await _sb.from('users').select('full_name,avatar_url').eq('id',tutorId).maybeSingle();
   tutorData={...tp,...u};
 
-  const name=u?.full_name||tutorNameParam;
+  const name=u?.full_name||(params.get('name')?tutorNameParam:T('tutor','Tutor'));
   const initials=name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
   const av=document.getElementById('tutorAv');
   const avatarUrl=tp?.avatar_url||u?.avatar_url;
@@ -305,21 +310,21 @@ async function init(){
 
   document.getElementById('tutorName').textContent=name;
   const subjects=Array.isArray(tp?.subjects)?tp.subjects:[];
-  document.getElementById('tutorSubjects').textContent=subjects.join(', ')||'';
+  document.getElementById('tutorSubjects').textContent=(window.I18N?I18N.join(subjects):subjects.join(', '))||'';
 
   const currency = tp?.currency || 'EUR';
   const sym = currSymbol(currency);
   const rate = tp?.hourly_rate || 0;
   const minPrice = currency === 'USD' ? 17 : 15;
-  document.getElementById('tutorRate').textContent = rate ? sym + rate + '/hr' : 'Rate not set';
+  document.getElementById('tutorRate').textContent = rate ? T('per-hour', '{{price}}/hr', { price: sym + rate }) : T('no-rate', 'Rate not set');
 
   // Editable price / negotiation
   if (rate >= minPrice) {
     document.getElementById('currencySymbolLabel').textContent = sym;
-    document.getElementById('listedRateHint').textContent = sym + rate + '/hr';
+    document.getElementById('listedRateHint').textContent = T('per-hour', '{{price}}/hr', { price: sym + rate });
     const offerInput = document.getElementById('offerPrice');
     offerInput.min = minPrice;
-    document.getElementById('priceHint').textContent = `Minimum ${sym}${minPrice}. Agreed on a different price in chat? Enter it here — the tutor will see your offer and can accept or decline.`;
+    document.getElementById('priceHint').textContent = T('price-hint', 'Minimum {{min}}. Agreed on a different price in chat? Enter it here — the tutor will see your offer and can accept or decline.', { min: sym + minPrice });
     applyDurationScaledPrice(); // sets the initial price based on the default 60-min duration
     updatePriceBreakdown();
     offerInput.addEventListener('input', updatePriceBreakdown);
@@ -328,7 +333,7 @@ async function init(){
     document.getElementById('sumPrice').style.display = 'flex';
   } else {
     // Without a valid rate there's no price to offer, so a request could never be sent
-    showAlert(`${name} hasn't set an hourly rate yet, so this session can't be booked. Send them a message to ask when they'll be available.`, 'error');
+    showAlert(T('no-rate-alert', "{{name}} hasn't set an hourly rate yet, so this session can't be booked. Send them a message to ask when they'll be available.", { name }), 'error');
     document.getElementById('submitBtn').style.display = 'none';
   }
 
@@ -363,10 +368,10 @@ function updateSummary() {
   let when = '—';
   if (d) {
     const dt = new Date(d + 'T' + (t || '12:00'));
-    when = dt.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' }) + (t ? ', ' + t : '');
+    when = (window.I18N && I18N.lang !== 'en' ? I18N.date(dt, { weekday: 'short', day: 'numeric', month: 'short' }) : dt.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' })) + (t ? (window.I18N && I18N.lang === 'ar' ? '، ' : ', ') + t : '');
   }
   document.getElementById('sumWhen').textContent = when;
-  document.getElementById('sumLength').textContent = dur + ' min · Online';
+  document.getElementById('sumLength').textContent = T('length', '{{n}} min · Online', { n: dur });
 }
 
 function applyDurationScaledPrice() {
@@ -397,7 +402,7 @@ function checkBlockedSlot() {
   const fullBlock = blocks.find(b => b.all_day);
 
   if (fullBlock) {
-    warningBox.textContent = 'This tutor is fully unavailable on this date. Please pick a different day.';
+    warningBox.textContent = T('blocked-day', 'This tutor is fully unavailable on this date. Please pick a different day.');
     warningBox.style.display = 'block';
     return true;
   }
@@ -405,7 +410,7 @@ function checkBlockedSlot() {
   if (time) {
     const partialBlock = blocks.find(b => !b.all_day && time >= b.start_time && time < b.end_time);
     if (partialBlock) {
-      warningBox.textContent = `This tutor is unavailable between ${partialBlock.start_time.slice(0,5)}–${partialBlock.end_time.slice(0,5)} on this date. Please pick a different time.`;
+      warningBox.textContent = T('blocked-time', 'This tutor is unavailable between {{from}}–{{to}} on this date. Please pick a different time.', { from: partialBlock.start_time.slice(0,5), to: partialBlock.end_time.slice(0,5) });
       warningBox.style.display = 'block';
       return true;
     }
@@ -424,19 +429,19 @@ async function submitBooking(){
   const notes=document.getElementById('notes').value.trim();
   const examDate=document.getElementById('examDate').value||null;
 
-  if(!subject){showAlert('Please enter a subject.','error');return;}
+  if(!subject){showAlert(T('need-subject','Please enter a subject.'),'error');return;}
   if(examDate){
     const ex=document.getElementById('examDate');
-    if(examDate<ex.min||examDate>ex.max){showAlert('Please check the exam date. It can be today or any date in the next year.','error');return;}
+    if(examDate<ex.min||examDate>ex.max){showAlert(T('exam-date','Please check the exam date. It can be today or any date in the next year.'),'error');return;}
   }
-  if(!date){showAlert('Please select a date.','error');return;}
-  if(!time){showAlert('Please select a time.','error');return;}
+  if(!date){showAlert(T('need-date','Please select a date.'),'error');return;}
+  if(!time){showAlert(T('need-time','Please select a time.'),'error');return;}
 
   const sessionDate=new Date(date+'T'+time);
-  if(sessionDate<new Date(Date.now()+2*60*60*1000)){showAlert('Please choose a time at least 2 hours from now.','error');return;}
+  if(sessionDate<new Date(Date.now()+2*60*60*1000)){showAlert(T('too-soon','Please choose a time at least 2 hours from now.'),'error');return;}
 
   if (checkBlockedSlot()) {
-    showAlert('This tutor is not available at the selected date/time. Please choose a different slot.','error');
+    showAlert(T('blocked','This tutor is not available at the selected date/time. Please choose a different slot.'),'error');
     return;
   }
 
@@ -444,7 +449,7 @@ async function submitBooking(){
   const minPrice = currency === 'USD' ? 17 : 15;
   const offerPrice = parseFloat(document.getElementById('offerPrice').value);
   if (!offerPrice || offerPrice < minPrice) {
-    showAlert(`The minimum session price is ${currSymbol(currency)}${minPrice}.`,'error');
+    showAlert(T('min-price','The minimum session price is {{min}}.',{ min: currSymbol(currency) + minPrice }),'error');
     return;
   }
 
@@ -461,7 +466,7 @@ async function submitBooking(){
     payment_status:'unpaid', timezone:__viewerTz(), exam_date:examDate
   }).select().single();
 
-  if(sessError){showAlert(__friendlyDbError(sessError,'Could not send your request. Please try again.'),'error');setLoading(false);return;}
+  if(sessError){showAlert(__friendlyDbError(sessError,T('send-failed','Could not send your request. Please try again.')),'error');setLoading(false);return;}
   window.usTrack&&usTrack('booking_requested',{subject,price:offerPrice,currency,duration_minutes:parseInt(duration),format});
 
   // Message to tutor
@@ -492,7 +497,7 @@ async function submitBooking(){
   } catch(e){console.error('Email failed:',e);}
 
   setLoading(false);
-  showAlert('✅ Request sent! We\'ll notify you the moment '+tutorName+' responds. If they accept, you\'ll have up to 24 hours to pay and lock in the session (or until 1 hour before it starts, if that\'s sooner).','success');
+  showAlert(T('sent',"✅ Request sent! We'll notify you the moment {{name}} responds. If they accept, you'll have up to 24 hours to pay and lock in the session (or until 1 hour before it starts, if that's sooner).",{ name: tutorName }),'success');
   document.getElementById('submitBtn').style.display='none';
   setTimeout(()=>window.location.href='student-dashboard.html',3500);
 }
@@ -504,7 +509,7 @@ function showAlert(msg,type){
 }
 function setLoading(loading){
   document.getElementById('submitBtn').disabled=loading;
-  document.getElementById('btnText').textContent=loading?'Sending request...':'Send request';
+  document.getElementById('btnText').textContent=loading?T('sending','Sending request...'):T('send','Send request');
   document.getElementById('spinner').style.display=loading?'block':'none';
 }
 

@@ -38,6 +38,12 @@
     },
     "page.tutor-profile": {
       "ar": "reviewed"
+    },
+    "page.book-session": {
+      "ar": "draft"
+    },
+    "page.student-dashboard": {
+      "ar": "draft"
     }
   },
   "reviewers": {

@@ -199,7 +199,7 @@
 /* Text people write themselves (bios, reviews, replies, names, course titles) keeps its own
    direction inside Arabic pages, so English text isn't jumbled (".with confidence" → "with confidence.").
    Arabic pages only: this file is never loaded on English pages. */
-.about-text, .profile-name, .cert-name,
+.about-text, .profile-name, .cert-name, .usk-title, .usk-body,
 .review-item div[style*="pre-wrap"], .review-item > div:first-child > span:first-child {
   unicode-bidi: plaintext;
 }

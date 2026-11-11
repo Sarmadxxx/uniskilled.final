@@ -11,13 +11,17 @@
   var FN_URL = 'https://orghkbbohnabcietidiv.supabase.co/functions/v1/reschedule-session';
   var MAX_MOVES = 2, MAX_DAYS = 30;
   var state = { sessionId: null, session: null, myId: null, busy: false };
+  // Interface text: English is written here; other languages come from locales/<lang>/common.json (resched.*)
+  function T(k, en, v) { return window.I18N ? I18N.t('resched.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? v[x] : m; }); }
+  function H(k, en, v) { return window.I18N ? I18N.h('resched.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? esc(v[x]) : m; }); }
 
   function esc(v) { return (window.__esc ? window.__esc(v) : String(v == null ? '' : v)); }
   function tzCity(tz) { return String(tz || 'Europe/Berlin').split('/').pop().replace(/_/g, ' '); }
   function fmtWhen(dateStr, timeStr, tz) {
     var d = new Date(String(dateStr) + 'T12:00:00Z');
-    var day = isNaN(d) ? String(dateStr) : d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
-    return day + ', ' + String(timeStr || '').slice(0, 5) + (window.__tzNote ? window.__tzNote(tz) : '');
+    var o = { weekday: 'short', day: 'numeric', month: 'short' };
+    var day = isNaN(d) ? String(dateStr) : (window.I18N && I18N.lang !== 'en' ? I18N.date(d, o) : d.toLocaleDateString([], o));
+    return day + (window.I18N && I18N.lang === 'ar' ? '، ' : ', ') + String(timeStr || '').slice(0, 5) + (window.__tzNote ? window.__tzNote(tz) : '');
   }
   function ymd(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
 
@@ -54,8 +58,8 @@
     o.innerHTML = ''
       + '<div id="usRsDialog" role="dialog" aria-modal="true" aria-labelledby="usRsTitle">'
       + '  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">'
-      + '    <h2 id="usRsTitle" style="font-size:1.05rem;font-weight:800;color:#0f172a;margin:0;">Propose a new time</h2>'
-      + '    <button type="button" id="usRsClose" aria-label="Close" style="background:none;border:none;font-size:1.4rem;color:#5b6474;cursor:pointer;line-height:1;min-width:36px;min-height:36px;">×</button>'
+      + '    <h2 id="usRsTitle" style="font-size:1.05rem;font-weight:800;color:#0f172a;margin:0;">' + esc(T('title', 'Propose a new time')) + '</h2>'
+      + '    <button type="button" id="usRsClose" aria-label="' + esc(T('close', 'Close')) + '" style="background:none;border:none;font-size:1.4rem;color:#5b6474;cursor:pointer;line-height:1;min-width:36px;min-height:36px;">×</button>'
       + '  </div>'
       + '  <div id="usRsBody"></div>'
       + '</div>';
@@ -82,8 +86,9 @@
     var headers = await window.authedHeaders();
     var res = await fetch(FN_URL, { method: 'POST', headers: headers, body: JSON.stringify(payload) });
     var data = {};
-    try { data = await res.json(); } catch (e) { data = { error: 'Something went wrong. Please try again.' }; }
-    if (!res.ok && !data.error) data.error = 'Something went wrong. Please try again.';
+    try { data = await res.json(); } catch (e) { data = { error: T('error', 'Something went wrong. Please try again.') }; }
+    if (!res.ok && !data.error) data.error = T('error', 'Something went wrong. Please try again.');
+    if (data.error && window.I18N) data.error = I18N.server(data.error);   // known server messages in the reader's language
     return data;
   }
 
@@ -113,26 +118,25 @@
     rowHtml: function (s, req, myId) {
       injectStyles();
       if (!s || (s.status !== 'confirmed' && s.status !== 'awaiting_payment')) return '';
-      var otherName = (s.student_id === myId) ? (s.tutor_name || 'your tutor') : (s.student_name || 'the student');
+      var otherName = (s.student_id === myId) ? (s.tutor_name || T('your-tutor', 'your tutor')) : (s.student_name || T('the-student', 'the student'));
       if (!req) {
         var startsIn = s.starts_at ? new Date(s.starts_at).getTime() - Date.now() : Infinity;
         if ((s.reschedule_count || 0) >= MAX_MOVES || startsIn < 2 * 3600 * 1000) return '';
-        return '<button class="btn-join" style="background:#fff;color:#1a6bff;border:1.5px solid #bfdbfe;margin-left:0.4rem;" onclick="UsResched.open(\'' + esc(s.id) + '\')">Reschedule</button>';
+        return '<button class="btn-join" style="background:#fff;color:#1a6bff;border:1.5px solid #bfdbfe;margin-left:0.4rem;" onclick="UsResched.open(\'' + esc(s.id) + '\')">' + esc(T('reschedule', 'Reschedule')) + '</button>';
       }
-      var when = esc(fmtWhen(req.new_date, req.new_time, s.timezone));
       if (req.requested_by === myId) {
-        return '<div class="us-rs-note mine"><span class="us-rs-text">⏳ You asked to move this to <strong>' + when + '</strong>. Waiting for ' + esc(otherName) + ' to reply — the session stays at its current time until then.</span>'
-          + '<button class="us-rs-btn ghost" onclick="UsResched.withdraw(\'' + esc(req.id) + '\', this)">Withdraw request</button></div>';
+        return '<div class="us-rs-note mine"><span class="us-rs-text">⏳ ' + H('mine', 'You asked to move this to <strong>{{when}}</strong>. Waiting for {{name}} to reply — the session stays at its current time until then.', { when: fmtWhen(req.new_date, req.new_time, s.timezone), name: otherName }) + '</span>'
+          + '<button class="us-rs-btn ghost" onclick="UsResched.withdraw(\'' + esc(req.id) + '\', this)">' + esc(T('withdraw', 'Withdraw request')) + '</button></div>';
       }
-      return '<div class="us-rs-note theirs"><span class="us-rs-text">🔄 ' + esc(otherName) + ' asked to move this session to <strong>' + when + '</strong>.</span>'
-        + '<button class="us-rs-btn primary" onclick="UsResched.respond(\'' + esc(req.id) + '\', true, this)">Accept new time</button>'
-        + '<button class="us-rs-btn ghost" onclick="UsResched.respond(\'' + esc(req.id) + '\', false, this)">Decline</button></div>';
+      return '<div class="us-rs-note theirs"><span class="us-rs-text">🔄 ' + H('theirs', '{{name}} asked to move this session to <strong>{{when}}</strong>.', { name: otherName, when: fmtWhen(req.new_date, req.new_time, s.timezone) }) + '</span>'
+        + '<button class="us-rs-btn primary" onclick="UsResched.respond(\'' + esc(req.id) + '\', true, this)">' + esc(T('accept', 'Accept new time')) + '</button>'
+        + '<button class="us-rs-btn ghost" onclick="UsResched.respond(\'' + esc(req.id) + '\', false, this)">' + esc(T('decline', 'Decline')) + '</button></div>';
     },
 
     open: async function (sessionId) {
       ensureModal();
       var body = document.getElementById('usRsBody');
-      body.innerHTML = '<p style="font-size:0.86rem;color:#334155;">Loading…</p>';
+      body.innerHTML = '<p style="font-size:0.86rem;color:#334155;">' + esc(T('loading', 'Loading…')) + '</p>';
       document.getElementById('usRsOverlay').style.display = 'flex';
       state.sessionId = sessionId;
 
@@ -143,12 +147,12 @@
         .eq('id', sessionId).maybeSingle();
       var s = r.data;
       if (!s || (s.status !== 'confirmed' && s.status !== 'awaiting_payment')) {
-        body.innerHTML = '<p style="font-size:0.86rem;color:#dc2626;">This session can no longer be rescheduled.</p>';
+        body.innerHTML = '<p style="font-size:0.86rem;color:#dc2626;">' + esc(T('no-longer', 'This session can no longer be rescheduled.')) + '</p>';
         return;
       }
       state.session = s;
       var isStudent = s.student_id === state.myId;
-      var otherName = isStudent ? (s.tutor_name || 'your tutor') : (s.student_name || 'the student');
+      var otherName = isStudent ? (s.tutor_name || T('your-tutor', 'your tutor')) : (s.student_name || T('the-student', 'the student'));
       var movesLeft = Math.max(0, MAX_MOVES - (s.reschedule_count || 0));
       var original = new Date(s.original_starts_at || s.starts_at || (s.scheduled_date + 'T' + s.scheduled_time));
       var maxDate = new Date(original.getTime() + MAX_DAYS * 24 * 3600 * 1000);
@@ -157,23 +161,23 @@
       var paid = s.status === 'confirmed';
       var warn = '';
       if (paid && isStudent && startsIn < 24 * 3600 * 1000) {
-        warn = '<div class="us-rs-warn">⚠️ This session is less than 24 hours away. If ' + esc(otherName) + ' accepts the new time, the session stays non-refundable — cancelling it later won\'t be refunded.</div>';
+        warn = '<div class="us-rs-warn">⚠️ ' + H('late-warn', "This session is less than 24 hours away. If {{name}} accepts the new time, the session stays non-refundable — cancelling it later won't be refunded.", { name: otherName }) + '</div>';
       }
 
       body.innerHTML = ''
-        + '<p style="font-size:0.86rem;color:#334155;line-height:1.5;margin:0;">Currently: <strong>' + esc(fmtWhen(s.scheduled_date, s.scheduled_time, s.timezone)) + '</strong>.<br>'
-        + 'Your session stays at this time until ' + esc(otherName) + ' accepts the new one. '
-        + (paid ? 'No new payment is needed.' : 'The booking still needs to be paid; if the new time is sooner, the payment deadline moves earlier with it.') + '</p>'
-        + '<div class="us-rs-rules">Times are in <strong>' + esc(tzCity(s.timezone)) + ' time</strong>. A session can be moved up to ' + MAX_MOVES + ' times (' + movesLeft + ' left), to a date within ' + MAX_DAYS + ' days of the original, and at least 2 hours from now.</div>'
+        + '<p style="font-size:0.86rem;color:#334155;line-height:1.5;margin:0;">' + H('currently', 'Currently: <strong>{{when}}</strong>.', { when: fmtWhen(s.scheduled_date, s.scheduled_time, s.timezone) }) + '<br>'
+        + H('stays', 'Your session stays at this time until {{name}} accepts the new one.', { name: otherName }) + ' '
+        + (paid ? H('no-payment', 'No new payment is needed.') : H('still-pay', 'The booking still needs to be paid; if the new time is sooner, the payment deadline moves earlier with it.')) + '</p>'
+        + '<div class="us-rs-rules">' + H('rules', 'Times are in <strong>{{city}} time</strong>. A session can be moved up to {{max}} times ({{left}} left), to a date within {{days}} days of the original, and at least 2 hours from now.', { city: tzCity(s.timezone), max: MAX_MOVES, left: movesLeft, days: MAX_DAYS }) + '</div>'
         + warn
         + '<div style="display:flex;gap:0.6rem;">'
-        + '  <div style="flex:1;"><label for="usRsDate">New date</label><input type="date" id="usRsDate" min="' + ymd(new Date()) + '" max="' + ymd(maxDate) + '"></div>'
-        + '  <div style="flex:1;"><label for="usRsTime">New time</label><input type="time" id="usRsTime"></div>'
+        + '  <div style="flex:1;"><label for="usRsDate">' + esc(T('new-date', 'New date')) + '</label><input type="date" id="usRsDate" min="' + ymd(new Date()) + '" max="' + ymd(maxDate) + '"></div>'
+        + '  <div style="flex:1;"><label for="usRsTime">' + esc(T('new-time', 'New time')) + '</label><input type="time" id="usRsTime"></div>'
         + '</div>'
         + '<div id="usRsError" role="alert" style="display:none;font-size:0.8rem;color:#dc2626;margin-top:0.6rem;"></div>'
         + '<div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:1rem;">'
-        + '  <button type="button" id="usRsSubmit" class="us-rs-btn primary" style="padding:0.7rem;font-size:0.86rem;">Send request</button>'
-        + '  <button type="button" id="usRsCancel" class="us-rs-btn ghost" style="padding:0.6rem;font-size:0.84rem;">Keep the current time</button>'
+        + '  <button type="button" id="usRsSubmit" class="us-rs-btn primary" style="padding:0.7rem;font-size:0.86rem;">' + esc(T('send', 'Send request')) + '</button>'
+        + '  <button type="button" id="usRsCancel" class="us-rs-btn ghost" style="padding:0.6rem;font-size:0.84rem;">' + esc(T('keep', 'Keep the current time')) + '</button>'
         + '</div>';
       document.getElementById('usRsSubmit').addEventListener('click', UsResched.submit);
       document.getElementById('usRsCancel').addEventListener('click', close);
@@ -186,18 +190,18 @@
       var d = document.getElementById('usRsDate').value;
       var t = document.getElementById('usRsTime').value;
       var err = document.getElementById('usRsError');
-      if (!d || !t) { err.textContent = 'Please choose both a date and a time.'; err.style.display = 'block'; return; }
+      if (!d || !t) { err.textContent = T('need-both', 'Please choose both a date and a time.'); err.style.display = 'block'; return; }
       err.style.display = 'none';
       var btn = document.getElementById('usRsSubmit');
-      state.busy = true; btn.disabled = true; btn.textContent = 'Sending…';
+      state.busy = true; btn.disabled = true; btn.textContent = T('sending', 'Sending…');
       var data = await call({ action: 'request', session_id: state.session.id, new_date: d, new_time: t });
-      state.busy = false; btn.disabled = false; btn.textContent = 'Send request';
+      state.busy = false; btn.disabled = false; btn.textContent = T('send', 'Send request');
       if (data.error) { err.textContent = data.error; err.style.display = 'block'; return; }
       var s = state.session;
-      var otherName = (s.student_id === state.myId) ? (s.tutor_name || 'your tutor') : (s.student_name || 'the student');
+      var otherName = (s.student_id === state.myId) ? (s.tutor_name || T('your-tutor', 'your tutor')) : (s.student_name || T('the-student', 'the student'));
       document.getElementById('usRsBody').innerHTML = ''
-        + '<p style="font-size:0.88rem;color:#334155;line-height:1.5;">✅ Request sent. We\'ve let ' + esc(otherName) + ' know. The session stays at its current time until they accept.</p>'
-        + '<button type="button" id="usRsDone" class="us-rs-btn primary" style="width:100%;padding:0.7rem;margin-top:0.8rem;">Done</button>';
+        + '<p style="font-size:0.88rem;color:#334155;line-height:1.5;">✅ ' + H('sent', "Request sent. We've let {{name}} know. The session stays at its current time until they accept.", { name: otherName }) + '</p>'
+        + '<button type="button" id="usRsDone" class="us-rs-btn primary" style="width:100%;padding:0.7rem;margin-top:0.8rem;">' + esc(T('done', 'Done')) + '</button>';
       document.getElementById('usRsDone').addEventListener('click', function () { close(); changed(); });
       window.usTrack && window.usTrack('reschedule_requested', {});
     },
@@ -211,7 +215,7 @@
         changed();
         return;
       }
-      toast(accept ? 'New time accepted — the session has been moved.' : 'Declined — the session stays at its current time.', 'success');
+      toast(accept ? T('accepted', 'New time accepted — the session has been moved.') : T('declined', 'Declined — the session stays at its current time.'), 'success');
       window.usTrack && window.usTrack(accept ? 'reschedule_accepted' : 'reschedule_declined', {});
       changed();
     },
@@ -224,7 +228,7 @@
         toast(data.error, 'error');
         return;
       }
-      toast('Request withdrawn — the session stays at its current time.', 'success');
+      toast(T('withdrawn', 'Request withdrawn — the session stays at its current time.'), 'success');
       changed();
     },
 

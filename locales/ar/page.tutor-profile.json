@@ -182,7 +182,7 @@
   "tutor-profile.js.sessions-count": {
     "zero": "{{count}} جلسة",
     "one": "{{count}} جلسة",
-    "two": "{{count}} جلستان",
+    "two": "{{count}} جلسة",
     "few": "{{count}} جلسات",
     "many": "{{count}} جلسة",
     "other": "{{count}} جلسة"
