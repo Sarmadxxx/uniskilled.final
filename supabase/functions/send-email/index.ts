@@ -17,6 +17,10 @@ const SUPPORT = 'info@uniskilled.com';
 const SITE = 'https://uniskilled.com';
 const LOGO_URL = `${SITE}/uniskilled-logo.png`;
 const ALWAYS_ALLOWED = ['info@uniskilled.com'];
+// The company behind UniSkilled (UK trading disclosures: name, place of registration, number, registered office).
+const COMPANY_NAME = 'UNISKILLED LTD';
+const COMPANY_NO = '17574736';
+const COMPANY_ADDRESS = '65 London Wall, London EC2M 5TU, United Kingdom';
 // The only emails a signed-in user may trigger from the browser, and only to their own session partner.
 const USER_SENDABLE_TYPES = ['booking_request', 'awaiting_payment', 'booking_declined'];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -298,6 +302,7 @@ function renderHtml(e: Email): string {
         <tr><td align="center" style="padding:20px 12px 8px;">
           ${footerLinks}
           <p style="margin:0 0 4px;font-size:12px;color:#94a3b8;">${t`UniSkilled · University-verified online tutoring`} · <a href="${SITE}" style="color:#94a3b8;">uniskilled.com</a></p>
+          <p style="margin:0 0 4px;font-size:11px;color:#a8b4c4;">${t`${COMPANY_NAME}, registered in England and Wales, company number ${COMPANY_NO}. Registered office: <span dir="ltr">${COMPANY_ADDRESS}</span>.`}</p>
           <p style="margin:0;font-size:11px;color:#a8b4c4;">${e.audience === 'admin' ? 'This is a service email about platform activity. You receive it because it concerns a booking or payment you are part of.' : t`This is a service email about your UniSkilled account and bookings. You receive it because it concerns a booking or payment you are part of.`}</p>
         </td></tr>
       </table>
@@ -326,7 +331,7 @@ function renderText(e: Email): string {
   if (e.cta) out.push(`${strip(e.cta.label)}: ${e.cta.url}`, '');
   (e.secondary || []).forEach(s => out.push(strip(s), ''));
   out.push(e.ref ? t`Need help? Reply to this email or write to ${SUPPORT} and quote booking reference #${e.ref}.` : t`Need help? Reply to this email or write to ${SUPPORT}.`, '');
-  out.push(t`Kind regards,`, t`The UniSkilled Team`, SITE);
+  out.push(t`Kind regards,`, t`The UniSkilled Team`, SITE, '', strip(t`${COMPANY_NAME}, registered in England and Wales, company number ${COMPANY_NO}. Registered office: <span dir="ltr">${COMPANY_ADDRESS}</span>.`));
   return out.join('\n');
 }
 

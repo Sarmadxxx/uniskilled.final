@@ -98,5 +98,6 @@
   "index.subject-course-code-professor.placeholder": "المادة أو رمز المقرر أو اسم الأستاذ أو المدرّس",
   "index.popular-searches.arialabel": "عمليات البحث الشائعة",
   "index.why-uniskilled.arialabel": "لماذا UniSkilled",
-  "index.js.heroPlaceholderShort": "المقرر أو المادة أو اسم المدرّس"
+  "index.js.heroPlaceholderShort": "المقرر أو المادة أو اسم المدرّس",
+  "index.company-details": "تُدار منصة UniSkilled من قِبل شركة UNISKILLED LTD المسجّلة في إنجلترا وويلز، ورقمها لدى سجل الشركات 17574736. العنوان المسجّل: <span dir=\"ltr\">65 London Wall, London EC2M 5TU, United Kingdom</span>."
 }

@@ -120,5 +120,6 @@
   "about.meta.description": "UniSkilled is a university-verified tutoring marketplace connecting students with peer tutors who have taken the same courses.",
   "about.meta.og-title": "About — UniSkilled",
   "about.meta.og-description": "UniSkilled is a university-verified tutoring marketplace connecting students with peer tutors who have taken the same courses.",
-  "about.live-uniskilled-tutoring-session.alt": "Live UniSkilled tutoring session — Algebra 101 with tutor Sarah J. and three students"
+  "about.live-uniskilled-tutoring-session.alt": "Live UniSkilled tutoring session — Algebra 101 with tutor Sarah J. and three students",
+  "about.company-details": "UniSkilled is operated by UNISKILLED LTD, registered in England and Wales, company number 17574736. Registered office: <span dir=\"ltr\">65 London Wall, London EC2M 5TU, United Kingdom</span>."
 }
