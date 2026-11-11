@@ -5,7 +5,7 @@
   "complete-payment.session-price": "<span>Session price</span><span id=\"priceAmount\">—</span>",
   "complete-payment.discount": "<span id=\"discountLabel\">Discount</span><span id=\"discountAmount\">—</span>",
   "complete-payment.total-due-now": "<span>Total due now</span><span id=\"priceTotal\">—</span>",
-  "complete-payment.payment-protected-held-safely": "<span>🛡️</span>\n      <span><strong>Payment protected.</strong> Held safely for 48 hours after your session — full refund guaranteed if something goes wrong.</span>",
+  "complete-payment.payment-protected-held-safely": "<span>🛡️</span>\n      <span><strong>Payment protected.</strong> Held safely for 48 hours after your session — full refund if something goes wrong.</span>",
   "complete-payment.this-session-starts-in": "<span>⚠️</span>\n      <span><strong>This session starts in less than 24 hours.</strong> After you pay, you can cancel for a full refund only within the first 30 minutes. After that, cancelling won't be refunded, and the tutor is paid for the time they reserved for you.</span>",
   "complete-payment.card-paypal": "<button id=\"btnUseCard\" onclick=\"setPaymentMethod('card')\" style=\"flex:1;padding:0.7rem;border-radius:9px;border:2px solid var(--blue);background:#eff6ff;color:var(--blue);font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;\">💳 Card</button>\n      <button id=\"btnUsePaypal\" onclick=\"setPaymentMethod('paypal')\" style=\"flex:1;padding:0.7rem;border-radius:9px;border:2px solid var(--border);background:#fff;color:var(--ink2,#374151);font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;\">PayPal</button>",
   "complete-payment.pay-with-card": "💳 Pay with Card",
