@@ -75,6 +75,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);min-heigh
 .cert-remove{background:none;border:none;cursor:pointer;color:var(--light);font-size:0.9rem;}
 .cert-remove:hover{color:var(--red);}
 .cert-add-row{display:grid;grid-template-columns:2fr 1fr auto;gap:0.5rem;align-items:end;}
+.course-add-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.5rem;align-items:end;}
 .btn-primary{width:100%;padding:0.88rem;background:var(--blue);color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:0.4rem;transition:all .18s;}
 .btn-primary:hover{background:#1558e0;}
 .btn-primary:disabled{opacity:0.6;cursor:not-allowed;}
@@ -97,6 +98,7 @@ body{font-family:'Manrope',sans-serif;background:#fff;color:var(--ink);min-heigh
   .form-row{grid-template-columns:1fr;}
   .avail-grid{grid-template-columns:repeat(4,1fr);}
   .cert-add-row{grid-template-columns:1fr 1fr;}.cert-add-row .tag-btn{grid-column:span 2;}
+  .course-add-grid{grid-template-columns:1fr 1fr;}.course-add-grid .tag-btn{grid-column:span 2;}
 }
 
 /* ── Get Started · Concept D (conversion-focused) ─────────────────────────────
@@ -388,11 +390,15 @@ body:not([data-role="tutor"]) .why [data-for-role="tutor"],body[data-role="tutor
         <div class="section-title">Specific Courses (optional)</div>
         <p style="font-size:0.8rem;color:var(--mid);margin-bottom:0.8rem;">Add exact course codes you can help with, so students searching for their specific class — not just the general subject — can find you.</p>
         <div class="cert-list" id="courseList"></div>
-        <div class="cert-add-row">
-          <div class="form-group" style="margin:0;"><label for="courseCode" class="form-label">Course code</label><input type="text" class="form-input" id="courseCode" placeholder="e.g. MATH 201"></div>
-          <div class="form-group" style="margin:0;"><label for="courseNameProf" class="form-label">Course name / Professor</label><input type="text" class="form-input" id="courseNameProf" placeholder="e.g. Calculus II — Prof. Chen"></div>
+        <div class="course-add-grid">
+          <div class="form-group" style="margin:0;"><label for="courseName" class="form-label">Course name</label><input type="text" class="form-input" id="courseName" maxlength="120" placeholder="e.g. Calculus II"></div>
+          <div class="form-group" style="margin:0;"><label for="courseCode" class="form-label">Course code (optional)</label><input type="text" class="form-input" id="courseCode" maxlength="40" placeholder="e.g. MATH 201"></div>
+          <div class="form-group" style="margin:0;"><label for="courseProf" class="form-label">Professor (optional)</label><input type="text" class="form-input" id="courseProf" maxlength="80" placeholder="e.g. Prof. Chen"></div>
+          <div class="form-group" style="margin:0;"><label for="courseSemester" class="form-label">Semester taken (optional)</label><input type="text" class="form-input" id="courseSemester" maxlength="30" placeholder="e.g. Winter 2025/26"></div>
+          <div class="form-group" style="margin:0;"><label for="courseGrade" class="form-label">Your grade (optional)</label><input type="text" class="form-input" id="courseGrade" maxlength="20" placeholder="e.g. 1.3"></div>
           <button class="tag-btn" id="addCourseBtn" style="align-self:flex-end;margin-bottom:0;">+ Add</button>
         </div>
+        <div class="hint">Students can find you by course name, code or professor. The course is listed under your university.</div>
       </div>
 
       <!-- Availability -->
@@ -530,7 +536,7 @@ window.removeCert = function(i) { certificates.splice(i, 1); renderCerts(); };
 
 function renderCourses() {
   document.getElementById('courseList').innerHTML = courses.map((c, i) =>
-    `<div class="cert-item"><span class="cert-icon">🎯</span><div class="cert-info"><div class="cert-name">${__esc(c.course_code)}</div><div class="cert-grade">${__esc(c.course_name || 'No details added')}</div></div><button class="cert-remove" onclick="removeCourse(${i})">×</button></div>`
+    `<div class="cert-item"><span class="cert-icon">🎯</span><div class="cert-info"><div class="cert-name">${__esc([c.course_code, c.course_name].filter(Boolean).join(' · '))}</div><div class="cert-grade">${__esc([c.professor_name ? 'Prof. ' + c.professor_name.replace(/^prof\.?\s*/i, '') : '', c.semester, c.grade ? 'Grade ' + c.grade : ''].filter(Boolean).join(' · ') || 'No details added')}</div></div><button class="cert-remove" onclick="removeCourse(${i})">×</button></div>`
   ).join('');
 }
 window.removeCourse = function(i) { courses.splice(i, 1); renderCourses(); };
@@ -616,15 +622,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Course add
   document.getElementById('addCourseBtn').addEventListener('click', function() {
-    const code = document.getElementById('courseCode').value.trim();
-    const nameProf = document.getElementById('courseNameProf').value.trim();
-    if (code) {
-      courses.push({ course_code: code, course_name: nameProf || null });
+    const val = id => document.getElementById(id).value.trim();
+    const name = val('courseName'), code = val('courseCode');
+    if (name) {
+      courses.push({
+        course_name: name || null, course_code: code || null,
+        professor_name: val('courseProf') || null,
+        semester: val('courseSemester') || null,
+        grade: val('courseGrade') || null,
+      });
       renderCourses();
-      document.getElementById('courseCode').value = '';
-      document.getElementById('courseNameProf').value = '';
+      ['courseName', 'courseCode', 'courseProf', 'courseSemester', 'courseGrade'].forEach(id => { document.getElementById(id).value = ''; });
+      hideAlert();
     } else {
-      showAlert('Please enter at least a course code.', 'error');
+      showAlert('Please enter the course name.', 'error');
     }
   });
 
@@ -739,7 +750,7 @@ document.addEventListener('DOMContentLoaded', function() {
             hourly_rate: hourlyRate || null, currency: hourlyCurrency || 'EUR',
             teaching_format: teachingFormat || null, bio: bio || null,
             certificates: selectedRole === 'tutor' ? certificates.map(c => ({ subject: c.subject, grade: c.grade, fileName: c.fileName })) : [],
-            courses: selectedRole === 'tutor' ? courses.map(c => ({ course_code: c.course_code, course_name: c.course_name })) : []
+            courses: selectedRole === 'tutor' ? courses.map(c => ({ course_code: c.course_code, course_name: c.course_name, professor_name: c.professor_name, semester: c.semester, grade: c.grade, university: university || null })) : []
           }
         },
         emailRedirectTo: 'https://uniskilled.com/signin.html'
