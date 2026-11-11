@@ -316,6 +316,12 @@
       client.auth.updateUser({ data: { ui_locale: code } }).then(function () { clearTimeout(t); go(); }, function () { clearTimeout(t); go(); });
     } else go();
   }
+  // A choice made before signing in is saved on the account once signed in, so emails use it too.
+  window.addEventListener('load', function () {
+    var pref = stored(PREF), client = pageClient();
+    if (!user || !pref || !client || !client.auth || (user.user_metadata || {}).ui_locale === pref) return;
+    try { client.auth.updateUser({ data: { ui_locale: pref } }).then(function () {}, function () {}); } catch (e) { /* not important */ }
+  });
   document.addEventListener('click', function (e) {
     var opt = e.target.closest && e.target.closest('.snav-lang-opt');
     if (!opt) return;
