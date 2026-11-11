@@ -40,10 +40,10 @@
       "ar": "reviewed"
     },
     "page.book-session": {
-      "ar": "draft"
+      "ar": "reviewed"
     },
     "page.student-dashboard": {
-      "ar": "draft"
+      "ar": "reviewed"
     }
   },
   "reviewers": {
