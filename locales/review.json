@@ -53,6 +53,9 @@
     },
     "page.onboarding": {
       "ar": "reviewed"
+    },
+    "page.messages": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
