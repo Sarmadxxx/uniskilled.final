@@ -4,13 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="sentry.js"></script>
+<script src="i18n.js"></script>
 <link rel="icon" href="favicon.ico?v=20261101" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=20261101">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
-<title>Tutor Dashboard — UniSkilled</title>
+<title data-i18n="tutor-dashboard.title">Tutor Dashboard — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -240,78 +241,78 @@ a.profile-av{text-decoration:none;}
     <div class="profile-card">
       <div class="profile-cover"></div>
       <div class="profile-card-body">
-        <a class="profile-av" id="sideAv" href="tutor-profile.html" aria-label="Your profile">?</a>
-        <a class="profile-name" id="sideName" href="tutor-profile.html">Loading...</a>
+        <a data-i18n-attr="aria-label:tutor-dashboard.your-profile.arialabel" class="profile-av" id="sideAv" href="tutor-profile.html" aria-label="Your profile">?</a>
+        <a data-i18n="tutor-dashboard.loading" class="profile-name" id="sideName" href="tutor-profile.html">Loading...</a>
         <div class="profile-sub" id="sideSub"></div>
-        <a href="#verify" id="sideVerifyLink" class="hit" style="display:none;font-size:0.75rem;font-weight:700;color:var(--blue);text-decoration:none;margin-bottom:0.6rem;">○ Not verified yet — get your badge</a>
-        <a href="tutor-profile.html" class="profile-btn">✏️ Edit Profile</a>
-        <button class="switch-btn" id="switchModeBtn" onclick="switchToStudent()">🎓 Switch to Student mode</button>
-        <button class="become-btn" id="becomeStudentBtn" onclick="openBecomeStudentModal()">+ Browse as Student</button>
-        <button class="payout-btn" id="payoutSetupBtn" onclick="setupPayouts()" style="display:none;">💳 Set up payouts</button>
+        <a data-i18n="tutor-dashboard.not-verified-yet-get" href="#verify" id="sideVerifyLink" class="hit" style="display:none;font-size:0.75rem;font-weight:700;color:var(--blue);text-decoration:none;margin-bottom:0.6rem;">○ Not verified yet — get your badge</a>
+        <a data-i18n="tutor-dashboard.edit-profile" href="tutor-profile.html" class="profile-btn">✏️ Edit Profile</a>
+        <button data-i18n="tutor-dashboard.switch-to-student-mode" class="switch-btn" id="switchModeBtn" onclick="switchToStudent()">🎓 Switch to Student mode</button>
+        <button data-i18n="tutor-dashboard.browse-as-student" class="become-btn" id="becomeStudentBtn" onclick="openBecomeStudentModal()">+ Browse as Student</button>
+        <button data-i18n="tutor-dashboard.set-up-payouts" class="payout-btn" id="payoutSetupBtn" onclick="setupPayouts()" style="display:none;">💳 Set up payouts</button>
 
         <div id="paypalPayoutBox" style="display:none; margin-top:0.5rem;">
           <div id="paypalStatusLine" style="font-size:0.72rem; font-weight:700; text-align:center; padding:0.55rem 0.6rem; border-radius:8px; font-family:'Manrope',sans-serif; line-height:1.4; word-break:break-word; overflow-wrap:anywhere;"></div>
           <div id="paypalEmailForm" style="display:none; margin-top:0.4rem; flex-direction:column; gap:0.35rem;">
-            <input type="email" id="paypalEmailInput" placeholder="your-paypal@email.com" style="padding:0.45rem; border-radius:8px; border:1.5px solid #cbd5e1; font-size:0.75rem; font-family:'Manrope',sans-serif;">
-            <button type="button" class="payout-btn" onclick="savePaypalEmail()" style="background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;">Save PayPal email</button>
+            <input data-i18n-attr="placeholder:tutor-dashboard.your-paypalemailcom.placeholder" type="email" id="paypalEmailInput" placeholder="your-paypal@email.com" style="padding:0.45rem; border-radius:8px; border:1.5px solid #cbd5e1; font-size:0.75rem; font-family:'Manrope',sans-serif;">
+            <button data-i18n="tutor-dashboard.save-paypal-email" type="button" class="payout-btn" onclick="savePaypalEmail()" style="background:#eff6ff;border-color:#93c5fd;color:#1d4ed8;">Save PayPal email</button>
             <div id="paypalEmailError" style="display:none; font-size:0.68rem; color:#dc2626; font-family:'Manrope',sans-serif;"></div>
           </div>
         </div>
 
-        <button type="button" id="payoutMethodToggle" onclick="togglePayoutMethodPicker()" style="display:none; width:100%; margin-top:0.45rem; padding:0.3rem; background:none; border:none; font-family:'Manrope',sans-serif; font-size:0.68rem; font-weight:600; color:#64748b; cursor:pointer; text-decoration:underline;">⚙️ Change payout method</button>
-        <div id="payoutMethodPicker" style="display:none; margin-top:0.4rem; gap:0.4rem;">
+        <button data-i18n="tutor-dashboard.change-payout-method" type="button" id="payoutMethodToggle" onclick="togglePayoutMethodPicker()" style="display:none; width:100%; margin-top:0.45rem; padding:0.3rem; background:none; border:none; font-family:'Manrope',sans-serif; font-size:0.68rem; font-weight:600; color:#64748b; cursor:pointer; text-decoration:underline;">⚙️ Change payout method</button>
+        <div data-i18n="tutor-dashboard.stripe-paypal" id="payoutMethodPicker" style="display:none; margin-top:0.4rem; gap:0.4rem;">
           <button type="button" onclick="selectPayoutMethod('stripe')" style="flex:1; padding:0.4rem; border-radius:8px; border:1.5px solid #cbd5e1; background:#fff; font-size:0.72rem; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif;">💳 Stripe</button>
           <button type="button" onclick="selectPayoutMethod('paypal')" style="flex:1; padding:0.4rem; border-radius:8px; border:1.5px solid #cbd5e1; background:#fff; font-size:0.72rem; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif;">🅿️ PayPal</button>
         </div>
       </div>
     </div>
-    <div class="sidebar-nav" role="navigation" aria-label="Dashboard sections">
+    <div data-i18n-attr="aria-label:tutor-dashboard.dashboard-sections.arialabel" class="sidebar-nav" role="navigation" aria-label="Dashboard sections">
       <a class="nav-item active" href="tutor-dashboard.html?tab=overview">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Overview</div>
+        <div data-i18n="tutor-dashboard.overview" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Overview</div>
       </a>
-      <div class="nav-group">Inbox</div>
+      <div data-i18n="tutor-dashboard.inbox" class="nav-group">Inbox</div>
       <a class="nav-item" href="messages.html">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</div>
+        <div data-i18n="tutor-dashboard.messages" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages</div>
         <span class="nav-badge" id="badgeMessages" style="display:none">0</span>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=notifications">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications</div>
+        <div data-i18n="tutor-dashboard.notifications" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Notifications</div>
         <span class="nav-badge" id="badgeNotifs" style="display:none">0</span>
       </a>
-      <div class="nav-group">Teaching</div>
+      <div data-i18n="tutor-dashboard.teaching" class="nav-group">Teaching</div>
       <a class="nav-item" href="tutor-dashboard.html?tab=requests">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>Booking requests</div>
+        <div data-i18n="tutor-dashboard.booking-requests" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg>Booking requests</div>
         <span class="nav-badge" id="badgeRequests" style="display:none">0</span>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=sessions">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><path d="M2 6h14v12H2z"/></svg>Sessions</div>
+        <div data-i18n="tutor-dashboard.sessions" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m22 8-6 4 6 4V8Z"/><path d="M2 6h14v12H2z"/></svg>Sessions</div>
         <span class="usk-sec-dot" data-sec="sessions" hidden></span>
       </a>
       <a class="nav-item" href="calendar.html">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</div>
+        <div data-i18n="tutor-dashboard.calendar" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Calendar</div>
       </a>
       <a class="nav-item" href="manage-availability.html">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 7v5l3 2"/></svg>Availability</div>
+        <div data-i18n="tutor-dashboard.availability" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M12 7v5l3 2"/></svg>Availability</div>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=groupSessions">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group sessions</div>
+        <div data-i18n="tutor-dashboard.group-sessions" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>Group sessions</div>
         <span class="usk-sec-dot" data-sec="groupSessions" hidden></span>
       </a>
-      <div class="nav-group">Grow</div>
+      <div data-i18n="tutor-dashboard.grow" class="nav-group">Grow</div>
       <a class="nav-item" href="tutor-dashboard.html?tab=subjectRequests">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4H9z"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg>Open subject requests</div>
+        <div data-i18n="tutor-dashboard.open-subject-requests" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v4H9z"/><path d="M16 5h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg>Open subject requests</div>
         <span class="nav-badge green" id="badgeSubjectRequests" style="display:none">0</span>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=reviews">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>Reviews</div>
+        <div data-i18n="tutor-dashboard.reviews" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z"/></svg>Reviews</div>
         <span class="usk-sec-dot" data-sec="reviews" hidden></span>
       </a>
       <a class="nav-item" href="tutor-dashboard.html?tab=referrals">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v4H3z"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></svg>Refer & earn</div>
+        <div data-i18n="tutor-dashboard.refer-earn" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h18v4H3z"/><path d="M12 8v13M19 12v9H5v-9"/><path d="M12 8S10.5 3 8 3a2.5 2.5 0 0 0 0 5M12 8s1.5-5 4-5a2.5 2.5 0 0 1 0 5"/></svg>Refer & earn</div>
         <span class="usk-sec-dot" data-sec="referrals" hidden></span>
       </a>
       <a class="nav-item" href="feed.html">
-        <div class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Feeds</div>
+        <div data-i18n="tutor-dashboard.feeds" class="nav-item-left"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Feeds</div>
       </a>
     </div>
   </div>
@@ -322,14 +323,14 @@ a.profile-av{text-decoration:none;}
     <!-- OVERVIEW -->
     <div id="page-overview">
       <div class="ov-head">
-        <h1 class="hero-title" id="heroTitle">Welcome</h1>
-        <p class="hero-sub" id="heroSub">Complete your profile to attract students.</p>
+        <h1 data-i18n="tutor-dashboard.welcome" class="hero-title" id="heroTitle">Welcome</h1>
+        <p data-i18n="tutor-dashboard.complete-your-profile-to" class="hero-sub" id="heroSub">Complete your profile to attract students.</p>
       </div>
       <div class="ov-stats">
-        <div class="ov-stat"><div class="ov-stat-l">Sessions</div><div class="ov-stat-n" id="statSessions">0</div></div>
-        <div class="ov-stat"><div class="ov-stat-l">Earned</div><div class="ov-stat-n" id="statEarnings">€0</div></div>
-        <div class="ov-stat"><div class="ov-stat-l">Rating</div><div class="ov-stat-n" id="statRating">New</div></div>
-        <div class="ov-stat"><div class="ov-stat-l">Reviews</div><div class="ov-stat-n" id="statReviews">0</div></div>
+        <div class="ov-stat"><div data-i18n="tutor-dashboard.sessions-2" class="ov-stat-l">Sessions</div><div class="ov-stat-n" id="statSessions">0</div></div>
+        <div class="ov-stat"><div data-i18n="tutor-dashboard.earned" class="ov-stat-l">Earned</div><div class="ov-stat-n" id="statEarnings">€0</div></div>
+        <div class="ov-stat"><div data-i18n="tutor-dashboard.rating" class="ov-stat-l">Rating</div><div data-i18n="tutor-dashboard.new" class="ov-stat-n" id="statRating">New</div></div>
+        <div class="ov-stat"><div data-i18n="tutor-dashboard.reviews-2" class="ov-stat-l">Reviews</div><div class="ov-stat-n" id="statReviews">0</div></div>
       </div>
 
       <!-- University verification (shows until verified; reminder on every visit) -->
@@ -339,21 +340,21 @@ a.profile-av{text-decoration:none;}
       <div id="coursesNudge" class="card" style="display:none;border-left:4px solid var(--blue,#1a6bff);">
         <div class="card-body" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
           <div style="flex:1;min-width:220px;">
-            <div style="font-weight:800;font-size:0.95rem;margin-bottom:0.2rem;">Add the courses you passed</div>
-            <div style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Students search for their own course, like "Statistics I at HU Berlin". Tutors with courses on their profile appear first in those searches.</div>
+            <div data-i18n="tutor-dashboard.add-the-courses-you" style="font-weight:800;font-size:0.95rem;margin-bottom:0.2rem;">Add the courses you passed</div>
+            <div data-i18n="tutor-dashboard.students-search-for-their" style="font-size:0.85rem;color:var(--mid);line-height:1.5;">Students search for their own course, like "Statistics I at HU Berlin". Tutors with courses on their profile appear first in those searches.</div>
           </div>
-          <a id="coursesNudgeLink" href="#" class="btn-accept" style="text-decoration:none;white-space:nowrap;">Add courses</a>
+          <a data-i18n="tutor-dashboard.add-courses" id="coursesNudgeLink" href="#" class="btn-accept" style="text-decoration:none;white-space:nowrap;">Add courses</a>
         </div>
       </div>
 
       <!-- Booking requests preview -->
       <div class="card">
         <div class="card-head">
-          <h2 class="card-title">Needs your reply</h2>
-          <a href="tutor-dashboard.html?tab=requests" class="hit">All requests</a>
+          <h2 data-i18n="tutor-dashboard.needs-your-reply" class="card-title">Needs your reply</h2>
+          <a data-i18n="tutor-dashboard.all-requests" href="tutor-dashboard.html?tab=requests" class="hit">All requests</a>
         </div>
         <div class="card-body" id="overviewRequests">
-          <div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>
+          <div class="empty-state"><div class="empty-icon">📥</div><div data-i18n="tutor-dashboard.no-pending-requests" class="empty-text">No pending requests</div></div>
         </div>
       </div>
 
@@ -361,21 +362,21 @@ a.profile-av{text-decoration:none;}
         <!-- Upcoming sessions preview -->
         <div class="card">
           <div class="card-head">
-            <h2 class="card-title">Upcoming sessions</h2>
-            <a href="calendar.html" class="hit">Calendar</a>
+            <h2 data-i18n="tutor-dashboard.upcoming-sessions" class="card-title">Upcoming sessions</h2>
+            <a data-i18n="tutor-dashboard.calendar-2" href="calendar.html" class="hit">Calendar</a>
           </div>
           <div class="card-body" id="overviewSessions">
-            <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No upcoming sessions yet</div></div>
+            <div class="empty-state"><div class="empty-icon">📅</div><div data-i18n="tutor-dashboard.no-upcoming-sessions-yet" class="empty-text">No upcoming sessions yet</div></div>
           </div>
         </div>
         <!-- Open subject requests preview -->
         <div class="card">
           <div class="card-head">
-            <h2 class="card-title">Open subject requests</h2>
-            <a href="tutor-dashboard.html?tab=subjectRequests" class="hit">See all</a>
+            <h2 data-i18n="tutor-dashboard.open-subject-requests-2" class="card-title">Open subject requests</h2>
+            <a data-i18n="tutor-dashboard.see-all" href="tutor-dashboard.html?tab=subjectRequests" class="hit">See all</a>
           </div>
           <div class="card-body" id="overviewSubjectRequests">
-            <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
+            <div class="empty-state"><div class="empty-icon">📋</div><div data-i18n="tutor-dashboard.no-open-subject-requests" class="empty-text">No open subject requests right now</div></div>
           </div>
         </div>
       </div>
@@ -386,25 +387,25 @@ a.profile-av{text-decoration:none;}
       <div class="card" style="padding:1.6rem 1.8rem;background:linear-gradient(135deg,#f5f3ff,#eff6ff);border-color:#ddd6fe;">
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.8rem;margin-bottom:1.1rem;">
           <div>
-            <div style="font-weight:800;font-size:1.15rem;color:var(--ink);">🎁 Refer & earn</div>
-            <div style="font-size:0.84rem;color:var(--ink2);margin-top:0.2rem;">Give €10, get €10 — for every student or tutor you refer who completes their first paid session.</div>
+            <div data-i18n="tutor-dashboard.refer-earn-2" style="font-weight:800;font-size:1.15rem;color:var(--ink);">🎁 Refer & earn</div>
+            <div data-i18n="tutor-dashboard.give-10-get-10" style="font-size:0.84rem;color:var(--ink2);margin-top:0.2rem;">Give €10, get €10 — for every student or tutor you refer who completes their first paid session.</div>
           </div>
           <div style="text-align:right;">
-            <div style="font-size:0.7rem;color:var(--mid);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">Your credit balance</div>
+            <div data-i18n="tutor-dashboard.your-credit-balance" style="font-size:0.7rem;color:var(--mid);font-weight:600;text-transform:uppercase;letter-spacing:0.03em;">Your credit balance</div>
             <div id="creditBalanceDisplay" style="font-size:1.5rem;font-weight:800;color:#7c3aed;">—</div>
           </div>
         </div>
         <div style="display:flex;gap:0.6rem;flex-wrap:wrap;align-items:center;">
-          <input id="referralLinkInput" readonly aria-label="Your referral link" style="flex:1;min-width:220px;padding:0.7rem 1rem;border:1.5px solid #ddd6fe;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;color:var(--ink2);background:#fff;" value="Loading your link...">
-          <button id="copyReferralBtn" onclick="copyReferralLink()" style="padding:0.7rem 1.2rem;background:#7c3aed;color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copy link</button>
-          <button id="shareReferralBtn" onclick="shareReferralLink()" style="padding:0.7rem 1.2rem;background:#fff;color:#7c3aed;border:1.5px solid #7c3aed;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;">↗ Share</button>
+          <input data-i18n-attr="aria-label:tutor-dashboard.your-referral-link.arialabel;value:tutor-dashboard.loading-your-link.value" id="referralLinkInput" readonly aria-label="Your referral link" style="flex:1;min-width:220px;padding:0.7rem 1rem;border:1.5px solid #ddd6fe;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;color:var(--ink2);background:#fff;" value="Loading your link...">
+          <button data-i18n="tutor-dashboard.copy-link" id="copyReferralBtn" onclick="copyReferralLink()" style="padding:0.7rem 1.2rem;background:#7c3aed;color:#fff;border:none;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;">📋 Copy link</button>
+          <button data-i18n="tutor-dashboard.share" id="shareReferralBtn" onclick="shareReferralLink()" style="padding:0.7rem 1.2rem;background:#fff;color:#7c3aed;border:1.5px solid #7c3aed;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;white-space:nowrap;">↗ Share</button>
         </div>
         <div id="referralStats" style="font-size:0.8rem;color:var(--mid);margin-top:0.9rem;"></div>
       </div>
       <div class="card" style="margin-top:1rem;">
-        <div class="card-head"><h2 class="card-title">Your referrals</h2></div>
+        <div class="card-head"><h2 data-i18n="tutor-dashboard.your-referrals" class="card-title">Your referrals</h2></div>
         <div class="card-body" id="referralsList">
-          <div class="empty-state"><div class="empty-icon">🎁</div><div class="empty-text">No referrals yet — share your link above to start earning credit.</div></div>
+          <div class="empty-state"><div class="empty-icon">🎁</div><div data-i18n="tutor-dashboard.no-referrals-yet-share" class="empty-text">No referrals yet — share your link above to start earning credit.</div></div>
         </div>
       </div>
     </div>
@@ -412,9 +413,9 @@ a.profile-av{text-decoration:none;}
     <!-- BOOKING REQUESTS PAGE -->
     <div id="page-requests" style="display:none;">
       <div class="card">
-        <div class="card-head"><h2 class="card-title">Booking Requests</h2></div>
+        <div class="card-head"><h2 data-i18n="tutor-dashboard.booking-requests-2" class="card-title">Booking Requests</h2></div>
         <div class="card-body" id="requestsList">
-          <div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>
+          <div class="empty-state"><div class="empty-icon">📥</div><div data-i18n="tutor-dashboard.no-pending-requests-2" class="empty-text">No pending requests</div></div>
         </div>
       </div>
     </div>
@@ -422,20 +423,20 @@ a.profile-av{text-decoration:none;}
     <!-- OPEN SUBJECT REQUESTS PAGE -->
     <div id="page-subjectRequests" style="display:none;">
       <div class="card" style="margin-bottom:1rem;">
-        <div class="card-head"><h2 class="card-title">Open Subject Requests</h2></div>
-        <div class="card-body" style="font-size:0.83rem;color:var(--mid);line-height:1.6;">
+        <div class="card-head"><h2 data-i18n="tutor-dashboard.open-subject-requests-3" class="card-title">Open Subject Requests</h2></div>
+        <div data-i18n="tutor-dashboard.students-post-subjects-they" class="card-body" style="font-size:0.83rem;color:var(--mid);line-height:1.6;">
           Students post subjects they need help with here. If you can teach one, click "I can offer this" — the student will be notified right away and you can confirm details by message.
         </div>
       </div>
       <div id="clusteredDemandSection" style="display:none;margin-bottom:1rem;">
         <div class="card">
-          <div class="card-head"><h2 class="card-title">🔥 Multiple Students Want the Same Thing</h2></div>
+          <div class="card-head"><h2 data-i18n="tutor-dashboard.multiple-students-want-the" class="card-title">🔥 Multiple Students Want the Same Thing</h2></div>
           <div class="card-body" id="clusteredDemandList"></div>
         </div>
       </div>
       <div class="card">
         <div class="card-body" id="subjectRequestsList">
-          <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>
+          <div class="empty-state"><div class="empty-icon">📋</div><div data-i18n="tutor-dashboard.no-open-subject-requests-2" class="empty-text">No open subject requests right now</div></div>
         </div>
       </div>
     </div>
@@ -443,13 +444,13 @@ a.profile-av{text-decoration:none;}
     <!-- SESSIONS PAGE -->
     <div id="page-sessions" style="display:none;">
       <div class="card" id="awaitingPaymentCard" style="display:none;margin-bottom:1rem;background:#fffbeb;border:1.5px solid #fcd34d;">
-        <div class="card-head"><h2 class="card-title">⏳ Waiting for Student Payment</h2></div>
+        <div class="card-head"><h2 data-i18n="tutor-dashboard.waiting-for-student-payment" class="card-title">⏳ Waiting for Student Payment</h2></div>
         <div class="card-body" id="awaitingPaymentList"></div>
       </div>
       <div class="card">
-        <div class="card-head"><h2 class="card-title">All Sessions</h2></div>
+        <div class="card-head"><h2 data-i18n="tutor-dashboard.all-sessions" class="card-title">All Sessions</h2></div>
         <div class="card-body" id="sessionsList">
-          <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No sessions yet</div></div>
+          <div class="empty-state"><div class="empty-icon">📅</div><div data-i18n="tutor-dashboard.no-sessions-yet" class="empty-text">No sessions yet</div></div>
         </div>
       </div>
     </div>
@@ -458,14 +459,14 @@ a.profile-av{text-decoration:none;}
     <div id="page-groupSessions" style="display:none;">
       <div class="card">
         <div class="card-head">
-          <h2 class="card-title">👥 Group Sessions</h2>
-          <button class="edit-btn" onclick="openGroupSessionModal()" style="background:var(--blue);color:#fff;border:none;">+ Create Group Session</button>
+          <h2 data-i18n="tutor-dashboard.group-sessions-2" class="card-title">👥 Group Sessions</h2>
+          <button data-i18n="tutor-dashboard.create-group-session" class="edit-btn" onclick="openGroupSessionModal()" style="background:var(--blue);color:#fff;border:none;">+ Create Group Session</button>
         </div>
         <div class="card-body" id="groupSessionsList">
-          <div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">No group sessions yet</div></div>
+          <div class="empty-state"><div class="empty-icon">👥</div><div data-i18n="tutor-dashboard.no-group-sessions-yet" class="empty-text">No group sessions yet</div></div>
         </div>
       </div>
-      <p style="font-size:0.8rem;color:var(--mid);margin-top:0.8rem;line-height:1.5;">
+      <p data-i18n="tutor-dashboard.group-sessions-let-up" style="font-size:0.8rem;color:var(--mid);margin-top:0.8rem;line-height:1.5;">
         Group sessions let up to 4 students split one session and each pay a lower price — great for popular subjects where several students need the same help. You still get paid per student, same 48-hour hold applies.
       </p>
     </div>
@@ -474,11 +475,11 @@ a.profile-av{text-decoration:none;}
     <div id="page-reviews" style="display:none;">
       <div class="card">
         <div class="card-head">
-          <h2 class="card-title">Ratings & Reviews</h2>
+          <h2 data-i18n="tutor-dashboard.ratings-reviews" class="card-title">Ratings & Reviews</h2>
           <div style="font-size:0.85rem;font-weight:700;" id="avgRatingDisplay"></div>
         </div>
         <div class="card-body" id="reviewsList">
-          <div class="empty-state"><div class="empty-icon">⭐</div><div class="empty-text">No reviews yet</div></div>
+          <div class="empty-state"><div class="empty-icon">⭐</div><div data-i18n="tutor-dashboard.no-reviews-yet" class="empty-text">No reviews yet</div></div>
         </div>
       </div>
     </div>
@@ -486,8 +487,8 @@ a.profile-av{text-decoration:none;}
     <!-- NOTIFICATIONS PAGE -->
     <div id="page-notifications" style="display:none;">
       <div class="card">
-        <div class="card-head"><h2 class="card-title">Notifications</h2>
-          <button type="button" class="usk-link" onclick="USKNotify.markAllRead()" style="background:none;border:0;color:var(--blue);font:700 0.8rem 'Manrope',sans-serif;cursor:pointer;">Mark all as read</button></div>
+        <div class="card-head"><h2 data-i18n="tutor-dashboard.notifications-2" class="card-title">Notifications</h2>
+          <button data-i18n="tutor-dashboard.mark-all-as-read" type="button" class="usk-link" onclick="USKNotify.markAllRead()" style="background:none;border:0;color:var(--blue);font:700 0.8rem 'Manrope',sans-serif;cursor:pointer;">Mark all as read</button></div>
         <div class="card-body" id="notifsList"><div class="spinner"></div></div>
       </div>
     </div>
@@ -501,8 +502,20 @@ function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 function __viewerTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Berlin';}catch(e){return 'Europe/Berlin';}}
-function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').pop().replace(/_/g,' ')+' time)':'';}
+function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+T('tz-time','{{zone}} time',{zone:String(tz).split('/').pop().replace(/_/g,' ')})+')':'';}
 function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
+
+// Interface text: English is written here; other languages come from locales/<lang>/page.tutor-dashboard.json
+// (Notifications, chat messages and emails saved for the student stay English until per-recipient language exists.)
+const __pick = (en, v) => typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en;
+const T = (k, en, v) => window.I18N ? I18N.t('tutor-dashboard.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? v[x] : m);
+const H = (k, en, v) => window.I18N ? I18N.h('tutor-dashboard.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, (m, x) => v && x in v ? __esc(v[x]) : m);
+const SRV = m => window.I18N ? I18N.server(m) : m;   // known server messages in the reader's language
+const __D = (d, o) => window.I18N && I18N.lang !== 'en' ? I18N.date(d, o) : (o ? new Date(d).toLocaleDateString([], o) : new Date(d).toLocaleDateString());
+// Button labels (full) and their short overview versions
+const L_ACCEPT = H('btn.accept', '✓ Accept'), L_DECLINE = H('btn.decline', '✗ Decline'), L_JOIN = H('btn.join', '🎥 Join Session'),
+  L_REPORT = H('btn.report', '⚠️ Report Issue'), L_OFFER = H('btn.offer', '✓ I can offer this'), L_MSGFIRST = H('btn.msg-first', '💬 Message first');
+const __rx = s => new RegExp('>' + s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '<', 'g');
 
 // Stop the browser from "helpfully" restoring the previous scroll position
 // when navigating between ?tab= variants of this same page (a known iOS
@@ -532,7 +545,7 @@ let tutorRate = 0;
 let _accessToken = null;
 
 // Overview cards show plain button labels; the full tabs keep their own wording.
-function __ovLabels(html){return String(html).replace(/>✓ Accept</g,'>Accept<').replace(/>✗ Decline</g,'>Decline<').replace(/>🎥 Join Session</g,'>Join session<').replace(/>⚠️ Report Issue</g,'>Report issue<').replace(/>✓ I can offer this</g,'>I can offer this<').replace(/>💬 Message first</g,'>Message first<').replace(/(<button class="btn-msg"[^>]*)>💬</g,'$1 aria-label="Message student">Message<')
+function __ovLabels(html){return String(html).replace(__rx(L_ACCEPT),'>'+H('ov.accept','Accept')+'<').replace(__rx(L_DECLINE),'>'+H('ov.decline','Decline')+'<').replace(__rx(L_JOIN),'>'+H('ov.join','Join session')+'<').replace(__rx(L_REPORT),'>'+H('ov.report','Report issue')+'<').replace(__rx(L_OFFER),'>'+H('ov.offer','I can offer this')+'<').replace(__rx(L_MSGFIRST),'>'+H('ov.msg-first','Message first')+'<').replace(/(<button class="btn-msg"[^>]*)>💬</g,'$1 aria-label="'+H('ov.msg-label','Message student')+'">'+H('ov.msg','Message')+'<')
     // same order on screen and for keyboard users: Message, Decline, Accept
     .replace(/(<button class="btn-accept"[\s\S]*?<\/button>)\s*(<button class="btn-decline"[\s\S]*?<\/button>)\s*(<button class="btn-msg"[\s\S]*?<\/button>)/g,'$3$2$1')
     .replace(/(<button class="btn-accept"[\s\S]*?<\/button>)\s*(<button class="btn-msg-wide"[\s\S]*?<\/button>)/g,'$2$1');}
@@ -581,7 +594,7 @@ async function init() {
   const TP_COLS = 'id,user_id,bio,subjects,teaching_levels,hourly_rate,currency,languages,format,location,teaching_style,materials_url,video_link,rating_avg,review_count,sessions_count,response_rate,completion_rate,no_show_count,university_verified_at,grade_verified_at,certified_at,top_rated_at,next_available,is_active,created_at,updated_at,session_length,availability,preferred_time,teaching_format,country,language,gender,certificates,degree_level,major,overall_grade,max_students,avatar_url,study_year,cover_url,preferred_times,verified_university';
   const { data: tp } = await _sb.from('tutor_profiles').select(TP_COLS).eq('user_id', userId).maybeSingle();
 
-  const fullName = (p && p.full_name) || (meta.full_name) || 'Tutor';
+  const fullName = (p && p.full_name) || (meta.full_name) || T('tutor', 'Tutor');
   const firstName = fullName.split(' ')[0];
   const initials = fullName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
   tutorName = fullName;
@@ -595,15 +608,15 @@ async function init() {
   else av.textContent = initials;
   document.getElementById('sideName').textContent = fullName;
   const subjects = Array.isArray(tp?.subjects) ? tp.subjects : [];
-  const rate = tp?.hourly_rate ? (tutorCurrency === 'USD' ? '$' : '€') + tp.hourly_rate + '/hr' : '';
-  document.getElementById('sideSub').textContent = [subjects.slice(0, 2).join(', '), rate].filter(Boolean).join(' · ') || 'Complete your profile';
+  const rate = tp?.hourly_rate ? T('per-hour', '{{price}}/hr', { price: (tutorCurrency === 'USD' ? '$' : '€') + tp.hourly_rate }) : '';
+  document.getElementById('sideSub').textContent = [window.I18N ? I18N.join(subjects.slice(0, 2)) : subjects.slice(0, 2).join(', '), rate].filter(Boolean).join(' · ') || T('complete-short', 'Complete your profile');
 
   // Hero
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-  document.getElementById('heroTitle').textContent = greeting + ', ' + firstName;
-  document.getElementById('heroSub').textContent = subjects.length > 0 ? 'Teaching: ' + subjects.join(', ') + (rate ? ' · ' + rate : '') : 'Complete your profile to attract students.';
-  document.title = firstName + "'s Dashboard — UniSkilled";
+  const greeting = hour < 12 ? T('morning', 'Good morning') : hour < 17 ? T('afternoon', 'Good afternoon') : T('evening', 'Good evening');
+  document.getElementById('heroTitle').textContent = T('greeting', '{{greeting}}, {{name}}', { greeting, name: firstName });
+  document.getElementById('heroSub').textContent = subjects.length > 0 ? T('teaching', 'Teaching: {{subjects}}', { subjects: window.I18N ? I18N.join(subjects) : subjects.join(', ') }) + (rate ? ' · ' + rate : '') : T('complete', 'Complete your profile to attract students.');
+  document.title = T('doc-title', "{{name}}'s Dashboard — UniSkilled", { name: firstName });
 
   // Nudge tutors without any courses to add them (that is how students find them in course search)
   try {
@@ -662,20 +675,20 @@ function openGroupSessionModal(prefillSubject, studentIdsCsv) {
   }
   sel.innerHTML = options.length > 0
     ? options.map(s => `<option value="${__esc(s)}">${__esc(s)}</option>`).join('')
-    : '<option value="">Add a subject to your profile first</option>';
+    : '<option value="">' + H('gs.no-subject', 'Add a subject to your profile first') + '</option>';
   if (prefillSubject) sel.value = prefillSubject;
 
   pendingGroupNotifyIds = studentIdsCsv ? studentIdsCsv.split(',').filter(Boolean) : [];
   const hint = document.getElementById('gsNotifyHint');
   if (pendingGroupNotifyIds.length > 0) {
-    hint.textContent = `✓ The ${pendingGroupNotifyIds.length} student${pendingGroupNotifyIds.length > 1 ? 's' : ''} who requested this will be notified as soon as you create it.`;
+    hint.textContent = '✓ ' + T('gs.notify', { one: 'The {{count}} student who requested this will be notified as soon as you create it.', other: 'The {{count}} students who requested this will be notified as soon as you create it.' }, { count: pendingGroupNotifyIds.length });
     hint.style.display = 'block';
   } else {
     hint.style.display = 'none';
   }
 
   const sym = tutorCurrency === 'USD' ? '$' : '€';
-  document.getElementById('gsPriceLabel').textContent = `Price per student (${sym})`;
+  document.getElementById('gsPriceLabel').textContent = T('gs.price-label', 'Price per student ({{sym}})', { sym });
   document.getElementById('gsPrice').min = tutorCurrency === 'USD' ? 11 : 10;
   document.getElementById('gsError').style.display = 'none';
   document.getElementById('groupSessionModalOverlay').style.display = 'flex';
@@ -698,21 +711,21 @@ async function submitGroupSession() {
 
   const gsMinPrice = tutorCurrency === 'USD' ? 11 : 10;
   if (!subject || !date || !time || !price || Number(price) < gsMinPrice) {
-    errBox.textContent = `Please fill in subject, date, time, and a price of at least ${tutorCurrency === 'USD' ? '$11' : '€10'} per student.`;
+    errBox.textContent = T('gs.fill', 'Please fill in subject, date, time, and a price of at least {{min}} per student.', { min: tutorCurrency === 'USD' ? '$11' : '€10' });
     errBox.style.display = 'block';
     return;
   }
 
   const sessionDateTime = new Date(date + 'T' + time);
   if (sessionDateTime < new Date()) {
-    errBox.textContent = 'Please choose a future date and time.';
+    errBox.textContent = T('gs.future', 'Please choose a future date and time.');
     errBox.style.display = 'block';
     return;
   }
 
   const btn = document.getElementById('gsSubmitBtn');
   btn.disabled = true;
-  btn.textContent = 'Creating...';
+  btn.textContent = T('gs.creating', 'Creating...');
 
   const { data: newSession, error } = await _sb.from('group_sessions').insert({
     tutor_id: userId,
@@ -728,10 +741,10 @@ async function submitGroupSession() {
   }).select().single();
 
   btn.disabled = false;
-  btn.textContent = 'Create Group Session';
+  btn.textContent = T('gs.create', 'Create Group Session');
 
   if (error) {
-    errBox.textContent = 'Could not create group session: ' + error.message;
+    errBox.textContent = T('gs.failed', 'Could not create group session: {{message}}', { message: error.message });
     errBox.style.display = 'block';
     return;
   }
@@ -760,7 +773,7 @@ async function loadGroupSessions() {
     .select('*').eq('tutor_id', userId).order('scheduled_date', { ascending: true });
 
   if (!groupSessions || groupSessions.length === 0) {
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">No group sessions yet</div></div>';
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">👥</div><div class="empty-text">' + H('gs.none', 'No group sessions yet') + '</div></div>';
     return;
   }
 
@@ -770,20 +783,20 @@ async function loadGroupSessions() {
   list.innerHTML = groupSessions.map(gs => {
     const participants = (allParticipants || []).filter(p => p.group_session_id === gs.id);
     const confirmed = participants.filter(p => p.status === 'confirmed');
-    const date = new Date(gs.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' });
+    const date = __D(gs.scheduled_date, { month: 'short', day: 'numeric' });
     const statusBadge = gs.status === 'cancelled'
-      ? '<span class="badge badge-expired">cancelled</span>'
+      ? '<span class="badge badge-expired">' + H('gs.st.cancelled', 'cancelled') + '</span>'
       : gs.status === 'completed'
-      ? '<span class="badge badge-completed">completed</span>'
+      ? '<span class="badge badge-completed">' + H('gs.st.completed', 'completed') + '</span>'
       : confirmed.length >= gs.max_students
-      ? '<span class="badge badge-confirmed">full</span>'
-      : '<span class="badge badge-pending">open</span>';
+      ? '<span class="badge badge-confirmed">' + H('gs.st.full', 'full') + '</span>'
+      : '<span class="badge badge-pending">' + H('gs.st.open', 'open') + '</span>';
 
     return `<div class="session-row">
       <div class="session-av">👥</div>
       <div class="session-info">
         <div class="session-name">${__esc(gs.subject)}</div>
-        <div class="session-sub">${__esc(date)} · ${__esc(gs.scheduled_time.slice(0,5) + __tzNote(gs.timezone))} · ${__esc(gs.currency === 'USD' ? '$' : '€')}${__esc(gs.price_per_student)}/student · ${__esc(confirmed.length)}/${__esc(gs.max_students)} joined</div>
+        <div class="session-sub">${__esc(date)} · ${__esc(gs.scheduled_time.slice(0,5) + __tzNote(gs.timezone))} · ${H('gs.price', '{{price}}/student', { price: (gs.currency === 'USD' ? '$' : '€') + gs.price_per_student })} · ${H('gs.joined', '{{n}}/{{max}} joined', { n: confirmed.length, max: gs.max_students })}</div>
       </div>
       ${statusBadge}
     </div>`;
@@ -791,7 +804,7 @@ async function loadGroupSessions() {
 }
 
 // Exam date (YYYY-MM-DD) shown in the viewer's own date format, e.g. "19 Nov 2026"
-function __examDate(d) { try { return new Date(d + 'T12:00:00').toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return d; } }
+function __examDate(d) { try { return __D(d + 'T12:00:00', { day: 'numeric', month: 'short', year: 'numeric' }); } catch (e) { return d; } }
 // A request nobody answered in time is released automatically (status 'declined' with this reason)
 function __isReleased(s) { return s.status === 'declined' && /^No answer from the tutor/.test(s.cancellation_reason || ''); }
 
@@ -806,7 +819,7 @@ async function loadRequests() {
   else badge.style.display = 'none';
 
   const html = requests.length === 0
-    ? '<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>'
+    ? '<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">' + H('no-requests', 'No pending requests') + '</div></div>'
     : requests.map(r => {
         const sym = (r.currency || tutorCurrency) === 'USD' ? '$' : '€';
         const offeredPrice = Number(r.price) || 0;
@@ -818,27 +831,27 @@ async function loadRequests() {
         const priceHtml = `<div style="margin-top:0.4rem;">
           <span style="font-weight:800;font-size:0.95rem;color:var(--ink);">${__esc(sym)}${__esc(offeredPrice.toFixed(2))}</span>
           ${isNegotiated
-            ? `<span style="margin-left:0.4rem;font-size:0.7rem;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:100px;">🏷️ Negotiated — your rate: ${__esc(sym)}${__esc(expectedAtListedRate.toFixed(2))}</span>`
-            : `<span style="margin-left:0.4rem;font-size:0.72rem;color:var(--mid);">at your listed rate</span>`}
+            ? `<span style="margin-left:0.4rem;font-size:0.7rem;font-weight:700;color:#92400e;background:#fffbeb;padding:2px 8px;border-radius:100px;">🏷️ ${H('negotiated', 'Negotiated — your rate: {{price}}', { price: sym + expectedAtListedRate.toFixed(2) })}</span>`
+            : `<span style="margin-left:0.4rem;font-size:0.72rem;color:var(--mid);">${H('listed-rate', 'at your listed rate')}</span>`}
         </div>`;
         return `
       <div class="request-row">
         <div class="request-header">
           <div>
-            <div class="request-name">${__esc(r.student_name || 'Student')}</div>
-            <div class="request-subject">Subject: <strong>${__esc(r.subject || '—')}</strong></div>
+            <div class="request-name">${__esc(r.student_name || T('student', 'Student'))}</div>
+            <div class="request-subject">${H('req.subject', 'Subject: <strong>{{subject}}</strong>', { subject: r.subject || '—' })}</div>
             ${priceHtml}
           </div>
-          <span style="font-size:0.75rem;color:var(--mid);">${__esc(r.scheduled_date ? new Date(r.scheduled_date).toLocaleDateString() : '')} ${__esc(r.scheduled_time ? r.scheduled_time.slice(0,5) + __tzNote(r.timezone) : '')}</span>
+          <span style="font-size:0.75rem;color:var(--mid);">${__esc(r.scheduled_date ? __D(r.scheduled_date) : '')} ${__esc(r.scheduled_time ? r.scheduled_time.slice(0,5) + __tzNote(r.timezone) : '')}</span>
         </div>
-        ${r.exam_date ? `<div class="request-meta" style="font-weight:700;color:#92400e;">📝 Exam on ${__esc(__examDate(r.exam_date))}</div>` : ''}
+        ${r.exam_date ? `<div class="request-meta" style="font-weight:700;color:#92400e;">📝 ${H('exam-on', 'Exam on {{date}}', { date: __examDate(r.exam_date) })}</div>` : ''}
         <div class="request-meta">
-          📋 ${__esc(r.duration_minutes || 60)} min · Online
+          📋 ${H('min-online', '{{n}} min · Online', { n: r.duration_minutes || 60 })}
           ${__esc(r.notes ? ' · "' + r.notes.slice(0, 60) + '"' : '')}
         </div>
         <div class="request-actions">
-          <button class="btn-accept" onclick="respond('${r.id}','confirmed','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}', this)">✓ Accept</button>
-          <button class="btn-decline" onclick="respond('${r.id}','declined','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}', this)">✗ Decline</button>
+          <button class="btn-accept" onclick="respond('${r.id}','confirmed','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}', this)">${L_ACCEPT}</button>
+          <button class="btn-decline" onclick="respond('${r.id}','declined','${r.student_id}','${__jsStr(r.student_name||'')}','${__jsStr(r.subject||'')}', this)">${L_DECLINE}</button>
           <button class="btn-msg" onclick="window.location.href='messages.html?with=${r.student_id}'">💬</button>
         </div>
       </div>`;
@@ -846,7 +859,7 @@ async function loadRequests() {
 
   document.getElementById('requestsList').innerHTML = html;
   document.getElementById('overviewRequests').innerHTML = requests.length === 0
-    ? '<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">No pending requests</div></div>'
+    ? '<div class="empty-state"><div class="empty-icon">📥</div><div class="empty-text">' + H('no-requests', 'No pending requests') + '</div></div>'
     : __ovLabels(html);
 }
 
@@ -860,7 +873,7 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
   const rowButtons = row ? Array.from(row.querySelectorAll('button')) : [];
   const btnLabel = btn ? btn.textContent : '';
   rowButtons.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; b.style.cursor = 'default'; });
-  if (btn) { btn.textContent = accepting ? 'Accepting…' : 'Declining…'; btn.style.opacity = '1'; }
+  if (btn) { btn.textContent = accepting ? T('accepting', 'Accepting…') : T('declining', 'Declining…'); btn.style.opacity = '1'; }
   const unlock = () => {
     rowButtons.forEach(b => { b.disabled = false; b.style.opacity = ''; b.style.cursor = ''; });
     if (btn) btn.textContent = btnLabel;
@@ -872,18 +885,19 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
   const { error: respondErr } = await _sb.from('sessions').update(updatePayload).eq('id', sessionId);
   if (respondErr) {
     unlock();
-    showToast(__friendlyDbError(respondErr, 'Could not update this request. Please refresh and try again.'), 'error');
+    showToast(__friendlyDbError(respondErr, T('respond-failed', 'Could not update this request. Please refresh and try again.')), 'error');
     return;
   }
   window.usTrack&&usTrack('booking_responded', { decision: accepting ? 'accepted' : 'declined' });
 
   // The database ends the payment window 1 hour before the session if that's sooner than 24 hours.
   let payWindowText = '24 hours';
+  let payWindowUi = T('pay.24h', '24 hours');
   if (accepting) {
     try {
       const { data: dueRow } = await _sb.from('sessions').select('payment_due_at').eq('id', sessionId).maybeSingle();
       const mins = dueRow?.payment_due_at ? Math.floor((new Date(dueRow.payment_due_at).getTime() - Date.now()) / 60000) : null;
-      if (mins !== null && mins > 0) payWindowText = mins >= 90 ? Math.round(mins / 60) + ' hours' : mins + ' minutes';
+      if (mins !== null && mins > 0) { payWindowText = mins >= 90 ? Math.round(mins / 60) + ' hours' : mins + ' minutes'; payWindowUi = mins >= 90 ? T('pay.hours', '{{count}} hours', { count: Math.round(mins / 60) }) : T('pay.minutes', '{{count}} minutes', { count: mins }); }
     } catch (e) { /* keep the default wording */ }
   }
 
@@ -926,13 +940,13 @@ window.respond = async function(sessionId, status, studentId, studentName, subje
   })();
   await Promise.allSettled([notify, email]);
 
-  const who = String(studentName || 'The student').split(' ')[0] || 'The student';
+  const who = String(studentName || T('the-student', 'The student')).split(' ')[0] || T('the-student', 'The student');
   if (accepting) {
     // Take the tutor to Sessions, where the booking now waits for payment.
-    showToast('✅ Request accepted. ' + who + ' has ' + payWindowText + ' to pay — the session is confirmed as soon as they do, and we\'ll notify you. You can follow it below.', 'success', { afterReload: true });
+    showToast(T('accepted-toast', "✅ Request accepted. {{name}} has {{window}} to pay — the session is confirmed as soon as they do, and we'll notify you. You can follow it below.", { name: who, window: payWindowUi }), 'success', { afterReload: true });
     window.location.href = 'tutor-dashboard.html?tab=sessions';
   } else {
-    showToast('Request declined. ' + who + ' has been notified.', 'success', { afterReload: true });
+    showToast(T('declined-toast', 'Request declined. {{name}} has been notified.', { name: who }), 'success', { afterReload: true });
     window.location.href = 'tutor-dashboard.html?tab=requests';
   }
 };
@@ -946,17 +960,17 @@ function renderSubjectRequestRow(r) {
     <div class="request-row">
       <div class="request-header">
         <div>
-          <div class="request-name">${__esc(r.subject)}${isMatch ? ' <span style="background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:6px;">Matches your subjects</span>' : ''}</div>
-          <div class="request-subject">Requested by ${__esc(r.student_name || 'a student')}${__esc(r.level ? ' · ' + r.level : '')}${__esc(r.frequency ? ' · ' + r.frequency : '')}</div>
+          <div class="request-name">${__esc(r.subject)}${isMatch ? ' <span style="background:var(--green-bg);color:var(--green);font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:100px;margin-left:6px;">' + H('matches', 'Matches your subjects') + '</span>' : ''}</div>
+          <div class="request-subject">${H('requested-by', 'Requested by {{name}}', { name: r.student_name || T('a-student', 'a student') })}${__esc(r.level ? ' · ' + r.level : '')}${__esc(r.frequency ? ' · ' + r.frequency : '')}</div>
         </div>
-        <span style="font-size:0.75rem;color:var(--mid);">${__esc(new Date(r.created_at).toLocaleDateString())}</span>
+        <span style="font-size:0.75rem;color:var(--mid);">${__esc(__D(r.created_at))}</span>
       </div>
       ${r.notes ? `<div class="request-meta">💬 "${__esc(r.notes.slice(0, 160))}${__esc(r.notes.length > 160 ? '…' : '')}"</div>` : ''}
       ${r.university ? `<div class="request-meta">🎓 ${__esc(r.university)}</div>` : ''}
       ${r.language ? `<div class="request-meta">🌍 ${__esc(r.language)}</div>` : ''}
       <div class="request-actions">
-        <button class="btn-accept" onclick="acceptSubjectRequest('${r.id}','${r.student_id}','${safeName}','${safeSubject}')">✓ I can offer this</button>
-        <button class="btn-msg-wide" onclick="window.location.href='messages.html?with=${r.student_id}'">💬 Message first</button>
+        <button class="btn-accept" onclick="acceptSubjectRequest('${r.id}','${r.student_id}','${safeName}','${safeSubject}')">${L_OFFER}</button>
+        <button class="btn-msg-wide" onclick="window.location.href='messages.html?with=${r.student_id}'">${L_MSGFIRST}</button>
       </div>
     </div>`;
 }
@@ -969,7 +983,7 @@ async function loadSubjectRequests() {
   if (reqs.length > 0) { badge.textContent = reqs.length; badge.style.display = 'block'; }
   else badge.style.display = 'none';
 
-  const emptyHtml = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">No open subject requests right now</div></div>';
+  const emptyHtml = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">' + H('no-subject-requests', 'No open subject requests right now') + '</div></div>';
 
   document.getElementById('subjectRequestsList').innerHTML = reqs.length === 0
     ? emptyHtml
@@ -998,16 +1012,16 @@ function renderClusteredDemand(reqs) {
   section.style.display = 'block';
 
   document.getElementById('clusteredDemandList').innerHTML = grouped.map(c => {
-    const names = c.requests.map(r => r.student_name || 'A student').join(', ');
+    const names = (window.I18N ? I18N.join : (a => a.join(', ')))(c.requests.map(r => r.student_name || T('a-student-cap', 'A student')));
     const ids = c.requests.map(r => r.student_id).join(',');
     const safeSubject = __jsStr(c.subject || '');
     return `<div style="border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem;margin-bottom:0.8rem;background:#fffbeb;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:0.6rem;">
         <div>
           <div style="font-weight:800;font-size:0.92rem;">${__esc(c.subject)}</div>
-          <div style="font-size:0.8rem;color:var(--mid);margin-top:2px;">${__esc(c.requests.length)} students want this · ${__esc(names)}</div>
+          <div style="font-size:0.8rem;color:var(--mid);margin-top:2px;">${H('want-this', '{{count}} students want this', { count: c.requests.length })} · ${__esc(names)}</div>
         </div>
-        <button class="btn-accept" onclick="openGroupSessionModal('${safeSubject}','${ids}')" style="white-space:nowrap;">🚀 Create Group Session</button>
+        <button class="btn-accept" onclick="openGroupSessionModal('${safeSubject}','${ids}')" style="white-space:nowrap;">🚀 ${H('gs.create', 'Create Group Session')}</button>
       </div>
     </div>`;
   }).join('');
@@ -1016,7 +1030,7 @@ function renderClusteredDemand(reqs) {
 window.acceptSubjectRequest = async function(requestId, studentId, studentName, subject) {
   // Immediate visual feedback on the button
   const btn = event?.target;
-  if (btn) { btn.disabled = true; btn.textContent = '⏳ Accepting...'; }
+  if (btn) { btn.disabled = true; btn.textContent = '⏳ ' + T('accepting-dots', 'Accepting...'); }
 
   const { data, error } = await _sb.from('subject_requests').update({
     status: 'accepted',
@@ -1025,14 +1039,14 @@ window.acceptSubjectRequest = async function(requestId, studentId, studentName, 
     accepted_at: new Date().toISOString()
   }).eq('id', requestId).eq('status', 'open').select(); // guard: only matches if still open (first-accept-wins)
 
-  if (error) { showToast(__friendlyDbError(error, 'Could not accept this request. Please try again.'), 'error'); if(btn){btn.disabled=false;btn.textContent='✓ I can offer this';} return; }
+  if (error) { showToast(__friendlyDbError(error, T('accept-failed', 'Could not accept this request. Please try again.')), 'error'); if(btn){btn.disabled=false;btn.textContent=T('btn.offer', '✓ I can offer this');} return; }
   if (!data || data.length === 0) {
-    showToast('Another tutor already accepted this request.', 'info');
+    showToast(T('taken', 'Another tutor already accepted this request.'), 'info');
     await loadSubjectRequests();
     return;
   }
 
-  if (btn) { btn.textContent = '✅ Accepted!'; btn.style.background = 'var(--green)'; }
+  if (btn) { btn.textContent = T('accepted', '✅ Accepted!'); btn.style.background = 'var(--green)'; }
 
   const { error: notifError } = await _sb.from('notifications').insert({
     user_id: studentId,
@@ -1120,15 +1134,15 @@ async function loadSessions() {
       const ini = (s.student_name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
       const dueAt = s.payment_due_at ? new Date(s.payment_due_at) : null;
       const hoursLeft = dueAt ? Math.max(0, Math.round((dueAt.getTime() - Date.now()) / 3600000)) : null;
-      const timeLeftText = hoursLeft !== null ? `${hoursLeft}h left to pay before this expires` : 'Waiting on payment';
+      const timeLeftText = hoursLeft !== null ? T('hours-left', '{{h}}h left to pay before this expires', { h: hoursLeft }) : T('waiting-payment', 'Waiting on payment');
       return `<div class="session-row">
         <div class="session-av">${__esc(ini)}</div>
         <div class="session-info">
-          <div class="session-name">${__esc(s.student_name || 'Student')}</div>
-          <div class="session-sub">${__esc(s.subject || '—')} ${__esc(s.scheduled_date ? '· ' + new Date(s.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')} — you accepted this, now waiting on the student to pay</div>
+          <div class="session-name">${__esc(s.student_name || T('student', 'Student'))}</div>
+          <div class="session-sub">${__esc(s.subject || '—')} ${__esc(s.scheduled_date ? '· ' + __D(s.scheduled_date, { month: 'short', day: 'numeric' }) : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')} — ${H('awaiting-note', 'you accepted this, now waiting on the student to pay')}</div>
         </div>
         <span class="badge badge-awaiting-payment" style="white-space:nowrap;">${__esc(timeLeftText)}</span>
-        <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}', 'awaiting_payment')">Cancel booking</button>
+        <button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}', 'awaiting_payment')">${H('cancel-booking', 'Cancel booking')}</button>
         ${UsResched.rowHtml(s, __rr[s.id], userId)}
       </div>`;
     }).join('');
@@ -1138,7 +1152,7 @@ async function loadSessions() {
 
   const sessionHtml = s => {
     const ini = (s.student_name || 'S').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-    const date = s.scheduled_date ? new Date(s.scheduled_date).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+    const date = s.scheduled_date ? __D(s.scheduled_date, { month: 'short', day: 'numeric' }) : '';
     const badgeClass = s.status === 'confirmed' ? 'badge-confirmed'
       : s.status === 'completed' ? 'badge-completed'
       : s.status === 'awaiting_payment' ? 'badge-awaiting-payment'
@@ -1146,27 +1160,27 @@ async function loadSessions() {
       : s.status === 'cancelled' ? 'badge-expired'
       : __isReleased(s) ? 'badge-expired'
       : 'badge-pending';
-    const badgeLabel = s.status === 'awaiting_payment' ? 'awaiting payment'
-      : s.status === 'payment_expired' ? 'payment expired'
-      : __isReleased(s) ? 'no answer · released'
-      : s.status;
-    const examNote = s.exam_date && (s.status === 'confirmed' || s.status === 'awaiting_payment') ? ' · Exam ' + __examDate(s.exam_date) : '';
+    const badgeLabel = s.status === 'awaiting_payment' ? T('st.awaiting_payment', 'awaiting payment')
+      : s.status === 'payment_expired' ? T('st.payment_expired', 'payment expired')
+      : __isReleased(s) ? T('st.released', 'no answer · released')
+      : T('st.' + s.status, s.status);
+    const examNote = s.exam_date && (s.status === 'confirmed' || s.status === 'awaiting_payment') ? ' · ' + T('exam', 'Exam {{date}}', { date: __examDate(s.exam_date) }) : '';
     const joinBtn = s.status === 'confirmed'
-      ? `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.student_name||'Student')}')">🎥 Join Session</button>`
+      ? `<button class="btn-join" onclick="joinSession('${s.id}','${__jsStr(s.subject||'Session')}','${__jsStr(s.student_name||'Student')}')">${L_JOIN}</button>`
       : '';
     const cancelBtn = (s.status === 'confirmed' || s.status === 'awaiting_payment')
-      ? `<button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}', '${s.status}')">Cancel</button>`
+      ? `<button class="btn-join" style="background:#fff;color:#b91c1c;border:1.5px solid #fecaca;margin-left:0.4rem;" onclick="openCancelModal('${s.id}', '${s.status}')">${H('cancel', 'Cancel')}</button>`
       : '';
     // Issues can be reported until 48h after the session ended (same window open-dispute enforces)
     const reportOpen = s.status === 'confirmed'
       || (s.status === 'completed' && (!s.completed_at || Date.now() - new Date(s.completed_at).getTime() <= 48 * 3600 * 1000));
     const reportBtn = reportOpen
-      ? `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">⚠️ Report Issue</button>`
+      ? `<button class="btn-join" style="background:#fff;color:#92400e;border:1.5px solid #fcd34d;margin-left:0.4rem;" onclick="openReportModal('${s.id}')">${L_REPORT}</button>`
       : '';
     return `<div class="session-row">
       <div class="session-av">${__esc(ini)}</div>
       <div class="session-info">
-        <div class="session-name">${__esc(s.student_name || 'Student')}</div>
+        <div class="session-name">${__esc(s.student_name || T('student', 'Student'))}</div>
         <div class="session-sub">${__esc(s.subject || '—')} ${__esc(date ? '· ' + date : '')} ${__esc(s.scheduled_time ? '· ' + s.scheduled_time.slice(0,5) + __tzNote(s.timezone) : '')}${__esc(examNote)}</div>
       </div>
       <span class="badge ${__esc(badgeClass)}">${__esc(badgeLabel)}</span>
@@ -1175,11 +1189,11 @@ async function loadSessions() {
   };
 
   document.getElementById('sessionsList').innerHTML = sessions.length === 0
-    ? '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No sessions yet</div></div>'
+    ? '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">' + H('no-sessions', 'No sessions yet') + '</div></div>'
     : sessions.map(sessionHtml).join('');
 
   document.getElementById('overviewSessions').innerHTML = upcoming.length === 0
-    ? '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">No upcoming sessions</div></div>'
+    ? '<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">' + H('no-upcoming', 'No upcoming sessions') + '</div></div>'
     : __ovLabels(upcoming.slice(0, 3).map(sessionHtml).join(''));
 }
 
@@ -1193,7 +1207,7 @@ async function loadReviews() {
     document.getElementById('statRating').textContent = sum.rating;
     document.getElementById('avgRatingDisplay').textContent = sum.label;
     const list = document.getElementById('reviewsList');
-    list.innerHTML = (sum.isNew ? '<div style="padding:0.8rem 1.4rem;font-size:0.8rem;color:var(--mid);background:#f8fafc;border-bottom:1px solid var(--border)">Students see you as a <b>New tutor</b> until you have 3 reviews. Then your average rating is shown.</div>' : '')
+    list.innerHTML = (sum.isNew ? '<div style="padding:0.8rem 1.4rem;font-size:0.8rem;color:var(--mid);background:#f8fafc;border-bottom:1px solid var(--border)">' + H('new-tutor-note', 'Students see you as a <b>New tutor</b> until you have 3 reviews. Then your average rating is shown.') + '</div>' : '')
       + UsReviews.listHtml(reviews, { replyable: true });
     UsReviews.bindReplies(list, _sb, loadReviews);
   }
@@ -1213,7 +1227,7 @@ async function startNotifications(requestedTab) {
         const n = counts[d.dataset.sec] || 0;
         d.hidden = n === 0;
         d.textContent = n > 9 ? '9+' : n;
-        d.title = n ? n + ' new' : '';
+        d.title = n ? T('n-new', '{{n}} new', { n }) : '';
       });
     },
   });
@@ -1276,12 +1290,12 @@ async function submitBecomeStudent() {
   }, { onConflict: 'user_id' });
 
   if (error) {
-    alertEl.textContent = 'Error: ' + error.message;
+    alertEl.textContent = T('error', 'Error: {{message}}', { message: error.message });
     alertEl.className = 'dm-alert error';
     return;
   }
 
-  alertEl.textContent = '✓ Student profile created! Redirecting...';
+  alertEl.textContent = T('bs.created', '✓ Student profile created! Redirecting...');
   alertEl.className = 'dm-alert success';
   setTimeout(() => window.location.href = 'student-dashboard.html', 1200);
 }
@@ -1293,7 +1307,7 @@ function dashSignOut() {
 // Check if returning from Stripe Connect onboarding
 if (new URLSearchParams(window.location.search).get('payout') === 'success') {
   setTimeout(() => {
-    showToast('Payout account connected. You can now receive payments.', 'success');
+    showToast(T('payout-connected-toast', 'Payout account connected. You can now receive payments.'), 'success');
     window.history.replaceState({}, '', 'tutor-dashboard.html');
   }, 1000);
 }
@@ -1357,13 +1371,13 @@ async function checkPayoutStatus() {
     const emailForm = document.getElementById('paypalEmailForm');
 
     if (tp?.paypal_email) {
-      statusLine.innerHTML = `✅ PayPal payouts enabled<br><span style="font-weight:500; font-size:0.9em; opacity:0.85;">${__esc(tp.paypal_email)}</span>`;
+      statusLine.innerHTML = `✅ ${H('pp.enabled', 'PayPal payouts enabled')}<br><span style="font-weight:500; font-size:0.9em; opacity:0.85;">${__esc(tp.paypal_email)}</span>`;
       statusLine.style.background = '#f0fdf4';
       statusLine.style.border = '1.5px solid #86efac';
       statusLine.style.color = '#15803d';
       emailForm.style.display = 'none';
     } else {
-      statusLine.textContent = '⚠️ Add your PayPal email to get paid';
+      statusLine.textContent = '⚠️ ' + T('pp.add', 'Add your PayPal email to get paid');
       statusLine.style.background = '#fffbeb';
       statusLine.style.border = '1.5px solid #fcd34d';
       statusLine.style.color = '#92400e';
@@ -1374,15 +1388,15 @@ async function checkPayoutStatus() {
     stripeBtn.style.display = '';
 
     if (tp?.stripe_account_status === 'active') {
-      stripeBtn.textContent = '✅ Payouts connected';
+      stripeBtn.textContent = '✅ ' + T('payout.connected', 'Payouts connected');
       stripeBtn.className = 'payout-btn connected';
       stripeBtn.onclick = null;
     } else if (tp?.stripe_account_id) {
-      stripeBtn.textContent = '⏳ Complete payout setup';
+      stripeBtn.textContent = '⏳ ' + T('payout.complete', 'Complete payout setup');
       stripeBtn.className = 'payout-btn pending';
       stripeBtn.onclick = setupPayouts;
     } else {
-      stripeBtn.textContent = '💳 Set up payouts';
+      stripeBtn.textContent = '💳 ' + T('payout.setup', 'Set up payouts');
       stripeBtn.className = 'payout-btn';
       stripeBtn.onclick = setupPayouts;
     }
@@ -1401,7 +1415,7 @@ async function selectPayoutMethod(method) {
     .eq('user_id', userId);
 
   if (error) {
-    showToast(__friendlyDbError(error, 'Could not update your payout method. Please try again.'), 'error');
+    showToast(__friendlyDbError(error, T('payout.method-failed', 'Could not update your payout method. Please try again.')), 'error');
     return;
   }
 
@@ -1416,7 +1430,7 @@ async function savePaypalEmail() {
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(email)) {
-    errBox.textContent = 'Please enter a valid email address.';
+    errBox.textContent = T('pp.invalid', 'Please enter a valid email address.');
     errBox.style.display = 'block';
     return;
   }
@@ -1427,7 +1441,7 @@ async function savePaypalEmail() {
     .eq('user_id', userId);
 
   if (error) {
-    errBox.textContent = 'Could not save: ' + error.message;
+    errBox.textContent = T('pp.save-failed', 'Could not save: {{message}}', { message: error.message });
     errBox.style.display = 'block';
     return;
   }
@@ -1437,7 +1451,7 @@ async function savePaypalEmail() {
 
 async function setupPayouts() {
   const btn = document.getElementById('payoutSetupBtn');
-  btn.textContent = '⏳ Loading...';
+  btn.textContent = '⏳ ' + T('loading', 'Loading...');
   btn.disabled = true;
 
   try {
@@ -1452,16 +1466,16 @@ async function setupPayouts() {
     });
     const data = await res.json();
     if (!res.ok || !data.url) {
-      showToast('Could not start payout setup. Please try again in a moment.', 'error');
-      btn.textContent = '💳 Set up payouts';
+      showToast(T('payout.start-failed', 'Could not start payout setup. Please try again in a moment.'), 'error');
+      btn.textContent = '💳 ' + T('payout.setup', 'Set up payouts');
       btn.disabled = false;
       return;
     }
     // Open Stripe onboarding in same tab
     window.location.href = data.url;
   } catch (err) {
-    showToast('Could not start payout setup. Check your connection and try again.', 'error');
-    btn.textContent = '💳 Set up payouts';
+    showToast(T('payout.offline', 'Could not start payout setup. Check your connection and try again.'), 'error');
+    btn.textContent = '💳 ' + T('payout.setup', 'Set up payouts');
     btn.disabled = false;
   }
 }
@@ -1493,28 +1507,28 @@ async function loadReferralCard() {
   const statsEl = document.getElementById('referralStats');
   if (statsEl) {
     statsEl.textContent = total === 0
-      ? 'Share your link — you\'ll both get €10 once they complete their first session.'
-      : `${total} referred · ${qualified} qualified for your €10 credit`;
+      ? T('ref.none', "Share your link — you'll both get €10 once they complete their first session.")
+      : T('ref.stats', '{{total}} referred · {{qualified}} qualified for your €10 credit', { total, qualified });
   }
 
   const listEl = document.getElementById('referralsList');
   if (listEl) {
     if (total === 0) {
-      listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🎁</div><div class="empty-text">No referrals yet — share your link above to start earning credit.</div></div>';
+      listEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🎁</div><div class="empty-text">' + H('ref.empty', 'No referrals yet — share your link above to start earning credit.') + '</div></div>';
     } else {
       listEl.innerHTML = (referrals || []).map(r => {
-        const name = r.users?.full_name || 'A referred user';
+        const name = r.users?.full_name || T('ref.someone', 'A referred user');
         const roleLabel = r.invitee_role === 'tutor' ? 'tutor' : 'student';
         const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
         const statusBadge = r.status === 'qualified'
-          ? `<span class="badge badge-confirmed">+€${__esc(Number(r.referrer_reward_amount || 10).toFixed(2))} earned</span>`
-          : `<span class="badge badge-pending">pending first session</span>`;
-        const dateStr = r.created_at ? new Date(r.created_at).toLocaleDateString([], { month: 'short', day: 'numeric' }) : '';
+          ? `<span class="badge badge-confirmed">${H('ref.earned', '+€{{amount}} earned', { amount: Number(r.referrer_reward_amount || 10).toFixed(2) })}</span>`
+          : `<span class="badge badge-pending">${H('ref.pending', 'pending first session')}</span>`;
+        const dateStr = r.created_at ? __D(r.created_at, { month: 'short', day: 'numeric' }) : '';
         return `<div class="session-row">
           <div class="session-av">${__esc(initials)}</div>
           <div class="session-info">
             <div class="session-name">${__esc(name)}</div>
-            <div class="session-sub">Joined as a ${__esc(roleLabel)} ${__esc(dateStr ? '· ' + dateStr : '')}</div>
+            <div class="session-sub">${roleLabel === 'tutor' ? H('ref.as-tutor', 'Joined as a tutor') : H('ref.as-student', 'Joined as a student')} ${__esc(dateStr ? '· ' + dateStr : '')}</div>
           </div>
           ${statusBadge}
         </div>`;
@@ -1528,7 +1542,7 @@ function copyReferralLink() {
   navigator.clipboard.writeText(myReferralLink).then(() => {
     const btn = document.getElementById('copyReferralBtn');
     const original = btn.textContent;
-    btn.textContent = '✅ Copied!';
+    btn.textContent = T('copied', '✅ Copied!');
     setTimeout(() => { btn.textContent = original; }, 1800);
   }).catch(() => {
     const linkInput = document.getElementById('referralLinkInput');
@@ -1545,7 +1559,7 @@ function shareReferralLink() {
     navigator.clipboard.writeText(text).then(() => {
       const btn = document.getElementById('shareReferralBtn');
       const original = btn.textContent;
-      btn.textContent = '✅ Copied to share!';
+      btn.textContent = T('copied-share', '✅ Copied to share!');
       setTimeout(() => { btn.textContent = original; }, 1800);
     });
   }
@@ -1571,14 +1585,14 @@ async function submitReport() {
   const reason = document.getElementById('reportReasonInput').value.trim();
   const errBox = document.getElementById('reportModalError');
   if (!reason) {
-    errBox.textContent = 'Please describe the issue.';
+    errBox.textContent = T('describe', 'Please describe the issue.');
     errBox.style.display = 'block';
     return;
   }
 
   const btn = document.getElementById('reportSubmitBtn');
   btn.disabled = true;
-  btn.textContent = 'Submitting...';
+  btn.textContent = T('submitting', 'Submitting...');
 
   const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/open-dispute', {
     method: 'POST', headers: await authedHeaders(),
@@ -1587,17 +1601,17 @@ async function submitReport() {
   const data = await res.json();
 
   btn.disabled = false;
-  btn.textContent = 'Submit Report';
+  btn.textContent = T('submit-report', 'Submit Report');
 
   if (data.error) {
-    errBox.textContent = data.error;
+    errBox.textContent = SRV(data.error);
     errBox.style.display = 'block';
     return;
   }
 
   closeReportModal();
   window.usTrack&&usTrack('issue_reported', { reporter_role: 'tutor' }, { now: true });
-  showToast('Report submitted. We\'ll review it and email you — the payout stays on hold meanwhile.', 'success', {afterReload:true});
+  showToast(T('reported', "Report submitted. We'll review it and email you — the payout stays on hold meanwhile."), 'success', {afterReload:true});
   location.reload();
 }
 
@@ -1605,11 +1619,11 @@ function openCancelModal(sessionId, status) {
   cancelTargetSessionId = sessionId;
   const unpaid = status === 'awaiting_payment';
   document.getElementById('cancelModalBody').innerHTML = unpaid
-    ? 'The student hasn\'t paid yet, so nothing is charged. They\'ll be told the booking is cancelled and can book another time. If you only need a different time, use <strong>Reschedule</strong> instead.'
-    : 'As the tutor, cancelling this session will always issue the student a full refund, regardless of timing. If you only need a different time, use <strong>Reschedule</strong> instead.';
+    ? H('cancel.unpaid', "The student hasn't paid yet, so nothing is charged. They'll be told the booking is cancelled and can book another time. If you only need a different time, use <strong>Reschedule</strong> instead.")
+    : H('cancel.paid', 'As the tutor, cancelling this session will always issue the student a full refund, regardless of timing. If you only need a different time, use <strong>Reschedule</strong> instead.');
   document.getElementById('cancelModalActions').innerHTML = `
-    <button onclick="confirmCancel(false, this)" style="background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">${unpaid ? 'Yes, cancel booking' : 'Yes, cancel and refund'}</button>
-    <button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Never mind</button>
+    <button onclick="confirmCancel(false, this)" style="background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">${unpaid ? H('cancel.yes-booking', 'Yes, cancel booking') : H('cancel.yes-refund', 'Yes, cancel and refund')}</button>
+    <button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">${H('cancel.never-mind', 'Never mind')}</button>
   `;
   document.getElementById('cancelModalOverlay').style.display = 'flex';
 }
@@ -1620,7 +1634,7 @@ function closeCancelModal() {
 }
 
 async function confirmCancel(confirmNoRefund, btn) {
-  if (btn) { btn.disabled = true; btn.textContent = 'Cancelling…'; }
+  if (btn) { btn.disabled = true; btn.textContent = T('cancelling', 'Cancelling…'); }
   const res = await fetch('https://orghkbbohnabcietidiv.supabase.co/functions/v1/cancel-session', {
     method: 'POST', headers: await authedHeaders(),
     body: JSON.stringify({ session_id: cancelTargetSessionId, requester_id: userId, confirm_no_refund: confirmNoRefund }),
@@ -1628,24 +1642,24 @@ async function confirmCancel(confirmNoRefund, btn) {
   const data = await res.json();
 
   if (data.requires_confirmation) {
-    document.getElementById('cancelModalBody').innerHTML = data.message;
+    document.getElementById('cancelModalBody').innerHTML = SRV(data.message);
     document.getElementById('cancelModalActions').innerHTML = `
-      <button onclick="confirmCancel(true)" style="background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Cancel anyway (no refund)</button>
-      <button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Keep the session</button>
+      <button onclick="confirmCancel(true)" style="background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">${H('cancel.anyway', 'Cancel anyway (no refund)')}</button>
+      <button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">${H('cancel.keep', 'Keep the session')}</button>
     `;
     return;
   }
 
   if (data.error) {
-    document.getElementById('cancelModalBody').innerHTML = `<span style="color:#dc2626;">${__esc(data.error)}</span>`;
-    document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">Close</button>`;
+    document.getElementById('cancelModalBody').innerHTML = `<span style="color:#dc2626;">${__esc(SRV(data.error))}</span>`;
+    document.getElementById('cancelModalActions').innerHTML = `<button onclick="closeCancelModal()" style="background:none;border:1.5px solid var(--border);color:var(--ink2);padding:0.65rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;">${H('close', 'Close')}</button>`;
     return;
   }
 
   closeCancelModal();
   showToast(data.outcome === 'not_paid'
-    ? 'Booking cancelled. The student has been notified — nothing was charged.'
-    : 'Session cancelled. The student has been notified and fully refunded.', 'success');
+    ? T('cancelled-unpaid', 'Booking cancelled. The student has been notified — nothing was charged.')
+    : T('cancelled-refund', 'Session cancelled. The student has been notified and fully refunded.'), 'success');
   await loadAll();
 }
 
@@ -1679,37 +1693,37 @@ async function joinSession(sessionId, subject, otherName) {
 <div class="dual-modal-overlay" id="becomeStudentModal" onclick="if(event.target===this)closeDualModal('becomeStudentModal')">
   <div class="dual-modal">
     <div class="dual-modal-head">
-      <div class="dual-modal-title">🎓 Browse as Student</div>
+      <div data-i18n="tutor-dashboard.browse-as-student-2" class="dual-modal-title">🎓 Browse as Student</div>
       <button class="dual-modal-close" onclick="closeDualModal('becomeStudentModal')">✕</button>
     </div>
     <div class="dual-modal-body">
       <div class="dm-alert" id="becomeStudentAlert"></div>
-      <p style="font-size:0.85rem;color:var(--mid);margin-bottom:1.2rem;line-height:1.6;">Set up a student profile so you can also browse tutors and book sessions. You can switch between modes any time.</p>
+      <p data-i18n="tutor-dashboard.set-up-a-student" style="font-size:0.85rem;color:var(--mid);margin-bottom:1.2rem;line-height:1.6;">Set up a student profile so you can also browse tutors and book sessions. You can switch between modes any time.</p>
       <div class="dm-form-group">
-        <label for="bsUniversity" class="dm-label">University</label>
-        <input type="text" class="dm-input" id="bsUniversity" placeholder="e.g. TU Berlin">
+        <label data-i18n="tutor-dashboard.university" for="bsUniversity" class="dm-label">University</label>
+        <input data-i18n-attr="placeholder:tutor-dashboard.eg-tu-berlin.placeholder" type="text" class="dm-input" id="bsUniversity" placeholder="e.g. TU Berlin">
       </div>
       <div class="dm-row">
         <div class="dm-form-group">
-          <label for="bsDegree" class="dm-label">Degree / Course</label>
-          <input type="text" class="dm-input" id="bsDegree" placeholder="e.g. Computer Science">
+          <label data-i18n="tutor-dashboard.degree-course" for="bsDegree" class="dm-label">Degree / Course</label>
+          <input data-i18n-attr="placeholder:tutor-dashboard.eg-computer-science.placeholder" type="text" class="dm-input" id="bsDegree" placeholder="e.g. Computer Science">
         </div>
         <div class="dm-form-group">
-          <label for="bsYear" class="dm-label">Year</label>
+          <label data-i18n="tutor-dashboard.year" for="bsYear" class="dm-label">Year</label>
           <select class="dm-select" id="bsYear">
-            <option value="">Select</option>
-            <option value="1">1st Year</option><option value="2">2nd Year</option>
-            <option value="3">3rd Year</option><option value="4">4th Year</option>
-            <option value="graduate">Graduate</option>
+            <option data-i18n="tutor-dashboard.select" value="">Select</option>
+            <option data-i18n="tutor-dashboard.1st-year" value="1">1st Year</option><option data-i18n="tutor-dashboard.2nd-year" value="2">2nd Year</option>
+            <option data-i18n="tutor-dashboard.3rd-year" value="3">3rd Year</option><option data-i18n="tutor-dashboard.4th-year" value="4">4th Year</option>
+            <option data-i18n="tutor-dashboard.graduate" value="graduate">Graduate</option>
           </select>
         </div>
       </div>
       <div class="dm-form-group">
-        <label for="bsSubjects" class="dm-label">Subjects you want to learn</label>
-        <input type="text" class="dm-input" id="bsSubjects" placeholder="e.g. Python, Statistics, French">
+        <label data-i18n="tutor-dashboard.subjects-you-want-to" for="bsSubjects" class="dm-label">Subjects you want to learn</label>
+        <input data-i18n-attr="placeholder:tutor-dashboard.eg-python-statistics-french.placeholder" type="text" class="dm-input" id="bsSubjects" placeholder="e.g. Python, Statistics, French">
       </div>
     </div>
-    <div class="dual-modal-footer">
+    <div data-i18n="tutor-dashboard.cancel-create-student-profile" class="dual-modal-footer">
       <button class="btn btn-outline" onclick="closeDualModal('becomeStudentModal')">Cancel</button>
       <button class="btn btn-primary" onclick="submitBecomeStudent()">Create student profile →</button>
     </div>
@@ -1719,23 +1733,23 @@ async function joinSession(sessionId, subject, otherName) {
 <div id="groupSessionModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:#fff;border-radius:16px;max-width:440px;width:100%;max-height:90vh;overflow-y:auto;padding:1.6rem;font-family:'Manrope',sans-serif;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem;">
-      <div style="font-size:1.1rem;font-weight:800;color:var(--ink);">Create Group Session</div>
+      <div data-i18n="tutor-dashboard.create-group-session-2" style="font-size:1.1rem;font-weight:800;color:var(--ink);">Create Group Session</div>
       <button onclick="closeGroupSessionModal()" style="background:none;border:none;font-size:1.3rem;color:var(--mid);cursor:pointer;line-height:1;">×</button>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:0.9rem;">
       <div>
-        <label for="gsSubject" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Subject</label>
+        <label data-i18n="tutor-dashboard.subject" for="gsSubject" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Subject</label>
         <select id="gsSubject" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;"></select>
         <div id="gsNotifyHint" style="display:none;font-size:0.76rem;color:var(--green);font-weight:600;margin-top:0.4rem;"></div>
       </div>
 
       <div style="display:flex;gap:0.7rem;">
-        <div style="flex:1;">
+        <div data-i18n="tutor-dashboard.date" style="flex:1;">
           <label for="gsDate" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Date</label>
           <input type="date" id="gsDate" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
-        <div style="flex:1;">
+        <div data-i18n="tutor-dashboard.time" style="flex:1;">
           <label for="gsTime" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Time</label>
           <input type="time" id="gsTime" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
         </div>
@@ -1743,23 +1757,23 @@ async function joinSession(sessionId, subject, otherName) {
 
       <div style="display:flex;gap:0.7rem;">
         <div style="flex:1;">
-          <label for="gsDuration" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Duration</label>
+          <label data-i18n="tutor-dashboard.duration" for="gsDuration" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Duration</label>
           <select id="gsDuration" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
-            <option value="30">30 min</option>
-            <option value="45">45 min</option>
-            <option value="60" selected>60 min</option>
-            <option value="90">90 min</option>
+            <option data-i18n="tutor-dashboard.30-min" value="30">30 min</option>
+            <option data-i18n="tutor-dashboard.45-min" value="45">45 min</option>
+            <option data-i18n="tutor-dashboard.60-min" value="60" selected>60 min</option>
+            <option data-i18n="tutor-dashboard.90-min" value="90">90 min</option>
           </select>
         </div>
         <div style="flex:1;">
-          <span style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</span>
-          <div style="width:100%;box-sizing:border-box;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;background:#f8fafc;color:var(--ink2);">💻 Online</div>
+          <span data-i18n="tutor-dashboard.format" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Format</span>
+          <div data-i18n="tutor-dashboard.online" style="width:100%;box-sizing:border-box;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;background:#f8fafc;color:var(--ink2);">💻 Online</div>
         </div>
       </div>
 
       <div style="display:flex;gap:0.7rem;">
         <div style="flex:1;">
-          <label for="gsMaxStudents" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Max students</label>
+          <label data-i18n="tutor-dashboard.max-students" for="gsMaxStudents" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Max students</label>
           <select id="gsMaxStudents" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
             <option value="2">2</option>
             <option value="3">3</option>
@@ -1767,20 +1781,20 @@ async function joinSession(sessionId, subject, otherName) {
           </select>
         </div>
         <div style="flex:1;">
-          <label for="gsPrice" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;" id="gsPriceLabel">Price per student (€)</label>
-          <input type="number" id="gsPrice" min="1" step="0.5" placeholder="e.g. 12" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
-          <div style="font-size:0.72rem;color:var(--mid);margin-top:0.25rem;">You receive 75% of each student's payment (25% platform fee for group sessions).</div>
+          <label data-i18n="tutor-dashboard.price-per-student" for="gsPrice" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;" id="gsPriceLabel">Price per student (€)</label>
+          <input data-i18n-attr="placeholder:tutor-dashboard.eg-12.placeholder" type="number" id="gsPrice" min="1" step="0.5" placeholder="e.g. 12" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;">
+          <div data-i18n="tutor-dashboard.you-receive-75-of" style="font-size:0.72rem;color:var(--mid);margin-top:0.25rem;">You receive 75% of each student's payment (25% platform fee for group sessions).</div>
         </div>
       </div>
 
       <div>
-        <label for="gsNotes" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Notes (optional)</label>
-        <textarea id="gsNotes" rows="2" placeholder="e.g. Covers chapters 3-4, bring a calculator" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;resize:vertical;"></textarea>
+        <label data-i18n="tutor-dashboard.notes-optional" for="gsNotes" style="font-size:0.78rem;font-weight:700;color:var(--ink);display:block;margin-bottom:0.3rem;">Notes (optional)</label>
+        <textarea data-i18n-attr="placeholder:tutor-dashboard.eg-covers-chapters-3-4.placeholder" id="gsNotes" rows="2" placeholder="e.g. Covers chapters 3-4, bring a calculator" style="width:100%;padding:0.6rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.88rem;resize:vertical;"></textarea>
       </div>
 
       <div id="gsError" style="display:none;font-size:0.8rem;color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:0.6rem 0.8rem;"></div>
 
-      <button onclick="submitGroupSession()" id="gsSubmitBtn" style="background:var(--blue);color:#fff;border:none;padding:0.75rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:0.3rem;">Create Group Session</button>
+      <button data-i18n="tutor-dashboard.create-group-session-3" onclick="submitGroupSession()" id="gsSubmitBtn" style="background:var(--blue);color:#fff;border:none;padding:0.75rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;margin-top:0.3rem;">Create Group Session</button>
     </div>
   </div>
 </div>
@@ -1789,7 +1803,7 @@ async function joinSession(sessionId, subject, otherName) {
 <div id="cancelModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:1.6rem;font-family:'Manrope',sans-serif;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-      <div style="font-size:1.05rem;font-weight:800;color:var(--ink);">Cancel this session?</div>
+      <div data-i18n="tutor-dashboard.cancel-this-session" style="font-size:1.05rem;font-weight:800;color:var(--ink);">Cancel this session?</div>
       <button onclick="closeCancelModal()" style="background:none;border:none;font-size:1.3rem;color:var(--mid);cursor:pointer;line-height:1;">×</button>
     </div>
     <div id="cancelModalBody" style="font-size:0.86rem;color:var(--ink2);line-height:1.5;"></div>
@@ -1801,12 +1815,12 @@ async function joinSession(sessionId, subject, otherName) {
 <div id="reportModalOverlay" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.5);z-index:1000;align-items:center;justify-content:center;padding:1rem;">
   <div style="background:#fff;border-radius:16px;max-width:420px;width:100%;padding:1.6rem;font-family:'Manrope',sans-serif;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-      <div style="font-size:1.05rem;font-weight:800;color:var(--ink);">⚠️ Report an Issue</div>
+      <div data-i18n="tutor-dashboard.report-an-issue" style="font-size:1.05rem;font-weight:800;color:var(--ink);">⚠️ Report an Issue</div>
       <button onclick="closeReportModal()" style="background:none;border:none;font-size:1.3rem;color:var(--mid);cursor:pointer;line-height:1;">×</button>
     </div>
-    <textarea id="reportReasonInput" rows="4" placeholder="Describe the issue..." style="width:100%;padding:0.7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.85rem;resize:vertical;margin-bottom:0.6rem;"></textarea>
+    <textarea data-i18n-attr="placeholder:tutor-dashboard.describe-the-issue.placeholder" id="reportReasonInput" rows="4" placeholder="Describe the issue..." style="width:100%;padding:0.7rem;border:1.5px solid var(--border);border-radius:8px;font-family:'Manrope',sans-serif;font-size:0.85rem;resize:vertical;margin-bottom:0.6rem;"></textarea>
     <div id="reportModalError" style="display:none;font-size:0.78rem;color:#dc2626;margin-bottom:0.6rem;"></div>
-    <button onclick="submitReport()" id="reportSubmitBtn" style="width:100%;background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Submit Report</button>
+    <button data-i18n="tutor-dashboard.submit-report" onclick="submitReport()" id="reportSubmitBtn" style="width:100%;background:#dc2626;color:#fff;border:none;padding:0.7rem;border-radius:9px;font-family:'Manrope',sans-serif;font-size:0.86rem;font-weight:700;cursor:pointer;">Submit Report</button>
   </div>
 </div>
 

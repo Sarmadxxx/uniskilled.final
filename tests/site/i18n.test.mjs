@@ -344,7 +344,7 @@ test('translated pages: every visible text, label and placeholder is marked for 
   const { parse } = await import('parse5');
   const SKIP = new Set(['script', 'style', 'noscript', 'template', 'svg']);
   const ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
-  const words = s => /\p{L}{2,}/u.test(s) && !/^\s*(UniSkilled|[€$£]?\d.*|https?:\S+|you@example\.com|Python)\s*$/u.test(s);
+  const words = s => (/\p{L}{2,}/u.test(s) || /\be\.g\./i.test(s)) && !/^\s*(UniSkilled|[€$£]?\d.*|https?:\S+|you@example\.com|Python)\s*$/u.test(s);
   const pages = readdirSync(join(ROOT, 'locales', 'en')).filter(f => /^page\..+\.json$/.test(f)).map(f => f.slice(5, -5) + '.html');
   for (const p of pages) {
     const missed = [];
@@ -360,5 +360,18 @@ test('translated pages: every visible text, label and placeholder is marked for 
       if (n.content) visit(n.content, m);
     })(parse(readFileSync(join(ROOT, p), 'utf8')), false);
     assert.deepEqual(missed, [], `${p}: not marked for translation`);
+  }
+});
+
+// A label or placeholder inside a translated sentence must be translated too (not left in English).
+test('translations: placeholders and labels inside translated text are translated', () => {
+  const ATTR = /\s(placeholder|title|aria-label|alt)="([^"]*)"/g;
+  for (const lang of others) for (const f of areas(lang)) {
+    const en = readArea('en', f), tr = readArea(lang, f);
+    for (const [k, v] of Object.entries(tr)) {
+      if (k.startsWith('_') || en[k] == null) continue;
+      const enAttrs = new Set([...values(en[k]).join(' ').matchAll(ATTR)].map(m => m[2]).filter(x => /\p{L}{2,}|e\.g\./iu.test(x) && !/^(UniSkilled|you@example\.com|https?:\S+|[\w.+-]+@[\w.-]+)$/.test(x)));
+      for (const form of values(v)) for (const m of form.matchAll(ATTR)) assert.ok(!enAttrs.has(m[2]), `${lang} ${k}: ${m[1]}="${m[2]}" is still English`);
+    }
   }
 });

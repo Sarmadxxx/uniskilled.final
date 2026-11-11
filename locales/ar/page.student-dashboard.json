@@ -49,7 +49,7 @@
   "student-dashboard.become-a-tutor-2": "📚 كن مدرّسًا",
   "student-dashboard.set-up-your-tutor": "أنشئ ملفك الشخصي كمدرّس. يمكنك التبديل بين وضع الطالب ووضع المدرّس في أي وقت من لوحة التحكم.",
   "student-dashboard.subjects-you-can-teach": "المواد التي يمكنك تدريسها *",
-  "student-dashboard.hourly-rate": "<label for=\"btRate\" class=\"dm-label\">السعر في الساعة</label> <input type=\"number\" class=\"dm-input\" id=\"btRate\" placeholder=\"e.g. 20\" min=\"15\">",
+  "student-dashboard.hourly-rate": "<label for=\"btRate\" class=\"dm-label\">السعر في الساعة</label> <input type=\"number\" class=\"dm-input\" id=\"btRate\" placeholder=\"مثال: 20\" min=\"15\">",
   "student-dashboard.currency": "العملة",
   "student-dashboard.eur": "€ يورو (EUR)",
   "student-dashboard.usd": "$ دولار أمريكي (USD)",
