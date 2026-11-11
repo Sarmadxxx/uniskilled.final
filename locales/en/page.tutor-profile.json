@@ -305,5 +305,6 @@
   "tutor-profile.js.time.morning": "morning",
   "tutor-profile.js.time.afternoon": "afternoon",
   "tutor-profile.js.time.evening": "evening",
-  "tutor-profile.js.time.flexible": "flexible"
+  "tutor-profile.js.time.flexible": "flexible",
+  "tutor-profile.tell-students-about-yourself.placeholder": "Tell students about yourself..."
 }
