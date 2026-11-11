@@ -203,3 +203,9 @@
 .review-item div[style*="pre-wrap"], .review-item > div:first-child > span:first-child {
   unicode-bidi: plaintext;
 }
+
+/* Money amounts keep their own left-to-right order (so "−€5.00" doesn't become "€5.00−"). */
+#priceAmount, #discountAmount, #priceTotal, #priceFee, #priceTutor, #priceCharge {
+  direction: ltr;
+  unicode-bidi: isolate;
+}

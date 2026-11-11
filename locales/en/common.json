@@ -169,5 +169,17 @@
   "server.this-request-has-expired-so-the-session-stays-at-its-current-time": "This request has expired, so the session stays at its current time.",
   "server.this-session-has-already-been-moved-2-times-which-is-the-limit": "This session has already been moved 2 times, which is the limit.",
   "server.could-not-move-the-session-it-stays-at-its-current-time-please-try-again": "Could not move the session. It stays at its current time — please try again.",
-  "server.something-went-wrong-please-try-again": "Something went wrong. Please try again."
+  "server.something-went-wrong-please-try-again": "Something went wrong. Please try again.",
+  "server.group-session-spot-not-found": "Group session spot not found",
+  "server.this-booking-belongs-to-a-different-account": "This booking belongs to a different account.",
+  "server.this-spot-is-not-currently-awaiting-payment": "This spot is not currently awaiting payment.",
+  "server.the-24-hour-payment-window-for-this-spot-has-expired": "The 24-hour payment window for this spot has expired.",
+  "server.this-group-session-is-no-longer-taking-payments": "This group session is no longer taking payments.",
+  "server.this-booking-is-not-currently-awaiting-payment": "This booking is not currently awaiting payment.",
+  "server.the-24-hour-payment-window-for-this-booking-has-expired": "The 24-hour payment window for this booking has expired.",
+  "server.this-spot-is-no-longer-awaiting-payment": "This spot is no longer awaiting payment.",
+  "server.this-paypal-order-has-already-been-used": "This PayPal order has already been used.",
+  "server.payment-amount-did-not-match-please-contact-support": "Payment amount did not match. Please contact support.",
+  "server.this-booking-is-no-longer-awaiting-payment-it-may-have-expired-or-been-cancelled": "This booking is no longer awaiting payment (it may have expired or been cancelled).",
+  "server.payment-could-not-be-completed-please-contact-support": "Payment could not be completed. Please contact support."
 }

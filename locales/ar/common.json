@@ -212,5 +212,17 @@
   "server.this-request-has-expired-so-the-session-stays-at-its-current-time": "انتهت صلاحية هذا الطلب، لذا تبقى الجلسة في وقتها الحالي.",
   "server.this-session-has-already-been-moved-2-times-which-is-the-limit": "نُقلت هذه الجلسة مرتين بالفعل، وهو الحد الأقصى.",
   "server.could-not-move-the-session-it-stays-at-its-current-time-please-try-again": "تعذّر نقل الجلسة. تبقى في وقتها الحالي — يُرجى المحاولة مرة أخرى.",
-  "server.something-went-wrong-please-try-again": "حدث خطأ ما. يُرجى المحاولة مرة أخرى."
+  "server.something-went-wrong-please-try-again": "حدث خطأ ما. يُرجى المحاولة مرة أخرى.",
+  "server.group-session-spot-not-found": "لم يُعثر على المقعد في الجلسة الجماعية",
+  "server.this-booking-belongs-to-a-different-account": "هذا الحجز مرتبط بحساب آخر.",
+  "server.this-spot-is-not-currently-awaiting-payment": "هذا المقعد لا ينتظر الدفع حاليًا.",
+  "server.the-24-hour-payment-window-for-this-spot-has-expired": "انتهت مهلة الـ 24 ساعة لدفع ثمن هذا المقعد.",
+  "server.this-group-session-is-no-longer-taking-payments": "لم تعد هذه الجلسة الجماعية تقبل المدفوعات.",
+  "server.this-booking-is-not-currently-awaiting-payment": "هذا الحجز لا ينتظر الدفع حاليًا.",
+  "server.the-24-hour-payment-window-for-this-booking-has-expired": "انتهت مهلة الـ 24 ساعة لدفع ثمن هذا الحجز.",
+  "server.this-spot-is-no-longer-awaiting-payment": "لم يعد هذا المقعد بانتظار الدفع.",
+  "server.this-paypal-order-has-already-been-used": "استُخدم طلب PayPal هذا بالفعل.",
+  "server.payment-amount-did-not-match-please-contact-support": "المبلغ المدفوع غير مطابق. يُرجى التواصل مع الدعم.",
+  "server.this-booking-is-no-longer-awaiting-payment-it-may-have-expired-or-been-cancelled": "لم يعد هذا الحجز بانتظار الدفع (ربما انتهت مهلته أو أُلغي).",
+  "server.payment-could-not-be-completed-please-contact-support": "تعذّر إتمام الدفع. يُرجى التواصل مع الدعم."
 }
