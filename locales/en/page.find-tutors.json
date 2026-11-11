@@ -130,5 +130,6 @@
   "find.js.reviews": {
     "one": "{{count}} review",
     "other": "{{count}} reviews"
-  }
+  },
+  "find-tutors.the-more-detail-you.placeholder": "The more detail you give, the better tutors can judge if they can help."
 }

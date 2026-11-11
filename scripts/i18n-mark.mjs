@@ -66,7 +66,9 @@ export function markPage(src, page) {
       if (nm && c && META_NAMES.test(nm.value) && hasWords(c.value)) attrs.push({ node: n, pairs: [['content', `${page}.meta.${nm.value.replace(/[^a-z]+/gi, '-')}`, c.value]] });
       return;
     }
-    if (SKIP.has(tag) && tag !== 'head') return;
+    // Skipped elements' content is never translated, but a <textarea>'s own placeholder/title is.
+    const skipInside = SKIP.has(tag) && tag !== 'head';
+    if (skipInside && tag !== 'textarea') return;
     if (n.sourceCodeLocation && n.attrs) {
       const pairs = [];
       for (const a of ATTRS) {
@@ -76,6 +78,7 @@ export function markPage(src, page) {
       if (attr(n, 'data-i18n') || attr(n, 'data-i18n-attr')) return;   // already marked
       if (pairs.length) attrs.push({ node: n, pairs });
     }
+    if (skipInside) return;
     if (!inUnit && n.sourceCodeLocation?.startTag && n.sourceCodeLocation.endTag && !INLINE_TOP_EXCLUDE.has(tag)) {
       const t = textOf(n);
       if (hasWords(t) && !BRAND_ONLY.test(t) && isInlineOnly(n) && !hasAttrText(n) && tag !== 'body' && tag !== 'html') {

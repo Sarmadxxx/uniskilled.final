@@ -338,3 +338,26 @@ test('every interface string a page uses in its scripts exists in English, and i
     }
   }
 });
+
+// ---------- nothing visible is left unmarked on a translated page ------------------------------
+test('translated pages: every visible text, label and placeholder is marked for translation', async () => {
+  const { parse } = await import('parse5');
+  const SKIP = new Set(['script', 'style', 'noscript', 'template', 'svg']);
+  const ATTRS = ['placeholder', 'title', 'aria-label', 'alt'];
+  const words = s => /\p{L}{2,}/u.test(s) && !/^\s*(UniSkilled|[€$£]?\d.*|https?:\S+|you@example\.com|Python)\s*$/u.test(s);
+  const pages = readdirSync(join(ROOT, 'locales', 'en')).filter(f => /^page\..+\.json$/.test(f)).map(f => f.slice(5, -5) + '.html');
+  for (const p of pages) {
+    const missed = [];
+    (function visit(n, marked) {
+      const a = k => (n.attrs || []).find(x => x.name === k)?.value;
+      const m = marked || a('data-i18n') != null;
+      const covered = (a('data-i18n-attr') || '').split(';').map(x => x.split(':')[0]);
+      if (!m) for (const k of ATTRS) { const v = a(k); if (v && words(v) && !covered.includes(k)) missed.push(`<${n.nodeName} ${k}="${v}">`); }
+      if (n.nodeName === '#text' && !m && words(n.value)) missed.push(n.value.trim().slice(0, 60));
+      if (SKIP.has(n.nodeName)) return;
+      for (const c of n.childNodes || []) visit(c, m);
+      if (n.content) visit(n.content, m);
+    })(parse(readFileSync(join(ROOT, p), 'utf8')), false);
+    assert.deepEqual(missed, [], `${p}: not marked for translation`);
+  }
+});
