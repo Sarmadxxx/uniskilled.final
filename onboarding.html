@@ -484,6 +484,17 @@ function showAlert(msg, type) {
   const el = document.getElementById('alert');
   el.textContent = msg; el.className = 'alert ' + type;
 }
+function showExistingAccount() {
+  const el = document.getElementById('alert');
+  el.textContent = 'This email already has an account, so no new account was created. ';
+  const link = document.createElement('a');
+  link.href = 'signin.html'; link.textContent = 'Sign in instead';
+  link.style.cssText = 'color:inherit;font-weight:700;text-decoration:underline;';
+  el.appendChild(link);
+  el.appendChild(document.createTextNode('. If you forgot your password, use "Forgot password?" on the sign-in page.'));
+  el.className = 'alert error';
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
 function hideAlert() { document.getElementById('alert').className = 'alert'; }
 
 function setStep(step) {
@@ -737,6 +748,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (error) {
       showAlert(error.message.includes('already registered') ? 'This email is already registered. Try signing in.' : error.message, 'error');
+      setLoading(false); return;
+    }
+
+    // An email that already has an account: Supabase answers "success" without sending any email
+    // (it returns a user with no identities). Say so instead of asking the person to wait for a link.
+    if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      showExistingAccount();
       setLoading(false); return;
     }
 
