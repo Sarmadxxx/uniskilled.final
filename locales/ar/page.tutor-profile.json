@@ -119,7 +119,7 @@
   "tutor-profile.cancel-save-6": "<button class=\"btn btn-outline\" onclick=\"closeModal('modalTeaching')\">إلغاء</button> <button class=\"btn btn-primary\" onclick=\"saveTeaching()\">حفظ</button>",
   "tutor-profile.certificates-grades-2": "الشهادات والدرجات",
   "tutor-profile.subject": "المادة",
-  "tutor-profile.grade": "<label for=\"certGradeInput\" class=\"form-label\">الدرجة</label><input type=\"text\" class=\"form-input\" id=\"certGradeInput\" placeholder=\"e.g. A, 95%\">",
+  "tutor-profile.grade": "<label for=\"certGradeInput\" class=\"form-label\">الدرجة</label><input type=\"text\" class=\"form-input\" id=\"certGradeInput\" placeholder=\"مثال: A، 95%\">",
   "tutor-profile.upload-proof-optional": "<label for=\"certFileInput\" class=\"form-label\">رفع إثبات (اختياري)</label><input type=\"file\" id=\"certFileInput\" accept=\"image/jpeg,image/png,application/pdf\" class=\"form-input\" style=\"padding:0.4rem;\">",
   "tutor-profile.add-certificate": "+ إضافة شهادة",
   "tutor-profile.after-adding-dont-forget": "بعد الإضافة، لا تنسَ الضغط على <strong>حفظ</strong> في الأسفل لحفظها فعليًا في ملفك الشخصي.",
