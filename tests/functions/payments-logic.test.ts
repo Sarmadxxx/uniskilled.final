@@ -12,6 +12,7 @@ import {
 import {
   checkoutExpiresAt, STRIPE_MIN_EXPIRY_SECONDS, STRIPE_MAX_EXPIRY_SECONDS,
 } from '../../supabase/functions/create-stripe-checkout/checkout-expiry.ts';
+import { checkoutReturnUrls, siteLanguage } from '../../supabase/functions/create-stripe-checkout/return-url.ts';
 
 // ─── PAY-02: payout route follows where the money is ────────────────────────────
 const activeStripeTutor = { stripe_account_id: 'acct_123', stripe_account_status: 'active', paypal_email: null };
@@ -199,4 +200,33 @@ test('expiry is always inside Stripe’s accepted window', () => {
 test('checkout function sends expires_at to Stripe', () => {
   const src = readFileSync(new URL('../../supabase/functions/create-stripe-checkout/index.ts', import.meta.url), 'utf8');
   assert.ok(src.includes("'expires_at': checkoutExpiresAt(paymentDueAt, Date.now())"));
+});
+
+// ─── Stripe return address follows the website language ──────────────────────────
+test('no language / English / unknown → exactly the English return addresses as before', () => {
+  for (const lang of [undefined, null, '', 'en', 'EN', 'xx', 'https://evil.example', '../ar', 'ar/../../x']) {
+    const r = checkoutReturnUrls('session', 'abc', lang);
+    assert.equal(r.success, 'https://uniskilled.com/complete-payment.html?session=abc&stripe_success=1');
+    assert.equal(r.cancel, 'https://uniskilled.com/complete-payment.html?session=abc');
+    assert.equal(r.stripeLocale, null);
+  }
+});
+test('Arabic → back to the Arabic page; Stripe page language stays automatic (Stripe has no Arabic)', () => {
+  const r = checkoutReturnUrls('group_participant', 'g1', 'ar');
+  assert.equal(r.success, 'https://uniskilled.com/ar/complete-payment.html?group_participant=g1&stripe_success=1');
+  assert.equal(r.cancel, 'https://uniskilled.com/ar/complete-payment.html?group_participant=g1');
+  assert.equal(r.stripeLocale, null);
+});
+test('German/French/Spanish/Turkish → own page and Stripe page in that language', () => {
+  for (const l of ['de', 'fr', 'es', 'tr']) {
+    const r = checkoutReturnUrls('session', 's', l);
+    assert.ok(r.success.startsWith(`https://uniskilled.com/${l}/complete-payment.html?`));
+    assert.equal(r.stripeLocale, l);
+  }
+  assert.equal(siteLanguage(' De '), 'de');
+});
+test('the return address always stays on uniskilled.com', () => {
+  for (const lang of ['ar', 'de', '//evil.com', 'ar.evil.com', 'ar@evil.com']) {
+    assert.ok(checkoutReturnUrls('session', 'x', lang).success.startsWith('https://uniskilled.com/'));
+  }
 });

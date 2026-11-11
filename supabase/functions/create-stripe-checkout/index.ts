@@ -2,6 +2,7 @@ import 'jsr:@supabase/functions-js/edge-runtime.d.ts';
 import { createClient } from 'jsr:@supabase/supabase-js@2';
 import { withSentry } from './sentry.ts';
 import { checkoutExpiresAt } from './checkout-expiry.ts';
+import { checkoutReturnUrls } from './return-url.ts';
 
 const STRIPE_SECRET = Deno.env.get('STRIPE_SECRET_KEY') ?? '';
 const MIN_CHARGE = 1.00; // never let a discount take the card charge to zero
@@ -30,7 +31,7 @@ Deno.serve(withSentry('create-stripe-checkout', async (req: Request) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors });
 
   try {
-    const { session_id, group_participant_id } = await req.json();
+    const { session_id, group_participant_id, lang } = await req.json();
     if (!session_id && !group_participant_id) return json({ error: 'session_id or group_participant_id required' }, 400);
 
     const supabase = createClient(Deno.env.get('SUPABASE_URL') ?? '', Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '');
@@ -138,12 +139,13 @@ Deno.serve(withSentry('create-stripe-checkout', async (req: Request) => {
     // (80% for one-to-one, 75% for group seats).
     const applicationFeeCents = Math.max(0, Math.round(priceCents * feeRate) - discountCents);
 
-    const siteUrl = 'https://uniskilled.com';
     const refParam = metadataKey === 'session_id' ? 'session' : 'group_participant';
+    // Back to the page in the student's website language (English when none is given).
+    const back = checkoutReturnUrls(refParam, referenceId, lang);
     const body = new URLSearchParams({
       'mode': 'payment',
-      'success_url': `${siteUrl}/complete-payment.html?${refParam}=${referenceId}&stripe_success=1`,
-      'cancel_url': `${siteUrl}/complete-payment.html?${refParam}=${referenceId}`,
+      'success_url': back.success,
+      'cancel_url': back.cancel,
       // The checkout link expires with the booking's payment window (see checkout-expiry.ts).
       'expires_at': checkoutExpiresAt(paymentDueAt, Date.now()).toString(),
       'line_items[0][price_data][currency]': currency,
@@ -159,6 +161,7 @@ Deno.serve(withSentry('create-stripe-checkout', async (req: Request) => {
       'payment_method_types[0]': 'card',
       'payment_method_types[1]': 'klarna',
     });
+    if (back.stripeLocale) body.set('locale', back.stripeLocale);
 
     const createSession = (b: URLSearchParams) => fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
