@@ -120,7 +120,8 @@ function setSeo(title, desc) {
   set('meta[name="description"]', 'content', desc);
   set('meta[property="og:title"]', 'content', title + ' — UniSkilled');
   set('meta[property="og:description"]', 'content', desc);
-  const url = 'https://uniskilled.com/course.html?c=' + encodeURIComponent(KEY);
+  // The address of this page in its own language (/ar/… on the Arabic page; unchanged in English)
+  const url = 'https://uniskilled.com' + (NON_EN ? '/' + I18N.lang : '') + '/course.html?c=' + encodeURIComponent(KEY);
   let link = document.querySelector('link[rel="canonical"]');
   if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link); }
   link.href = url;

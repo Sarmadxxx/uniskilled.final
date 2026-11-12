@@ -774,7 +774,8 @@ function applyTutorSeo(fullName, p, tp, subjects) {
   const desc = (bioBit ? bioBit + (bioBit.length >= 110 ? '… ' : ' ') : '') +
     (tp?.university_verified_at ? T('seo-verified', 'University-verified tutor') : T('seo-tutor', 'Tutor')) + (subj.length ? T('seo-for', ' for {{subjects}}', { subjects: J(subj) }) : '') + (place ? ' · ' + place : '') +
     (tp?.hourly_rate ? ' · ' + T('seo-from', 'from {{price}}/hr', { price: sym + tp.hourly_rate }) : '') + T('seo-book', '. Book securely on UniSkilled.');
-  const url = 'https://uniskilled.com/tutor-profile.html?id=' + encodeURIComponent(tutorId);
+  // The address of this page in its own language (/ar/… on the Arabic page; unchanged in English)
+  const url = 'https://uniskilled.com' + (window.I18N && I18N.lang && I18N.lang !== 'en' ? '/' + I18N.lang : '') + '/tutor-profile.html?id=' + encodeURIComponent(tutorId);
   document.title = title;
   const set = (id, attr, v) => { const el = document.getElementById(id); if (el) el.setAttribute(attr, v); };
   // Canonical + og:url are only added once the tutor is known, so the static HTML never points every profile at another page
