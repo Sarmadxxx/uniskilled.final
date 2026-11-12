@@ -18,6 +18,7 @@
   "nav.main": "التنقّل الرئيسي",
   "nav.mainMenu": "القائمة الرئيسية",
   "nav.openMenu": "فتح القائمة",
+  "nav.backToDashboard": "→ العودة إلى لوحة التحكم",
   "nav.closeMenu": "إغلاق القائمة",
   "nav.role.student": "حساب طالب",
   "nav.role.tutor": "حساب مدرّس",

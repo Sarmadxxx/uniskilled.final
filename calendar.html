@@ -10,7 +10,7 @@
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
-<title>Calendar — UniSkilled</title>
+<title data-i18n="calendar.title">Calendar — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -89,12 +89,12 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 <nav>
   <div id="nav-root"></div>
 </nav>
-<script src="nav.js"></script>
+<script src="nav.js?v=2"></script>
 
 <div class="page">
   <div class="cal-header">
     <div class="cal-title" id="monthTitle">—</div>
-    <div class="cal-nav">
+    <div data-i18n="calendar.today" class="cal-nav">
       <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
       <button class="cal-today-btn" onclick="goToToday()">Today</button>
       <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
@@ -102,11 +102,11 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
   </div>
 
   <div class="cal-legend">
-    <div class="legend-item"><span class="legend-dot dot-pending"></span>Pending</div>
-    <div class="legend-item"><span class="legend-dot dot-awaiting-payment"></span>Awaiting payment</div>
-    <div class="legend-item"><span class="legend-dot dot-confirmed"></span>Confirmed</div>
-    <div class="legend-item"><span class="legend-dot dot-completed"></span>Completed</div>
-    <div class="legend-item"><span class="legend-dot dot-expired"></span>Expired</div>
+    <div data-i18n="calendar.pending" class="legend-item"><span class="legend-dot dot-pending"></span>Pending</div>
+    <div data-i18n="calendar.awaiting-payment" class="legend-item"><span class="legend-dot dot-awaiting-payment"></span>Awaiting payment</div>
+    <div data-i18n="calendar.confirmed" class="legend-item"><span class="legend-dot dot-confirmed"></span>Confirmed</div>
+    <div data-i18n="calendar.completed" class="legend-item"><span class="legend-dot dot-completed"></span>Completed</div>
+    <div data-i18n="calendar.expired" class="legend-item"><span class="legend-dot dot-expired"></span>Expired</div>
   </div>
 
   <div id="calGrid" class="cal-grid">
@@ -125,7 +125,11 @@ function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 function __viewerTz(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Berlin';}catch(e){return 'Europe/Berlin';}}
-function __tzNote(tz){return (tz&&tz!==__viewerTz())?' ('+String(tz).split('/').pop().replace(/_/g,' ')+' time)':'';}
+// Text shown by this page's script, in the page's language (English unchanged; locales/*/page.calendar.json).
+function T(k, en, v) { return window.I18N ? I18N.t('calendar.js.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? v[x] : m; }); }
+function H(k, en, v) { return window.I18N ? I18N.h('calendar.js.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? __esc(v[x]) : m; }); }
+const NON_EN = !!(window.I18N && I18N.lang && I18N.lang !== 'en');
+function __tzNote(tz){if(!(tz&&tz!==__viewerTz()))return '';var city=String(tz).split('/').pop().replace(/_/g,' ');return NON_EN?' ('+T('tz-note','{{city}} time',{city:city})+')':' ('+city+' time)';}
 function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/row-level security|permission denied|Not allowed|violates|JWT|fetch/i.test(m))return fallback;return m;}
 
 const _sb = window.supabase.createClient(
@@ -144,11 +148,13 @@ function dateKey(y, m, d) {
 }
 
 function badgeInfoFor(status) {
-  if (status === 'awaiting_payment') return { cls: 'awaiting-payment', label: 'awaiting payment' };
-  if (status === 'payment_expired') return { cls: 'expired', label: 'expired' };
-  if (status === 'confirmed') return { cls: 'confirmed', label: 'confirmed' };
-  if (status === 'completed') return { cls: 'completed', label: 'completed' };
-  return { cls: 'pending', label: status || 'pending' };
+  if (status === 'awaiting_payment') return { cls: 'awaiting-payment', label: T('st-awaiting-payment', 'awaiting payment') };
+  if (status === 'payment_expired') return { cls: 'expired', label: T('st-expired', 'expired') };
+  if (status === 'confirmed') return { cls: 'confirmed', label: T('st-confirmed', 'confirmed') };
+  if (status === 'completed') return { cls: 'completed', label: T('st-completed', 'completed') };
+  // Other statuses keep their stored name in English; known ones are shown in the reader's language.
+  const OTHER = NON_EN ? { pending: T('st-pending', 'pending'), cancelled: T('st-cancelled', 'cancelled'), declined: T('st-declined', 'declined'), disputed: T('st-disputed', 'disputed'), refunded: T('st-refunded', 'refunded') } : {};
+  return { cls: 'pending', label: OTHER[status || 'pending'] || status || 'pending' };
 }
 
 async function init() {
@@ -203,7 +209,7 @@ function goToToday() {
 
 function render() {
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('monthTitle').textContent = `${monthNames[viewMonth]} ${viewYear}`;
+  document.getElementById('monthTitle').textContent = NON_EN ? I18N.date(new Date(viewYear, viewMonth, 1), { month: 'long', year: 'numeric' }) : `${monthNames[viewMonth]} ${viewYear}`;
 
   const firstDay = new Date(viewYear, viewMonth, 1).getDay(); // 0=Sun
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -237,7 +243,7 @@ function render() {
 
   document.getElementById('calGrid').innerHTML = `
     <div class="cal-weekdays">
-      ${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w => `<div class="cal-weekday">${__esc(w)}</div>`).join('')}
+      ${(NON_EN ? [0,1,2,3,4,5,6].map(i => I18N.date(new Date(2026, 10, 15 + i), { weekday: 'short' })) : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']).map(w => `<div class="cal-weekday">${__esc(w)}</div>`).join('')}
     </div>
     <div class="cal-days">${cells}</div>
   `;
@@ -250,23 +256,23 @@ function selectDay(key, dayNum, skipRerender) {
   const daySessions = sessionsByDate[key] || [];
   const panel = document.getElementById('dayPanel');
   const dateObj = new Date(key + 'T00:00:00');
-  document.getElementById('dayPanelTitle').textContent = dateObj.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('dayPanelTitle').textContent = (NON_EN ? I18N.date(dateObj, { weekday: 'long', month: 'long', day: 'numeric' }) : dateObj.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' }));
 
   if (daySessions.length === 0) {
-    document.getElementById('dayPanelBody').innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div>No sessions on this day.</div>`;
+    document.getElementById('dayPanelBody').innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div>${H('no-sessions', 'No sessions on this day.')}</div>`;
   } else {
     document.getElementById('dayPanelBody').innerHTML = daySessions
       .sort((a, b) => (a.scheduled_time || '').localeCompare(b.scheduled_time || ''))
       .map(s => {
-        const otherName = userRole === 'tutor' ? (s.student_name || 'Student') : (s.tutor_name || 'Tutor');
+        const otherName = userRole === 'tutor' ? (s.student_name || T('student', 'Student')) : (s.tutor_name || T('tutor', 'Tutor'));
         const initials = otherName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
         const info = badgeInfoFor(s.status);
         const time = s.scheduled_time ? s.scheduled_time.slice(0, 5) + __tzNote(s.timezone) : '';
         let action = '';
         if (s.status === 'confirmed') {
-          action = `<a href="${__safeUrl(userRole === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html')}" style="font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;">Go to session →</a>`;
+          action = `<a href="${__safeUrl(userRole === 'tutor' ? 'tutor-dashboard.html' : 'student-dashboard.html')}" style="font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;">${H('go', 'Go to session →')}</a>`;
         } else if (s.status === 'awaiting_payment' && userRole === 'student') {
-          action = `<a href="complete-payment.html?session=${__safeUrl(s.id)}" style="font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;">Pay now →</a>`;
+          action = `<a href="complete-payment.html?session=${__safeUrl(s.id)}" style="font-size:0.78rem;font-weight:700;color:var(--blue);text-decoration:none;">${H('pay', 'Pay now →')}</a>`;
         }
         return `<div class="session-item">
           <div class="session-av">${__esc(initials)}</div>
