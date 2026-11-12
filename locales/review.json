@@ -68,6 +68,9 @@
     },
     "page.rate-lesson": {
       "ar": "reviewed"
+    },
+    "page.course": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
