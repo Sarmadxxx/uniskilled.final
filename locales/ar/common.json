@@ -396,5 +396,11 @@
   "server.only-the-student-of-this-lesson-can-rate-it": "لا يمكن تقييم هذا الدرس إلا من قِبل طالبه.",
   "server.this-lesson-can-t-be-rated-because-it-didn-t-take-place": "لا يمكن تقييم هذا الدرس لأنه لم يُعقد.",
   "server.you-can-rate-this-lesson-once-it-has-taken-place": "يمكنك تقييم هذا الدرس بعد انعقاده.",
-  "server.reviews-can-be-changed-for-14-days-after-they-are-written": "يمكن تعديل التقييمات خلال 14 يوماً من كتابتها."
+  "server.reviews-can-be-changed-for-14-days-after-they-are-written": "يمكن تعديل التقييمات خلال 14 يوماً من كتابتها.",
+  "server.reply-is-too-long": "الرد طويل جداً.",
+  "server.author-not-found": "تعذّر العثور على الكاتب",
+  "server.could-not-post-reply": "تعذّر نشر الرد.",
+  "server.file-is-too-large-max-10-mb": "الملف كبير جداً (الحد الأقصى 10 ميغابايت).",
+  "server.file-type-not-allowed-use-pdf-png-jpg-webp-or-gif": "نوع الملف غير مسموح به. استخدم PDF أو PNG أو JPG أو WEBP أو GIF.",
+  "server.upload-failed-please-try-again": "تعذّر الرفع. يُرجى المحاولة مرة أخرى."
 }

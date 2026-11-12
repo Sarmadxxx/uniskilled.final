@@ -10,7 +10,7 @@
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
-<title>Feeds — UniSkilled</title>
+<title data-i18n="feed.title">Feeds — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -120,25 +120,25 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
 
 <nav>
   <a href="index.html" class="nav-logo"><img src="uniskilled-logo.png?v=20261101" alt="UniSkilled"></a>
-  <span class="nav-title">✨ Feeds</span>
-  <div class="nav-right" id="navRight"><a href="student-dashboard.html">← Dashboard</a></div>
+  <span data-i18n="feed.feeds" class="nav-title">✨ Feeds</span>
+  <div data-i18n="feed.dashboard" class="nav-right" id="navRight"><a href="student-dashboard.html">← Dashboard</a></div>
 </nav>
 
 <div class="page-wrap">
 <div class="page">
-  <div class="hero-title">Feeds</div>
-  <div class="hero-sub">Ask what you're stuck on. Get real answers from verified tutors — join in with your own comments too.</div>
+  <div data-i18n="feed.feeds-2" class="hero-title">Feeds</div>
+  <div data-i18n="feed.ask-what-youre-stuck" class="hero-sub">Ask what you're stuck on. Get real answers from verified tutors — join in with your own comments too.</div>
 
   <div class="compose" id="studentCompose">
     <div class="compose-top">
       <div class="avatar" id="composeAvatar">?</div>
-      <textarea id="postInput" placeholder="What are you stuck on right now?" rows="2" oninput="autoGrow(this)"></textarea>
+      <textarea data-i18n-attr="placeholder:feed.what-are-you-stuck.placeholder" id="postInput" placeholder="What are you stuck on right now?" rows="2" oninput="autoGrow(this)"></textarea>
     </div>
     <div class="compose-tags">
-      <input type="text" id="postCourse" placeholder="🎯 Course code">
-      <input type="text" id="postSubject" placeholder="📚 Subject">
+      <input data-i18n-attr="placeholder:feed.course-code.placeholder" type="text" id="postCourse" placeholder="🎯 Course code">
+      <input data-i18n-attr="placeholder:feed.subject.placeholder" type="text" id="postSubject" placeholder="📚 Subject">
     </div>
-    <div class="compose-footer">
+    <div data-i18n="feed.post" class="compose-footer">
       <button class="post-btn" id="postBtn" onclick="submitPost()">Post</button>
     </div>
   </div>
@@ -146,17 +146,17 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
   <div class="compose" id="tutorCompose" style="display:none;">
     <div class="compose-top">
       <div class="avatar" id="composeAvatarTutor">?</div>
-      <textarea id="shareInput" placeholder="Share a study tip, resource, or something useful for your students..." rows="2" oninput="autoGrow(this)"></textarea>
+      <textarea data-i18n-attr="placeholder:feed.share-a-study-tip.placeholder" id="shareInput" placeholder="Share a study tip, resource, or something useful for your students..." rows="2" oninput="autoGrow(this)"></textarea>
     </div>
     <div class="compose-tags">
-      <input type="text" id="shareCourse" placeholder="🎯 Course code">
-      <input type="text" id="shareSubject" placeholder="📚 Subject">
+      <input data-i18n-attr="placeholder:feed.course-code-2.placeholder" type="text" id="shareCourse" placeholder="🎯 Course code">
+      <input data-i18n-attr="placeholder:feed.subject-2.placeholder" type="text" id="shareSubject" placeholder="📚 Subject">
     </div>
     <div id="attachmentPreview" style="display:none;align-items:center;gap:8px;background:var(--off);border-radius:10px;padding:0.5rem 0.8rem;margin-top:0.6rem;font-size:0.8rem;color:var(--ink2);">
       <span id="attachmentPreviewName"></span>
       <button onclick="clearAttachment()" style="margin-left:auto;background:none;border:none;color:var(--mid);cursor:pointer;font-size:1rem;">×</button>
     </div>
-    <div class="compose-footer" style="justify-content:space-between;">
+    <div data-i18n="feed.attach-a-file-share" class="compose-footer" style="justify-content:space-between;">
       <label style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--mid);cursor:pointer;">
         <input type="file" id="shareFileInput" accept="image/jpeg,image/png,application/pdf" style="display:none;" onchange="handleAttachmentSelect(this)">
         📎 Attach a file
@@ -166,17 +166,17 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
   </div>
 
   <div id="feedList"></div>
-  <button class="load-more" id="loadMoreBtn" onclick="loadPosts(false)" style="display:none;">Load more</button>
+  <button data-i18n="feed.load-more" class="load-more" id="loadMoreBtn" onclick="loadPosts(false)" style="display:none;">Load more</button>
 </div>
 
 <div class="sidebar">
   <div class="side-card">
-    <div class="side-card-title">📚 Courses you follow</div>
-    <div id="sidebarFollowed"><div class="side-empty">Click any course tag on a post to follow it — it'll show up here.</div></div>
+    <div data-i18n="feed.courses-you-follow" class="side-card-title">📚 Courses you follow</div>
+    <div id="sidebarFollowed"><div data-i18n="feed.click-any-course-tag" class="side-empty">Click any course tag on a post to follow it — it'll show up here.</div></div>
   </div>
   <div class="side-card">
-    <div class="side-card-title">🔥 Trending this week</div>
-    <div id="sidebarTrending"><div class="side-empty">Loading...</div></div>
+    <div data-i18n="feed.trending-this-week" class="side-card-title">🔥 Trending this week</div>
+    <div id="sidebarTrending"><div data-i18n="feed.loading" class="side-empty">Loading...</div></div>
   </div>
 </div>
 </div>
@@ -185,6 +185,13 @@ nav{height:60px;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);bor
 // ── XSS protection (security review Oct 2026) ──
 function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+// Text shown by this page's script, in the page's language (English unchanged; locales/*/page.feed.json).
+function __pick(en, v) { return typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en; }
+function T(k, en, v) { return window.I18N ? I18N.t('feed.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? v[x] : m; }); }
+function H(k, en, v) { return window.I18N ? I18N.h('feed.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? __esc(v[x]) : m; }); }
+const NON_EN = !!(window.I18N && I18N.lang && I18N.lang !== 'en');
+// Technical database messages are replaced by a plain one on non-English pages.
+const SRV = m => (!NON_EN ? m : /row-level security|permission denied|violates|JWT|fetch/i.test(String(m)) ? T('try-again', 'Please try again.') : I18N.server(m));
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 
 const SUPABASE_URL = USK_CONFIG.url;
@@ -215,13 +222,13 @@ function initials(name) {
 function timeAgo(dateStr) {
   const diff = Date.now() - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return T('just-now', 'just now');
+  if (mins < 60) return T('m-ago', '{{n}}m ago', { n: mins, count: mins });
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) return T('h-ago', '{{n}}h ago', { n: hrs, count: hrs });
   const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(dateStr).toLocaleDateString();
+  if (days < 7) return T('d-ago', '{{n}}d ago', { n: days, count: days });
+  return NON_EN ? I18N.date(new Date(dateStr)) : new Date(dateStr).toLocaleDateString();
 }
 
 async function init() {
@@ -232,7 +239,7 @@ async function init() {
   const { data: u } = await _sb.from('users').select('full_name, roles').eq('id', currentUser.id).single();
   currentUserName = u?.full_name || 'You';
   isTutor = Array.isArray(u?.roles) && u.roles.includes('tutor');
-  document.getElementById('navRight').innerHTML = `<a href="${__safeUrl(isTutor ? 'tutor-dashboard.html' : 'student-dashboard.html')}">← Dashboard</a>`;
+  document.getElementById('navRight').innerHTML = `<a href="${__safeUrl(isTutor ? 'tutor-dashboard.html' : 'student-dashboard.html')}">${H('dashboard', '← Dashboard')}</a>`;
 
   // Students ask questions; tutors share resources/tips with an optional
   // attachment — two genuinely different actions, not one generic box.
@@ -266,7 +273,7 @@ function renderSidebarFollowed(follows) {
   if (!el) return;
   el.innerHTML = follows.length > 0
     ? follows.map(f => `<div class="side-item"><a href="feed.html?course=${__safeUrl(encodeURIComponent(f.course_code))}">🎯 ${escapeHtml(f.course_code)}</a></div>`).join('')
-    : '<div class="side-empty">Click any course tag on a post to follow it — it\'ll show up here.</div>';
+    : '<div class="side-empty">' + H('follow-hint', 'Click any course tag on a post to follow it — it\'ll show up here.') + '</div>';
 }
 
 async function loadSidebarTrending() {
@@ -284,8 +291,8 @@ async function loadSidebarTrending() {
 
   const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 5);
   el.innerHTML = top.length > 0
-    ? top.map(([topic, count]) => `<div class="side-item"><a href="feed.html?course=${__safeUrl(encodeURIComponent(topic))}">${escapeHtml(topic)}</a><span class="side-count">${__esc(count)} post${__esc(count > 1 ? 's' : '')}</span></div>`).join('')
-    : '<div class="side-empty">Nothing trending yet this week.</div>';
+    ? top.map(([topic, count]) => `<div class="side-item"><a href="feed.html?course=${__safeUrl(encodeURIComponent(topic))}">${escapeHtml(topic)}</a><span class="side-count">${NON_EN ? H('n-posts', { one: '{{count}} post', other: '{{count}} posts' }, { count: count }) : `${__esc(count)} post${__esc(count > 1 ? 's' : '')}`}</span></div>`).join('')
+    : '<div class="side-empty">' + H('no-trending', 'Nothing trending yet this week.') + '</div>';
 }
 
 function renderCourseHubHeader() {
@@ -297,10 +304,10 @@ function renderCourseHubHeader() {
   header.style.justifyContent = 'space-between';
   header.innerHTML = `
     <div>
-      <a href="feed.html" style="font-size:0.78rem;color:var(--mid);text-decoration:none;">← All feeds</a>
+      <a href="feed.html" style="font-size:0.78rem;color:var(--mid);text-decoration:none;">${H('all-feeds', '← All feeds')}</a>
       <div style="font-size:1.1rem;font-weight:800;margin-top:4px;">🎯 ${escapeHtml(activeCourseFilter)}</div>
     </div>
-    <button id="followBtn" onclick="toggleFollowCourse()" style="padding:0.5rem 1.1rem;border-radius:100px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;${isFollowing ? 'background:var(--green-bg);color:var(--green);border:1.5px solid #a7f3d0;' : 'background:var(--blue);color:#fff;border:none;'}">${__esc(isFollowing ? '✓ Following' : '+ Follow')}</button>
+    <button id="followBtn" onclick="toggleFollowCourse()" style="padding:0.5rem 1.1rem;border-radius:100px;font-family:'Manrope',sans-serif;font-size:0.82rem;font-weight:700;cursor:pointer;${isFollowing ? 'background:var(--green-bg);color:var(--green);border:1.5px solid #a7f3d0;' : 'background:var(--blue);color:#fff;border:none;'}">${__esc(isFollowing ? T('following', '✓ Following') : T('follow', '+ Follow'))}</button>
   `;
   document.querySelector('.page').insertBefore(header, document.getElementById('studentCompose'));
 }
@@ -313,12 +320,12 @@ async function toggleFollowCourse() {
   if (isFollowing) {
     await _sb.from('course_follows').delete().eq('user_id', currentUser.id).eq('course_code', code);
     followedCourses.delete(code.toLowerCase());
-    btn.textContent = '+ Follow';
+    btn.textContent = T('follow', '+ Follow');
     btn.style.cssText = btn.style.cssText.replace(/background:[^;]+;color:[^;]+;border:[^;]+;/, 'background:var(--blue);color:#fff;border:none;');
   } else {
     await _sb.from('course_follows').insert({ user_id: currentUser.id, course_code: code });
     followedCourses.add(code.toLowerCase());
-    btn.textContent = '✓ Following';
+    btn.textContent = T('following', '✓ Following');
     btn.style.cssText = btn.style.cssText.replace(/background:[^;]+;color:[^;]+;border:[^;]+;/, 'background:var(--green-bg);color:var(--green);border:1.5px solid #a7f3d0;');
   }
 
@@ -332,7 +339,7 @@ async function submitPost() {
   const course = document.getElementById('postCourse').value.trim();
   const subject = document.getElementById('postSubject').value.trim();
   const btn = document.getElementById('postBtn');
-  btn.disabled = true; btn.textContent = 'Posting...';
+  btn.disabled = true; btn.textContent = T('posting', 'Posting...');
 
   const { error } = await _sb.from('feed_posts').insert({
     author_id: currentUser.id, author_name: currentUserName,
@@ -340,8 +347,8 @@ async function submitPost() {
     content, course_code: course || null, subject: subject || null,
   });
 
-  btn.disabled = false; btn.textContent = 'Post';
-  if (error) { alert('Could not post: ' + error.message); return; }
+  btn.disabled = false; btn.textContent = T('post', 'Post');
+  if (error) { alert(T('post-failed', 'Could not post: {{error}}', { error: SRV(error.message) })); return; }
 
   document.getElementById('postInput').value = '';
   document.getElementById('postInput').style.height = 'auto';
@@ -373,7 +380,7 @@ async function submitSharePost() {
   const course = document.getElementById('shareCourse').value.trim();
   const subject = document.getElementById('shareSubject').value.trim();
   const btn = document.getElementById('shareBtn');
-  btn.disabled = true; btn.textContent = 'Sharing...';
+  btn.disabled = true; btn.textContent = T('sharing', 'Sharing...');
 
   let attachmentUrl = null, attachmentName = null;
   if (pendingAttachment) {
@@ -388,10 +395,10 @@ async function submitSharePost() {
         attachmentUrl = uploadResult.fileUrl;
         attachmentName = pendingAttachment.name;
       } else {
-        alert('Could not attach the file: ' + (uploadResult.error || 'unknown error') + '. Posting without it.');
+        alert(T('attach-failed', 'Could not attach the file: {{error}}. Posting without it.', { error: uploadResult.error ? SRV(uploadResult.error) : T('unknown-error', 'unknown error') }));
       }
     } catch (e) {
-      alert('Could not attach the file — check your connection. Posting without it.');
+      alert(T('attach-offline', 'Could not attach the file — check your connection. Posting without it.'));
     }
   }
 
@@ -402,8 +409,8 @@ async function submitSharePost() {
     attachment_url: attachmentUrl, attachment_name: attachmentName,
   });
 
-  btn.disabled = false; btn.textContent = 'Share';
-  if (error) { alert('Could not post: ' + error.message); return; }
+  btn.disabled = false; btn.textContent = T('share', 'Share');
+  if (error) { alert(T('post-failed', 'Could not post: {{error}}', { error: SRV(error.message) })); return; }
 
   document.getElementById('shareInput').value = '';
   document.getElementById('shareInput').style.height = 'auto';
@@ -434,7 +441,7 @@ function skeletons() {
 
 async function renderFeed() {
   const list = document.getElementById('feedList');
-  if (posts.length === 0) { list.innerHTML = '<div class="empty-state">No posts yet — be the first to ask something.</div>'; return; }
+  if (posts.length === 0) { list.innerHTML = '<div class="empty-state">' + H('no-posts', 'No posts yet — be the first to ask something.') + '</div>'; return; }
 
   // On the main feed (not inside a specific course hub), bring posts from
   // followed courses to the top — recency still governs order within each
@@ -471,8 +478,8 @@ async function renderFeed() {
 
     const attachmentHtml = p.attachment_url ? `
       <a href="${__safeUrl(p.attachment_url)}" target="_blank" style="display:flex;align-items:center;gap:8px;background:var(--off);border-radius:10px;padding:0.6rem 0.9rem;margin:0.6rem 0 0.9rem;font-size:0.82rem;color:var(--ink2);text-decoration:none;">
-        📎 <span style="font-weight:600;">${escapeHtml(p.attachment_name || 'Attachment')}</span>
-        <span style="margin-left:auto;color:var(--blue);font-weight:700;font-size:0.78rem;">View →</span>
+        📎 <span style="font-weight:600;">${escapeHtml(p.attachment_name || T('attachment', 'Attachment'))}</span>
+        <span style="margin-left:auto;color:var(--blue);font-weight:700;font-size:0.78rem;">${H('view', 'View →')}</span>
       </a>` : '';
 
     // Only makes sense on a tutor's own share, viewed by someone else — not
@@ -480,36 +487,36 @@ async function renderFeed() {
     const showBookBtn = isShare && p.author_id !== currentUser.id && !isTutor;   // tutors only teach
     const bookUrl = `book-session.html?tutor=${p.author_id}&name=${encodeURIComponent(p.author_name)}${p.course_code || p.subject ? '&subject=' + encodeURIComponent(p.course_code || p.subject) : ''}`;
 
-    return `<div class="post" data-post-id="${__esc(p.id)}" style="${isShare ? 'border-left:3px solid var(--green);' : ''}">
+    return `<div class="post" data-post-id="${__esc(p.id)}" style="${isShare ? (document.documentElement.dir === 'rtl' ? 'border-right' : 'border-left') + ':3px solid var(--green);' : ''}">
       <div class="post-head">
         <div class="avatar" style="background:${p.author_role === 'tutor' ? 'linear-gradient(135deg,#059669,#0ea5e9)' : 'linear-gradient(135deg,var(--blue),#7c3aed)'};">${__esc(initials(p.author_name))}</div>
         <div class="post-head-info">
           <div class="post-name-row">
             <span class="post-name">${escapeHtml(p.author_name)}</span>
-            ${isShare ? '<span class="verified-badge">✓ Verified tutor</span>' : ''}
+            ${isShare ? '<span class="verified-badge">✓ ' + H('verified-tutor', 'Verified tutor') + '</span>' : ''}
             <span class="post-time">· ${__esc(timeAgo(p.created_at))}</span>
-            ${isShare ? '<span class="tag-pill" style="background:var(--green-bg);color:var(--green);">📎 Shared resource</span>' : ''}
+            ${isShare ? '<span class="tag-pill" style="background:var(--green-bg);color:var(--green);">📎 ' + H('shared', 'Shared resource') + '</span>' : ''}
             ${p.course_code
               ? `<a href="feed.html?course=${__safeUrl(encodeURIComponent(p.course_code))}" class="tag-pill" style="text-decoration:none;cursor:pointer;">🎯 ${escapeHtml(p.course_code)}${followedCourses.has(p.course_code.toLowerCase()) ? ' ✓' : ''}</a>`
               : (p.subject ? `<a href="feed.html?course=${__safeUrl(encodeURIComponent(p.subject))}" class="tag-pill" style="text-decoration:none;cursor:pointer;">📚 ${escapeHtml(p.subject)}${followedCourses.has(p.subject.toLowerCase()) ? ' ✓' : ''}</a>` : '')}
           </div>
           <div class="post-content">${escapeHtml(p.content)}</div>
           ${attachmentHtml}
-          ${showBookBtn ? `<a href="${__safeUrl(bookUrl)}" style="display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;font-size:0.82rem;font-weight:700;padding:8px 16px;border-radius:100px;text-decoration:none;margin-bottom:0.7rem;">📅 Book a session with ${escapeHtml(p.author_name.split(' ')[0])} →</a>` : ''}
+          ${showBookBtn ? `<a href="${__safeUrl(bookUrl)}" style="display:inline-flex;align-items:center;gap:6px;background:var(--blue);color:#fff;font-size:0.82rem;font-weight:700;padding:8px 16px;border-radius:100px;text-decoration:none;margin-bottom:0.7rem;">📅 ${H('book-with', 'Book a session with {{name}} →', { name: p.author_name.split(' ')[0] })}</a>` : ''}
           ${showNudge ? `<div class="group-nudge">
-            <span class="group-nudge-text">👥 ${__esc(demandCount)} students interested in ${escapeHtml(p.course_code)} — enough for a group session</span>
-            <button class="group-nudge-btn" onclick="window.location.href='tutor-dashboard.html?tab=groupSessions'">Start it →</button>
+            <span class="group-nudge-text">👥 ${H('demand', '{{n}} students interested in {{course}} — enough for a group session', { n: demandCount, course: p.course_code })}</span>
+            <button class="group-nudge-btn" onclick="window.location.href='tutor-dashboard.html?tab=groupSessions'">${H('start-it', 'Start it →')}</button>
           </div>` : ''}
           <div class="post-actions">
             <button class="action-btn like-btn" onclick="toggleLike('${p.id}', this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> <span class="like-count">${__esc(p.like_count || 0)}</span></button>
-            <button class="action-btn" onclick="toggleReplies('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> ${__esc(p.reply_count || 0)} ${__esc(p.reply_count === 1 ? 'reply' : (isShare ? 'comments' : 'replies'))}</button>
-            ${(!isShare && p.has_tutor_answer) ? `<span class="action-btn answer-btn" style="cursor:default;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg> Answered</span>` : ''}
+            <button class="action-btn" onclick="toggleReplies('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> ${NON_EN ? (isShare ? H('n-comments', { one: '{{count}} comment', other: '{{count}} comments' }, { count: p.reply_count || 0 }) : H('n-replies', { one: '{{count}} reply', other: '{{count}} replies' }, { count: p.reply_count || 0 })) : `${__esc(p.reply_count || 0)} ${__esc(p.reply_count === 1 ? 'reply' : (isShare ? 'comments' : 'replies'))}`}</button>
+            ${(!isShare && p.has_tutor_answer) ? `<span class="action-btn answer-btn" style="cursor:default;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg> ${H('answered', 'Answered')}</span>` : ''}
           </div>
           <div class="replies" id="replies-${__esc(p.id)}">
             <div class="reply-list" id="replyList-${__esc(p.id)}"></div>
             <div class="reply-compose">
-              <input type="text" id="replyInput-${__esc(p.id)}" placeholder="${__esc(isShare ? 'Add a comment...' : (isTutor ? 'Write a reply...' : 'Add a comment...'))}" onkeydown="if(event.key==='Enter')submitReply('${p.id}')">
-              ${(!isShare && isTutor) ? `<label class="tutor-toggle"><input type="checkbox" id="asAnswer-${__esc(p.id)}" checked style="accent-color:var(--green);"> Answer</label>` : ''}
+              <input type="text" id="replyInput-${__esc(p.id)}" placeholder="${__esc(isShare ? T('add-comment', 'Add a comment...') : (isTutor ? T('write-reply', 'Write a reply...') : T('add-comment', 'Add a comment...')))}" onkeydown="if(event.key==='Enter')submitReply('${p.id}')">
+              ${(!isShare && isTutor) ? `<label class="tutor-toggle"><input type="checkbox" id="asAnswer-${__esc(p.id)}" checked style="accent-color:var(--green);"> ${H('answer', 'Answer')}</label>` : ''}
               <button class="reply-send" onclick="submitReply('${p.id}')"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg></button>
             </div>
           </div>
@@ -573,7 +580,7 @@ async function loadReplies(postId) {
       <div class="reply-bubble ${__esc(r.is_tutor_answer ? 'answer' : '')}">
         <div class="reply-name-row">
           <span class="reply-name">${escapeHtml(r.author_name)}</span>
-          ${r.is_tutor_answer ? '<span class="verified-badge">✓ Verified tutor</span>' : ''}
+          ${r.is_tutor_answer ? '<span class="verified-badge">✓ ' + H('verified-tutor', 'Verified tutor') + '</span>' : ''}
         </div>
         <div class="reply-text">${escapeHtml(r.content)}</div>
       </div>
@@ -595,7 +602,7 @@ async function submitReply(postId) {
     body: JSON.stringify({ post_id: postId, author_id: currentUser.id, content, as_tutor_answer: asAnswer }),
   });
   const data = await res.json();
-  if (data.error) { alert('Could not post reply: ' + data.error); return; }
+  if (data.error) { alert(T('reply-failed', 'Could not post reply: {{error}}', { error: SRV(data.error) })); return; }
 
   await loadReplies(postId);
   const post = posts.find(p => p.id === postId);
