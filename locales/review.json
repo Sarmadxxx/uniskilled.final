@@ -65,6 +65,9 @@
     },
     "page.manage-availability": {
       "ar": "reviewed"
+    },
+    "page.rate-lesson": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
