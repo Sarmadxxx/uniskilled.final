@@ -217,4 +217,4 @@
 header.top p { direction: rtl !important; unicode-bidi: isolate !important; }
 
 /* The simple top bar keeps the logo on the left; its back link still reads right to left (arrow first, on the right). */
-#navBackLink { direction: rtl; unicode-bidi: isolate; }
+#navBackLink, nav > a.nav-link[href$="dashboard.html"] { direction: rtl; unicode-bidi: isolate; }

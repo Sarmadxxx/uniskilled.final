@@ -10,7 +10,7 @@
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
-<title>Manage Availability — UniSkilled</title>
+<title data-i18n="manage-availability.title">Manage Availability — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -99,13 +99,13 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
   <a href="index.html" class="nav-logo">
     <img src="uniskilled-logo-sm.png?v=20261101" alt="UniSkilled" width="139" height="34" style="height:34px;width:auto;display:block;">
   </a>
-  <a href="tutor-dashboard.html" class="nav-link">← Back to Dashboard</a>
+  <a data-i18n="manage-availability.back-to-dashboard" href="tutor-dashboard.html" class="nav-link">← Back to Dashboard</a>
 </nav>
 
 <div class="page">
   <div class="page-head">
-    <div class="page-title">🗓️ Manage Availability</div>
-    <div class="page-sub">Block off days or specific hours you're not available. Students won't be able to book you during blocked times — everything else stays open.</div>
+    <div data-i18n="manage-availability.manage-availability" class="page-title">🗓️ Manage Availability</div>
+    <div data-i18n="manage-availability.block-off-days-or" class="page-sub">Block off days or specific hours you're not available. Students won't be able to book you during blocked times — everything else stays open.</div>
   </div>
 
   <div class="layout">
@@ -119,18 +119,18 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
       </div>
       <div id="calGrid" class="cal-grid"></div>
       <div class="legend">
-        <div class="legend-item"><span class="legend-dot" style="background:#fee2e2;"></span>Fully blocked</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#fef3c7;"></span>Partially blocked</div>
+        <div data-i18n="manage-availability.fully-blocked" class="legend-item"><span class="legend-dot" style="background:#fee2e2;"></span>Fully blocked</div>
+        <div data-i18n="manage-availability.partially-blocked" class="legend-item"><span class="legend-dot" style="background:#fef3c7;"></span>Partially blocked</div>
       </div>
     </div>
 
     <div class="side-panel">
-      <div class="side-title" id="sidePanelTitle">Select a day to manage</div>
+      <div data-i18n="manage-availability.select-a-day-to" class="side-title" id="sidePanelTitle">Select a day to manage</div>
 
       <div class="block-form" id="blockForm">
         <div class="selected-date-label" id="selectedDateLabel"></div>
 
-        <div class="radio-row">
+        <div data-i18n="manage-availability.whole-day-specific-hours" class="radio-row">
           <label class="radio-chip"><input type="radio" name="blockType" value="full" checked>Whole day</label>
           <label class="radio-chip"><input type="radio" name="blockType" value="partial">Specific hours</label>
         </div>
@@ -140,14 +140,14 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
           <input type="time" id="blockEnd" value="12:00">
         </div>
 
-        <input type="text" class="reason-input" id="blockReason" placeholder="Reason (optional, e.g. exams)">
+        <input data-i18n-attr="placeholder:manage-availability.reason-optional-eg-exams.placeholder" type="text" class="reason-input" id="blockReason" placeholder="Reason (optional, e.g. exams)">
 
-        <button class="block-save-btn" onclick="saveBlock()">Block this day</button>
-        <button class="block-cancel-btn" onclick="closeForm()">Cancel</button>
+        <button data-i18n="manage-availability.block-this-day" class="block-save-btn" onclick="saveBlock()">Block this day</button>
+        <button data-i18n="manage-availability.cancel" class="block-cancel-btn" onclick="closeForm()">Cancel</button>
       </div>
 
-      <div class="blocked-list-title">Upcoming blocked times</div>
-      <div id="blockedList"><div class="side-empty">Nothing blocked yet.</div></div>
+      <div data-i18n="manage-availability.upcoming-blocked-times" class="blocked-list-title">Upcoming blocked times</div>
+      <div id="blockedList"><div data-i18n="manage-availability.nothing-blocked-yet" class="side-empty">Nothing blocked yet.</div></div>
     </div>
   </div>
 </div>
@@ -156,6 +156,12 @@ nav{height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--
 // ── XSS protection (security review Oct 2026) ──
 function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
+// Text shown by this page's script, in the page's language (English unchanged; locales/*/page.manage-availability.json).
+function T(k, en, v) { return window.I18N ? I18N.t('manage-availability.js.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? v[x] : m; }); }
+function H(k, en, v) { return window.I18N ? I18N.h('manage-availability.js.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? __esc(v[x]) : m; }); }
+const NON_EN = !!(window.I18N && I18N.lang && I18N.lang !== 'en');
+// Right-to-left pages: "previous month" sits on the right, so its arrow points right.
+if (document.documentElement.dir === 'rtl') document.addEventListener('DOMContentLoaded', () => { const b = document.querySelectorAll('.cal-nav-btn'); if (b.length === 2) { b[0].textContent = '›'; b[1].textContent = '‹'; } });
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 
 const _sb = window.supabase.createClient(
@@ -208,7 +214,7 @@ function changeMonth(delta) {
 
 function render() {
   const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  document.getElementById('monthTitle').textContent = `${monthNames[viewMonth]} ${viewYear}`;
+  document.getElementById('monthTitle').textContent = NON_EN ? I18N.date(new Date(viewYear, viewMonth, 1), { month: 'long', year: 'numeric' }) : `${monthNames[viewMonth]} ${viewYear}`;
 
   const firstDay = new Date(viewYear, viewMonth, 1).getDay();
   const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
@@ -232,7 +238,7 @@ function render() {
     if (hasFullBlock) cls += ' blocked-full';
     else if (hasPartialBlock) cls += ' blocked-partial';
 
-    const tag = hasFullBlock ? '<span class="day-tag full">Blocked</span>' : hasPartialBlock ? '<span class="day-tag partial">Partial</span>' : '';
+    const tag = hasFullBlock ? '<span class="day-tag full">' + H('tag-blocked', 'Blocked') + '</span>' : hasPartialBlock ? '<span class="day-tag partial">' + H('tag-partial', 'Partial') + '</span>' : '';
     const onclick = isPast ? '' : `onclick="selectDay('${key}')"`;
     cells += `<div class="${__esc(cls)}" ${onclick}><div class="day-num">${__esc(d)}</div>${tag}</div>`;
   }
@@ -243,7 +249,7 @@ function render() {
   }
 
   document.getElementById('calGrid').innerHTML = `
-    <div class="cal-weekdays">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w => `<div class="cal-weekday">${__esc(w)}</div>`).join('')}</div>
+    <div class="cal-weekdays">${(NON_EN ? [0,1,2,3,4,5,6].map(i => I18N.date(new Date(2026, 10, 15 + i), { weekday: 'short' })) : ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']).map(w => `<div class="cal-weekday">${__esc(w)}</div>`).join('')}</div>
     <div class="cal-days">${cells}</div>
   `;
 }
@@ -251,8 +257,8 @@ function render() {
 function selectDay(key) {
   selectedDateKey = key;
   const dateObj = new Date(key + 'T00:00:00');
-  document.getElementById('selectedDateLabel').textContent = dateObj.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
-  document.getElementById('sidePanelTitle').textContent = 'Manage this day';
+  document.getElementById('selectedDateLabel').textContent = NON_EN ? I18N.date(dateObj, { weekday: 'long', month: 'long', day: 'numeric' }) : dateObj.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+  document.getElementById('sidePanelTitle').textContent = T('manage-day', 'Manage this day');
   document.getElementById('blockForm').classList.add('active');
   document.querySelector('input[name="blockType"][value="full"]').checked = true;
   document.getElementById('timeRow').classList.remove('active');
@@ -261,7 +267,7 @@ function selectDay(key) {
 
 function closeForm() {
   document.getElementById('blockForm').classList.remove('active');
-  document.getElementById('sidePanelTitle').textContent = 'Select a day to manage';
+  document.getElementById('sidePanelTitle').textContent = T('select-day', 'Select a day to manage');
   selectedDateKey = null;
 }
 
@@ -280,12 +286,12 @@ async function saveBlock() {
   };
 
   if (type === 'partial' && payload.start_time >= payload.end_time) {
-    showToast('End time must be after the start time.', 'error');
+    showToast(T('end-after-start', 'End time must be after the start time.'), 'error');
     return;
   }
 
   const { error } = await _sb.from('tutor_blocked_slots').insert(payload);
-  if (error) { showToast('Could not save this block. Please try again.', 'error'); return; }
+  if (error) { showToast(T('save-failed', 'Could not save this block. Please try again.'), 'error'); return; }
 
   closeForm();
   await loadBlocks();
@@ -307,19 +313,19 @@ function renderBlockedList() {
     .sort((a, b) => a.blocked_date.localeCompare(b.blocked_date));
 
   if (allBlocks.length === 0) {
-    container.innerHTML = '<div class="side-empty">Nothing blocked yet.</div>';
+    container.innerHTML = '<div class="side-empty">' + H('nothing', 'Nothing blocked yet.') + '</div>';
     return;
   }
 
   container.innerHTML = allBlocks.map(b => {
-    const dateStr = new Date(b.blocked_date + 'T00:00:00').toLocaleDateString([], { month: 'short', day: 'numeric' });
-    const detail = b.all_day ? 'Whole day' : `${b.start_time.slice(0,5)} – ${b.end_time.slice(0,5)}`;
+    const dateStr = NON_EN ? I18N.date(new Date(b.blocked_date + 'T00:00:00'), { month: 'short', day: 'numeric' }) : new Date(b.blocked_date + 'T00:00:00').toLocaleDateString([], { month: 'short', day: 'numeric' });
+    const detail = b.all_day ? T('whole-day', 'Whole day') : `${b.start_time.slice(0,5)} – ${b.end_time.slice(0,5)}`;
     return `<div class="blocked-item">
       <div>
         <div class="blocked-item-date">${__esc(dateStr)}</div>
         <div class="blocked-item-detail">${__esc(detail)}${__esc(b.reason ? ' · ' + b.reason : '')}</div>
       </div>
-      <button class="blocked-remove" onclick="removeBlock('${b.id}')">Remove</button>
+      <button class="blocked-remove" onclick="removeBlock('${b.id}')">${H('remove', 'Remove')}</button>
     </div>`;
   }).join('');
 }
