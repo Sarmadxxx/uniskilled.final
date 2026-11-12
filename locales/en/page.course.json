@@ -1,0 +1,61 @@
+{
+  "course.title": "Course — UniSkilled",
+  "course.skip-to-content": "Skip to content",
+  "course.all-courses": "<a href=\"courses.html\">← All courses</a>",
+  "course.meta.description": "Student tutors who passed this university course, and questions from classmates.",
+  "course.meta.og-title": "Course — UniSkilled",
+  "course.meta.og-description": "Student tutors who passed this university course, and questions from classmates.",
+  "course.loading-course.arialabel": "Loading course",
+  "course.js.incomplete": "This course link is incomplete.",
+  "course.js.browse": "Browse all courses",
+  "course.js.load-failed": "Could not load this course. Please refresh the page or try again in a moment.",
+  "course.js.tutor": "Tutor",
+  "course.js.seo-tutors": {
+    "one": "{{count}} student tutor has passed {{course}}. Book a session or ask classmates a question.",
+    "other": "{{count}} student tutors have passed {{course}}. Book a session or ask classmates a question."
+  },
+  "course.js.seo-empty": "Questions and tutors for {{course}} on UniSkilled.",
+  "course.js.per-hour": "/ hour",
+  "course.js.rate-on-request": "Rate on request",
+  "course.js.passed-at": "Passed at {{uni}}",
+  "course.js.passed": "Passed this course",
+  "course.js.verified": "Verified",
+  "course.js.new-tutor": "New tutor",
+  "course.js.your-uni": "Your university",
+  "course.js.grade": "Grade {{grade}}",
+  "course.js.self-reported": "(self-reported)",
+  "course.js.book": "Book session",
+  "course.js.view-profile": "View profile",
+  "course.js.student": "Student",
+  "course.js.replies": {
+    "one": "{{count}} reply",
+    "other": "{{count}} replies"
+  },
+  "course.js.answered": "Tutor answered",
+  "course.js.n-tutors": {
+    "one": "{{count}} tutor passed it",
+    "other": "{{count}} tutors passed it"
+  },
+  "course.js.n-followers": {
+    "one": "{{count}} follower",
+    "other": "{{count}} followers"
+  },
+  "course.js.n-questions": {
+    "one": "{{count}} question",
+    "other": "{{count}} questions"
+  },
+  "course.js.following": "Following",
+  "course.js.follow": "Follow course",
+  "course.js.signin-follow": "Sign in to follow",
+  "course.js.plan-exam": "Plan my exam",
+  "course.js.tutors-head": "Tutors who passed this course",
+  "course.js.own-uni-first": "Tutors from your university are shown first.",
+  "course.js.self-added": "Courses and grades are added by tutors themselves.",
+  "course.js.no-tutors": "No tutor has added this course yet.",
+  "course.js.post-request": "Post a request",
+  "course.js.q-head": "Questions from classmates",
+  "course.js.q-hint": "Ask about this course in the Feed. Tutors who passed it can answer.",
+  "course.js.no-questions": "No questions yet.",
+  "course.js.ask": "Ask a question",
+  "course.js.follow-failed": "That didn’t work. Please try again."
+}

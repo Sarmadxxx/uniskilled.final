@@ -9,12 +9,12 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
-<title>Course — UniSkilled</title>
-<meta name="description" content="Student tutors who passed this university course, and questions from classmates.">
+<title data-i18n="course.title">Course — UniSkilled</title>
+<meta data-i18n-attr="content:course.meta.description" name="description" content="Student tutors who passed this university course, and questions from classmates.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="UniSkilled">
-<meta property="og:title" content="Course — UniSkilled">
-<meta property="og:description" content="Student tutors who passed this university course, and questions from classmates.">
+<meta data-i18n-attr="content:course.meta.og-title" property="og:title" content="Course — UniSkilled">
+<meta data-i18n-attr="content:course.meta.og-description" property="og:description" content="Student tutors who passed this university course, and questions from classmates.">
 <meta property="og:image" content="https://uniskilled.com/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -84,19 +84,24 @@ body{font-family:'Manrope',sans-serif;background:var(--off);color:var(--ink);min
 <script src="analytics.js" defer></script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
+<a data-i18n="course.skip-to-content" class="skip-link" href="#main">Skip to content</a>
 <header id="site-nav"></header>
 <script src="site-nav.js"></script>
 
 <main class="page" id="main">
-  <div class="crumb"><a href="courses.html">← All courses</a></div>
-  <div id="content"><div class="spinner" role="status" aria-label="Loading course"></div></div>
+  <div data-i18n="course.all-courses" class="crumb"><a href="courses.html">← All courses</a></div>
+  <div id="content"><div data-i18n-attr="aria-label:course.loading-course.arialabel" class="spinner" role="status" aria-label="Loading course"></div></div>
 </main>
 
 <script>
 function __esc(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;');}
 function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?:)?\/\//i.test(u)||/^data:image\//i.test(u)||/^(?![a-z][a-z0-9+.-]*:)[^\s]*$/i.test(u))return __esc(u);return '#';}
 
+// Text shown by this page's script, in the page's language (English unchanged; locales/*/page.course.json).
+function __pick(en, v) { return typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en; }
+function T(k, en, v) { return window.I18N ? I18N.t('course.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? v[x] : m; }); }
+function H(k, en, v) { return window.I18N ? I18N.h('course.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, function (m, x) { return v && x in v ? __esc(v[x]) : m; }); }
+const NON_EN = !!(window.I18N && I18N.lang && I18N.lang !== 'en');
 const CURRENCY_SYMBOLS = { GBP:'£', EUR:'€', USD:'$' };
 const currSymbol = c => CURRENCY_SYMBOLS[c] || c || '€';
 // Same rule as the database's course_key(): letters and digits only, lower case.
@@ -141,7 +146,7 @@ async function whoAmI() {
 
 async function load() {
   const box = document.getElementById('content');
-  if (!KEY) { noindex(); box.innerHTML = '<div class="empty">This course link is incomplete. <a href="courses.html" style="color:var(--blue);font-weight:700;text-decoration:none">Browse all courses</a></div>'; return; }
+  if (!KEY) { noindex(); box.innerHTML = '<div class="empty">' + H('incomplete', 'This course link is incomplete.') + ' <a href="courses.html" style="color:var(--blue);font-weight:700;text-decoration:none">' + H('browse', 'Browse all courses') + '</a></div>'; return; }
 
   const [, tcRes, statsRes, postsRes] = await Promise.all([
     whoAmI(),
@@ -149,7 +154,7 @@ async function load() {
     _sb.rpc('course_stats', { p_course_key: KEY }),
     _sb.from('feed_posts').select('id,content,author_name,course_code,subject,reply_count,has_tutor_answer,created_at,post_type').eq('course_key', KEY).neq('post_type', 'share').order('created_at', { ascending: false }).limit(5),
   ]);
-  if (tcRes.error) { box.innerHTML = '<div class="empty">Could not load this course. Please refresh the page or try again in a moment.</div>'; return; }
+  if (tcRes.error) { box.innerHTML = '<div class="empty">' + H('load-failed', 'Could not load this course. Please refresh the page or try again in a moment.') + '</div>'; return; }
 
   const rows = tcRes.data || [];
   const tutorIds = [...new Set(rows.map(r => r.tutor_id))];
@@ -177,7 +182,7 @@ async function load() {
       const c = courseRows[0];
       const uni = c.university || tp.verified_university || tp.location || '';
       const s = rv[tp.user_id] || { t: 0, n: 0 };
-      return { tp, c, uni, name: peopleMap[tp.user_id].full_name || 'Tutor', avatar: tp.avatar_url || peopleMap[tp.user_id].avatar_url,
+      return { tp, c, uni, name: peopleMap[tp.user_id].full_name || T('tutor', 'Tutor'), avatar: tp.avatar_url || peopleMap[tp.user_id].avatar_url,
                mine: !!myUni && sameUni(uni, myUni), n: s.n, avg: s.n >= 3 ? (s.t / s.n).toFixed(1) : null, score: (3 * mean + s.t) / (3 + s.n) };
     })
     .sort((a, b) => (b.mine - a.mine) || ((b.tp.university_verified_at ? 1 : 0) - (a.tp.university_verified_at ? 1 : 0)) || (b.score - a.score) || (b.n - a.n));
@@ -192,7 +197,11 @@ async function load() {
   following = !!(me && stats.i_follow);
 
   const showName = name && name.toLowerCase() !== label.toLowerCase();
-  setSeo(showName ? `${label} — ${name}` : label,
+  if (NON_EN) setSeo(showName ? `${label} — ${name}` : label,
+    tutors.length
+      ? T('seo-tutors', { one: '{{count}} student tutor has passed {{course}}. Book a session or ask classmates a question.', other: '{{count}} student tutors have passed {{course}}. Book a session or ask classmates a question.' }, { count: tutors.length, course: label })
+      : T('seo-empty', 'Questions and tutors for {{course}} on UniSkilled.', { course: label }));
+  else setSeo(showName ? `${label} — ${name}` : label,
     tutors.length
       ? `${plural(tutors.length, 'student tutor has', 'student tutors have')} passed ${label}${unis.length ? ' at ' + unis.slice(0, 2).join(' and ') : ''}. Book a session or ask classmates a question.`
       : `Questions and tutors for ${label} on UniSkilled.`);
@@ -201,8 +210,8 @@ async function load() {
   const canBook = !me || myRole !== 'tutor';   // tutors only teach
   const tutorCard = t => {
     const initials = t.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-    const rate = t.tp.hourly_rate ? `${__esc(currSymbol(t.tp.currency))}${__esc(t.tp.hourly_rate)} <span>/ hour</span>` : '<span>Rate on request</span>';
-    const passed = [t.uni ? 'Passed at ' + t.uni : 'Passed this course', t.c.semester].filter(Boolean).join(' · ');
+    const rate = t.tp.hourly_rate ? `${__esc(currSymbol(t.tp.currency))}${__esc(t.tp.hourly_rate)} <span>${H('per-hour', '/ hour')}</span>` : '<span>' + H('rate-on-request', 'Rate on request') + '</span>';
+    const passed = [t.uni ? T('passed-at', 'Passed at {{uni}}', { uni: t.uni }) : T('passed', 'Passed this course'), t.c.semester].filter(Boolean).join(' · ');
     const bookHref = me
       ? `book-session.html?tutor=${encodeURIComponent(t.tp.user_id)}&name=${encodeURIComponent(t.name)}&subject=${encodeURIComponent(t.c.course_name || t.c.course_code || label)}`
       : 'signin.html?redirect=' + encodeURIComponent(location.pathname + location.search);
@@ -212,29 +221,29 @@ async function load() {
         <div style="min-width:0">
           <a class="t-name" href="tutor-profile.html?id=${encodeURIComponent(t.tp.user_id)}">${__esc(t.name)}</a>
           <div class="t-meta">
-            ${t.tp.university_verified_at ? '<span class="verified">✓ Verified</span>' : ''}
-            ${t.avg ? `<span>★ ${__esc(t.avg)} (${__esc(t.n)})</span>` : '<span>New tutor</span>'}
-            ${t.mine ? '<span class="same-uni">Your university</span>' : ''}
+            ${t.tp.university_verified_at ? '<span class="verified">✓ ' + H('verified', 'Verified') + '</span>' : ''}
+            ${t.avg ? `<span>★ ${__esc(t.avg)} (${__esc(t.n)})</span>` : '<span>' + H('new-tutor', 'New tutor') + '</span>'}
+            ${t.mine ? '<span class="same-uni">' + H('your-uni', 'Your university') + '</span>' : ''}
           </div>
         </div>
       </div>
-      <div class="passed">${__esc(passed)}${t.c.grade ? `<br><span class="grade">Grade ${__esc(t.c.grade)} <span>(self-reported)</span></span>` : ''}</div>
+      <div class="passed">${__esc(passed)}${t.c.grade ? `<br><span class="grade">${H('grade', 'Grade {{grade}}', { grade: t.c.grade })} <span>${H('self-reported', '(self-reported)')}</span></span>` : ''}</div>
       <div class="t-foot">
         <div class="rate">${rate}</div>
         ${canBook && t.tp.user_id !== me
-          ? `<a class="btn primary" href="${__safeUrl(bookHref)}">Book session</a>`
-          : `<a class="btn ghost" href="tutor-profile.html?id=${encodeURIComponent(t.tp.user_id)}">View profile</a>`}
+          ? `<a class="btn primary" href="${__safeUrl(bookHref)}">${H('book', 'Book session')}</a>`
+          : `<a class="btn ghost" href="tutor-profile.html?id=${encodeURIComponent(t.tp.user_id)}">${H('view-profile', 'View profile')}</a>`}
       </div>
     </article>`;
   };
 
   const askHref = 'feed.html?course=' + encodeURIComponent(label);
   const qCard = p => {
-    const when = new Date(p.created_at).toLocaleDateString([], { day: 'numeric', month: 'short' });
+    const when = NON_EN ? I18N.date(new Date(p.created_at), { day: 'numeric', month: 'short' }) : new Date(p.created_at).toLocaleDateString([], { day: 'numeric', month: 'short' });
     return `<a class="q" href="${__safeUrl(askHref)}">
       <div class="q-text">${__esc(p.content)}</div>
-      <div class="q-meta"><span>${__esc(p.author_name || 'Student')}</span><span>${__esc(when)}</span>
-        <span>${__esc(plural(p.reply_count || 0, 'reply', 'replies'))}</span>${p.has_tutor_answer ? '<span class="answered">Tutor answered</span>' : ''}</div>
+      <div class="q-meta"><span>${__esc(p.author_name || T('student', 'Student'))}</span><span>${__esc(when)}</span>
+        <span>${__esc(NON_EN ? T('replies', { one: '{{count}} reply', other: '{{count}} replies' }, { count: p.reply_count || 0 }) : plural(p.reply_count || 0, 'reply', 'replies'))}</span>${p.has_tutor_answer ? '<span class="answered">' + H('answered', 'Tutor answered') + '</span>' : ''}</div>
     </a>`;
   };
 
@@ -245,31 +254,31 @@ async function load() {
         ${showName ? `<div class="sub">${__esc(name)}</div>` : ''}
         ${unis.length ? `<div class="unis">${__esc(unis.join(' · '))}</div>` : ''}
         <div class="stats">
-          <span class="pill${tutors.length ? '' : ' muted'}">${__esc(plural(tutors.length, 'tutor passed it', 'tutors passed it'))}</span>
-          <span class="pill muted" id="followerPill">${__esc(plural(stats.follower_count, 'follower', 'followers'))}</span>
-          ${stats.question_count ? `<span class="pill muted">${__esc(plural(stats.question_count, 'question', 'questions'))}</span>` : ''}
+          <span class="pill${tutors.length ? '' : ' muted'}">${__esc(NON_EN ? T('n-tutors', { one: '{{count}} tutor passed it', other: '{{count}} tutors passed it' }, { count: tutors.length }) : plural(tutors.length, 'tutor passed it', 'tutors passed it'))}</span>
+          <span class="pill muted" id="followerPill">${__esc(NON_EN ? T('n-followers', { one: '{{count}} follower', other: '{{count}} followers' }, { count: Number(stats.follower_count) || 0 }) : plural(stats.follower_count, 'follower', 'followers'))}</span>
+          ${stats.question_count ? `<span class="pill muted">${__esc(NON_EN ? T('n-questions', { one: '{{count}} question', other: '{{count}} questions' }, { count: Number(stats.question_count) || 0 }) : plural(stats.question_count, 'question', 'questions'))}</span>` : ''}
         </div>
       </div>
       <div class="actions">
-        ${me ? `<button type="button" class="btn ghost" id="followBtn" aria-pressed="${following}" data-count="${Number(stats.follower_count) || 0}">${following ? 'Following' : 'Follow course'}</button>` : `<a class="btn ghost" href="signin.html?redirect=${encodeURIComponent(location.pathname + location.search)}">Sign in to follow</a>`}
-        ${me && myRole !== 'tutor' ? `<a class="btn ghost" href="exam-planner.html?course=${encodeURIComponent(label)}">Plan my exam</a>` : ''}
+        ${me ? `<button type="button" class="btn ghost" id="followBtn" aria-pressed="${following}" data-count="${Number(stats.follower_count) || 0}">${following ? H('following', 'Following') : H('follow', 'Follow course')}</button>` : `<a class="btn ghost" href="signin.html?redirect=${encodeURIComponent(location.pathname + location.search)}">${H('signin-follow', 'Sign in to follow')}</a>`}
+        ${me && myRole !== 'tutor' ? `<a class="btn ghost" href="exam-planner.html?course=${encodeURIComponent(label)}">${H('plan-exam', 'Plan my exam')}</a>` : ''}
       </div>
       <div class="msg" id="followMsg" role="status" style="flex-basis:100%"></div>
     </section>
 
     <section class="section" aria-labelledby="tutorsHead">
-      <h2 id="tutorsHead">Tutors who passed this course</h2>
-      <p class="hint">${myUni ? 'Tutors from your university are shown first. ' : ''}Courses and grades are added by tutors themselves.</p>
+      <h2 id="tutorsHead">${H('tutors-head', 'Tutors who passed this course')}</h2>
+      <p class="hint">${myUni ? H('own-uni-first', 'Tutors from your university are shown first.') + ' ' : ''}${H('self-added', 'Courses and grades are added by tutors themselves.')}</p>
       ${tutors.length
         ? `<div class="tutors">${tutors.map(tutorCard).join('')}</div>`
-        : `<div class="empty">No tutor has added this course yet.${canBook ? `<br><a class="btn primary" href="find-tutors.html?q=${encodeURIComponent(label)}#request">Post a request</a>` : ''}</div>`}
+        : `<div class="empty">${H('no-tutors', 'No tutor has added this course yet.')}${canBook ? `<br><a class="btn primary" href="find-tutors.html?q=${encodeURIComponent(label)}#request">${H('post-request', 'Post a request')}</a>` : ''}</div>`}
     </section>
 
     <section class="section" aria-labelledby="qHead">
-      <h2 id="qHead">Questions from classmates</h2>
-      <p class="hint">Ask about this course in the Feed. Tutors who passed it can answer.</p>
-      ${posts.length ? `<div class="qs">${posts.map(qCard).join('')}</div>` : '<div class="empty">No questions yet.</div>'}
-      <div style="margin-top:.85rem"><a class="btn ghost" href="${__safeUrl(askHref)}">Ask a question</a></div>
+      <h2 id="qHead">${H('q-head', 'Questions from classmates')}</h2>
+      <p class="hint">${H('q-hint', 'Ask about this course in the Feed. Tutors who passed it can answer.')}</p>
+      ${posts.length ? `<div class="qs">${posts.map(qCard).join('')}</div>` : '<div class="empty">' + H('no-questions', 'No questions yet.') + '</div>'}
+      <div style="margin-top:.85rem"><a class="btn ghost" href="${__safeUrl(askHref)}">${H('ask', 'Ask a question')}</a></div>
     </section>`;
 
   const fb = document.getElementById('followBtn');
@@ -285,18 +294,18 @@ async function toggleFollow() {
     ? await _sb.from('course_follows').delete().eq('user_id', me).eq('course_key', KEY)
     : await _sb.from('course_follows').insert({ user_id: me, course_code: label });
   btn.disabled = false;
-  if (res.error) { msg.textContent = 'That didn’t work. Please try again.'; return; }
+  if (res.error) { msg.textContent = T('follow-failed', 'That didn’t work. Please try again.'); return; }
   following = !following;
   const n = Math.max(0, Number(btn.dataset.count) + (following ? 1 : -1));
   btn.dataset.count = n;
   btn.setAttribute('aria-pressed', following);
-  btn.textContent = following ? 'Following' : 'Follow course';
-  document.getElementById('followerPill').textContent = plural(n, 'follower', 'followers');
+  btn.textContent = following ? T('following', 'Following') : T('follow', 'Follow course');
+  document.getElementById('followerPill').textContent = NON_EN ? T('n-followers', { one: '{{count}} follower', other: '{{count}} followers' }, { count: n }) : plural(n, 'follower', 'followers');
   window.usTrack && usTrack(following ? 'course_follow' : 'course_unfollow', { course: KEY });
 }
 
 load().catch(() => {
-  document.getElementById('content').innerHTML = '<div class="empty">Could not load this course. Please refresh the page or try again in a moment.</div>';
+  document.getElementById('content').innerHTML = '<div class="empty">' + H('load-failed', 'Could not load this course. Please refresh the page or try again in a moment.') + '</div>';
 });
 </script>
 </body>
