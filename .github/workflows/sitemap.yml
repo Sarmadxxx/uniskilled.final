@@ -26,6 +26,9 @@ jobs:
         with:
           node-version: '22'
 
+      # The sitemap uses the website build's own check of which pages are translated (needs its packages)
+      - run: npm ci
+
       - name: Generate sitemap.xml
         run: node scripts/build-sitemap.mjs
 

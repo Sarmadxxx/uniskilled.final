@@ -197,8 +197,8 @@ export function build({ site, preview = false, root = ROOT, log = console.log })
     const out = stripMarkers(src);
     if (out !== src) { writeFileSync(p, out); englishChanged++; }
   }
-  // 2) Other languages
-  const report = {};
+  // 2) Other languages (all translated first, then written, so each page can list its language versions)
+  const report = {}, built = [];
   for (const L of conf.languages) {
     if (L.code === conf.default) continue;
     // Languages not live yet are built too (noindex, not linked) so they can be reviewed at their real address.
@@ -217,12 +217,39 @@ export function build({ site, preview = false, root = ROOT, log = console.log })
       if (r.missing.length) { skipped[p] = r.missing; continue; }
       ready.add(p); results[p] = r.html;
     }
+    built.push({ L, ready, results, skipped });
+  }
+  for (const { L, ready, results, skipped } of built) {
+    if (L.live) for (const p of ready) {
+      const langs = [conf.default, ...built.filter(b => b.L.live && b.ready.has(p)).map(b => b.L.code)];
+      results[p] = seoTags(results[p], { lang: L.code, page: p, langs, def: conf.default });
+    }
     writeLanguage({ site, lang: L.code, dir: L.dir, pages, ready, results, shared });
     report[L.code] = { live: !!L.live, pages: [...ready], skipped };
     log(`${L.code}: ${ready.size} page(s) written${L.live ? '' : ' (hidden, noindex)'}; ${Object.keys(skipped).length} skipped for missing text`);
   }
   log(`en: ${englishChanged} page(s) had markers removed; every English file is otherwise untouched`);
   return report;
+}
+
+// ---------- search engines: canonical + hreflang on translated pages ---------------------------
+const SITE_URL = 'https://uniskilled.com';
+/** The public address of a page in a language: /ar/find-tutors.html, and /ar/ for the home page. */
+export function pageUrl(lang, page, def = 'en') {
+  return SITE_URL + (lang === def ? '' : '/' + lang) + '/' + (page === 'index.html' ? '' : page);
+}
+/** On a translated page that names an English canonical address for itself, point the canonical and
+ *  og:url at the translated address and list every live language version (+ x-default = English).
+ *  English pages are not changed: their language links are in sitemap.xml (Google reads either). */
+export function seoTags(html, { lang, page, langs, def = 'en' }) {
+  const own = pageUrl(def, page, def);
+  const canon = new RegExp(`<link rel="canonical" href="${own.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}">`);
+  if (!canon.test(html)) return html;
+  const alts = [...langs.map(l => `<link rel="alternate" hreflang="${l}" href="${pageUrl(l, page, def)}">`),
+    `<link rel="alternate" hreflang="x-default" href="${own}">`].join('\n');
+  return html
+    .replace(canon, `<link rel="canonical" href="${pageUrl(lang, page, def)}">\n${alts}`)
+    .replace(new RegExp(`(<meta property="og:url" content=")${own.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(">)`), `$1${pageUrl(lang, page, def)}$2`);
 }
 
 /** Files a language folder needs besides its pages: a copy of every shared file (scripts, images,

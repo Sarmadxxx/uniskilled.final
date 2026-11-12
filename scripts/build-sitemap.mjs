@@ -9,9 +9,14 @@
  *
  * Only public data is read, with the same publishable (anon) key every page already ships.
  * Suspended tutors are excluded automatically (public_tutors filters them out).
+ *
+ * Languages: every page that is fully translated in a live language (locales/languages.json) is
+ * listed in each language, with <xhtml:link hreflang> links between the versions (+ x-default =
+ * English). The same check as the website build decides whether a translated page exists.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
+import { loadLanguages, loadDictionary, translatePage, pageScriptKeys, pageUrl } from './build-locales.mjs';
 
 const SITE = 'https://uniskilled.com';
 const SUPABASE_URL = 'https://orghkbbohnabcietidiv.supabase.co';
@@ -85,19 +90,45 @@ async function loadCourses() {
 }
 const courses = await loadCourses();
 
-const urls = STATIC_PAGES.map(p => {
+// Which live languages each page exists in (fully translated), always English first.
+const conf = loadLanguages();
+const live = conf.languages.filter(l => l.live && l.code !== conf.default);
+const dicts = Object.fromEntries(live.map(l => [l.code, loadDictionary(l.code)]));
+const langsCache = {};
+export function languagesOf(file) {
+  if (langsCache[file]) return langsCache[file];
+  const src = readFileSync(file, 'utf8');
+  const out = [conf.default];
+  if (/\sdata-i18n(?:-attr)?="/.test(src)) for (const l of live) {
+    const r = translatePage(src, dicts[l.code], { lang: l.code, dir: l.dir, inlineKeys: pageScriptKeys(l.code, file, src) });
+    if (!r.missing.length) out.push(l.code);
+  }
+  return (langsCache[file] = out);
+}
+
+// One <url> per language version, each listing all versions (Google needs the full set on every entry).
+function entries(file, query, tail) {
+  const langs = languagesOf(file);
+  const at = l => esc(pageUrl(l, file, conf.default) + query);
+  const links = langs.length > 1
+    ? langs.map(l => `<xhtml:link rel="alternate" hreflang="${l}" href="${at(l)}"/>`).join('') + `<xhtml:link rel="alternate" hreflang="x-default" href="${at(conf.default)}"/>`
+    : '';
+  return langs.map(l => `  <url><loc>${at(l)}</loc>${links}${tail}</url>`);
+}
+
+const urls = STATIC_PAGES.flatMap(p => {
   const lm = lastCommitDate(p.file);
-  return `  <url><loc>${SITE}${p.path}</loc>${lm ? `<lastmod>${lm}</lastmod>` : ''}<changefreq>${p.changefreq}</changefreq><priority>${p.priority}</priority></url>`;
-}).concat(tutors.map(t =>
-  `  <url><loc>${esc(`${SITE}/tutor-profile.html?id=${encodeURIComponent(t.id)}`)}</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>`
-)).concat(courses.map(k =>
-  `  <url><loc>${esc(`${SITE}/course.html?c=${encodeURIComponent(k)}`)}</loc><changefreq>weekly</changefreq><priority>0.6</priority></url>`
+  return entries(p.file, '', `${lm ? `<lastmod>${lm}</lastmod>` : ''}<changefreq>${p.changefreq}</changefreq><priority>${p.priority}</priority>`);
+}).concat(tutors.flatMap(t =>
+  entries('tutor-profile.html', `?id=${encodeURIComponent(t.id)}`, '<changefreq>weekly</changefreq><priority>0.7</priority>')
+)).concat(courses.flatMap(k =>
+  entries('course.html', `?c=${encodeURIComponent(k)}`, '<changefreq>weekly</changefreq><priority>0.6</priority>')
 ));
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 ${urls.join('\n')}
 </urlset>
 `;
 writeFileSync('sitemap.xml', xml);
-console.log(`sitemap.xml: ${STATIC_PAGES.length} pages + ${tutors.length} tutor profile(s) + ${courses.length} course page(s)`);
+console.log(`sitemap.xml: ${STATIC_PAGES.length} pages + ${tutors.length} tutor profile(s) + ${courses.length} course page(s); ${urls.length} addresses in ${[conf.default, ...live.map(l => l.code)].join(', ')}`);
