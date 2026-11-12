@@ -202,7 +202,8 @@
 .about-text, .profile-name, .cert-name, .usk-title, .usk-body,
 .review-item div[style*="pre-wrap"], .review-item > div:first-child > span:first-child,
 .msg-text, .conv-name, .conv-preview, #activeChatName, .quote span, #replySnippet, .att-file .fn, #msgInput,
-#pjMeta b, #remoteName, #topTitle, #topSub, .file .fname, #msgs .who, #chatInput, #comment, #privateNote, .q .q-text {
+#pjMeta b, #remoteName, #topTitle, #topSub, .file .fname, #msgs .who, #chatInput, #comment, #privateNote, .q .q-text,
+.post-content, .reply-text, #postInput, #shareInput, .reply-compose input {
   unicode-bidi: plaintext;
 }
 
@@ -217,4 +218,4 @@
 header.top p { direction: rtl !important; unicode-bidi: isolate !important; }
 
 /* The simple top bar keeps the logo on the left; its back link still reads right to left (arrow first, on the right). */
-#navBackLink, nav > a.nav-link[href$="dashboard.html"] { direction: rtl; unicode-bidi: isolate; }
+#navBackLink, nav > a.nav-link[href$="dashboard.html"], .nav-right > a[href$="dashboard.html"] { direction: rtl; unicode-bidi: isolate; }

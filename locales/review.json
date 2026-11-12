@@ -71,6 +71,9 @@
     },
     "page.course": {
       "ar": "reviewed"
+    },
+    "page.feed": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
