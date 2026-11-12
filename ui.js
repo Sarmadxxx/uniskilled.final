@@ -47,7 +47,7 @@
     p.textContent = String(message == null ? '' : message);
     var x = document.createElement('button');
     x.type = 'button';
-    x.setAttribute('aria-label', 'Dismiss');
+    x.setAttribute('aria-label', window.I18N ? I18N.t('notify.dismiss', 'Dismiss') : 'Dismiss');
     x.textContent = '×';
     x.onclick = function () { t.remove(); };
     t.appendChild(p); t.appendChild(x);

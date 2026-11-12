@@ -62,6 +62,9 @@
     },
     "page.calendar": {
       "ar": "reviewed"
+    },
+    "page.manage-availability": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
