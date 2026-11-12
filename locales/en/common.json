@@ -347,5 +347,11 @@
   "server.this-lesson-isn-t-confirmed-yet-the-classroom-opens-once-it-has-been-paid": "This lesson isn't confirmed yet. The classroom opens once it has been paid.",
   "server.this-lesson-is-no-longer-active-so-its-classroom-is-closed": "This lesson is no longer active, so its classroom is closed.",
   "server.this-lesson-has-ended-so-its-classroom-is-closed": "This lesson has ended, so its classroom is closed.",
-  "server.the-classroom-could-not-be-opened-please-try-again": "The classroom could not be opened. Please try again."
+  "server.the-classroom-could-not-be-opened-please-try-again": "The classroom could not be opened. Please try again.",
+  "server.please-sign-in-to-rate-your-lesson": "Please sign in to rate your lesson.",
+  "server.please-choose-1-to-5-stars": "Please choose 1 to 5 stars.",
+  "server.only-the-student-of-this-lesson-can-rate-it": "Only the student of this lesson can rate it.",
+  "server.this-lesson-can-t-be-rated-because-it-didn-t-take-place": "This lesson can't be rated because it didn't take place.",
+  "server.you-can-rate-this-lesson-once-it-has-taken-place": "You can rate this lesson once it has taken place.",
+  "server.reviews-can-be-changed-for-14-days-after-they-are-written": "Reviews can be changed for 14 days after they are written."
 }

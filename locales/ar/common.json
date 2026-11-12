@@ -390,5 +390,11 @@
   "server.this-lesson-isn-t-confirmed-yet-the-classroom-opens-once-it-has-been-paid": "لم يُؤكَّد هذا الدرس بعد. يُفتح الفصل الدراسي بعد إتمام الدفع.",
   "server.this-lesson-is-no-longer-active-so-its-classroom-is-closed": "لم يعد هذا الدرس قائماً، لذا أُغلق فصله الدراسي.",
   "server.this-lesson-has-ended-so-its-classroom-is-closed": "انتهى هذا الدرس، لذا أُغلق فصله الدراسي.",
-  "server.the-classroom-could-not-be-opened-please-try-again": "تعذّر فتح الفصل الدراسي. يُرجى المحاولة مرة أخرى."
+  "server.the-classroom-could-not-be-opened-please-try-again": "تعذّر فتح الفصل الدراسي. يُرجى المحاولة مرة أخرى.",
+  "server.please-sign-in-to-rate-your-lesson": "يُرجى تسجيل الدخول لتقييم درسك.",
+  "server.please-choose-1-to-5-stars": "يُرجى اختيار من نجمة إلى 5 نجوم.",
+  "server.only-the-student-of-this-lesson-can-rate-it": "لا يمكن تقييم هذا الدرس إلا من قِبل طالبه.",
+  "server.this-lesson-can-t-be-rated-because-it-didn-t-take-place": "لا يمكن تقييم هذا الدرس لأنه لم يُعقد.",
+  "server.you-can-rate-this-lesson-once-it-has-taken-place": "يمكنك تقييم هذا الدرس بعد انعقاده.",
+  "server.reviews-can-be-changed-for-14-days-after-they-are-written": "يمكن تعديل التقييمات خلال 14 يوماً من كتابتها."
 }

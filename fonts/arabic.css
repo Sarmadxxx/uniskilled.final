@@ -202,7 +202,7 @@
 .about-text, .profile-name, .cert-name, .usk-title, .usk-body,
 .review-item div[style*="pre-wrap"], .review-item > div:first-child > span:first-child,
 .msg-text, .conv-name, .conv-preview, #activeChatName, .quote span, #replySnippet, .att-file .fn, #msgInput,
-#pjMeta b, #remoteName, #topTitle, #topSub, .file .fname, #msgs .who, #chatInput {
+#pjMeta b, #remoteName, #topTitle, #topSub, .file .fname, #msgs .who, #chatInput, #comment, #privateNote {
   unicode-bidi: plaintext;
 }
 
