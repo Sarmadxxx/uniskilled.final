@@ -284,10 +284,11 @@ document.getElementById('forgotLink').addEventListener('click', async (e) => {
     return;
   }
   const { error } = await _supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://uniskilled.com/reset-password.html'
+    // The reset link opens the reset page in the visitor's language (English unchanged)
+    redirectTo: 'https://uniskilled.com' + (window.I18N && I18N.lang && I18N.lang !== 'en' ? '/' + I18N.lang : '') + '/reset-password.html'
   });
   if (error) {
-    showAlert(error.message, 'error');
+    showAlert(window.I18N ? I18N.server(error.message) : error.message, 'error');
   } else {
     showAlert(T('reset-sent', 'Password reset email sent! Check your inbox.'), 'success');
   }
