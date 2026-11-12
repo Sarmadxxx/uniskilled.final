@@ -214,18 +214,18 @@
         if (typeof e.data !== 'string') { this.onFileChunk(e.data); return; }
         try {
           const m = JSON.parse(e.data);
-          if (m.t === 'chat') this.emit('chat', { from: this.peer?.name || 'Them', text: String(m.text).slice(0, 2000), at: Date.now(), mine: false });
+          if (m.t === 'chat') this.emit('chat', { from: this.peer?.name || tx('them', 'Them'), text: String(m.text).slice(0, 2000), at: Date.now(), mine: false });
           if (m.t === 'media') this.emit('peer-media', { mic: !!m.mic, cam: !!m.cam, screen: !!m.screen });
           if (m.t === 'file') {
             const size = Number(m.size);
             if (!(size > 0 && size <= MAX_FILE)) { this.incoming = null; return; }
             this.incoming = { id: String(m.id), name: String(m.name || 'file').slice(0, 200), size, mime: String(m.mime || ''), parts: [], got: 0, lastPct: 0 };
-            this.emit('file-progress', { id: this.incoming.id, name: this.incoming.name, size, done: 0, mine: false, from: this.peer?.name || 'Them' });
+            this.emit('file-progress', { id: this.incoming.id, name: this.incoming.name, size, done: 0, mine: false, from: this.peer?.name || tx('them', 'Them') });
           }
           if (m.t === 'file-end' && this.incoming && this.incoming.id === String(m.id)) {
             const f = this.incoming; this.incoming = null;
             if (f.got !== f.size) { this.emit('file-failed', { id: f.id, mine: false }); return; }
-            this.emit('file', { id: f.id, name: f.name, size: f.size, mime: f.mime, blob: new Blob(f.parts, { type: safeMime(f.mime) }), mine: false, from: this.peer?.name || 'Them' });
+            this.emit('file', { id: f.id, name: f.name, size: f.size, mime: f.mime, blob: new Blob(f.parts, { type: safeMime(f.mime) }), mine: false, from: this.peer?.name || tx('them', 'Them') });
           }
         } catch (err) {}
       };
@@ -286,7 +286,7 @@
         case 'hello':
         case 'hello-ack': {
           const isNew = !this.peer || this.peer.peerId !== m.from;
-          this.peer = { peerId: m.from, name: m.name || 'Guest', role: m.role || '' };
+          this.peer = { peerId: m.from, name: m.name || tx('guest', 'Guest'), role: m.role || '' };
           this.lastPeerSeen = Date.now();
           if (isNew) this.emit('peer-joined', this.peer);
           if (m.type === 'hello') {
@@ -371,7 +371,7 @@
 
     async toggleScreen() {
       if (this.screen) { this.stopScreen(); return false; }
-      if (!navigator.mediaDevices.getDisplayMedia) { this.emit('error', { code: 'no-screen', message: 'Screen sharing isn\'t supported on this device.' }); return false; }
+      if (!navigator.mediaDevices.getDisplayMedia) { this.emit('error', { code: 'no-screen', message: tx('no-screen', 'Screen sharing isn\'t supported on this device.') }); return false; }
       try { this.screen = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false }); }
       catch (e) { return false; }
       const track = this.screen.getVideoTracks()[0];
@@ -408,10 +408,10 @@
 
     // Send a file directly to the other person (nothing is stored on a server).
     sendFile(file) {
-      if (!file) return { ok: false, error: 'No file selected.' };
-      if (file.size > MAX_FILE) return { ok: false, error: 'Files can be up to 25 MB.' };
-      if (file.size === 0) return { ok: false, error: 'That file is empty.' };
-      if (!this.chat || this.chat.readyState !== 'open') return { ok: false, error: 'You can share files once you\'re connected.' };
+      if (!file) return { ok: false, error: tx('no-file', 'No file selected.') };
+      if (file.size > MAX_FILE) return { ok: false, error: tx('max-file', 'Files can be up to 25 MB.') };
+      if (file.size === 0) return { ok: false, error: tx('empty-file', 'That file is empty.') };
+      if (!this.chat || this.chat.readyState !== 'open') return { ok: false, error: tx('files-later', 'You can share files once you\'re connected.') };
       const id = rid();
       this.sendQueue = (this.sendQueue || Promise.resolve()).then(() => this._sendFile(id, file)).catch((e) => {
         console.error('file send failed', e); this.emit('file-failed', { id, mine: true });
@@ -482,7 +482,16 @@
     return /^(image\/(png|jpeg|gif|webp)|application\/pdf|text\/plain)$/.test(m) ? m : 'application/octet-stream';
   }
 
+  // On a non-English page, the same messages in the page's language (locales/*/page.classroom.json).
+  const tx = (k, en) => (window.I18N && I18N.lang && I18N.lang !== 'en' ? I18N.t('classroom.js.' + k, en) : en);
+
   function mediaErrorText(e, noCam, noMic) {
+    const en = mediaErrorEnglish(e, noCam, noMic);
+    const n = e && e.name, w = noCam && noMic ? 'both' : noCam ? 'cam' : 'mic';
+    const kind = n === 'Unsupported' ? 'unsupported' : (n === 'NotAllowedError' || n === 'SecurityError') ? 'blocked' : (n === 'NotReadableError' || n === 'AbortError') ? 'busy' : (n === 'NotFoundError' || n === 'OverconstrainedError') ? 'missing' : 'failed';
+    return tx(kind === 'unsupported' ? 'media-unsupported' : 'media-' + kind + '-' + w, en);
+  }
+  function mediaErrorEnglish(e, noCam, noMic) {
     const n = e && e.name;
     const what = noCam && noMic ? 'camera and microphone' : noCam ? 'camera' : 'microphone';
     if (n === 'Unsupported') return 'This browser can\'t use a camera or microphone here. Please open the lesson in Safari or Chrome (not inside another app).';

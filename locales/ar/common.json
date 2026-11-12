@@ -380,5 +380,14 @@
   "server.that-code-isn-t-right-1-attempt-left": "هذا الرمز غير صحيح. متبقٍّ محاولة واحدة.",
   "server.that-code-isn-t-right-2-attempts-left": "هذا الرمز غير صحيح. متبقٍّ محاولتان.",
   "server.that-code-isn-t-right-3-attempts-left": "هذا الرمز غير صحيح. متبقٍّ 3 محاولات.",
-  "server.that-code-isn-t-right-4-attempts-left": "هذا الرمز غير صحيح. متبقٍّ 4 محاولات."
+  "server.that-code-isn-t-right-4-attempts-left": "هذا الرمز غير صحيح. متبقٍّ 4 محاولات.",
+  "server.please-sign-in-to-join-your-lesson": "يُرجى تسجيل الدخول للانضمام إلى درسك.",
+  "server.your-login-has-expired-please-sign-in-again": "انتهت صلاحية تسجيل دخولك. يُرجى تسجيل الدخول مرة أخرى.",
+  "server.this-classroom-link-is-not-valid": "رابط الفصل الدراسي هذا غير صالح.",
+  "server.this-lesson-could-not-be-found": "تعذّر العثور على هذا الدرس.",
+  "server.you-are-not-part-of-this-lesson": "لست طرفاً في هذا الدرس.",
+  "server.this-lesson-isn-t-confirmed-yet-the-classroom-opens-once-it-has-been-paid": "لم يُؤكَّد هذا الدرس بعد. يُفتح الفصل الدراسي بعد إتمام الدفع.",
+  "server.this-lesson-is-no-longer-active-so-its-classroom-is-closed": "لم يعد هذا الدرس قائماً، لذا أُغلق فصله الدراسي.",
+  "server.this-lesson-has-ended-so-its-classroom-is-closed": "انتهى هذا الدرس، لذا أُغلق فصله الدراسي.",
+  "server.the-classroom-could-not-be-opened-please-try-again": "تعذّر فتح الفصل الدراسي. يُرجى المحاولة مرة أخرى."
 }

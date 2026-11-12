@@ -201,7 +201,8 @@
    Arabic pages only: this file is never loaded on English pages. */
 .about-text, .profile-name, .cert-name, .usk-title, .usk-body,
 .review-item div[style*="pre-wrap"], .review-item > div:first-child > span:first-child,
-.msg-text, .conv-name, .conv-preview, #activeChatName, .quote span, #replySnippet, .att-file .fn, #msgInput {
+.msg-text, .conv-name, .conv-preview, #activeChatName, .quote span, #replySnippet, .att-file .fn, #msgInput,
+#pjMeta b, #remoteName, #topTitle, #topSub, .file .fname, #msgs .who, #chatInput {
   unicode-bidi: plaintext;
 }
 

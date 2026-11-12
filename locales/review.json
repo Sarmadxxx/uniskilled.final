@@ -56,6 +56,9 @@
     },
     "page.messages": {
       "ar": "reviewed"
+    },
+    "page.classroom": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
