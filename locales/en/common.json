@@ -337,5 +337,14 @@
   "server.that-code-isn-t-right-1-attempt-left": "That code isn't right. 1 attempt left.",
   "server.that-code-isn-t-right-2-attempts-left": "That code isn't right. 2 attempts left.",
   "server.that-code-isn-t-right-3-attempts-left": "That code isn't right. 3 attempts left.",
-  "server.that-code-isn-t-right-4-attempts-left": "That code isn't right. 4 attempts left."
+  "server.that-code-isn-t-right-4-attempts-left": "That code isn't right. 4 attempts left.",
+  "server.please-sign-in-to-join-your-lesson": "Please sign in to join your lesson.",
+  "server.your-login-has-expired-please-sign-in-again": "Your login has expired. Please sign in again.",
+  "server.this-classroom-link-is-not-valid": "This classroom link is not valid.",
+  "server.this-lesson-could-not-be-found": "This lesson could not be found.",
+  "server.you-are-not-part-of-this-lesson": "You are not part of this lesson.",
+  "server.this-lesson-isn-t-confirmed-yet-the-classroom-opens-once-it-has-been-paid": "This lesson isn't confirmed yet. The classroom opens once it has been paid.",
+  "server.this-lesson-is-no-longer-active-so-its-classroom-is-closed": "This lesson is no longer active, so its classroom is closed.",
+  "server.this-lesson-has-ended-so-its-classroom-is-closed": "This lesson has ended, so its classroom is closed.",
+  "server.the-classroom-could-not-be-opened-please-try-again": "The classroom could not be opened. Please try again."
 }
