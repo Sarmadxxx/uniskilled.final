@@ -1,0 +1,1 @@
+{{ if eq (printf "%v" .Data.ui_locale) "ar" }}مرحباً بك في UniSkilled — يُرجى تأكيد بريدك الإلكتروني{{ else }}Welcome to UniSkilled — Please confirm your email{{ end }}

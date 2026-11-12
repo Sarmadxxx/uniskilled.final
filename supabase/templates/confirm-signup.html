@@ -1,0 +1,39 @@
+{{ if eq (printf "%v" .Data.ui_locale) "ar" }}<div dir="rtl" lang="ar" style="font-family:Tahoma,'Segoe UI','Helvetica Neue',Arial,sans-serif;max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;text-align:right;">
+  <div style="background:linear-gradient(135deg,#0f2460 0%,#1a6bff 100%);padding:40px;text-align:center;">
+    <div style="width:44px;height:44px;background:rgba(255,255,255,0.2);border-radius:12px;display:inline-block;margin-bottom:16px;line-height:44px;text-align:center;">
+      <span style="color:#fff;font-size:1.3rem;font-weight:800;">U</span>
+    </div>
+    <h1 dir="ltr" style="color:#ffffff;font-size:1.5rem;font-weight:800;margin:0;">UniSkilled</h1>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:6px 0 0;">منصة طلابية موثَّقة جامعياً</p>
+  </div>
+  <div style="padding:40px;">
+    <h2 style="font-size:1.4rem;font-weight:800;color:#111827;margin:0 0 12px;">أهلاً بك! أكّد بريدك الإلكتروني 🎉</h2>
+    <p style="color:#6b7280;font-size:0.95rem;line-height:1.9;margin:0 0 28px;">خطوة واحدة تفصلك عن الانضمام إلى أول منصة طلابية موثَّقة جامعياً في العالم. اضغط على الزر أدناه لتأكيد بريدك الإلكتروني وتفعيل حسابك.</p>
+    <div style="text-align:center;margin-bottom:28px;">
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#1a6bff;color:#ffffff;font-weight:700;font-size:0.95rem;padding:14px 36px;border-radius:10px;text-decoration:none;">تأكيد بريدي الإلكتروني ←</a>
+    </div>
+    <p style="color:#9ca3af;font-size:0.82rem;line-height:1.8;margin:0;">إذا لم تُنشئ حساباً على UniSkilled، يمكنك تجاهل هذه الرسالة بأمان. تنتهي صلاحية هذا الرابط خلال 24 ساعة.</p>
+  </div>
+  <div style="background:#f9fafb;padding:20px 40px;border-top:1px solid #e5e7eb;text-align:center;">
+    <p dir="ltr" style="color:#9ca3af;font-size:0.78rem;margin:0;">© 2025 UniSkilled · <a href="https://uniskilled.com/ar/" style="color:#1a6bff;text-decoration:none;">uniskilled.com</a></p>
+  </div>
+</div>{{ else }}<div style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:560px;margin:0 auto;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e5e7eb;">
+  <div style="background:linear-gradient(135deg,#0f2460 0%,#1a6bff 100%);padding:40px;text-align:center;">
+    <div style="width:44px;height:44px;background:rgba(255,255,255,0.2);border-radius:12px;display:inline-block;margin-bottom:16px;line-height:44px;text-align:center;">
+      <span style="color:#fff;font-size:1.3rem;font-weight:800;">U</span>
+    </div>
+    <h1 style="color:#ffffff;font-size:1.5rem;font-weight:800;margin:0;">UniSkilled</h1>
+    <p style="color:rgba(255,255,255,0.6);font-size:0.85rem;margin:6px 0 0;">University Verified Student Marketplace</p>
+  </div>
+  <div style="padding:40px;">
+    <h2 style="font-size:1.4rem;font-weight:800;color:#111827;margin:0 0 12px;">Welcome! Confirm your email 🎉</h2>
+    <p style="color:#6b7280;font-size:0.95rem;line-height:1.7;margin:0 0 28px;">You're one step away from joining the world's first university-verified student marketplace. Click the button below to confirm your email and activate your account.</p>
+    <div style="text-align:center;margin-bottom:28px;">
+      <a href="{{ .ConfirmationURL }}" style="display:inline-block;background:#1a6bff;color:#ffffff;font-weight:700;font-size:0.95rem;padding:14px 36px;border-radius:10px;text-decoration:none;">Confirm my email →</a>
+    </div>
+    <p style="color:#9ca3af;font-size:0.82rem;line-height:1.6;margin:0;">If you didn't create an account on UniSkilled, you can safely ignore this email. This link expires in 24 hours.</p>
+  </div>
+  <div style="background:#f9fafb;padding:20px 40px;border-top:1px solid #e5e7eb;text-align:center;">
+    <p style="color:#9ca3af;font-size:0.78rem;margin:0;">© 2025 UniSkilled · <a href="https://uniskilled.com" style="color:#1a6bff;text-decoration:none;">uniskilled.com</a></p>
+  </div>
+</div>{{ end }}
