@@ -59,6 +59,9 @@
     },
     "page.classroom": {
       "ar": "reviewed"
+    },
+    "page.calendar": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {

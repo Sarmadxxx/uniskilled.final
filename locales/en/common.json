@@ -18,6 +18,7 @@
   "nav.main": "Main",
   "nav.mainMenu": "Main menu",
   "nav.openMenu": "Open menu",
+  "nav.backToDashboard": "← Back to Dashboard",
   "nav.closeMenu": "Close menu",
   "nav.role.student": "Student account",
   "nav.role.tutor": "Tutor account",
