@@ -16,4 +16,5 @@ sign-up (`user_metadata.ui_locale`, only on non-English pages), and the template
     {{ if eq (printf "%v" .Data.ui_locale) "ar" }} …Arabic… {{ else }} …English, unchanged… {{ end }}
 
 `printf "%v"` keeps this safe when an account has no language saved (it renders English).
-The English branch is byte-for-byte the template that was live before Arabic was added.
+The English branch is the template that was live before Arabic was added, with only the footer year
+updated from © 2025 to © 2026.
