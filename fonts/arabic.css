@@ -203,7 +203,8 @@
 .review-item div[style*="pre-wrap"], .review-item > div:first-child > span:first-child,
 .msg-text, .conv-name, .conv-preview, #activeChatName, .quote span, #replySnippet, .att-file .fn, #msgInput,
 #pjMeta b, #remoteName, #topTitle, #topSub, .file .fname, #msgs .who, #chatInput, #comment, #privateNote, .q .q-text,
-.post-content, .reply-text, #postInput, #shareInput, .reply-compose input {
+.post-content, .reply-text, #postInput, #shareInput, .reply-compose input,
+.exam-title, #fTitle, #fTopics, .task .t > span {
   unicode-bidi: plaintext;
 }
 
