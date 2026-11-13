@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261101">
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
-<title>Exam planner — UniSkilled</title>
+<title data-i18n="exam-planner.title">Exam planner — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -95,49 +95,49 @@ fieldset{border:0;}
 <script src="analytics.js" defer></script>
 </head>
 <body>
-<a class="skip-link" href="#main">Skip to content</a>
+<a data-i18n="exam-planner.skip-to-content" class="skip-link" href="#main">Skip to content</a>
 <header id="site-nav" data-nav="app"></header>
 <script src="site-nav.js"></script>
 
 <main class="page" id="main">
-  <div class="crumb"><a href="student-dashboard.html">← Dashboard</a></div>
+  <div data-i18n="exam-planner.dashboard" class="crumb"><a href="student-dashboard.html">← Dashboard</a></div>
   <div class="top">
     <div>
-      <h1 class="page-title">Exam planner</h1>
-      <p class="page-sub">Add an exam and the topics it covers. You get a day-by-day revision plan up to the exam date, and you can change it any time.</p>
+      <h1 data-i18n="exam-planner.exam-planner" class="page-title">Exam planner</h1>
+      <p data-i18n="exam-planner.add-an-exam-and" class="page-sub">Add an exam and the topics it covers. You get a day-by-day revision plan up to the exam date, and you can change it any time.</p>
     </div>
-    <button type="button" class="btn primary" id="addBtn" hidden>Add an exam</button>
+    <button data-i18n="exam-planner.add-an-exam" type="button" class="btn primary" id="addBtn" hidden>Add an exam</button>
   </div>
 
   <div id="suggest"></div>
 
   <section class="card" id="formCard" hidden aria-labelledby="formTitle">
-    <h2 id="formTitle" style="font-size:1.05rem;font-weight:800;margin-bottom:1rem">Add an exam</h2>
+    <h2 data-i18n="exam-planner.add-an-exam-2" id="formTitle" style="font-size:1.05rem;font-weight:800;margin-bottom:1rem">Add an exam</h2>
     <form id="examForm" novalidate>
       <div class="row two">
         <div class="field">
-          <label for="fTitle">Exam</label>
-          <input id="fTitle" maxlength="120" placeholder="e.g. Calculus I final" required>
+          <label data-i18n="exam-planner.exam" for="fTitle">Exam</label>
+          <input data-i18n-attr="placeholder:exam-planner.eg-calculus-i-final.placeholder" id="fTitle" maxlength="120" placeholder="e.g. Calculus I final" required>
         </div>
         <div class="field">
-          <label for="fCode">Course code <span class="opt">(optional)</span></label>
-          <input id="fCode" maxlength="60" placeholder="e.g. MATH 101">
+          <label data-i18n="exam-planner.course-code-optional" for="fCode">Course code <span class="opt">(optional)</span></label>
+          <input data-i18n-attr="placeholder:exam-planner.eg-math-101.placeholder" id="fCode" maxlength="60" placeholder="e.g. MATH 101">
         </div>
       </div>
-      <div class="field" style="max-width:260px">
+      <div data-i18n="exam-planner.exam-date" class="field" style="max-width:260px">
         <label for="fDate">Exam date</label>
         <input id="fDate" type="date" required>
       </div>
       <div class="field">
-        <label for="fTopics">Topics, one per line, in the order you want to learn them</label>
-        <textarea id="fTopics" placeholder="Limits&#10;Derivatives&#10;Integrals"></textarea>
-        <span class="help">Up to 30 topics. Your lecture slides or the syllabus are a good place to find them.</span>
+        <label data-i18n="exam-planner.topics-one-per-line" for="fTopics">Topics, one per line, in the order you want to learn them</label>
+        <textarea data-i18n-attr="placeholder:exam-planner.limits-derivatives-integrals.placeholder" id="fTopics" placeholder="Limits&#10;Derivatives&#10;Integrals"></textarea>
+        <span data-i18n="exam-planner.up-to-30-topics" class="help">Up to 30 topics. Your lecture slides or the syllabus are a good place to find them.</span>
       </div>
       <fieldset class="field">
-        <legend>Days I can study</legend>
+        <legend data-i18n="exam-planner.days-i-can-study">Days I can study</legend>
         <div class="days" id="fDays"></div>
       </fieldset>
-      <div class="form-actions">
+      <div data-i18n="exam-planner.create-my-plan-cancel" class="form-actions">
         <button type="submit" class="btn primary" id="saveBtn">Create my plan</button>
         <button type="button" class="btn ghost" id="cancelBtn">Cancel</button>
         <span class="preview" id="preview" aria-live="polite"></span>
@@ -146,9 +146,9 @@ fieldset{border:0;}
     </form>
   </section>
 
-  <div id="exams"><div class="spinner" role="status" aria-label="Loading your exams"></div></div>
+  <div id="exams"><div data-i18n-attr="aria-label:exam-planner.loading-your-exams.arialabel" class="spinner" role="status" aria-label="Loading your exams"></div></div>
 
-  <p class="note">The plan is a suggestion to help you spread your revision. It doesn't predict your result. Your exams and plans are private to you.</p>
+  <p data-i18n="exam-planner.the-plan-is-a" class="note">The plan is a suggestion to help you spread your revision. It doesn't predict your result. Your exams and plans are private to you.</p>
 </main>
 
 <script>
@@ -158,8 +158,27 @@ function __friendlyDbError(err, fallback){var m=(err&&err.message)||'';if(!m||/r
 const _sb = window.supabase.createClient(USK_CONFIG.url, USK_CONFIG.anonKey, { realtime: { params: { eventsPerSecond: 0 } } });
 const { buildPlan, iso, parse } = window.UskExamPlan;
 const courseKey = s => String(s || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
-const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const KIND_LABEL = { learn: 'Learn', review: 'Review', practice: 'Practice' };
+// Text shown by this page's script, in the page's language (English unchanged; locales/*/page.exam-planner.json).
+function __pick(en, v) { return typeof en === 'object' ? (v && v.count === 1 ? en.one : en.other) : en; }
+function T(k, en, v) { return window.I18N ? I18N.t('exam-planner.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, (m, x) => (v && x in v ? v[x] : m)); }
+function H(k, en, v) { return window.I18N ? I18N.h('exam-planner.js.' + k, en, v) : __pick(en, v).replace(/\{\{(\w+)\}\}/g, (m, x) => (v && x in v ? __esc(v[x]) : m)); }
+const NON_EN = !!(window.I18N && I18N.lang && I18N.lang !== 'en');
+const __D = (d, o) => (NON_EN ? I18N.date(d, o) : d.toLocaleDateString([], o));
+const DAY_NAMES = NON_EN ? [1, 2, 3, 4, 5, 6, 7].map(i => I18N.date(new Date(2026, 10, 15 + i), { weekday: 'short' })) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const KIND_LABEL = { learn: T('k-learn', 'Learn'), review: T('k-review', 'Review'), practice: T('k-practice', 'Practice') };
+// The plan builder (exam-plan.js) and the saved practice tasks are in English; shown in the page's language.
+const PLAN_TEXT = NON_EN ? {
+  'Practice questions (all topics)': T('practice-all', 'Practice questions (all topics)'),
+  'Mock exam under timed conditions': T('mock-exam', 'Mock exam under timed conditions'),
+  'Add at least one topic.': T('e-topic', 'Add at least one topic.'),
+  'Use 30 topics or fewer. Group small ones together.': T('e-30', 'Use 30 topics or fewer. Group small ones together.'),
+  'Pick at least one day of the week to study.': T('e-days', 'Pick at least one day of the week to study.'),
+  'Choose the exam date.': T('e-date', 'Choose the exam date.'),
+  'The exam date needs to be after today.': T('e-past', 'The exam date needs to be after today.'),
+  'Choose an exam date within the next year.': T('e-year', 'Choose an exam date within the next year.'),
+  'There are no study days left before the exam on the days you picked. Add more days.': T('e-no-days', 'There are no study days left before the exam on the days you picked. Add more days.'),
+} : {};
+const PT = s => PLAN_TEXT[s] || s;
 
 let me = null, exams = [], tasksByExam = {}, editingId = null;
 const expanded = new Set();
@@ -168,9 +187,9 @@ const todayIso = () => iso(new Date());
 function dayLabel(d) {
   const t = todayIso();
   const tm = new Date(); tm.setDate(tm.getDate() + 1);
-  if (d === t) return 'Today';
-  if (d === iso(tm)) return 'Tomorrow';
-  return parse(d).toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' });
+  if (d === t) return T('today', 'Today');
+  if (d === iso(tm)) return T('tomorrow', 'Tomorrow');
+  return __D(parse(d), { weekday: 'short', day: 'numeric', month: 'short' });
 }
 function daysUntil(d) { return Math.round((parse(d) - parse(todayIso())) / 86400000); }
 
@@ -194,7 +213,7 @@ function updatePreview() {
   if (!f.date || !f.topics.length) { el.textContent = ''; return; }
   const learned = editingId ? learnedTopics(editingId) : [];
   const r = buildPlan({ topics: f.topics, examDate: f.date, studyDays: f.studyDays, learned });
-  el.textContent = r.ok ? `${r.tasks.length} tasks over ${r.days.length} study day${r.days.length === 1 ? '' : 's'}` : '';
+  el.textContent = r.ok ? (NON_EN ? T('preview', '{{tasks}} tasks over {{days}} study days', { tasks: r.tasks.length, days: r.days.length }) : `${r.tasks.length} tasks over ${r.days.length} study day${r.days.length === 1 ? '' : 's'}`) : '';
 }
 ['fDate', 'fTopics'].forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
 document.getElementById('fDays').addEventListener('change', updatePreview);
@@ -203,8 +222,8 @@ function openForm(prefill) {
   const card = document.getElementById('formCard');
   const p = prefill || {};
   editingId = p.id || null;
-  document.getElementById('formTitle').textContent = editingId ? 'Change exam' : 'Add an exam';
-  document.getElementById('saveBtn').textContent = editingId ? 'Update my plan' : 'Create my plan';
+  document.getElementById('formTitle').textContent = editingId ? T('change-exam', 'Change exam') : T('add-exam', 'Add an exam');
+  document.getElementById('saveBtn').textContent = editingId ? T('update-plan', 'Update my plan') : T('create-plan', 'Create my plan');
   document.getElementById('fTitle').value = p.title || '';
   document.getElementById('fCode').value = p.course_code || '';
   document.getElementById('fDate').value = p.exam_date || '';
@@ -239,11 +258,11 @@ document.getElementById('examForm').addEventListener('submit', async (e) => {
   const btn = document.getElementById('saveBtn');
   const f = readForm();
   err.textContent = '';
-  if (!f.title) { err.textContent = 'Give the exam a name.'; document.getElementById('fTitle').focus(); return; }
-  if (!f.date) { err.textContent = 'Choose the exam date.'; document.getElementById('fDate').focus(); return; }
+  if (!f.title) { err.textContent = T('e-name', 'Give the exam a name.'); document.getElementById('fTitle').focus(); return; }
+  if (!f.date) { err.textContent = T('e-date', 'Choose the exam date.'); document.getElementById('fDate').focus(); return; }
   const learned = editingId ? learnedTopics(editingId) : [];
   const plan = buildPlan({ topics: f.topics, examDate: f.date, studyDays: f.studyDays, learned });
-  if (!plan.ok) { err.textContent = plan.error; return; }
+  if (!plan.ok) { err.textContent = PT(plan.error); return; }
 
   btn.disabled = true;
   try {
@@ -270,7 +289,7 @@ document.getElementById('examForm').addEventListener('submit', async (e) => {
     expanded.add(examId);
     await loadAll();
   } catch (ex) {
-    err.textContent = __friendlyDbError(ex, 'Your plan couldn’t be saved. Please try again.');
+    err.textContent = NON_EN ? I18N.server(__friendlyDbError(ex, T('save-failed', 'Your plan couldn’t be saved. Please try again.'))) : __friendlyDbError(ex, 'Your plan couldn’t be saved. Please try again.');
   } finally {
     btn.disabled = false;
   }
@@ -279,9 +298,9 @@ document.getElementById('examForm').addEventListener('submit', async (e) => {
 // ── Exams list ───────────────────────────────────────────────────────────────────────────────
 function taskRow(t) {
   return `<div class="task${t.done_at ? ' done' : ''}">
-    <input type="checkbox" id="tk-${t.id}" data-task="${t.id}" ${t.done_at ? 'checked' : ''} aria-label="Done: ${__esc(KIND_LABEL[t.kind])} ${__esc(t.topic)}">
-    <label class="t" for="tk-${t.id}"><span><span class="kind ${t.kind}">${KIND_LABEL[t.kind]}</span>${__esc(t.topic)}</span><small>${__esc(dayLabel(t.day))}</small></label>
-    ${t.kind !== 'practice' ? `<button type="button" class="unsure-btn" data-unsure="${t.id}" aria-pressed="${t.unsure}">${t.unsure ? 'Still unsure' : 'Not sure yet?'}</button>` : ''}
+    <input type="checkbox" id="tk-${t.id}" data-task="${t.id}" ${t.done_at ? 'checked' : ''} aria-label="${H('done-aria', 'Done: {{kind}} {{topic}}', { kind: KIND_LABEL[t.kind], topic: PT(t.topic) })}">
+    <label class="t" for="tk-${t.id}"><span><span class="kind ${t.kind}">${KIND_LABEL[t.kind]}</span>${__esc(PT(t.topic))}</span><small>${__esc(dayLabel(t.day))}</small></label>
+    ${t.kind !== 'practice' ? `<button type="button" class="unsure-btn" data-unsure="${t.id}" aria-pressed="${t.unsure}">${t.unsure ? H('still-unsure', 'Still unsure') : H('not-sure', 'Not sure yet?')}</button>` : ''}
   </div>`;
 }
 
@@ -298,8 +317,8 @@ function examCard(x) {
   const upcoming = isOpen ? upcomingAll : upcomingAll.slice(0, 5);
   const unsure = [...new Set(tasks.filter(t => t.unsure).map(t => t.topic))];
   const courseHref = 'course.html?c=' + encodeURIComponent(x.course_key || courseKey(x.course_code || x.title));
-  const dateText = parse(x.exam_date).toLocaleDateString([], { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-  const countdown = left < 0 ? 'Exam passed' : left === 0 ? 'Exam today' : left === 1 ? 'Exam tomorrow' : `${left} days to go`;
+  const dateText = __D(parse(x.exam_date), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const countdown = left < 0 ? T('passed', 'Exam passed') : left === 0 ? T('exam-today', 'Exam today') : left === 1 ? T('exam-tomorrow', 'Exam tomorrow') : (NON_EN ? T('days-left', { one: '{{count}} day to go', other: '{{count}} days to go' }, { count: left }) : `${left} days to go`);
 
   return `<article class="card" aria-labelledby="ex-${x.id}">
     <div class="exam-head">
@@ -309,21 +328,21 @@ function examCard(x) {
       </div>
       <span class="countdown${left >= 0 && left <= 7 ? ' soon' : ''}">${__esc(countdown)}</span>
     </div>
-    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Plan progress"><div style="width:${pct}%"></div></div>
-    <div class="bar-label">${done} of ${tasks.length} tasks done</div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="${H('progress', 'Plan progress')}"><div style="width:${pct}%"></div></div>
+    <div class="bar-label">${H('done-of', '{{done}} of {{total}} tasks done', { done: done, total: tasks.length })}</div>
 
-    ${overdue.length ? `<div class="group"><h3>Catch up</h3>${overdue.map(taskRow).join('')}</div>` : ''}
-    <div class="group"><h3>Today</h3>${today.length ? today.map(taskRow).join('') : `<div class="help">${left > 0 ? 'Nothing planned today.' : 'No more study days in this plan.'}</div>`}</div>
-    ${upcoming.length ? `<div class="group"><h3>Coming up</h3>${upcoming.map(taskRow).join('')}
-      ${upcomingAll.length > 5 ? `<button type="button" class="more" data-expand="${x.id}" aria-expanded="${isOpen}">${isOpen ? 'Show less' : `Show all ${upcomingAll.length} upcoming tasks`}</button>` : ''}</div>` : ''}
+    ${overdue.length ? `<div class="group"><h3>${H('catch-up', 'Catch up')}</h3>${overdue.map(taskRow).join('')}</div>` : ''}
+    <div class="group"><h3>${H('today', 'Today')}</h3>${today.length ? today.map(taskRow).join('') : `<div class="help">${left > 0 ? H('nothing-today', 'Nothing planned today.') : H('no-more', 'No more study days in this plan.')}</div>`}</div>
+    ${upcoming.length ? `<div class="group"><h3>${H('coming-up', 'Coming up')}</h3>${upcoming.map(taskRow).join('')}
+      ${upcomingAll.length > 5 ? `<button type="button" class="more" data-expand="${x.id}" aria-expanded="${isOpen}">${isOpen ? H('show-less', 'Show less') : H('show-all', 'Show all {{n}} upcoming tasks', { n: upcomingAll.length })}</button>` : ''}</div>` : ''}
 
-    ${unsure.length ? `<div class="help-box">Still unsure about <b>${unsure.map(__esc).join(', ')}</b>?
-      A tutor who passed this course can go through it with you. <a href="${courseHref}">Find a tutor for ${__esc(x.course_code || x.title)}</a></div>` : ''}
+    ${unsure.length ? `<div class="help-box">${H('unsure-about', 'Still unsure about <b>{{topics}}</b>?', { topics: unsure.join(T('list-sep', ', ')) })}
+      ${H('tutor-help', 'A tutor who passed this course can go through it with you.')} <a href="${courseHref}">${H('find-tutor', 'Find a tutor for {{course}}', { course: x.course_code || x.title })}</a></div>` : ''}
 
     <div class="exam-actions">
-      <button type="button" class="btn ghost" data-edit="${x.id}">Change exam or topics</button>
-      <a class="btn ghost" href="${courseHref}">Course page</a>
-      <button type="button" class="btn danger" data-delete="${x.id}">Delete</button>
+      <button type="button" class="btn ghost" data-edit="${x.id}">${H('edit', 'Change exam or topics')}</button>
+      <a class="btn ghost" href="${courseHref}">${H('course-page', 'Course page')}</a>
+      <button type="button" class="btn danger" data-delete="${x.id}">${H('delete', 'Delete')}</button>
     </div>
   </article>`;
 }
@@ -332,7 +351,7 @@ function render() {
   const box = document.getElementById('exams');
   if (!exams.length) {
     box.innerHTML = document.getElementById('formCard').hidden
-      ? '<div class="empty">No exams planned yet.<br><button type="button" class="btn primary" style="margin-top:.85rem" onclick="openForm()">Add your first exam</button></div>'
+      ? '<div class="empty">' + H('no-exams', 'No exams planned yet.') + '<br><button type="button" class="btn primary" style="margin-top:.85rem" onclick="openForm()">' + H('add-first', 'Add your first exam') + '</button></div>'
       : '';
     return;
   }
@@ -345,7 +364,7 @@ async function loadAll() {
     _sb.from('exam_plan_tasks').select('id,exam_id,day,topic,kind,done_at,unsure').eq('student_id', me).order('day').order('created_at'),
   ]);
   if (ex.error || tk.error) {
-    document.getElementById('exams').innerHTML = '<div class="empty">Could not load your exams. Please refresh the page.</div>';
+    document.getElementById('exams').innerHTML = '<div class="empty">' + H('load-failed', 'Could not load your exams. Please refresh the page.') + '</div>';
     return;
   }
   // upcoming exams first, then past ones
@@ -368,11 +387,11 @@ async function renderSuggestions() {
     if (planned.has(k) || seen.has(k)) return false;
     seen.add(k); return true;
   }).slice(0, 4);
-  box.innerHTML = list.length ? `<div class="suggest"><b>From your bookings:</b> you mentioned ${list.length === 1 ? 'this exam' : 'these exams'} to a tutor.
-    <div class="chips">${list.map((s, i) => `<button type="button" class="chip" data-suggest="${i}">Plan ${__esc(s.subject || 'exam')} · ${__esc(parse(s.exam_date).toLocaleDateString([], { day: 'numeric', month: 'short' }))}</button>`).join('')}</div></div>` : '';
+  box.innerHTML = list.length ? `<div class="suggest">${list.length === 1 ? H('from-bookings-1', '<b>From your bookings:</b> you mentioned this exam to a tutor.') : H('from-bookings', '<b>From your bookings:</b> you mentioned these exams to a tutor.')}
+    <div class="chips">${list.map((s, i) => `<button type="button" class="chip" data-suggest="${i}">${H('plan-chip', 'Plan {{subject}} · {{date}}', { subject: s.subject || T('exam', 'exam'), date: __D(parse(s.exam_date), { day: 'numeric', month: 'short' }) })}</button>`).join('')}</div></div>` : '';
   box.querySelectorAll('[data-suggest]').forEach(b => b.addEventListener('click', () => {
     const s = list[Number(b.dataset.suggest)];
-    openForm({ title: (s.subject || 'Exam') + ' exam', course_code: s.subject || '', exam_date: s.exam_date });
+    openForm({ title: NON_EN ? T('exam-title', '{{subject}} exam', { subject: s.subject || T('exam', 'exam') }) : (s.subject || 'Exam') + ' exam', course_code: s.subject || '', exam_date: s.exam_date });
   }));
 }
 
@@ -405,7 +424,7 @@ document.getElementById('exams').addEventListener('click', async (e) => {
     openForm(exams.find(x => x.id === t.dataset.edit));
   } else if (t.dataset.delete) {
     const x = exams.find(y => y.id === t.dataset.delete);
-    if (!confirm(`Delete "${x.title}" and its plan? This can't be undone.`)) return;
+    if (!confirm(NON_EN ? T('confirm-delete', 'Delete “{{title}}” and its plan? This can’t be undone.', { title: x.title }) : `Delete "${x.title}" and its plan? This can't be undone.`)) return;
     const { error } = await _sb.from('student_exams').delete().eq('id', x.id);
     if (!error) await loadAll();
   }
@@ -418,7 +437,7 @@ document.getElementById('exams').addEventListener('click', async (e) => {
   document.getElementById('addBtn').hidden = false;
   await loadAll();
   const pre = new URLSearchParams(location.search).get('course');
-  if (pre) openForm({ title: pre + ' exam', course_code: pre });
+  if (pre) openForm({ title: NON_EN ? T('exam-title', '{{subject}} exam', { subject: pre }) : pre + ' exam', course_code: pre });
 })();
 </script>
 </body>
