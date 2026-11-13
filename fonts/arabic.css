@@ -204,7 +204,8 @@
 .msg-text, .conv-name, .conv-preview, #activeChatName, .quote span, #replySnippet, .att-file .fn, #msgInput,
 #pjMeta b, #remoteName, #topTitle, #topSub, .file .fname, #msgs .who, #chatInput, #comment, #privateNote, .q .q-text,
 .post-content, .reply-text, #postInput, #shareInput, .reply-compose input,
-.exam-title, #fTitle, #fTopics, .task .t > span {
+.exam-title, #fTitle, #fTopics, .task .t > span,
+#bioText, #inputBio, .info-value, .subject-tag, .tag-chip {
   unicode-bidi: plaintext;
 }
 

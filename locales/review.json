@@ -80,6 +80,9 @@
     },
     "page.exam-planner": {
       "ar": "reviewed"
+    },
+    "page.student-profile": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {
