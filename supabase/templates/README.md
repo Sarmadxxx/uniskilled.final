@@ -7,6 +7,7 @@ exact text pasted into the dashboard, kept so changes are reviewed and can be re
 | Dashboard template | Subject                         | Body                 |
 |--------------------|---------------------------------|----------------------|
 | Confirm sign up    | `confirm-signup.subject.txt`    | `confirm-signup.html`|
+| Reset password     | `reset-password.subject.txt`    | `reset-password.html`|
 
 ## Languages
 
@@ -18,3 +19,7 @@ sign-up (`user_metadata.ui_locale`, only on non-English pages), and the template
 `printf "%v"` keeps this safe when an account has no language saved (it renders English).
 The English branch is the template that was live before Arabic was added, with only the footer year
 updated from © 2025 to © 2026.
+
+The other Supabase templates (magic link, invite, change email, reauthentication) are not used by
+the site and keep Supabase's defaults. `reset-password-email-template.html` in the repo root is an
+older draft; the live reset email is `supabase/templates/reset-password.html`.

@@ -126,6 +126,12 @@
     if (msg == null || lang === DEFAULT || conf.pseudo) return msg;
     var entry = dict['server.' + serverSlug(msg)];
     var v = entry != null ? pick(entry, lang, {}) : null;
+    if (!v) {
+      // Messages with one number in them ("… after 42 seconds.") are stored with N in the key and {{n}} in the text.
+      var num = String(msg).match(/\d+/);
+      var e2 = num ? dict['server.' + serverSlug(String(msg).replace(/\d+/, 'N'))] : null;
+      if (e2 != null) { var vars = { n: num[0], count: +num[0] }; v = fill(pick(e2, lang, vars), vars, false); }
+    }
     return v ? v : msg;
   }
 

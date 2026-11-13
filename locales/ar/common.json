@@ -402,5 +402,16 @@
   "server.could-not-post-reply": "تعذّر نشر الرد.",
   "server.file-is-too-large-max-10-mb": "الملف كبير جداً (الحد الأقصى 10 ميغابايت).",
   "server.file-type-not-allowed-use-pdf-png-jpg-webp-or-gif": "نوع الملف غير مسموح به. استخدم PDF أو PNG أو JPG أو WEBP أو GIF.",
-  "server.upload-failed-please-try-again": "تعذّر الرفع. يُرجى المحاولة مرة أخرى."
+  "server.upload-failed-please-try-again": "تعذّر الرفع. يُرجى المحاولة مرة أخرى.",
+  "server.new-password-should-be-different-from-the-old-password": "يجب أن تختلف كلمة المرور الجديدة عن كلمة المرور القديمة.",
+  "server.email-rate-limit-exceeded": "تم تجاوز الحد المسموح به لإرسال الرسائل. يُرجى المحاولة لاحقاً.",
+  "server.auth-session-missing": "انتهت صلاحية الرابط أو الجلسة. يُرجى طلب رابط جديد.",
+  "server.for-security-purposes-you-can-only-request-this-after-n-seconds": {
+    "zero": "لأسباب أمنية، يمكنك تقديم هذا الطلب بعد {{n}} ثانية.",
+    "one": "لأسباب أمنية، يمكنك تقديم هذا الطلب بعد {{n}} ثانية.",
+    "two": "لأسباب أمنية، يمكنك تقديم هذا الطلب بعد {{n}} ثانيتين.",
+    "few": "لأسباب أمنية، يمكنك تقديم هذا الطلب بعد {{n}} ثوانٍ.",
+    "many": "لأسباب أمنية، يمكنك تقديم هذا الطلب بعد {{n}} ثانية.",
+    "other": "لأسباب أمنية، يمكنك تقديم هذا الطلب بعد {{n}} ثانية."
+  }
 }

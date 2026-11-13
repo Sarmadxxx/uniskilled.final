@@ -74,6 +74,9 @@
     },
     "page.feed": {
       "ar": "reviewed"
+    },
+    "page.reset-password": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {

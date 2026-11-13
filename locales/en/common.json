@@ -359,5 +359,9 @@
   "server.could-not-post-reply": "Could not post reply.",
   "server.file-is-too-large-max-10-mb": "File is too large (max 10 MB).",
   "server.file-type-not-allowed-use-pdf-png-jpg-webp-or-gif": "File type not allowed. Use PDF, PNG, JPG, WEBP or GIF.",
-  "server.upload-failed-please-try-again": "Upload failed. Please try again."
+  "server.upload-failed-please-try-again": "Upload failed. Please try again.",
+  "server.new-password-should-be-different-from-the-old-password": "New password should be different from the old password.",
+  "server.email-rate-limit-exceeded": "Email rate limit exceeded",
+  "server.auth-session-missing": "Auth session missing!",
+  "server.for-security-purposes-you-can-only-request-this-after-n-seconds": "For security purposes, you can only request this after {{n}} seconds."
 }
