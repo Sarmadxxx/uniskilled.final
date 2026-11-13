@@ -1,0 +1,31 @@
+{
+  "tutor-certificate.title": "شهادة المدرّس — UniSkilled",
+  "tutor-certificate.back-to-profile-print": "<a href=\"#\" id=\"backLink\" class=\"hit\">→ العودة إلى الملف الشخصي</a>\n  <button class=\"print-btn\" onclick=\"window.print()\">🖨️ طباعة / حفظ بصيغة PDF</button>",
+  "tutor-certificate.tutor-certificate": "شهادة مدرّس",
+  "tutor-certificate.certificate-of-tutoring-achievem": "شهادة إنجاز في التدريس",
+  "tutor-certificate.issued-by-uniskilled": "صادرة عن UniSkilled",
+  "tutor-certificate.sessions": "الجلسات",
+  "tutor-certificate.rating": "التقييم",
+  "tutor-certificate.reviews": "المراجعات",
+  "tutor-certificate.member-since": "عضو منذ",
+  "tutor-certificate.subjects-taught": "المواد التي درّسها",
+  "tutor-certificate.verify-this-certificate-atuniski": "تحقّق من هذه الشهادة على<br><a id=\"verifyUrl\" href=\"#\">uniskilled.com</a>",
+  "tutor-certificate.uniskilled-verified": "✓ موثَّقة من UniSkilled",
+  "tutor-certificate.this-tutors-certificate-isnt": "شهادة هذا المدرّس غير متاحة بعد.",
+  "tutor-certificate.js.verified-cert": "شهادة مدرّس موثَّق",
+  "tutor-certificate.js.issued-verified": "صادرة عن UniSkilled — دروس خصوصية مع مدرّسين موثَّقين جامعياً",
+  "tutor-certificate.js.uni-verified": "موثَّق جامعياً",
+  "tutor-certificate.js.tutor": "مدرّس",
+  "tutor-certificate.js.doc-title": "شهادة {{name}} — UniSkilled",
+  "tutor-certificate.js.role": "مدرّس على UniSkilled",
+  "tutor-certificate.js.other": "أخرى",
+  "tutor-certificate.js.n-sessions": {
+    "zero": "{{count}} جلسة",
+    "one": "{{count}} جلسة",
+    "two": "{{count}} جلستان",
+    "few": "{{count}} جلسات",
+    "many": "{{count}} جلسة",
+    "other": "{{count}} جلسة"
+  },
+  "tutor-certificate.js.no-sessions": "لا توجد جلسات مكتملة بعد."
+}

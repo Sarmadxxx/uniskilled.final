@@ -83,6 +83,12 @@
     },
     "page.student-profile": {
       "ar": "reviewed"
+    },
+    "page.tutor-certificate": {
+      "ar": "reviewed"
+    },
+    "page.coming-soon": {
+      "ar": "reviewed"
     }
   },
   "reviewers": {

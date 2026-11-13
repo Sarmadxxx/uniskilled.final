@@ -1,0 +1,27 @@
+{
+  "tutor-certificate.title": "Tutor Certificate — UniSkilled",
+  "tutor-certificate.back-to-profile-print": "<a href=\"#\" id=\"backLink\" class=\"hit\">← Back to profile</a>\n  <button class=\"print-btn\" onclick=\"window.print()\">🖨️ Print / Save as PDF</button>",
+  "tutor-certificate.tutor-certificate": "Tutor Certificate",
+  "tutor-certificate.certificate-of-tutoring-achievem": "Certificate of Tutoring Achievement",
+  "tutor-certificate.issued-by-uniskilled": "Issued by UniSkilled",
+  "tutor-certificate.sessions": "Sessions",
+  "tutor-certificate.rating": "Rating",
+  "tutor-certificate.reviews": "Reviews",
+  "tutor-certificate.member-since": "Member Since",
+  "tutor-certificate.subjects-taught": "Subjects Taught",
+  "tutor-certificate.verify-this-certificate-atuniski": "Verify this certificate at<br><a id=\"verifyUrl\" href=\"#\">uniskilled.com</a>",
+  "tutor-certificate.uniskilled-verified": "✓ UniSkilled Verified",
+  "tutor-certificate.this-tutors-certificate-isnt": "This tutor's certificate isn't available yet.",
+  "tutor-certificate.js.verified-cert": "Verified Tutor Certificate",
+  "tutor-certificate.js.issued-verified": "Issued by UniSkilled — University-Verified Tutoring",
+  "tutor-certificate.js.uni-verified": "University verified",
+  "tutor-certificate.js.tutor": "Tutor",
+  "tutor-certificate.js.doc-title": "Certificate of {{name}} — UniSkilled",
+  "tutor-certificate.js.role": "UniSkilled Tutor",
+  "tutor-certificate.js.other": "Other",
+  "tutor-certificate.js.n-sessions": {
+    "one": "{{count}} session",
+    "other": "{{count}} sessions"
+  },
+  "tutor-certificate.js.no-sessions": "No completed sessions yet."
+}
