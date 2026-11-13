@@ -899,11 +899,15 @@ function renderQuickReplies(list){
 // but raises real friction for the common case: someone dropping a phone
 // number, email, or social handle to move the conversation off-platform.
 function detectContactInfo(text) {
+  // Arabic-Indic (٠-٩) and Persian (۰-۹) digits count as digits too; only the copy being checked is changed.
+  text = String(text).replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660)).replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0));
   const patterns = [
     { re: /[\w.+-]+@[\w-]+\.[a-z]{2,}/i, label: T('c-email','an email address') },
     { re: /(?:\+?\d[\s.-]?){7,}/, label: T('c-phone','a phone number') },
     { re: /\b(?:wa\.me|t\.me|instagram\.com|snapchat\.com|discord\.gg)\/\S+/i, label: T('c-link','a social media link') },
     { re: /\b(?:whatsapp|whats app|telegram|snap(?:chat)?|insta(?:gram)?|discord|tiktok|imessage|line id|wechat)\b.{0,15}[@#]?[\w.]{3,}/i, label: T('c-handle','a social media handle') },
+    // The same apps written in Arabic (واتساب، تيليجرام، انستغرام، سناب…) followed by a handle
+    { re: /(?:واتس ?اب|وتس ?اب|واتس|تيليجرام|تيليغرام|تلغرام|تليجرام|تلجرام|إنستغرام|انستغرام|انستقرام|انستجرام|انستا|سناب ?شات|سناب|ديسكورد|تيك ?توك|وي ?تشات|ايمسج|آيمسج)[\s\S]{0,15}[@#]?[\w.]{3,}/, label: T('c-handle','a social media handle') },
   ];
   for (const p of patterns) {
     if (p.re.test(text)) return p.label;
