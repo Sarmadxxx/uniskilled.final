@@ -10,7 +10,7 @@
 <link rel="manifest" href="site.webmanifest">
 <meta name="theme-color" content="#1a6bff">
 <meta name="robots" content="noindex, nofollow">
-<title>My Profile — UniSkilled</title>
+<title data-i18n="student-profile.title">My Profile — UniSkilled</title>
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
@@ -202,8 +202,8 @@ body{background:#f4f6f9}
 <script src="site-nav.js"></script>
 
 <div class="cover-wrap" id="coverWrap">
-  <img class="cover-img" id="coverImg" style="display:none;" alt="Cover">
-  <button type="button" class="cover-edit" onclick="document.getElementById('coverInput').click()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>Change cover</button>
+  <img data-i18n-attr="alt:student-profile.cover.alt" class="cover-img" id="coverImg" style="display:none;" alt="Cover">
+  <button data-i18n="student-profile.change-cover" type="button" class="cover-edit" onclick="document.getElementById('coverInput').click()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>Change cover</button>
   <input type="file" id="coverInput" accept="image/*" style="display:none;" onchange="uploadCover(this)">
 </div>
 
@@ -212,26 +212,26 @@ body{background:#f4f6f9}
     <div class="identity-row">
       <div class="avatar-wrap">
         <div class="avatar" id="avatarEl">?<div class="avatar-overlay">📷</div></div>
-        <button type="button" class="avatar-cam" aria-label="Change profile photo" onclick="document.getElementById('avatarInput').click()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg></button>
+        <button data-i18n-attr="aria-label:student-profile.change-profile-photo.arialabel" type="button" class="avatar-cam" aria-label="Change profile photo" onclick="document.getElementById('avatarInput').click()"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg></button>
         <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar(this)">
       </div>
       <div class="identity-info">
         <div class="identity-name-row">
-          <h1 class="profile-name" id="profileName">Loading...</h1>
+          <h1 data-i18n="student-profile.loading" class="profile-name" id="profileName">Loading...</h1>
         </div>
         <div class="profile-title" id="profileTitle"></div>
         <div class="profile-meta" id="profileMeta"></div>
         <div id="profileTags" style="display:flex;flex-wrap:wrap;gap:0.4rem;"></div>
       </div>
-      <div class="profile-actions">
+      <div data-i18n="student-profile.edit-profile-dashboard" class="profile-actions">
         <button type="button" class="btn btn-outline" onclick="openModal('modalBio')">Edit profile</button>
         <a href="student-dashboard.html" class="btn btn-primary">← Dashboard</a>
       </div>
     </div>
     <div class="progress-wrap">
-      <div class="progress-head"><span>Profile completeness</span><span id="progressPct"></span></div>
-      <div class="progress-bar" role="progressbar" aria-label="Profile completeness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-      <div class="progress-label" id="progressLabel">Calculating profile completeness...</div>
+      <div data-i18n="student-profile.profile-completeness" class="progress-head"><span>Profile completeness</span><span id="progressPct"></span></div>
+      <div data-i18n-attr="aria-label:student-profile.profile-completeness-2.arialabel" class="progress-bar" role="progressbar" aria-label="Profile completeness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progressBar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div data-i18n="student-profile.calculating-profile-completeness" class="progress-label" id="progressLabel">Calculating profile completeness...</div>
     </div>
   </div>
 </div>
@@ -239,37 +239,37 @@ body{background:#f4f6f9}
 <div class="page-layout">
   <div>
     <div class="card">
-      <div class="card-head"><h2 class="card-title">About me</h2><button type="button" class="edit-btn" aria-label="Edit About me" onclick="openModal('modalBio')">Edit</button></div>
-      <div class="card-body"><p id="bioText" style="font-size:0.88rem;color:var(--ink2);line-height:1.7;" class="empty">Tell tutors about yourself — your goals, study style, and what you're looking for help with.</p></div>
+      <div class="card-head"><h2 data-i18n="student-profile.about-me" class="card-title">About me</h2><button data-i18n="student-profile.edit" data-i18n-attr="aria-label:student-profile.edit-about-me.arialabel" type="button" class="edit-btn" aria-label="Edit About me" onclick="openModal('modalBio')">Edit</button></div>
+      <div class="card-body"><p data-i18n="student-profile.tell-tutors-about-yourself" id="bioText" style="font-size:0.88rem;color:var(--ink2);line-height:1.7;" class="empty">Tell tutors about yourself — your goals, study style, and what you're looking for help with.</p></div>
     </div>
     <div class="card">
-      <div class="card-head"><h2 class="card-title">Academic background</h2><button type="button" class="edit-btn" aria-label="Edit academic background" onclick="openModal('modalAcademic')">Edit</button></div>
-      <div class="card-body" id="academicBody"><span class="empty">Not set yet.</span></div>
+      <div class="card-head"><h2 data-i18n="student-profile.academic-background" class="card-title">Academic background</h2><button data-i18n="student-profile.edit-2" data-i18n-attr="aria-label:student-profile.edit-academic-background.arialabel" type="button" class="edit-btn" aria-label="Edit academic background" onclick="openModal('modalAcademic')">Edit</button></div>
+      <div data-i18n="student-profile.not-set-yet" class="card-body" id="academicBody"><span class="empty">Not set yet.</span></div>
     </div>
     <div class="card">
-      <div class="card-head"><h2 class="card-title">Subjects I need help with</h2><button type="button" class="edit-btn" aria-label="Edit subjects" onclick="openModal('modalSubjects')">Edit</button></div>
-      <div class="card-body"><div id="subjectsBody"><span class="empty">No subjects added yet.</span></div></div>
+      <div class="card-head"><h2 data-i18n="student-profile.subjects-i-need-help" class="card-title">Subjects I need help with</h2><button data-i18n="student-profile.edit-3" data-i18n-attr="aria-label:student-profile.edit-subjects.arialabel" type="button" class="edit-btn" aria-label="Edit subjects" onclick="openModal('modalSubjects')">Edit</button></div>
+      <div class="card-body"><div data-i18n="student-profile.no-subjects-added-yet" id="subjectsBody"><span class="empty">No subjects added yet.</span></div></div>
     </div>
     <div class="card">
-      <div class="card-head"><h2 class="card-title">Availability</h2><button type="button" class="edit-btn" aria-label="Edit availability" onclick="openModal('modalAvailability')">Edit</button></div>
-      <div class="card-body" id="availBody"><span class="empty">Not set yet.</span></div>
+      <div class="card-head"><h2 data-i18n="student-profile.availability" class="card-title">Availability</h2><button data-i18n="student-profile.edit-4" data-i18n-attr="aria-label:student-profile.edit-availability.arialabel" type="button" class="edit-btn" aria-label="Edit availability" onclick="openModal('modalAvailability')">Edit</button></div>
+      <div data-i18n="student-profile.not-set-yet-2" class="card-body" id="availBody"><span class="empty">Not set yet.</span></div>
     </div>
   </div>
   <div>
     <div class="sidebar-widget">
-      <div class="widget-title">Personal</div>
-      <div id="personalBody"><span class="empty" style="font-size:0.82rem;">Not set yet.</span></div>
+      <div data-i18n="student-profile.personal" class="widget-title">Personal</div>
+      <div data-i18n="student-profile.not-set-yet-3" id="personalBody"><span class="empty" style="font-size:0.82rem;">Not set yet.</span></div>
     </div>
     <div class="sidebar-widget privacy-note">
-      <div class="widget-title">Who sees this</div>
-      <p class="privacy-text"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v10H5z"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Only you can see this page. When you book a session or post a subject request, tutors see your name and what you write in it.</span></p>
+      <div data-i18n="student-profile.who-sees-this" class="widget-title">Who sees this</div>
+      <p data-i18n="student-profile.only-you-can-see" class="privacy-text"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11h14v10H5z"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Only you can see this page. When you book a session or post a subject request, tutors see your name and what you write in it.</span></p>
     </div>
     <div class="sidebar-widget">
-      <div class="widget-title">Profile tips</div>
-      <div class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg><span>Add a photo so tutors recognise you</span></div>
-      <div class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/></svg><span>List your subjects so tutors know what you need help with</span></div>
-      <div class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>Set your availability to make scheduling easier</span></div>
-      <div class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>A short bio helps tutors understand your learning style</span></div>
+      <div data-i18n="student-profile.profile-tips" class="widget-title">Profile tips</div>
+      <div data-i18n="student-profile.add-a-photo-so" class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M12 16.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg><span>Add a photo so tutors recognise you</span></div>
+      <div data-i18n="student-profile.list-your-subjects-so" class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"/></svg><span>List your subjects so tutors know what you need help with</span></div>
+      <div data-i18n="student-profile.set-your-availability-to" class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18v16H3z"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>Set your availability to make scheduling easier</span></div>
+      <div data-i18n="student-profile.a-short-bio-helps" class="help-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg><span>A short bio helps tutors understand your learning style</span></div>
     </div>
   </div>
 </div>
@@ -277,84 +277,84 @@ body{background:#f4f6f9}
 <!-- MODALS -->
 <div class="modal-overlay" id="modalBio" onclick="if(event.target===this)closeModal('modalBio')">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalBioTitle">
-    <div class="modal-head"><h2 class="modal-title" id="modalBioTitle">Edit Profile</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalBio')">✕</button></div>
+    <div class="modal-head"><h2 data-i18n="student-profile.edit-profile" class="modal-title" id="modalBioTitle">Edit Profile</h2><button data-i18n-attr="aria-label:student-profile.close.arialabel" type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalBio')">✕</button></div>
     <div class="modal-body">
       <div class="alert-inline" id="alertBio" role="alert"></div>
       <div class="form-row">
-        <div class="form-group"><label for="inputFirstName" class="form-label">First name</label><input type="text" class="form-input" id="inputFirstName" placeholder="First name"></div>
-        <div class="form-group"><label for="inputLastName" class="form-label">Last name</label><input type="text" class="form-input" id="inputLastName" placeholder="Last name"></div>
+        <div class="form-group"><label data-i18n="student-profile.first-name" for="inputFirstName" class="form-label">First name</label><input data-i18n-attr="placeholder:student-profile.first-name-2.placeholder" type="text" class="form-input" id="inputFirstName" placeholder="First name"></div>
+        <div class="form-group"><label data-i18n="student-profile.last-name" for="inputLastName" class="form-label">Last name</label><input data-i18n-attr="placeholder:student-profile.last-name-2.placeholder" type="text" class="form-input" id="inputLastName" placeholder="Last name"></div>
       </div>
-      <div class="form-group"><label for="inputBio" class="form-label">About me</label><textarea class="form-textarea" id="inputBio" placeholder="Tell tutors about yourself..."></textarea></div>
+      <div class="form-group"><label data-i18n="student-profile.about-me-2" for="inputBio" class="form-label">About me</label><textarea data-i18n-attr="placeholder:student-profile.tell-tutors-about-yourself-2.placeholder" class="form-textarea" id="inputBio" placeholder="Tell tutors about yourself..."></textarea></div>
       <div class="form-row">
-        <div class="form-group"><label for="inputCountry" class="form-label">Country</label>
+        <div class="form-group"><label data-i18n="student-profile.country" for="inputCountry" class="form-label">Country</label>
           <select class="form-select" id="inputCountry">
-            <option value="">Select country</option>
-            <option>Germany</option><option>United Kingdom</option><option>France</option><option>Turkey</option><option>Qatar</option><option>UAE</option><option>Saudi Arabia</option><option>Egypt</option><option>Jordan</option><option>Lebanon</option><option>Morocco</option><option>Pakistan</option><option>India</option><option>Nigeria</option><option>United States</option><option>Canada</option><option>Australia</option><option>Netherlands</option><option>Belgium</option><option>Spain</option><option>Italy</option><option>Poland</option><option>Sweden</option><option>Switzerland</option><option>Austria</option><option>Other</option>
+            <option data-i18n="student-profile.select-country" value="">Select country</option>
+            <option data-i18n="student-profile.germany" value="Germany">Germany</option><option data-i18n="student-profile.united-kingdom" value="United Kingdom">United Kingdom</option><option data-i18n="student-profile.france" value="France">France</option><option data-i18n="student-profile.turkey" value="Turkey">Turkey</option><option data-i18n="student-profile.qatar" value="Qatar">Qatar</option><option data-i18n="student-profile.uae" value="UAE">UAE</option><option data-i18n="student-profile.saudi-arabia" value="Saudi Arabia">Saudi Arabia</option><option data-i18n="student-profile.egypt" value="Egypt">Egypt</option><option data-i18n="student-profile.jordan" value="Jordan">Jordan</option><option data-i18n="student-profile.lebanon" value="Lebanon">Lebanon</option><option data-i18n="student-profile.morocco" value="Morocco">Morocco</option><option data-i18n="student-profile.pakistan" value="Pakistan">Pakistan</option><option data-i18n="student-profile.india" value="India">India</option><option data-i18n="student-profile.nigeria" value="Nigeria">Nigeria</option><option data-i18n="student-profile.united-states" value="United States">United States</option><option data-i18n="student-profile.canada" value="Canada">Canada</option><option data-i18n="student-profile.australia" value="Australia">Australia</option><option data-i18n="student-profile.netherlands" value="Netherlands">Netherlands</option><option data-i18n="student-profile.belgium" value="Belgium">Belgium</option><option data-i18n="student-profile.spain" value="Spain">Spain</option><option data-i18n="student-profile.italy" value="Italy">Italy</option><option data-i18n="student-profile.poland" value="Poland">Poland</option><option data-i18n="student-profile.sweden" value="Sweden">Sweden</option><option data-i18n="student-profile.switzerland" value="Switzerland">Switzerland</option><option data-i18n="student-profile.austria" value="Austria">Austria</option><option data-i18n="student-profile.other" value="Other">Other</option>
           </select>
         </div>
-        <div class="form-group"><label for="inputGender" class="form-label">Gender (optional)</label>
-          <select class="form-select" id="inputGender"><option value="">Prefer not to say</option><option>Male</option><option>Female</option><option>Non-binary</option><option>Other</option></select>
+        <div class="form-group"><label data-i18n="student-profile.gender-optional" for="inputGender" class="form-label">Gender (optional)</label>
+          <select class="form-select" id="inputGender"><option data-i18n="student-profile.prefer-not-to-say" value="">Prefer not to say</option><option data-i18n="student-profile.male" value="Male">Male</option><option data-i18n="student-profile.female" value="Female">Female</option><option data-i18n="student-profile.non-binary" value="Non-binary">Non-binary</option><option data-i18n="student-profile.other-2" value="Other">Other</option></select>
         </div>
       </div>
-      <div class="form-group"><span class="form-label" id="spokenLangsLabel">Languages you speak</span><div id="spokenLangs" role="group" aria-labelledby="spokenLangsLabel"></div></div>
+      <div class="form-group"><span data-i18n="student-profile.languages-you-speak" class="form-label" id="spokenLangsLabel">Languages you speak</span><div id="spokenLangs" role="group" aria-labelledby="spokenLangsLabel"></div></div>
     </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button><button class="btn btn-primary" onclick="saveBio()">Save</button></div>
+    <div data-i18n="student-profile.cancelsave" class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalBio')">Cancel</button><button class="btn btn-primary" onclick="saveBio()">Save</button></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="modalAcademic" onclick="if(event.target===this)closeModal('modalAcademic')">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAcademicTitle">
-    <div class="modal-head"><h2 class="modal-title" id="modalAcademicTitle">Academic Background</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalAcademic')">✕</button></div>
+    <div class="modal-head"><h2 data-i18n="student-profile.academic-background-2" class="modal-title" id="modalAcademicTitle">Academic Background</h2><button data-i18n-attr="aria-label:student-profile.close-2.arialabel" type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalAcademic')">✕</button></div>
     <div class="modal-body">
       <div class="alert-inline" id="alertAcademic" role="alert"></div>
-      <div class="form-group"><label for="inputUniversity" class="form-label">University / College</label><input type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
+      <div class="form-group"><label data-i18n="student-profile.university-college" for="inputUniversity" class="form-label">University / College</label><input data-i18n-attr="placeholder:student-profile.eg-tu-berlin.placeholder" type="text" class="form-input" id="inputUniversity" placeholder="e.g. TU Berlin"></div>
       <div class="form-row">
-        <div class="form-group"><label for="inputDegree" class="form-label">Degree</label><input type="text" class="form-input" id="inputDegree" placeholder="e.g. Computer Science"></div>
-        <div class="form-group"><label for="inputMajor" class="form-label">Major</label><input type="text" class="form-input" id="inputMajor" placeholder="e.g. AI & Machine Learning"></div>
+        <div class="form-group"><label data-i18n="student-profile.degree" for="inputDegree" class="form-label">Degree</label><input data-i18n-attr="placeholder:student-profile.eg-computer-science.placeholder" type="text" class="form-input" id="inputDegree" placeholder="e.g. Computer Science"></div>
+        <div class="form-group"><label data-i18n="student-profile.major" for="inputMajor" class="form-label">Major</label><input data-i18n-attr="placeholder:student-profile.eg-ai-machine-learning.placeholder" type="text" class="form-input" id="inputMajor" placeholder="e.g. AI & Machine Learning"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label for="inputYear" class="form-label">Year of study</label>
-          <select class="form-select" id="inputYear"><option value="">Select</option><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option><option value="graduate">Graduate</option><option value="phd">PhD</option></select>
+        <div class="form-group"><label data-i18n="student-profile.year-of-study" for="inputYear" class="form-label">Year of study</label>
+          <select class="form-select" id="inputYear"><option data-i18n="student-profile.select" value="">Select</option><option data-i18n="student-profile.1st-year" value="1">1st Year</option><option data-i18n="student-profile.2nd-year" value="2">2nd Year</option><option data-i18n="student-profile.3rd-year" value="3">3rd Year</option><option data-i18n="student-profile.4th-year" value="4">4th Year</option><option data-i18n="student-profile.graduate" value="graduate">Graduate</option><option data-i18n="student-profile.phd" value="phd">PhD</option></select>
         </div>
-        <div class="form-group"><label for="inputGradYear" class="form-label">Graduation year</label><input type="number" class="form-input" id="inputGradYear" placeholder="e.g. 2027" min="2024" max="2035"></div>
+        <div data-i18n="student-profile.graduation-year" class="form-group"><label for="inputGradYear" class="form-label">Graduation year</label><input type="number" class="form-input" id="inputGradYear" placeholder="e.g. 2027" min="2024" max="2035"></div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAcademic')">Cancel</button><button class="btn btn-primary" onclick="saveAcademic()">Save</button></div>
+    <div data-i18n="student-profile.cancelsave-2" class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAcademic')">Cancel</button><button class="btn btn-primary" onclick="saveAcademic()">Save</button></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="modalSubjects" onclick="if(event.target===this)closeModal('modalSubjects')">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalSubjectsTitle">
-    <div class="modal-head"><h2 class="modal-title" id="modalSubjectsTitle">Subjects I need help with</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalSubjects')">✕</button></div>
+    <div class="modal-head"><h2 data-i18n="student-profile.subjects-i-need-help-2" class="modal-title" id="modalSubjectsTitle">Subjects I need help with</h2><button data-i18n-attr="aria-label:student-profile.close-3.arialabel" type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalSubjects')">✕</button></div>
     <div class="modal-body">
       <div class="alert-inline" id="alertSubjects" role="alert"></div>
       <div class="form-group">
-        <label for="subjectInput" class="form-label">Add subjects</label>
+        <label data-i18n="student-profile.add-subjects" for="subjectInput" class="form-label">Add subjects</label>
         <div class="tag-input-wrap" id="subjectTagWrap" onclick="document.getElementById('subjectInput').focus()">
-          <input type="text" class="tag-input" id="subjectInput" placeholder="Type a subject and press Enter...">
+          <input data-i18n-attr="placeholder:student-profile.type-a-subject-and.placeholder" type="text" class="tag-input" id="subjectInput" placeholder="Type a subject and press Enter...">
         </div>
-        <div style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;">Press Enter or comma to add each subject</div>
+        <div data-i18n="student-profile.press-enter-or-comma" style="font-size:0.75rem;color:var(--mid);margin-top:0.3rem;">Press Enter or comma to add each subject</div>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalSubjects')">Cancel</button><button class="btn btn-primary" onclick="saveSubjects()">Save</button></div>
+    <div data-i18n="student-profile.cancelsave-3" class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalSubjects')">Cancel</button><button class="btn btn-primary" onclick="saveSubjects()">Save</button></div>
   </div>
 </div>
 
 <div class="modal-overlay" id="modalAvailability" onclick="if(event.target===this)closeModal('modalAvailability')">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalAvailabilityTitle">
-    <div class="modal-head"><h2 class="modal-title" id="modalAvailabilityTitle">My Availability</h2><button type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalAvailability')">✕</button></div>
+    <div class="modal-head"><h2 data-i18n="student-profile.my-availability" class="modal-title" id="modalAvailabilityTitle">My Availability</h2><button data-i18n-attr="aria-label:student-profile.close-4.arialabel" type="button" class="modal-x" aria-label="Close" onclick="closeModal('modalAvailability')">✕</button></div>
     <div class="modal-body">
       <div class="form-group">
-        <div class="form-label" id="availDaysLabel">Available days</div>
-        <div class="day-grid" id="dayGrid" role="group" aria-labelledby="availDaysLabel">
+        <div data-i18n="student-profile.available-days" class="form-label" id="availDaysLabel">Available days</div>
+        <div data-i18n="student-profile.montuewedthufrisatsun" class="day-grid" id="dayGrid" role="group" aria-labelledby="availDaysLabel">
           <button type="button" class="day-btn" aria-pressed="false" data-day="mon">Mon</button><button type="button" class="day-btn" aria-pressed="false" data-day="tue">Tue</button><button type="button" class="day-btn" aria-pressed="false" data-day="wed">Wed</button><button type="button" class="day-btn" aria-pressed="false" data-day="thu">Thu</button><button type="button" class="day-btn" aria-pressed="false" data-day="fri">Fri</button><button type="button" class="day-btn" aria-pressed="false" data-day="sat">Sat</button><button type="button" class="day-btn" aria-pressed="false" data-day="sun">Sun</button>
         </div>
       </div>
-      <div class="form-group"><label for="inputPrefTime" class="form-label">Preferred time</label>
-        <select class="form-select" id="inputPrefTime"><option value="">Flexible</option><option value="morning">Morning (before 12pm)</option><option value="afternoon">Afternoon (12–5pm)</option><option value="evening">Evening (after 5pm)</option><option value="weekend">Weekends only</option></select>
+      <div class="form-group"><label data-i18n="student-profile.preferred-time" for="inputPrefTime" class="form-label">Preferred time</label>
+        <select class="form-select" id="inputPrefTime"><option data-i18n="student-profile.flexible" value="">Flexible</option><option data-i18n="student-profile.morning-before-12pm" value="morning">Morning (before 12pm)</option><option data-i18n="student-profile.afternoon-125pm" value="afternoon">Afternoon (12–5pm)</option><option data-i18n="student-profile.evening-after-5pm" value="evening">Evening (after 5pm)</option><option data-i18n="student-profile.weekends-only" value="weekend">Weekends only</option></select>
       </div>
     </div>
-    <div class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAvailability')">Cancel</button><button class="btn btn-primary" onclick="saveAvailability()">Save</button></div>
+    <div data-i18n="student-profile.cancelsave-4" class="modal-footer"><button class="btn btn-outline" onclick="closeModal('modalAvailability')">Cancel</button><button class="btn btn-primary" onclick="saveAvailability()">Save</button></div>
   </div>
 </div>
 
@@ -367,6 +367,13 @@ function __safeUrl(u){u=String(u==null?'':u).trim();if(!u)return '';if(/^(https?
 function __jsStr(v){return __esc(JSON.stringify(String(v==null?'':v)).slice(1,-1).replace(/'/g,'\\x27'));}
 
 const _sb = window.supabase.createClient(USK_CONFIG.url,USK_CONFIG.anonKey);
+// Text shown by this page's script, in the page's language (English unchanged; locales/*/page.student-profile.json).
+function T(k, en, v) { return window.I18N ? I18N.t('student-profile.js.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, (m, x) => (v && x in v ? v[x] : m)); }
+function H(k, en, v) { return window.I18N ? I18N.h('student-profile.js.' + k, en, v) : en.replace(/\{\{(\w+)\}\}/g, (m, x) => (v && x in v ? __esc(v[x]) : m)); }
+const NON_EN = !!(window.I18N && I18N.lang && I18N.lang !== 'en');
+const SRV = m => (NON_EN ? I18N.server(m) : m);
+// Saved choices (country, gender, year, preferred time) are stored in English; show the choice's label in the page's language.
+function optLabel(selectId, v) { if (!NON_EN || !v) return v; const o = [...document.getElementById(selectId).options].find(x => x.value === String(v)); return o ? o.textContent : v; }
 let currentUserId=null,userData=null,profileData=null,subjectTags=[],availDays=[];
 
 async function init(){
@@ -382,7 +389,7 @@ async function loadProfile(){
   const {data:sp}=await _sb.from('student_profiles').select('*').eq('user_id',currentUserId).maybeSingle();
   userData=u||{};profileData=sp||{};
   myLanguages=((await USKLangs.load(_sb,[currentUserId]))[currentUserId])||[];
-  const fullName=u?.full_name||'Student';
+  const fullName=u?.full_name||T('student','Student');
   const initials=fullName.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
   const av=document.getElementById('avatarEl');
   if(u?.avatar_url)av.innerHTML=`<img src="${__safeUrl(u.avatar_url)}" alt="${__esc(fullName)}"><div class="avatar-overlay">📷</div>`;
@@ -391,36 +398,36 @@ async function loadProfile(){
   if(u?.cover_url){const img=document.getElementById('coverImg');img.src=u.cover_url;img.style.display='block';}
   document.getElementById('profileName').textContent=fullName;
   document.title=fullName+' — UniSkilled';
-  const titleParts=[sp?.university,sp?.year_of_study?'Year '+sp.year_of_study:'',sp?.degree].filter(Boolean);
-  document.getElementById('profileTitle').textContent=titleParts.join(' · ')||'Student at UniSkilled';
+  const titleParts=[sp?.university,sp?.year_of_study?(NON_EN?optLabel('inputYear',sp.year_of_study):'Year '+sp.year_of_study):'',sp?.degree].filter(Boolean);
+  document.getElementById('profileTitle').textContent=titleParts.join(' · ')||T('student-at','Student at UniSkilled');
   const meta=[];
-  if(u?.country)meta.push(`<span>🌍 ${__esc(u.country)}</span>`);
-  if(sp?.graduation_year)meta.push(`<span>🎓 Graduating ${__esc(sp.graduation_year)}</span>`);
+  if(u?.country)meta.push(`<span>🌍 ${__esc(optLabel('inputCountry',u.country))}</span>`);
+  if(sp?.graduation_year)meta.push(`<span>🎓 ${H('graduating','Graduating {{year}}',{year:sp.graduation_year})}</span>`);
   if(myLanguages.length)meta.push(`<span>💬 ${__esc(USKLangs.list(myLanguages))}</span>`);
   document.getElementById('profileMeta').innerHTML=meta.join('');
   const subjects=Array.isArray(sp?.subjects)?sp.subjects:[];
   document.getElementById('profileTags').innerHTML=subjects.slice(0,5).map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('');
   const bioEl=document.getElementById('bioText');
   if(sp?.bio){bioEl.textContent=sp.bio;bioEl.classList.remove('empty');}
-  else{bioEl.textContent='Tell tutors about yourself...';bioEl.classList.add('empty');}
+  else{bioEl.textContent=T('bio-empty','Tell tutors about yourself...');bioEl.classList.add('empty');}
   const acParts=[];
-  if(sp?.university)acParts.push(`<div class="info-row"><span class="info-label">University</span><span class="info-value">${__esc(sp.university)}</span></div>`);
-  if(sp?.degree)acParts.push(`<div class="info-row"><span class="info-label">Degree</span><span class="info-value">${__esc(sp.degree)}</span></div>`);
-  if(sp?.major)acParts.push(`<div class="info-row"><span class="info-label">Major</span><span class="info-value">${__esc(sp.major)}</span></div>`);
-  if(sp?.year_of_study)acParts.push(`<div class="info-row"><span class="info-label">Year</span><span class="info-value">${__esc(sp.year_of_study)}</span></div>`);
-  if(sp?.graduation_year)acParts.push(`<div class="info-row"><span class="info-label">Graduation</span><span class="info-value">${__esc(sp.graduation_year)}</span></div>`);
-  document.getElementById('academicBody').innerHTML=acParts.length?acParts.join(''):'<span class="empty">Not set yet.</span>';
+  if(sp?.university)acParts.push(`<div class="info-row"><span class="info-label">${H('l-university','University')}</span><span class="info-value">${__esc(sp.university)}</span></div>`);
+  if(sp?.degree)acParts.push(`<div class="info-row"><span class="info-label">${H('l-degree','Degree')}</span><span class="info-value">${__esc(sp.degree)}</span></div>`);
+  if(sp?.major)acParts.push(`<div class="info-row"><span class="info-label">${H('l-major','Major')}</span><span class="info-value">${__esc(sp.major)}</span></div>`);
+  if(sp?.year_of_study)acParts.push(`<div class="info-row"><span class="info-label">${H('l-year','Year')}</span><span class="info-value">${__esc(optLabel('inputYear',sp.year_of_study))}</span></div>`);
+  if(sp?.graduation_year)acParts.push(`<div class="info-row"><span class="info-label">${H('l-graduation','Graduation')}</span><span class="info-value">${__esc(sp.graduation_year)}</span></div>`);
+  document.getElementById('academicBody').innerHTML=acParts.length?acParts.join(''):'<span class="empty">'+H('not-set','Not set yet.')+'</span>';
   subjectTags=[...subjects];
-  document.getElementById('subjectsBody').innerHTML=subjects.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>`:'<span class="empty">No subjects added yet.</span>';
+  document.getElementById('subjectsBody').innerHTML=subjects.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${subjects.map(s=>`<span class="subject-tag">${__esc(s)}</span>`).join('')}</div>`:'<span class="empty">'+H('no-subjects','No subjects added yet.')+'</span>';
   const avail=Array.isArray(sp?.availability)?sp.availability:[];
   availDays=[...avail];
-  const dayNames={mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
-  document.getElementById('availBody').innerHTML=avail.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${avail.map(d=>`<span style="background:#eef4ff;color:#01367c;font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:100px;">${__esc(dayNames[d]||d)}</span>`).join('')}</div>${sp?.preferred_time?`<div style="font-size:0.82rem;color:var(--mid);margin-top:0.5rem;">Preferred: ${__esc(sp.preferred_time)}</div>`:''}`:'<span class="empty">Not set yet.</span>';
+  const dayNames=NON_EN?Object.fromEntries(['mon','tue','wed','thu','fri','sat','sun'].map((d,i)=>[d,I18N.date(new Date(2026,10,16+i),{weekday:'short'})])):{mon:'Mon',tue:'Tue',wed:'Wed',thu:'Thu',fri:'Fri',sat:'Sat',sun:'Sun'};
+  document.getElementById('availBody').innerHTML=avail.length?`<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">${avail.map(d=>`<span style="background:#eef4ff;color:#01367c;font-size:0.78rem;font-weight:700;padding:4px 10px;border-radius:100px;">${__esc(dayNames[d]||d)}</span>`).join('')}</div>${sp?.preferred_time?`<div style="font-size:0.82rem;color:var(--mid);margin-top:0.5rem;">${H('preferred','Preferred: {{time}}',{time:optLabel('inputPrefTime',sp.preferred_time)})}</div>`:''}`:'<span class="empty">'+H('not-set','Not set yet.')+'</span>';
   const personal=[];
-  if(u?.country)personal.push(`<div class="info-row"><span class="info-label">Country</span><span class="info-value">${__esc(u.country)}</span></div>`);
-  if(u?.gender)personal.push(`<div class="info-row"><span class="info-label">Gender</span><span class="info-value">${__esc(u.gender)}</span></div>`);
-  if(myLanguages.length)personal.push(`<div class="info-row"><span class="info-label">Languages</span><span class="info-value">${__esc(myLanguages.map(l=>USKLangs.name(l.code)+' ('+USKLangs.levelLabel(l.level)+')').join(', '))}</span></div>`);
-  document.getElementById('personalBody').innerHTML=personal.length?personal.join(''):'<span class="empty" style="font-size:0.82rem;">Not set yet.</span>';
+  if(u?.country)personal.push(`<div class="info-row"><span class="info-label">${H('l-country','Country')}</span><span class="info-value">${__esc(optLabel('inputCountry',u.country))}</span></div>`);
+  if(u?.gender)personal.push(`<div class="info-row"><span class="info-label">${H('l-gender','Gender')}</span><span class="info-value">${__esc(optLabel('inputGender',u.gender))}</span></div>`);
+  if(myLanguages.length)personal.push(`<div class="info-row"><span class="info-label">${H('l-languages','Languages')}</span><span class="info-value">${__esc(NON_EN?I18N.join(myLanguages.map(l=>USKLangs.name(l.code)+' ('+USKLangs.levelLabel(l.level)+')')):myLanguages.map(l=>USKLangs.name(l.code)+' ('+USKLangs.levelLabel(l.level)+')').join(', '))}</span></div>`);
+  document.getElementById('personalBody').innerHTML=personal.length?personal.join(''):'<span class="empty" style="font-size:0.82rem;">'+H('not-set','Not set yet.')+'</span>';
   const checks=[u?.full_name,u?.avatar_url,sp?.bio,sp?.university,sp?.degree,subjects.length>0,avail.length>0,u?.country];
   const done=checks.filter(Boolean).length;
   const pct=Math.round((done/checks.length)*100);
@@ -428,12 +435,12 @@ async function loadProfile(){
   document.getElementById('progressPct').textContent=pct+'%';
   document.getElementById('progressBar').setAttribute('aria-valuenow',pct);
   // Say exactly what is missing, each item opening the right place to fill it in
-  const todo=[[u?.full_name,'add your name',"openModal('modalBio')"],[u?.avatar_url,'add a photo',"document.getElementById('avatarInput').click()"],[sp?.bio,'write a short bio',"openModal('modalBio')"],
-    [sp?.university,'add your university',"openModal('modalAcademic')"],[sp?.degree,'add your degree',"openModal('modalAcademic')"],[subjects.length>0,'list your subjects',"openModal('modalSubjects')"],
-    [avail.length>0,'set your availability',"openModal('modalAvailability')"],[u?.country,'add your country',"openModal('modalBio')"]].filter(t=>!t[0]);
+  const todo=[[u?.full_name,T('todo-name','add your name'),"openModal('modalBio')"],[u?.avatar_url,T('todo-photo','add a photo'),"document.getElementById('avatarInput').click()"],[sp?.bio,T('todo-bio','write a short bio'),"openModal('modalBio')"],
+    [sp?.university,T('todo-uni','add your university'),"openModal('modalAcademic')"],[sp?.degree,T('todo-degree','add your degree'),"openModal('modalAcademic')"],[subjects.length>0,T('todo-subjects','list your subjects'),"openModal('modalSubjects')"],
+    [avail.length>0,T('todo-avail','set your availability'),"openModal('modalAvailability')"],[u?.country,T('todo-country','add your country'),"openModal('modalBio')"]].filter(t=>!t[0]);
   document.getElementById('progressLabel').innerHTML = todo.length
-    ? 'Still to do: '+todo.map(t=>`<button type="button" class="todo-link" onclick="${t[2]}">${t[1]}</button>`).join(' · ')
-    : 'Your profile is complete.';
+    ? H('still-to-do','Still to do:')+' '+todo.map(t=>`<button type="button" class="todo-link" onclick="${t[2]}">${__esc(t[1])}</button>`).join(' · ')
+    : H('complete','Your profile is complete.');
 }
 
 async function saveBio(){
@@ -445,12 +452,12 @@ async function saveBio(){
   const alertEl=document.getElementById('alertBio');
   const fullName=[firstName,lastName].filter(Boolean).join(' ')||userData?.full_name||'Student';
   const {error:uErr}=await _sb.from('users').update({full_name:fullName,country:country||null,gender:gender||null}).eq('id',currentUserId);
-  if(uErr){alertEl.textContent=uErr.message;alertEl.className='alert-inline error';return;}
+  if(uErr){alertEl.textContent=SRV(uErr.message);alertEl.className='alert-inline error';return;}
   const {error:lErr}=await USKLangs.save(_sb,spokenPicker?spokenPicker.get():myLanguages);
-  if(lErr){alertEl.textContent=lErr.message;alertEl.className='alert-inline error';return;}
+  if(lErr){alertEl.textContent=SRV(lErr.message);alertEl.className='alert-inline error';return;}
   const {error:spErr}=await _sb.from('student_profiles').upsert({user_id:currentUserId,bio:bio||null},{onConflict:'user_id'});
-  if(spErr){alertEl.textContent=spErr.message;alertEl.className='alert-inline error';return;}
-  closeModal('modalBio');showToast('Profile saved ✓');await loadProfile();
+  if(spErr){alertEl.textContent=SRV(spErr.message);alertEl.className='alert-inline error';return;}
+  closeModal('modalBio');showToast(T('saved-profile','Profile saved ✓'));await loadProfile();
 }
 
 async function saveAcademic(){
@@ -461,22 +468,22 @@ async function saveAcademic(){
   const gradYear=document.getElementById('inputGradYear').value;
   const alertEl=document.getElementById('alertAcademic');
   const {error}=await _sb.from('student_profiles').upsert({user_id:currentUserId,university:university||null,degree:degree||null,major:major||null,year_of_study:year||null,graduation_year:gradYear?parseInt(gradYear):null},{onConflict:'user_id'});
-  if(error){alertEl.textContent=error.message;alertEl.className='alert-inline error';return;}
-  closeModal('modalAcademic');showToast('Academic info saved ✓');await loadProfile();
+  if(error){alertEl.textContent=SRV(error.message);alertEl.className='alert-inline error';return;}
+  closeModal('modalAcademic');showToast(T('saved-academic','Academic info saved ✓'));await loadProfile();
 }
 
 async function saveSubjects(){
   const alertEl=document.getElementById('alertSubjects');
   const {error}=await _sb.from('student_profiles').upsert({user_id:currentUserId,subjects:subjectTags.length>0?subjectTags:null},{onConflict:'user_id'});
-  if(error){alertEl.textContent=error.message;alertEl.className='alert-inline error';return;}
-  closeModal('modalSubjects');showToast('Subjects saved ✓');await loadProfile();
+  if(error){alertEl.textContent=SRV(error.message);alertEl.className='alert-inline error';return;}
+  closeModal('modalSubjects');showToast(T('saved-subjects','Subjects saved ✓'));await loadProfile();
 }
 
 async function saveAvailability(){
   const prefTime=document.getElementById('inputPrefTime').value;
   const {error}=await _sb.from('student_profiles').upsert({user_id:currentUserId,availability:availDays.length>0?availDays:null,preferred_time:prefTime||null},{onConflict:'user_id'});
-  if(error){showToast('Error: '+error.message);return;}
-  closeModal('modalAvailability');showToast('Availability saved ✓');await loadProfile();
+  if(error){showToast(T('error','Error: {{msg}}',{msg:SRV(error.message)}));return;}
+  closeModal('modalAvailability');showToast(T('saved-avail','Availability saved ✓'));await loadProfile();
 }
 
 async function uploadAvatar(input){
@@ -484,10 +491,10 @@ async function uploadAvatar(input){
   const ext=file.name.split('.').pop();
   const path=currentUserId+'/student-avatar.'+ext;
   const {error:upErr}=await _sb.storage.from('avatars').upload(path,file,{upsert:true});
-  if(upErr){showToast('Upload failed: '+upErr.message);return;}
+  if(upErr){showToast(T('upload-failed','Upload failed: {{msg}}',{msg:SRV(upErr.message)}));return;}
   const {data:urlData}=_sb.storage.from('avatars').getPublicUrl(path);
   await _sb.from('users').update({avatar_url:urlData.publicUrl}).eq('id',currentUserId);
-  showToast('Photo updated ✓');await loadProfile();
+  showToast(T('photo-updated','Photo updated ✓'));await loadProfile();
 }
 
 async function uploadCover(input){
@@ -495,17 +502,17 @@ async function uploadCover(input){
   const ext=file.name.split('.').pop();
   const path=currentUserId+'/student-cover.'+ext;
   const {error:upErr}=await _sb.storage.from('covers').upload(path,file,{upsert:true});
-  if(upErr){showToast('Upload failed: '+upErr.message);return;}
+  if(upErr){showToast(T('upload-failed','Upload failed: {{msg}}',{msg:SRV(upErr.message)}));return;}
   const {data:urlData}=_sb.storage.from('covers').getPublicUrl(path);
   await _sb.from('users').update({cover_url:urlData.publicUrl}).eq('id',currentUserId);
-  showToast('Cover updated ✓');await loadProfile();
+  showToast(T('cover-updated','Cover updated ✓'));await loadProfile();
 }
 
 function renderSubjectTags(){
   const wrap=document.getElementById('subjectTagWrap');
   const input=document.getElementById('subjectInput');
   wrap.innerHTML='';
-  subjectTags.forEach((s,i)=>{const chip=document.createElement('span');chip.className='tag-chip';chip.innerHTML=`${__esc(s)} <button type="button" aria-label="Remove ${__esc(s)}" onclick="removeSubjectTag(${i})">×</button>`;wrap.appendChild(chip);});
+  subjectTags.forEach((s,i)=>{const chip=document.createElement('span');chip.className='tag-chip';chip.innerHTML=`${__esc(s)} <button type="button" aria-label="${H('remove','Remove {{s}}',{s:s})}" onclick="removeSubjectTag(${i})">×</button>`;wrap.appendChild(chip);});
   wrap.appendChild(input);input.focus();
 }
 function removeSubjectTag(i){subjectTags.splice(i,1);renderSubjectTags();}
@@ -547,7 +554,7 @@ function toggleNav(btn, force) {
   n.style.display = open ? 'flex' : 'none';
   btn.textContent = open ? '✕' : '☰';
   btn.setAttribute('aria-expanded', open);
-  btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  btn.setAttribute('aria-label', open ? (window.I18N ? I18N.t('nav.closeMenu', 'Close menu') : 'Close menu') : (window.I18N ? I18N.t('nav.openMenu', 'Open menu') : 'Open menu'));
 }
 document.addEventListener('click', e => {
   const n = document.getElementById('mobileNav'); if (!n || n.style.display !== 'flex') return;
