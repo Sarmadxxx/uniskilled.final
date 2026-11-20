@@ -88,6 +88,8 @@ a.profile-av{text-decoration:none;}
 
 /* MAIN */
 .main{display:flex;flex-direction:column;gap:1.2rem;}
+/* Grid children may shrink below their content width, so long rows (filter chips, tables) scroll inside instead of widening the page on phones. */
+.layout>.main,.layout>.sidebar{min-width:0;}
 
 /* HERO CARD */
 .hero-card{background:linear-gradient(135deg,#0b1f4a,#1a6bff);border-radius:16px;padding:2rem;color:#fff;position:relative;overflow:hidden;}

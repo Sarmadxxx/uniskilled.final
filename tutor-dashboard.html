@@ -83,6 +83,8 @@ a.profile-av{text-decoration:none;}
 
 /* MAIN */
 .main{display:flex;flex-direction:column;gap:1.2rem;}
+/* Grid children may shrink below their content width, so long rows (filter chips, tables) scroll inside instead of widening the page on phones. */
+.layout>.main,.layout>.sidebar{min-width:0;}
 @keyframes pageFadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 .page-transition{animation:pageFadeIn 0.28s ease;}
 
