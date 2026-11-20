@@ -120,9 +120,9 @@ body{font-family:'Manrope',system-ui,sans-serif;background:var(--canvas);color:v
 .quick button{flex:none;min-height:34px;padding:0 14px;border-radius:999px;border:1px solid #b9cdf5;background:var(--tint);color:var(--navy);font:600 0.8125rem 'Manrope',sans-serif;cursor:pointer;white-space:nowrap}
 .quick button:hover{background:#dbe7ff}
 .chat-input-area{display:flex;align-items:flex-end;gap:10px}
-.input-wrap{flex:1;background:var(--canvas);border-radius:22px;border:1px solid transparent;padding:4px 6px 4px 16px;display:flex;align-items:flex-end}
+.input-wrap{flex:1;min-width:0;background:var(--canvas);border-radius:22px;border:1px solid transparent;padding:4px 6px 4px 16px;display:flex;align-items:flex-end}
 .input-wrap:focus-within{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,107,255,.18)}
-.chat-input{flex:1;border:0;background:transparent;resize:none;font:500 0.9375rem/1.45 'Manrope',sans-serif;color:var(--ink);padding:8px 0;max-height:132px;outline:none}
+.chat-input{flex:1;min-width:0;width:100%;border:0;background:transparent;resize:none;font:500 0.9375rem/1.45 'Manrope',sans-serif;color:var(--ink);padding:8px 0;max-height:132px;outline:none}
 .chat-input:focus-visible{outline:none}
 .counter{font-size:0.6875rem;color:var(--mid);padding:0 6px 10px;display:none}
 .counter.show{display:block}
@@ -251,7 +251,7 @@ body{font-family:'Manrope',system-ui,sans-serif;background:var(--canvas);color:v
         <input data-i18n-attr="placeholder:messages.search-conversations.placeholder;aria-label:messages.search-conversations-2.arialabel" id="convSearch" type="search" placeholder="Search conversations" aria-label="Search conversations" autocomplete="off">
       </div>
     </div>
-    <div data-i18n-attr="aria-label:messages.conversations.arialabel" id="convItems" role="list" aria-label="Conversations"><div data-i18n="messages.loading" class="empty-conv">Loading…</div></div>
+    <div data-i18n-attr="aria-label:messages.conversations.arialabel" id="convItems" role="list" aria-label="Conversations"><div data-i18n="messages.loading" class="empty-conv" role="listitem">Loading…</div></div>
   </section>
 
   <!-- Chat area -->
@@ -449,8 +449,8 @@ function renderConvList(){
   const convItems=document.getElementById('convItems');
   if(!allConvs.length){
     convItems.innerHTML = currentRole==='tutor'
-      ? '<div class="empty-conv">'+H('empty-tutor','No conversations yet.<br>Students who message you or book a session will appear here. <a href="tutor-profile.html">Check your profile</a> is complete.')+'</div>'
-      : '<div class="empty-conv">'+H('empty-student','No conversations yet.<br><a href="find-tutors.html">Find a tutor</a> and message them from their profile.')+'</div>';
+      ? '<div class="empty-conv" role="listitem">'+H('empty-tutor','No conversations yet.<br>Students who message you or book a session will appear here. <a href="tutor-profile.html">Check your profile</a> is complete.')+'</div>'
+      : '<div class="empty-conv" role="listitem">'+H('empty-student','No conversations yet.<br><a href="find-tutors.html">Find a tutor</a> and message them from their profile.')+'</div>';
     return;
   }
   const q=(document.getElementById('convSearch').value||'').trim().toLowerCase();
@@ -459,7 +459,7 @@ function renderConvList(){
     const otherName=c.participant_1===currentUser.id?c.participant_2_name:c.participant_1_name;
     return {c,otherId,otherName:otherName||T('unknown','Unknown')};
   }).filter(r=>!q||r.otherName.toLowerCase().includes(q)||String(r.c.last_message||'').toLowerCase().includes(q));
-  if(!rows.length){convItems.innerHTML='<div class="empty-conv">'+H('no-match','No conversations match “{{q}}”.',{q:q})+'</div>';return;}
+  if(!rows.length){convItems.innerHTML='<div class="empty-conv" role="listitem">'+H('no-match','No conversations match “{{q}}”.',{q:q})+'</div>';return;}
   convItems.innerHTML=rows.map(({c,otherId,otherName})=>{
     const unread = unreadMap[c.id]||0;
     const preview = c.last_message ? __pv(c.last_message) : T('no-messages','No messages yet');
