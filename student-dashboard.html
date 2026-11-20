@@ -88,6 +88,8 @@ a.profile-av{text-decoration:none;}
 
 /* MAIN */
 .main{display:flex;flex-direction:column;gap:1.2rem;}
+/* Grid children may shrink below their content width, so long rows (filter chips, tables) scroll inside instead of widening the page on phones. */
+.layout>.main,.layout>.sidebar{min-width:0;}
 
 /* HERO CARD */
 .hero-card{background:linear-gradient(135deg,#0b1f4a,#1a6bff);border-radius:16px;padding:2rem;color:#fff;position:relative;overflow:hidden;}
@@ -235,7 +237,7 @@ main.main .subject-tag{background:#f4f6f9;color:#334155;border:1px solid #e3e8ef
 </style>
 <link rel="stylesheet" href="site.css">
 <script src="ui.js"></script>
-<script src="notifications.js?v=1"></script>
+<script src="notifications.js?v=2"></script>
 <script src="auth-guard.js"></script>
 <script src="reschedule.js"></script>
 <script src="analytics.js" defer></script>

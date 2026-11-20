@@ -253,6 +253,10 @@
     st.textContent = [
       '.usk-bell{position:relative;display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:12px;border:1px solid #e2e8f0;background:#fff;color:#0f172a;cursor:pointer;margin-right:.35rem;transition:background .15s,border-color .15s}',
       '.usk-bell:hover{background:#f1f5ff;border-color:#c7d7fe}',
+      // On the navy shared header: same look as the header's account button.
+      '.usk-bell.usk-bell-dark{width:40px;height:40px;margin-right:0;border-radius:999px;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16);color:#fff}',
+      '.usk-bell.usk-bell-dark:hover,.usk-bell.usk-bell-dark[aria-expanded="true"]{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3);color:#fff}',
+      '.usk-bell.usk-bell-dark .usk-count{box-shadow:0 0 0 2px #0f2460}',
       '.usk-bell[aria-expanded="true"]{background:#eaf1ff;border-color:#1a6bff;color:#1a6bff}',
       '.usk-bell .usk-count{position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#ef4444;color:#fff;font:800 11px/20px Manrope,system-ui,sans-serif;text-align:center;box-shadow:0 0 0 2px #fff}',
       '.usk-bell.ring svg{animation:uskRing .9s ease-in-out}',
@@ -507,8 +511,13 @@
   }
 
   function mountBell() {
-    var nav = document.querySelector('body > nav');
-    if (!nav || document.getElementById('uskBell')) return;
+    if (document.getElementById('uskBell')) return;
+    // Shared navy header (site-nav.js, used by both dashboards since 26 Oct): the bell goes
+    // at the start of its right-hand group, before the account button. Older pages with a
+    // plain <nav> bar keep the original placement below.
+    var snavEnd = document.querySelector('#site-nav .snav-end');
+    var nav = snavEnd ? null : document.querySelector('body > nav');
+    if (!snavEnd && !nav) return;
     var b = document.createElement('button');
     b.type = 'button';
     b.id = 'uskBell';
@@ -518,6 +527,10 @@
     b.setAttribute('aria-controls', 'uskPanel');
     b.innerHTML = svg(CAT.other.icon, 20);
     b.addEventListener('click', function (e) { e.stopPropagation(); S.open ? closePanel() : openPanel(); });
+    if (snavEnd) {
+      b.classList.add('usk-bell-dark');
+      snavEnd.insertBefore(b, snavEnd.firstChild);
+    } else {
     // Right side of the bar: before the menu button (phones) / at the end of the links (desktop).
     var wrap = document.createElement('div');
     wrap.style.cssText = 'display:flex;align-items:center;gap:.25rem;margin-left:auto';
@@ -527,6 +540,7 @@
     wrap.appendChild(b);
     if (links) wrap.appendChild(links);
     if (burger) wrap.appendChild(burger);
+    }
     document.addEventListener('click', function (e) {
       if (S.open && !e.target.closest('#uskPanel,#uskBell')) closePanel();
     });
