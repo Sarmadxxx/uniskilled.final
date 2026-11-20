@@ -553,15 +553,25 @@ function __ovLabels(html){return String(html).replace(__rx(L_ACCEPT),'>'+H('ov.a
     .replace(/(<button class="btn-accept"[\s\S]*?<\/button>)\s*(<button class="btn-msg-wide"[\s\S]*?<\/button>)/g,'$2$1');}
 // ── NAVIGATION ──
 function showPage(id, el) {
+  let target = document.getElementById('page-' + id);
+  if (!target) { id = 'overview'; target = document.getElementById('page-overview'); el = document.querySelector('.nav-item[href="tutor-dashboard.html?tab=overview"]'); }
   document.querySelectorAll('.main > div[id^="page-"]').forEach(p => p.style.display = 'none');
-  const target = document.getElementById('page-' + id);
   target.style.display = 'block';
   target.classList.remove('page-transition');
   void target.offsetWidth; // force reflow so the animation replays every time
   target.classList.add('page-transition');
   document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
   if (el) el.classList.add('active');
-  window.scrollTo(0, 0);
+  // On phones the sidebar sits above the content, so a section scrolled "to the top" opens
+  // out of sight and the tap looks like it did nothing. Bring the opened section into view
+  // instead, just below the sticky header.
+  if (id !== 'overview' && window.matchMedia('(max-width: 900px)').matches) {
+    const header = document.getElementById('site-nav');
+    const offset = (header ? header.getBoundingClientRect().height : 0) + 12;
+    window.scrollTo(0, Math.max(0, target.getBoundingClientRect().top + window.scrollY - offset));
+  } else {
+    window.scrollTo(0, 0);
+  }
 }
 
 // ── INIT ──
@@ -629,8 +639,12 @@ async function init() {
     }
   } catch (e) { /* the prompt is optional */ }
 
-  await loadAll();
-  await loadReferralCard();
+  // Load the lists and the referral card side by side. A failure in one of them must not
+  // stop the requested tab from opening (it used to leave the tutor stuck on Overview).
+  await Promise.all([
+    loadAll(),
+    Promise.resolve().then(loadReferralCard).catch(e => console.error('referral card', e)),
+  ]);
 
   // Show whichever tab the URL asked for (real navigation from the sidebar
   // now reloads the page with ?tab=X, so this runs fresh on every click —
@@ -663,7 +677,8 @@ async function init() {
 }
 
 async function loadAll() {
-  await Promise.all([loadRequests(), loadSubjectRequests(), loadSessions(), loadReviews(), loadGroupSessions(), loadMessageBadge()]);
+  const results = await Promise.allSettled([loadRequests(), loadSubjectRequests(), loadSessions(), loadReviews(), loadGroupSessions(), loadMessageBadge()]);
+  results.forEach(r => { if (r.status === 'rejected') console.error('dashboard load', r.reason); });
 }
 
 // ── GROUP SESSIONS ──
