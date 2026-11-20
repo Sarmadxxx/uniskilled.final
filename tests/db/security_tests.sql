@@ -151,3 +151,23 @@ SELECT test, expect, actual,
   END AS pass
 FROM run
 ORDER BY pass, test;
+
+-- API roles must not hold rights the site never uses (TRUNCATE ignores RLS), and the
+-- signed-out role must not hold write rights on a table with no policy that would allow them.
+-- (db/2026-11-20_trim_api_role_grants.sql)
+SELECT 'API roles hold no TRUNCATE/TRIGGER/REFERENCES on public tables' AS test, 'none' AS expect,
+       coalesce(string_agg(c.relname || ':' || r.rol || ':' || p.priv, ', '), 'none') AS actual,
+       count(*) = 0 AS pass
+FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+CROSS JOIN (VALUES ('anon'), ('authenticated')) r(rol)
+CROSS JOIN (VALUES ('TRUNCATE'), ('TRIGGER'), ('REFERENCES')) p(priv)
+WHERE n.nspname = 'public' AND c.relkind IN ('r', 'p') AND has_table_privilege(r.rol, c.oid, p.priv)
+UNION ALL
+SELECT 'Signed-out role has no write rights without a matching policy', 'none',
+       coalesce(string_agg(c.relname || ':' || p.priv, ', '), 'none'),
+       count(*) = 0
+FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+CROSS JOIN (VALUES ('INSERT'), ('UPDATE'), ('DELETE')) p(priv)
+WHERE n.nspname = 'public' AND c.relkind IN ('r', 'p') AND has_table_privilege('anon', c.oid, p.priv)
+  AND NOT EXISTS (SELECT 1 FROM pg_policies pol WHERE pol.schemaname = 'public' AND pol.tablename = c.relname
+                  AND ('anon' = ANY (pol.roles) OR 'public' = ANY (pol.roles)) AND pol.cmd IN (p.priv, 'ALL'));
