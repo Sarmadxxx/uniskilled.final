@@ -36,7 +36,7 @@ jobs:
       - uses: supabase/setup-cli@v1
         if: env.DATABASE_URL != ''
         with:
-          version: latest
+          version: 3.2.0  # pinned (was "latest"); bump deliberately
       - name: Dump structure (no data)
         if: env.DATABASE_URL != ''
         run: supabase db dump --db-url "$DATABASE_URL" -f db/schema.sql
