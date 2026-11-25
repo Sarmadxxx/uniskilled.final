@@ -102,6 +102,10 @@
   }
 
   /* ---------------------------------------------------------------- data */
+  // Study HQ's own connection to the database, created the same way every other UniSkilled page creates one.
+  if (!DEMO && !window._sb && window.supabase && window.USK_CONFIG) {
+    window._sb = window.supabase.createClient(window.USK_CONFIG.url, window.USK_CONFIG.anonKey, { realtime: { params: { eventsPerSecond: 0 } } });
+  }
   var store = DEMO ? demoStore() : liveStore();
 
   function liveStore() {
