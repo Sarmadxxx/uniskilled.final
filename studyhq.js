@@ -1282,6 +1282,7 @@
       else if (act === 'follow') { await store.follow(b.getAttribute('data-label')); render(); toast(T('course-added', 'Course added')); }
       else if (act === 'capture') capture(b.getAttribute('data-course'));
       else if (act === 'quick-capture') openQuick();
+      else if (act === 'plant-rustle') { var g = b.querySelector('.gd-sway'); if (g) { g.classList.remove('gd-rustle'); void g.getBoundingClientRect(); g.classList.add('gd-rustle'); } }
       else if (act === 'upload') pickFile(b.getAttribute('data-kind'), b.getAttribute('data-course'));
       else if (act === 'file-open') {
         var fo = S.files.filter(function (f) { return String(f.id) === String(id); })[0]; if (!fo) return;

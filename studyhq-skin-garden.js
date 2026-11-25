@@ -10,11 +10,23 @@ body[data-concept="garden"]{background:#f4f3ec;color:#25302b;
 .gd-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
 @media(max-width:1100px){.gd-pair{grid-template-columns:1fr}}
 .gd-rv .shq-d-review{grid-template-columns:auto minmax(0,1fr)}.gd-rv .shq-d-review>a{grid-column:1/-1;justify-self:start}
-.gd-plant{display:grid;justify-items:center;gap:8px;text-align:center}.gd-plant svg{width:min(260px,80%);height:auto;max-height:240px}.gd-plant p{font-size:.9rem;color:var(--d-ink2);max-width:300px}.gd-plant small{font-size:.76rem;color:var(--d-muted)}
+.gd-plant{display:grid;justify-items:center;gap:8px;text-align:center}.gd-plant p{font-size:.9rem;color:var(--d-ink2);max-width:300px}.gd-plant small{font-size:.76rem;color:var(--d-muted)}
 .gd-pdays{display:flex;gap:6px}.gd-pday{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:.68rem;font-weight:800;background:#f1f2ec;color:#8a8f84}.gd-pday.on{background:#C0DD97;color:#27500A}.gd-pday.fut{opacity:.55}
-.gd-stem{transform-origin:80px 102px;animation:gdGrow .7s cubic-bezier(.2,.8,.2,1) both}.gd-leaf{transform-box:fill-box;transform-origin:center;animation:gdLeaf .45s cubic-bezier(.2,.8,.2,1.3) both;animation-delay:calc(var(--d) + 250ms)}
-@keyframes gdGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes gdLeaf{from{transform:scale(0)}to{transform:scale(1)}}
-@media(prefers-reduced-motion:reduce){.gd-stem,.gd-leaf{animation:none}}
+.gd-plantbtn{background:none;border:0;padding:0;cursor:pointer;width:min(260px,80%);display:block;border-radius:16px}.gd-plantbtn:focus-visible{outline:3px solid var(--sage);outline-offset:4px}.gd-plantbtn svg{width:100%;height:auto;max-height:250px;display:block}
+.gd-sway{transform-box:view-box;transform-origin:80px 104px;animation:gdSway 6s ease-in-out 1.6s infinite}
+.gd-sway.gd-rustle{animation:gdRustle .9s ease-out,gdSway 6s ease-in-out .9s infinite}
+.gd-stem{stroke-dasharray:200;stroke-dashoffset:200;animation:gdDraw .9s cubic-bezier(.2,.8,.2,1) .1s forwards}
+.gd-leaf{transform-box:fill-box;animation:gdLeaf .6s cubic-bezier(.2,.8,.25,1.25) both;animation-delay:var(--d)}
+.gd-flower{transform-origin:center!important;animation-name:gdBloom;animation-duration:.9s}
+.gd-new{animation:gdLeaf .6s cubic-bezier(.2,.8,.25,1.25) both,gdNew 2.4s ease-in-out 1.4s 2;animation-delay:var(--d),1.4s}
+.gd-drops path{fill:#7DB8E8;opacity:0;animation:gdDrop 1.4s ease-in .6s 2}.gd-drops path:nth-child(2){animation-delay:.9s}.gd-drops path:nth-child(3){animation-delay:1.2s}
+@keyframes gdDraw{to{stroke-dashoffset:0}}@keyframes gdLeaf{from{transform:scale(0) rotate(-20deg);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes gdBloom{0%{transform:scale(0) rotate(-60deg);opacity:0}70%{transform:scale(1.12) rotate(5deg);opacity:1}100%{transform:scale(1)}}
+@keyframes gdSway{0%,100%{transform:rotate(0)}30%{transform:rotate(1.6deg)}70%{transform:rotate(-1.4deg)}}
+@keyframes gdRustle{0%{transform:rotate(0)}20%{transform:rotate(-5deg)}45%{transform:rotate(4deg)}70%{transform:rotate(-2deg)}100%{transform:rotate(0)}}
+@keyframes gdNew{0%,100%{filter:none}50%{filter:brightness(1.25) drop-shadow(0 0 3px #d8f0b0)}}
+@keyframes gdDrop{0%{opacity:0;transform:translateY(-14px)}20%{opacity:.9}100%{opacity:0;transform:translateY(46px)}}
+@media(prefers-reduced-motion:reduce){.gd-sway,.gd-sway.gd-rustle,.gd-leaf,.gd-flower,.gd-new,.gd-drops path{animation:none}.gd-stem{animation:none;stroke-dashoffset:0}.gd-drops{display:none}}
 .gd-wk{display:grid;gap:10px}.gd-wkrow{display:grid;gap:2px;padding:10px 12px;border-radius:14px;background:#f7f8f3;border-left:4px solid var(--c)}.gd-wkrow a{font-weight:800;color:var(--d-ink);text-decoration:none;display:flex;gap:8px;align-items:center}.gd-wkrow span{font-size:.84rem;color:var(--d-ink2)}.gd-wkrow small{font-size:.78rem;color:#9a6b1f;font-weight:700}
 .gd-capside{width:100%;justify-content:center;margin:0 0 14px}
 .gd-rf{display:grid;gap:4px;font-size:.88rem}.gd-rf dt{font-weight:800;color:var(--d-ink);margin-top:8px}.gd-rf dt:first-child{margin-top:0}.gd-rf dd{color:var(--d-ink2);line-height:1.5}
@@ -499,24 +511,57 @@ button.gd-pillev:hover{filter:brightness(.97)}
   }
 
   /* The study plant: one leaf for each day this week with a review, a flower from five days.
-     Starts fresh every Monday. Pure SVG; it only grows, it never wilts or scolds. */
+     Starts fresh every Monday; it only grows, never wilts. Alive over time: leaves unfold one by
+     one, it sways gently, rustles when tapped and gets a little water on days with a review.
+     Pure SVG + CSS; no motion with reduced-motion. */
   function plant(a, rec) {
-    var n = Math.min(7, rec.reviewDays || 0), h = 10 + n * 10, stemTop = 100 - h, leaves = '';
+    var n = Math.min(7, rec.reviewDays || 0), base = 104, len = n ? 18 + n * 11 : 0, top = base - len;
+    var todayIdx = (new Date().getDay() + 6) % 7, wateredToday = rec.days[todayIdx] && rec.days[todayIdx].cards > 0;
+    var bend = 6;                                             // the stem leans a little, like a real seedling
+    function xAt(y) { var t = len ? (base - y) / len : 0; return 80 + bend * t * t; }
+    var stem = n ? '<path class="gd-stem" d="M80 ' + base + ' Q' + (80 + bend * 0.2) + ' ' + (base - len * 0.55) + ' ' + xAt(top) + ' ' + top + '" stroke="url(#gdpStem)" stroke-width="' + (2.2 + n * 0.25) + '" stroke-linecap="round" fill="none"/>' : '';
+    var leaves = '';
     for (var i = 0; i < n; i++) {
-      var y = 98 - (i + 1) * 10, left = i % 2 === 0, x = left ? 79 : 81, dx = left ? -15 : 15;
-      leaves += '<polygon class="gd-leaf" style="--d:' + (i * 70) + 'ms" points="' + x + ',' + y + ' ' + (x + dx) + ',' + (y - 7) + ' ' + (x + dx * 0.6) + ',' + (y + 2) + '" fill="' + (i % 3 === 0 ? '#639922' : '#97C459') + '"/>';
+      var y = base - 14 - i * (len - 14) / Math.max(1, n), left = i % 2 === 0, size = 1.15 - i * 0.08, x = xAt(y);
+      var rot = left ? 'scale(-1,1) rotate(-28)' : 'rotate(-28)';
+      leaves += '<g transform="translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')"><g class="gd-leaf' + (i === n - 1 && wateredToday ? ' gd-new' : '') + '" style="--d:' + (300 + i * 140) + 'ms;transform-origin:0 0"><g transform="' + rot + ' scale(' + size.toFixed(2) + ')">' +
+        '<path d="M0 0 C7 -10 21 -11 31 -1 C22 6 9 7 0 0Z" fill="url(#gdpLeaf' + (i % 2) + ')"/>' +
+        '<path d="M1 0 C10 -2 20 -2 29 -1" stroke="#e9f5d8" stroke-width=".7" fill="none" opacity=".8"/>' +
+        '<path d="M10 -1.4 l4 -4 M16 -1.5 l4 -4 M13 -1.3 l3 3 M19 -1.2 l3 3" stroke="#e9f5d8" stroke-width=".45" opacity=".55"/></g></g></g>';
     }
-    var flower = n >= 5 ? '<g class="gd-leaf" style="--d:' + (n * 70) + 'ms"><circle cx="80" cy="' + (stemTop - 3) + '" r="7" fill="#ED93B1"/><circle cx="80" cy="' + (stemTop - 3) + '" r="3" fill="#FAC775"/></g>' : '';
+    var flower = '';
+    if (n >= 5) {
+      var fx = xAt(top), fy = top - 2, pet = '';
+      for (var k = 0; k < 6; k++) pet += '<ellipse cx="' + fx + '" cy="' + (fy - 6.5) + '" rx="3.6" ry="6.5" fill="url(#gdpPetal)" transform="rotate(' + (k * 60) + ' ' + fx + ' ' + fy + ')"/>';
+      flower = '<g class="gd-leaf gd-flower" style="--d:' + (300 + n * 140) + 'ms">' + pet + '<circle cx="' + fx + '" cy="' + fy + '" r="3.4" fill="#F2B544"/><circle cx="' + (fx - 1) + '" cy="' + (fy - 1) + '" r="1.2" fill="#FBE3A3"/></g>';
+    }
+    var bud = n && n < 5 ? '<ellipse class="gd-leaf" style="--d:' + (300 + n * 140) + 'ms" cx="' + xAt(top) + '" cy="' + (top - 1.5) + '" rx="2.6" ry="3.6" fill="#7FB04A"/>' : '';
+    var sprout = n ? '' : '<path d="M80 101 q-1 -5 -5 -7 q4 0 5 4 q1 -5 6 -6 q-3 3 -6 9" fill="#8DBE57"/>';
+    var drops = wateredToday ? '<g class="gd-drops"><path d="M58 40 q3 5 0 7 q-3 -2 0 -7Z"/><path d="M102 30 q3 5 0 7 q-3 -2 0 -7Z"/><path d="M90 52 q2.4 4 0 5.6 q-2.4 -1.6 0 -5.6Z"/></g>' : '';
+    var vbTop = Math.min(50, top - 22);
+    var defs = '<defs>' +
+      '<linearGradient id="gdpPot" x1="0" x2="1"><stop offset="0" stop-color="#B9532B"/><stop offset=".45" stop-color="#DC7448"/><stop offset="1" stop-color="#A24624"/></linearGradient>' +
+      '<linearGradient id="gdpRim" x1="0" x2="1"><stop offset="0" stop-color="#C86440"/><stop offset=".5" stop-color="#EE9468"/><stop offset="1" stop-color="#B85733"/></linearGradient>' +
+      '<radialGradient id="gdpSoil" cx=".5" cy=".4" r=".6"><stop offset="0" stop-color="#6B4A35"/><stop offset="1" stop-color="#3F2A1E"/></radialGradient>' +
+      '<linearGradient id="gdpStem" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#4E7A2A"/><stop offset="1" stop-color="#7FB04A"/></linearGradient>' +
+      '<linearGradient id="gdpLeaf0" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4F8A2B"/><stop offset=".6" stop-color="#77B243"/><stop offset="1" stop-color="#A6D46F"/></linearGradient>' +
+      '<linearGradient id="gdpLeaf1" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#44792A"/><stop offset=".6" stop-color="#689F3A"/><stop offset="1" stop-color="#93C65E"/></linearGradient>' +
+      '<radialGradient id="gdpPetal" cx=".5" cy=".9" r=".9"><stop offset="0" stop-color="#F7C7D6"/><stop offset="1" stop-color="#E0789C"/></radialGradient>' +
+      '<radialGradient id="gdpShadow"><stop offset="0" stop-color="#2c3a1f" stop-opacity=".28"/><stop offset="1" stop-color="#2c3a1f" stop-opacity="0"/></radialGradient></defs>';
+    var pot = '<ellipse cx="80" cy="131" rx="36" ry="6" fill="url(#gdpShadow)"/>' +
+      '<path d="M60 106 L100 106 L95 129 Q80 133 65 129Z" fill="url(#gdpPot)"/>' +
+      '<path d="M66 112 L70 127" stroke="#F3A77F" stroke-width="1.4" stroke-linecap="round" opacity=".45"/>' +
+      '<rect x="57" y="100" width="46" height="8" rx="2.5" fill="url(#gdpRim)"/>' +
+      '<ellipse cx="80" cy="102.6" rx="20" ry="2.6" fill="url(#gdpSoil)"/>';
     var wd = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
     var dots = rec.days.map(function (d, i) { return '<span class="gd-pday' + (d.cards > 0 ? ' on' : '') + (d.future ? ' fut' : '') + '" title="' + a.esc(wd[i]) + '">' + a.esc(wd[i]) + '</span>'; }).join('');
     var say = n === 0 ? a.T('plant-0', 'Review on any day this week and your plant grows its first leaf.')
       : n >= 5 ? a.T('plant-flower', 'It’s flowering: {{n}} review days this week.', { n: n })
       : a.T('plant-n', '{{n}} review days this week. Five days and it flowers.', { n: n });
-    return '<div class="gd-plant"><svg viewBox="0 ' + Math.min(48, stemTop - 16) + ' 160 ' + (136 - Math.min(48, stemTop - 16)) + '" role="img" aria-label="' + a.esc(a.T('plant-aria', 'Study plant with {{n}} leaves', { n: n })) + '">' +
-      '<polygon points="80,100 132,117 80,134 28,117" fill="#C0DD97"/><polygon points="28,117 80,134 80,136 28,119" fill="#639922"/><polygon points="80,134 132,117 132,119 80,136" fill="#3B6D11"/>' +
-      '<polygon points="64,107 96,107 91,123 69,123" fill="#D85A30"/><polygon points="64,107 96,107 96,102 64,102" fill="#F0997B"/>' +
-      (n ? '<rect class="gd-stem" x="78.5" y="' + stemTop + '" width="3" height="' + h + '" fill="#3B6D11"/>' : '<ellipse cx="80" cy="102" rx="4" ry="2" fill="#3B6D11"/>') +
-      leaves + flower + '</svg><div class="gd-pdays">' + dots + '</div><p>' + a.esc(say) + '</p><small>' + a.esc(a.T('plant-fresh', 'A new plant every Monday.')) + '</small></div>';
+    return '<div class="gd-plant"><button type="button" class="gd-plantbtn" data-act="plant-rustle" aria-label="' + a.esc(a.T('plant-aria', 'Study plant with {{n}} leaves', { n: n })) + '">' +
+      '<svg viewBox="0 ' + vbTop + ' 160 ' + (138 - vbTop) + '" aria-hidden="true">' + defs + drops + pot +
+      '<g class="gd-sway">' + sprout + stem + leaves + bud + flower + '</g></svg></button>' +
+      '<div class="gd-pdays">' + dots + '</div><p>' + a.esc(say) + '</p><small>' + a.esc(a.T('plant-fresh', 'A new plant every Monday.')) + '</small></div>';
   }
   function progress(a, m) {
     var h = head(a, a.T('week-title', 'Your week'), a.esc(a.T('week-sub', 'An honest record to plan the next one. No scores, no comparisons.')), m.daily.ready ? '<button type="button" class="shq-btn ghost" data-act="reflect">' + a.ic('leaf', 15) + a.esc(a.T('reflect-btn', 'Reflect on this week')) + '</button>' : '');
