@@ -1,0 +1,15 @@
+{
+  "id": "/studyhq.html",
+  "name": "UniSkilled Study HQ",
+  "short_name": "Study HQ",
+  "description": "Your timetable, notes, files and daily review in one place.",
+  "start_url": "/studyhq.html",
+  "scope": "/studyhq",
+  "display": "standalone",
+  "background_color": "#f6f5ef",
+  "theme_color": "#3f6e55",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

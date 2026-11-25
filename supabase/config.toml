@@ -143,6 +143,10 @@ verify_jwt = true
 [functions.stripe-webhook]
 verify_jwt = false
 
+# Study HQ: reads a student's campus timetable link (signed-in students only). Not deployed yet.
+[functions.studyhq-ical]
+verify_jwt = true
+
 [functions.sync-connect-status]
 verify_jwt = false
 
