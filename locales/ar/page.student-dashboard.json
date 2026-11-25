@@ -8,6 +8,7 @@
   "student-dashboard.messages-0": "<svg class=\"ico\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z\"/></svg>الرسائل <span class=\"badge-count\" id=\"badgeMessages\" style=\"display:none;margin-left:auto;\">0</span>",
   "student-dashboard.notifications-0": "<svg class=\"ico\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9\"/><path d=\"M10.3 21a1.94 1.94 0 0 0 3.4 0\"/></svg>الإشعارات <span class=\"badge-count\" id=\"badgeNotifs\" style=\"display:none;margin-left:auto;\">0</span>",
   "student-dashboard.learning": "التعلّم",
+  "student-dashboard.study-hq": "<svg class=\"ico\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M2 9l10-5 10 5-10 5z\"/><path d=\"M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5\"/></svg>Study HQ",
   "student-dashboard.find-a-tutor": "<svg class=\"ico\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M11 19a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z\"/><path d=\"m21 21-4.3-4.3\"/></svg>ابحث عن مدرّس",
   "student-dashboard.group-sessions": "<svg class=\"ico\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><path d=\"M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/></svg>الجلسات الجماعية<span class=\"usk-sec-dot\" data-sec=\"groupSessions\" hidden></span>",
   "student-dashboard.calendar": "<svg class=\"ico\" viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M3 5h18v16H3z\"/><path d=\"M16 3v4M8 3v4M3 10h18\"/></svg>التقويم",

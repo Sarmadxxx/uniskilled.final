@@ -401,7 +401,7 @@
       if (e.type === 'review') { slot.cards += e.n || 0; reviewed += e.n || 0; right += e.right || 0; }
       if (e.type === 'note') notes += 1;
     });
-    return { days: days, activeDays: days.filter(function (d) { return d.active; }).length, focusMinutes: focus, reviewed: reviewed, recall: reviewed ? Math.round(right / reviewed * 100) : null, notes: notes };
+    return { days: days, activeDays: days.filter(function (d) { return d.active; }).length, reviewDays: days.filter(function (d) { return d.cards > 0; }).length, focusMinutes: focus, reviewed: reviewed, recall: reviewed ? Math.round(right / reviewed * 100) : null, notes: notes };
   }
 
   // Concepts across notes (#tags and [[links]]) with how well their cards are held.

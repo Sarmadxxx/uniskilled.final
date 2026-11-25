@@ -10,6 +10,11 @@ body[data-concept="garden"]{background:#f4f3ec;color:#25302b;
 .gd-pair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
 @media(max-width:1100px){.gd-pair{grid-template-columns:1fr}}
 .gd-rv .shq-d-review{grid-template-columns:auto minmax(0,1fr)}.gd-rv .shq-d-review>a{grid-column:1/-1;justify-self:start}
+.gd-plant{display:grid;justify-items:center;gap:8px;text-align:center}.gd-plant svg{width:min(260px,80%);height:auto;max-height:240px}.gd-plant p{font-size:.9rem;color:var(--d-ink2);max-width:300px}.gd-plant small{font-size:.76rem;color:var(--d-muted)}
+.gd-pdays{display:flex;gap:6px}.gd-pday{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:.68rem;font-weight:800;background:#f1f2ec;color:#8a8f84}.gd-pday.on{background:#C0DD97;color:#27500A}.gd-pday.fut{opacity:.55}
+.gd-stem{transform-origin:80px 102px;animation:gdGrow .7s cubic-bezier(.2,.8,.2,1) both}.gd-leaf{transform-box:fill-box;transform-origin:center;animation:gdLeaf .45s cubic-bezier(.2,.8,.2,1.3) both;animation-delay:calc(var(--d) + 250ms)}
+@keyframes gdGrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}@keyframes gdLeaf{from{transform:scale(0)}to{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.gd-stem,.gd-leaf{animation:none}}
 .gd-wk{display:grid;gap:10px}.gd-wkrow{display:grid;gap:2px;padding:10px 12px;border-radius:14px;background:#f7f8f3;border-left:4px solid var(--c)}.gd-wkrow a{font-weight:800;color:var(--d-ink);text-decoration:none;display:flex;gap:8px;align-items:center}.gd-wkrow span{font-size:.84rem;color:var(--d-ink2)}.gd-wkrow small{font-size:.78rem;color:#9a6b1f;font-weight:700}
 .gd-capside{width:100%;justify-content:center;margin:0 0 14px}
 .gd-rf{display:grid;gap:4px;font-size:.88rem}.gd-rf dt{font-weight:800;color:var(--d-ink);margin-top:8px}.gd-rf dt:first-child{margin-top:0}.gd-rf dd{color:var(--d-ink2);line-height:1.5}
@@ -492,11 +497,33 @@ button.gd-pillev:hover{filter:brightness(.97)}
     var h = head(a, a.T('notes-title', 'Notes & resources'), a.esc(a.T('notes-sub', 'Your notes and favourite explanations, sorted by course.')), acts) + a.storageNotice() + filters(a, m.filters, m.filter, 'note-filter');
     return h + (m.list.length ? '<div class="gd-notes">' + m.list.map(function (x) { return noteCard(a, x.n, x.url, x.color); }).join('') + '</div>' : '<div class="gd-empty">' + sprout() + '<b>' + a.esc(a.T('no-notes', 'No notes yet')) + '</b>' + a.esc(a.T('no-notes-sub', 'Write down what the lecturer stressed, or save the link to a good explanation.')) + '</div>');
   }
+
+  /* The study plant: one leaf for each day this week with a review, a flower from five days.
+     Starts fresh every Monday. Pure SVG; it only grows, it never wilts or scolds. */
+  function plant(a, rec) {
+    var n = Math.min(7, rec.reviewDays || 0), h = 10 + n * 10, stemTop = 100 - h, leaves = '';
+    for (var i = 0; i < n; i++) {
+      var y = 98 - (i + 1) * 10, left = i % 2 === 0, x = left ? 79 : 81, dx = left ? -15 : 15;
+      leaves += '<polygon class="gd-leaf" style="--d:' + (i * 70) + 'ms" points="' + x + ',' + y + ' ' + (x + dx) + ',' + (y - 7) + ' ' + (x + dx * 0.6) + ',' + (y + 2) + '" fill="' + (i % 3 === 0 ? '#639922' : '#97C459') + '"/>';
+    }
+    var flower = n >= 5 ? '<g class="gd-leaf" style="--d:' + (n * 70) + 'ms"><circle cx="80" cy="' + (stemTop - 3) + '" r="7" fill="#ED93B1"/><circle cx="80" cy="' + (stemTop - 3) + '" r="3" fill="#FAC775"/></g>' : '';
+    var wd = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
+    var dots = rec.days.map(function (d, i) { return '<span class="gd-pday' + (d.cards > 0 ? ' on' : '') + (d.future ? ' fut' : '') + '" title="' + a.esc(wd[i]) + '">' + a.esc(wd[i]) + '</span>'; }).join('');
+    var say = n === 0 ? a.T('plant-0', 'Review on any day this week and your plant grows its first leaf.')
+      : n >= 5 ? a.T('plant-flower', 'It’s flowering: {{n}} review days this week.', { n: n })
+      : a.T('plant-n', '{{n}} review days this week. Five days and it flowers.', { n: n });
+    return '<div class="gd-plant"><svg viewBox="0 ' + Math.min(48, stemTop - 16) + ' 160 ' + (136 - Math.min(48, stemTop - 16)) + '" role="img" aria-label="' + a.esc(a.T('plant-aria', 'Study plant with {{n}} leaves', { n: n })) + '">' +
+      '<polygon points="80,100 132,117 80,134 28,117" fill="#C0DD97"/><polygon points="28,117 80,134 80,136 28,119" fill="#639922"/><polygon points="80,134 132,117 132,119 80,136" fill="#3B6D11"/>' +
+      '<polygon points="64,107 96,107 91,123 69,123" fill="#D85A30"/><polygon points="64,107 96,107 96,102 64,102" fill="#F0997B"/>' +
+      (n ? '<rect class="gd-stem" x="78.5" y="' + stemTop + '" width="3" height="' + h + '" fill="#3B6D11"/>' : '<ellipse cx="80" cy="102" rx="4" ry="2" fill="#3B6D11"/>') +
+      leaves + flower + '</svg><div class="gd-pdays">' + dots + '</div><p>' + a.esc(say) + '</p><small>' + a.esc(a.T('plant-fresh', 'A new plant every Monday.')) + '</small></div>';
+  }
   function progress(a, m) {
     var h = head(a, a.T('week-title', 'Your week'), a.esc(a.T('week-sub', 'An honest record to plan the next one. No scores, no comparisons.')), m.daily.ready ? '<button type="button" class="shq-btn ghost" data-act="reflect">' + a.ic('leaf', 15) + a.esc(a.T('reflect-btn', 'Reflect on this week')) + '</button>' : '');
     h += a.storageNotice();
     var lr = m.daily.lastReflection;
-    h += '<div class="gd-two" style="margin-bottom:22px"><section class="gd-card"><h2>' + a.esc(a.T('learning-week', 'Learning this week')) + '</h2>' + a.recordBlock(m.daily.record) + '</section>' +
+    h += '<div class="gd-two" style="margin-bottom:22px"><section class="gd-card"><h2>' + a.esc(a.T('your-plant', 'Your study plant')) + '</h2>' + plant(a, m.daily.record) + '</section><section class="gd-card"><h2>' + a.esc(a.T('learning-week', 'Learning this week')) + '</h2>' + a.recordBlock(m.daily.record) + '</section></div>' +
+      '<div class="gd-two" style="margin-bottom:22px">' +
       '<section class="gd-card"><h2>' + a.esc(a.T('last-reflect', 'Your last reflection')) + '</h2>' + (lr ? '<dl class="gd-rf"><dt>' + a.esc(a.T('rf.went', 'What went well?')) + '</dt><dd>' + a.esc(lr.went || '–') + '</dd><dt>' + a.esc(a.T('rf.stuck', 'What is still stuck?')) + '</dt><dd>' + a.esc(lr.stuck || '–') + '</dd><dt>' + a.esc(a.T('rf.aim', 'One aim for next week')) + '</dt><dd>' + a.esc(lr.aim || '–') + '</dd></dl>' : '<p class="gd-muted">' + a.esc(a.T('no-reflect', 'Nothing yet. Three questions at the end of each week, private to you.')) + '</p>') + '</section></div>';
     h += '<div class="gd-two"><section class="gd-card"><h2>' + a.esc(a.T('by-course-week', 'This week, course by course')) + '</h2>' + (m.weekRows.length ? '<div class="gd-wk">' + m.weekRows.map(function (r) {
       return '<div class="gd-wkrow' + (r.quiet ? ' quiet' : '') + '" style="--c:' + r.color + '"><a href="' + r.href + '"><i class="shq-dot" style="background:' + r.color + '"></i>' + a.esc(r.label) + '</a><span>' + a.esc(a.T('wk-line', '{{n}} notes · {{f}} files · {{c}} cards', { n: r.notes, f: r.files, c: r.cards })) + '</span>' + (r.quiet ? '<small>' + a.esc(a.T('wk-quiet', 'Nothing captured yet this week')) + '</small>' : '') + '</div>';

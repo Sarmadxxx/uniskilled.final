@@ -974,6 +974,14 @@
     editing = { kind: 'ical' };
     openDialog(T('import-tt', 'Import timetable'), field('fIcs', T('f.ics', 'Calendar file (.ics)'), '<input id="fIcs" type="file" accept=".ics,text/calendar">') +
       '<p class="hint">' + esc(T('ics-help', 'In your campus system look for “Export”, “iCal” or “Subscribe to calendar” and download the .ics file. It is read on this device; only the classes you confirm are saved.')) + '</p>' +
+      '<details class="shq-where"><summary>' + esc(T('ics-where', 'Where do I find this file?')) + '</summary><ul>' +
+      [['Stud.IP', T('w.studip', 'Open your timetable or calendar (Stundenplan / Terminkalender) and choose Export, then iCalendar.')],
+       ['campo / HISinOne', T('w.campo', 'Open your timetable (Stundenplan) and choose iCalendar export.')],
+       ['TUCaN', T('w.tucan', 'Open your timetable or appointments and choose Export, then iCalendar.')],
+       ['ZEuS / eKVV', T('w.zeus', 'Open your personal timetable and look for the iCal or Export button.')],
+       ['Moodle', T('w.moodle', 'Calendar, then Import or export calendars, then Export.')],
+       [T('w.other-h', 'Something else'), T('w.other', 'Search the help pages of your university for “iCal” or “Stundenplan exportieren”. No file? Use “Add a class” instead, it takes a minute.')]
+      ].map(function (r) { return '<li><b>' + esc(r[0]) + '</b> ' + esc(r[1]) + '</li>'; }).join('') + '</ul><p class="hint">' + esc(T('w.note', 'Menu names differ between universities; these are the usual places.')) + '</p></details>' +
       field('fIcsUrl', T('f.ics-url', 'Or paste the calendar link'), '<input id="fIcsUrl" type="url" maxlength="1000" placeholder="https://…">', true), false);
     document.getElementById('dlgSave').textContent = T('read-tt', 'Read timetable');
   }

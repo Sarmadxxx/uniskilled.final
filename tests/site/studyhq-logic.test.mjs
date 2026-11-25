@@ -345,3 +345,17 @@ test('examMode switches on within six weeks of the next exam', () => {
   const m = H.examMode({ exams: [{ exam_date: '2027-01-02', title: 'A' }, { exam_date: '2026-12-20', title: 'B' }], now });
   assert.equal(m.on, true); assert.equal(m.next.exam.title, 'B'); assert.equal(m.next.days, 25);
 });
+
+test('learningRecord counts review days for the study plant (notes alone do not grow it)', () => {
+  const now = new Date(2026, 10, 27, 18);                       // Friday
+  const log = [
+    { type: 'review', n: 10, right: 8, at: new Date(2026, 10, 23, 9).toISOString() },   // Mon
+    { type: 'review', n: 5, right: 5, at: new Date(2026, 10, 23, 20).toISOString() },   // Mon again
+    { type: 'note', at: new Date(2026, 10, 24, 9).toISOString() },                      // Tue: note only
+    { type: 'review', n: 3, right: 2, at: new Date(2026, 10, 26, 9).toISOString() },    // Thu
+    { type: 'review', n: 4, right: 4, at: new Date(2026, 10, 20, 9).toISOString() }     // last week
+  ];
+  const r = H.learningRecord({ log, now });
+  assert.equal(r.reviewDays, 2);
+  assert.equal(r.activeDays, 3);
+});

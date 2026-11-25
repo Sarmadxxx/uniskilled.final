@@ -15,8 +15,8 @@
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
-<script src="studyhq-logic.js?v=2"></script>
-<script src="studyhq-skin-garden.js?v=2"></script>
+<script src="studyhq-logic.js?v=3"></script>
+<script src="studyhq-skin-garden.js?v=3"></script>
 <style>
 /* Shared by every Study HQ design: reset, the form dialog, toasts, the preview bar.
    Each design (studyhq-skin-*.js) brings its own layout and sets the --d-* colours used here. */
@@ -196,6 +196,9 @@ dialog::backdrop{background:rgba(15,23,42,.42)}
 .shq-pick input{margin-top:4px;width:18px;height:18px;accent-color:var(--d-accent,#1a6bff)}
 .shq-pick b{display:block;font-size:.88rem}.shq-pick small{font-size:.78rem;color:var(--d-muted,#64748b)}
 @media(max-width:560px){.shq-file{grid-template-columns:36px minmax(0,1fr)}.shq-file .fa{grid-column:2}.shq-quick{grid-template-columns:1fr}.shq-quick button{min-height:0;grid-template-columns:auto 1fr;justify-items:start;text-align:left}}
+.shq-where{margin:4px 0 12px;border:1px solid var(--d-line,#e2e8f0);border-radius:12px;padding:8px 12px;font-size:.84rem}
+.shq-where summary{cursor:pointer;font-weight:700;color:var(--d-accent,#1a6bff);min-height:28px;display:flex;align-items:center}
+.shq-where ul{list-style:none;display:grid;gap:8px;margin:8px 0}.shq-where li{line-height:1.45;color:var(--d-ink2,#334155)}.shq-where b{color:var(--d-ink,#0f172a)}
 [dir="rtl"] .shq-steps li{padding:18px 64px 18px 20px}[dir="rtl"] .shq-steps li::before{left:auto;right:20px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
@@ -227,6 +230,6 @@ dialog::backdrop{background:rgba(15,23,42,.42)}
   </form>
 </dialog>
 
-<script src="studyhq.js?v=2"></script>
+<script src="studyhq.js?v=3"></script>
 </body>
 </html>
