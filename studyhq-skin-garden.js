@@ -367,6 +367,7 @@ button.gd-pillev:hover{filter:brightness(.97)}
 .gd-dl .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:640px){.gd-dl{flex-wrap:wrap}.gd-dl .r{flex-direction:row;width:100%;justify-content:space-between;align-items:center}.gd-sky{min-height:160px;border-radius:22px}}
 .gd-howto{display:grid;gap:10px;font-size:.86rem;color:var(--ink2)}.gd-howto b{color:var(--ink)}
+.gd-tabbar a{position:relative}.gd-tabbar a .n{position:absolute;top:2px;left:calc(50% + 6px);background:var(--peach);color:#fff;font-size:.62rem;font-weight:800;line-height:1;border-radius:999px;padding:3px 6px}
 `;
 
   var PALETTE = ['#5e8b6f', '#8b7bc8', '#4f8cc1', '#c9805f', '#b89036', '#b5739b', '#4a9696', '#7c8c4a'];
