@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="fonts/fonts.css">
 <script src="vendor/supabase-js/2.39.3/supabase.js"></script>
 <script src="supabase-config.js"></script>
-<script>/* Study Campus theme: the student's choice, otherwise the phone's setting. Runs before the page draws, so there is no white flash. */try{var t=JSON.parse(localStorage.getItem('shq_theme')||'null');if(t!=='dark'&&t!=='light')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<script>/* Study Campus theme: light unless the student switched dark mode on in the menu. Runs before the page draws, so there is no flash. */try{if(JSON.parse(localStorage.getItem('shq_theme')||'null')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
 <script src="studyhq-logic.js?v=8"></script>
 <script src="studyhq-sky.js?v=8"></script>
 <script src="studyhq-skin-garden.js?v=8"></script>

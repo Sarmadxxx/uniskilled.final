@@ -374,7 +374,7 @@ html[data-theme="dark"] body[data-concept="garden"]{background:#121815;color:#e4
   --d-ink:#e4ebe6;--d-ink2:#c2ccc5;--d-muted:#97a59d;--d-line:#2b3530;--d-accent:#86c29d;--d-surface:#1b231f;--d-field:#151c18}
 html[data-theme="dark"] .gd{--bg:#121815;--card:#1b231f;--ink:#e4ebe6;--ink2:#c2ccc5;--muted:#97a59d;--line:#2b3530;
   --sage:#86c29d;--sage2:#5d9274;--sage-l:#203229;--lav:#b9adf2;--lav2:#7c6fc4;--lav-l:#25213a;--sky:#8fc3ea;--sky-l:#1a2a36;
-  --peach:#f2a585;--peach-l:#36231b;--sun:#e8c46e;--sun-l:#2c2617;--glass:rgba(255,255,255,.06);--glass2:rgba(27,35,31,.96);--btn:#3f7a59;--btn2:#5d4fb0}
+  --peach:#f2a585;--peach-l:#36231b;--sun:#e8c46e;--sun-l:#2c2617;--glass:rgba(255,255,255,.06);--glass2:rgba(27,35,31,.96);--btn:#3f7a59;--btn2:#5d4fb0;--ring-track:rgba(255,255,255,.12)}
 html[data-theme="dark"] .gd-side,html[data-theme="dark"] .gd-card,html[data-theme="dark"] .gd-tabbar,html[data-theme="dark"] .gd-more{box-shadow:0 0 0 1px #26302b,0 20px 50px -38px #000}
 html[data-theme="dark"] .gd-hero{background:linear-gradient(120deg,#1c2c23 0%,#1b2532 55%,#251f36 100%)}
 html[data-theme="dark"] .gd-focus{background:linear-gradient(160deg,#25213a,#1e1b2e)}
@@ -396,16 +396,19 @@ html[data-theme="dark"] .gd-badge.self .medal{border-color:#3a4540}
 html[data-theme="dark"] .gd-busy i{background:#33453b}html[data-theme="dark"] .gd-busy .now i{background:var(--sage2)}html[data-theme="dark"] .gd-busy .hot i{background:#c99a45}
 html[data-theme="dark"] .gd-sky{filter:brightness(.82) saturate(.9)}
 html[data-theme="dark"] .gd img{opacity:.92}
-html[data-theme="dark"] .gd-theme{color:var(--sun)}
-.gd-theme{display:flex;align-items:center;gap:10px;border:0;background:none;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--lav);padding:8px 10px;border-radius:10px;text-align:left;width:100%}
-.gd-theme:hover{background:var(--bg)}
+.gd-theme{display:flex;align-items:center;gap:10px;border:0;background:none;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--ink2);padding:8px 10px;border-radius:10px;text-align:left;width:100%;margin-top:6px;border-top:1px solid var(--line);border-radius:0 0 10px 10px;padding-top:12px}
+.gd-theme:hover{background:var(--bg)}.gd-theme span{flex:1}
+.gd-sw{width:38px;height:22px;border-radius:999px;background:#cfd3c8;position:relative;flex:none;transition:background .2s}.gd-sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.gd-theme[aria-checked="true"] .gd-sw{background:var(--btn)}.gd-theme[aria-checked="true"] .gd-sw::after{transform:translateX(16px)}
+@media(prefers-reduced-motion:reduce){.gd-sw,.gd-sw::after{transition:none}}
 .gd-more .gd-theme{font-size:.88rem;padding:10px 12px;color:var(--ink2)}
 
 `;
   function themeBtn(a) {
     var dark = document.documentElement.getAttribute('data-theme') === 'dark';
-    return '<button type="button" class="gd-theme" data-act="theme" aria-pressed="' + dark + '">' + a.ic(dark ? 'sun' : 'moon', 18) + a.esc(dark ? a.T('light-mode', 'Light mode') : a.T('dark-mode', 'Dark mode')) + '</button>';
+    return '<button type="button" class="gd-theme" data-act="theme" role="switch" aria-checked="' + dark + '">' + a.ic('moon', 18) + '<span>' + a.esc(a.T('dark-mode', 'Dark mode')) + '</span><i class="gd-sw" aria-hidden="true"></i></button>';
   }
+
 
 
   var PALETTE = ['#5e8b6f', '#8b7bc8', '#4f8cc1', '#c9805f', '#b89036', '#b5739b', '#4a9696', '#7c8c4a'];
@@ -413,7 +416,7 @@ html[data-theme="dark"] .gd-theme{color:var(--sun)}
   function ring(pct, color, size, label, track) {
     size = size || 64; var r = size / 2 - 6, c = 2 * Math.PI * r, v = pct == null ? 0 : pct;
     return '<svg class="gd-ring" width="' + size + '" height="' + size + '" viewBox="0 0 ' + size + ' ' + size + '" role="img" aria-label="' + label + '">' +
-      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + (track || 'rgba(255,255,255,.85)') + '" stroke-width="8"/>' +
+      '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + (track || 'var(--ring-track,rgba(255,255,255,.85))') + '" stroke-width="8"/>' +
       '<circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="8" stroke-linecap="round" stroke-dasharray="' + (c * v / 100).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 ' + size / 2 + ' ' + size / 2 + ')"/>' +
       '<text x="50%" y="50%" text-anchor="middle" dy=".35em" font-size="' + Math.round(size / 4.6) + '">' + (pct == null ? '–' : v + '%') + '</text></svg>';
   }
@@ -448,7 +451,7 @@ html[data-theme="dark"] .gd-theme{color:var(--sun)}
     tabbar += '<details' + (moreCur ? ' class="cur"' : '') + '><summary>' + a.ic('more', 20) + a.esc(a.T('more', 'More')) + '</summary><div class="gd-more">' + rest.map(function (n) { return '<a href="' + n.href + '">' + a.ic(n.icon, 18) + a.esc(n.label) + '</a>'; }).join('') + '<a href="student-dashboard.html">' + a.ic('arrow', 18) + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + '</a>' + themeBtn(a) + '</div></details>';
     return '<div class="gd"><div class="gd-app"><aside class="gd-side" aria-label="Study Campus"><div class="gd-brand"><span class="gd-logo">' + a.ic('leaf', 22) + '</span><div><b>Study Campus</b><small>' + a.esc(p.university || a.T('your-workspace', 'Your study space')) + '</small></div></div>' +
       '<button type="button" class="shq-btn primary gd-capside" data-act="quick-capture">' + a.ic('plus', 16) + a.esc(a.T('capture-h', 'Quick add')) + '</button><nav class="gd-nav" aria-label="Study Campus sections">' + items + '</nav><h4>' + a.esc(a.T('my-courses', 'My courses')) + '</h4><nav class="gd-cnav" aria-label="My courses">' + cnav + '</nav>' + termbox +
-      '<div class="gd-sidelinks">' + themeBtn(a) + '<a href="student-dashboard.html">' + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + ' →</a><a href="find-tutors.html">' + a.esc(a.T('find-a-tutor', 'Find a tutor')) + ' →</a></div></aside>' +
+      '<div class="gd-sidelinks"><a href="student-dashboard.html">' + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + ' →</a><a href="find-tutors.html">' + a.esc(a.T('find-a-tutor', 'Find a tutor')) + ' →</a>' + themeBtn(a) + '</div></aside>' +
       '<main id="main" tabindex="-1"><div class="gd-mobilehead"><b><span class="gd-logo">' + a.ic('leaf', 16) + '</span>Study Campus</b>' + (t ? '<span class="gd-chip">' + a.esc(termWord(a, t)) + '</span>' : '<button type="button" class="shq-btn ghost small" data-act="term">' + a.esc(a.T('set-term', 'Set term dates')) + '</button>') + '</div><!--VIEW--></main></div>' +
       '<nav class="gd-tabbar" aria-label="Study Campus">' + tabbar + '</nav></div>';
   }
