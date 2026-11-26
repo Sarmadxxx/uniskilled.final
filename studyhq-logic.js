@@ -568,7 +568,242 @@
     return { on: !!next, next: next };
   }
 
+  /* ================================================================ release 2: exams & deadlines */
+
+  // One exam list from the three places a student can give an exam date: the Exam planner (student_exams,
+  // with topics and a plan), a course's exam date in Study HQ (study_courses) and a lesson booking
+  // (sessions.exam_date). The same course on the same day is one exam; the planner's version wins,
+  // then the course's (so "change date" still edits the course), then the lesson's.
+  function mergeExams(input) {
+    var out = [], byKey = {};
+    function add(x, source, rank) {
+      if (!x.exam_date) return;
+      var date = String(x.exam_date).slice(0, 10);
+      var k = (x.course_key || courseKey(x.course_code || x.title) || 'x') + '|' + date;
+      var cur = byKey[k];
+      if (cur) {
+        if (cur.sources.indexOf(source) === -1) cur.sources.push(source);
+        if (x.courseId && !cur.courseId) cur.courseId = x.courseId;
+        if (rank < cur.rank) { var keep = { sources: cur.sources, courseId: cur.courseId }; for (var p in x) cur[p] = x[p]; cur.exam_date = date; cur.source = source; cur.rank = rank; cur.sources = keep.sources; cur.courseId = cur.courseId || keep.courseId; }
+        return;
+      }
+      var e = {}; for (var q in x) e[q] = x[q];
+      e.exam_date = date; e.source = source; e.rank = rank; e.sources = [source];
+      e.course_key = x.course_key || courseKey(x.course_code || x.title);
+      byKey[k] = e; out.push(e);
+    }
+    (input.planner || []).forEach(function (x) { add({ id: x.id, title: x.title, course_code: x.course_code || x.title, course_key: x.course_key, exam_date: x.exam_date, topics: x.topics || [], planned: true }, 'planner', 0); });
+    (input.courses || []).forEach(function (x) { add({ id: x.id, courseId: x.courseId, title: x.title, course_code: x.course_code, course_key: x.course_key, exam_date: x.exam_date, topics: x.topics || [], planned: false }, 'course', 1); });
+    (input.sessions || []).forEach(function (s) {
+      if (!s.exam_date || !s.subject) return;
+      add({ id: 'lesson-' + s.id, title: s.subject, course_code: s.subject, course_key: courseKey(s.subject), exam_date: s.exam_date, topics: [], planned: false }, 'lesson', 2);
+    });
+    out.forEach(function (e) { delete e.rank; });
+    out.sort(function (a, b) { return a.exam_date < b.exam_date ? -1 : a.exam_date > b.exam_date ? 1 : String(a.id).localeCompare(String(b.id)); });
+    return out;
+  }
+
+  function startOfWeek(d) { var s = startOfDay(d), w = s.getDay(); return addDays(s, w === 0 ? -6 : 1 - w); } // Monday
+
+  // When to start an assignment: enough days at an easy pace (dailyMinutes) plus one spare day, never in the past.
+  function startBy(item, opts) {
+    opts = opts || {};
+    var now = opts.now || new Date(), today = startOfDay(now), due = item.due_at ? new Date(item.due_at) : null;
+    if (!due) return null;
+    var est = item.estimate_min != null ? Number(item.estimate_min) : DEFAULT_EST[item.kind] || DEFAULT_EST.task;
+    var days = Math.ceil(est / (opts.dailyMinutes || 90)) + 1;
+    var d = addDays(startOfDay(due), -days);
+    if (d < today) d = today;
+    return { date: d, iso: iso(d), days: Math.round((d - today) / DAY), today: d.getTime() === today.getTime() };
+  }
+
+  // Every exam and assignment/task with a due date, grouped for the Exams & deadlines page.
+  // Groups: overdue (up to 30 days late; older ones are counted, not listed), week (to Sunday),
+  // next (next Monday to Sunday), later. Done items are left out but counted.
+  function deadlineList(input) {
+    var now = input.now || new Date(), today = startOfDay(now);
+    var wk = startOfWeek(today), nextWk = addDays(wk, 7), after = addDays(wk, 14);
+    var rows = [], doneThisWeek = 0, oldOverdue = 0;
+    function group(d) { return d < now ? 'overdue' : d < nextWk ? 'week' : d < after ? 'next' : 'later'; }
+    (input.items || []).forEach(function (i) {
+      if ((i.kind !== 'assignment' && i.kind !== 'task') || !i.due_at) return;
+      var due = new Date(i.due_at);
+      if (i.status === 'done') { if (due >= wk && due < nextWk) doneThisWeek++; return; }
+      if (due < addDays(today, -30)) { oldOverdue++; return; }
+      var sb = startBy(i, { now: now, dailyMinutes: input.dailyMinutes });
+      rows.push({ type: i.kind, id: String(i.id), title: i.title, course: i.course_label || null, courseKey: i.course_key || courseKey(i.course_label),
+        due: due, days: Math.round((startOfDay(due) - today) / DAY), group: group(due), weight: i.weight_pct != null ? Number(i.weight_pct) : null,
+        estimate: i.estimate_min != null ? Number(i.estimate_min) : null, status: i.status, startBy: sb && sb.days > 0 ? sb : null, ref: i });
+    });
+    (input.exams || []).forEach(function (x) {
+      var d = parseDay(x.exam_date);
+      if (d < today) return;
+      var tasks = (input.tasksByExam || {})[x.id] || [];
+      var done = tasks.filter(function (t) { return !!t.done_at; }).length;
+      var unsure = {}; tasks.forEach(function (t) { if (t.unsure && !t.done_at) unsure[t.topic] = 1; });
+      rows.push({ type: 'exam', id: String(x.id), title: x.title, course: x.course_code || x.title, courseKey: x.course_key || courseKey(x.course_code || x.title),
+        due: d, days: Math.round((d - today) / DAY), group: d < nextWk ? 'week' : d < after ? 'next' : 'later', weight: null, estimate: null, status: null, startBy: null,
+        plan: tasks.length ? { done: done, total: tasks.length } : null, unsure: Object.keys(unsure).sort(), ref: x });
+    });
+    rows.sort(function (a, b) { return a.due - b.due || (a.type === 'exam' ? -1 : 0) - (b.type === 'exam' ? -1 : 0) || a.id.localeCompare(b.id); });
+    var groups = ['overdue', 'week', 'next', 'later'].map(function (g) { return { key: g, rows: rows.filter(function (r) { return r.group === g; }) }; });
+    return { rows: rows, groups: groups, doneThisWeek: doneThisWeek, oldOverdue: oldOverdue,
+             counts: { all: rows.length, exam: rows.filter(function (r) { return r.type === 'exam'; }).length, work: rows.filter(function (r) { return r.type !== 'exam'; }).length,
+                       soon: rows.filter(function (r) { return r.group === 'overdue' || r.group === 'week'; }).length } };
+  }
+
+  // Load per week for the next few weeks: an exam counts 2, an assignment 1, a small task 0.5.
+  function busyWeeks(input) {
+    var now = input.now || new Date(), first = startOfWeek(now), n = input.weeks || 6, weeks = [];
+    for (var i = 0; i < n; i++) weeks.push({ start: addDays(first, i * 7), iso: iso(addDays(first, i * 7)), points: 0, exams: 0, work: 0, titles: [] });
+    (input.rows || []).forEach(function (r) {
+      if (r.group === 'overdue') return;
+      var idx = Math.floor((startOfDay(r.due) - first) / (7 * DAY));
+      if (idx < 0 || idx >= n) return;
+      var w = weeks[idx];
+      w.points += r.type === 'exam' ? 2 : r.type === 'assignment' ? 1 : 0.5;
+      if (r.type === 'exam') w.exams++; else w.work++;
+      w.titles.push(r.course ? r.course + ' ' + r.title : r.title);
+    });
+    var max = 0, busiest = null;
+    weeks.forEach(function (w, i) { w.busy = w.points >= 4; if (w.points > max) { max = w.points; busiest = i; } });
+    return { weeks: weeks, max: max, busiest: max >= 3 ? busiest : null };
+  }
+
+  // Review without a backlog: at most `cap` cards today; the rest wait for days with time.
+  function capReview(queue, cap) {
+    cap = cap == null ? 15 : cap;
+    var all = (queue.due || []).concat(queue.fresh || []);
+    var today = all.slice(0, cap);
+    return { cards: today, waiting: Math.max(0, all.length - cap) + (queue.waitingNew || 0), total: today.length,
+             minutes: today.length ? Math.max(1, Math.round(today.length * SECONDS_PER_CARD / 60)) : 0 };
+  }
+
+  // Greeting sky: the student's own clock decides.
+  function skyPeriod(hour) { return hour >= 5 && hour < 12 ? 'morning' : hour >= 12 && hour < 17 ? 'afternoon' : hour >= 17 && hour < 21 ? 'evening' : 'night'; }
+
+  // One-line add: "EUS essay due 18 Dec 30%", "STAT exam 8.12. 10:00", "lab 4 cs102 friday".
+  // Never guesses a date: without one it answers ok:false, missing:['date'] so the page can ask.
+  var MONTHS = { jan: 0, feb: 1, mar: 2, mär: 2, apr: 3, may: 4, mai: 4, jun: 5, jul: 6, aug: 7, sep: 8, oct: 9, okt: 9, nov: 10, dec: 11, dez: 11 };
+  var WEEKDAYS = { mon: 1, monday: 1, mo: 1, montag: 1, tue: 2, tues: 2, tuesday: 2, di: 2, dienstag: 2, wed: 3, wednesday: 3, mi: 3, mittwoch: 3,
+                   thu: 4, thur: 4, thurs: 4, thursday: 4, do: 4, donnerstag: 4, fri: 5, friday: 5, fr: 5, freitag: 5, sat: 6, saturday: 6, sa: 6, samstag: 6,
+                   sun: 0, sunday: 0, so: 0, sonntag: 0 };
+  function parseQuickAdd(text, opts) {
+    opts = opts || {};
+    var now = opts.now || new Date(), today = startOfDay(now);
+    var s = ' ' + String(text || '').replace(/\s+/g, ' ').trim() + ' ';
+    var out = { ok: false, kind: 'assignment', title: '', course_label: null, date: null, time: null, weight_pct: null, missing: [] };
+    if (!s.trim()) { out.missing.push('title'); return out; }
+    function cut(re, ok) { var mm = s.match(re); if (mm && (!ok || ok(mm))) { s = s.replace(mm[0], ' '); return mm; } return null; }
+    function mon(w) { var v = MONTHS[String(w).slice(0, 3).toLowerCase()]; return v == null ? null : v; }
+    function yr(y) { return y ? (y.length === 2 ? 2000 + +y : +y) : today.getFullYear(); }
+    var m;
+    if ((m = cut(/\s(\d{1,3})\s?%/))) { var w = +m[1]; if (w >= 0 && w <= 100) out.weight_pct = w; }
+    if ((m = cut(/\s(?:at\s|um\s|@\s?)?([01]?\d|2[0-3])[:h]([0-5]\d)(?=\s)/i))) out.time = pad(+m[1]) + ':' + m[2];
+    var d = null;
+    if ((m = cut(/\s(\d{4})-(\d{2})-(\d{2})(?=\s)/))) d = new Date(+m[1], +m[2] - 1, +m[3]);
+    else if ((m = cut(/\s(\d{1,2})\.(\d{1,2})\.(\d{2,4})?(?=\s)/))) d = new Date(yr(m[3]), +m[2] - 1, +m[1]);
+    else if ((m = cut(/\s(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?(?=\s)/))) d = new Date(yr(m[3]), +m[2] - 1, +m[1]);
+    else if ((m = cut(/\s(\d{1,2})(?:st|nd|rd|th)?\.?\s([a-zäö]{3,9})\.?(?=\s)/i, function (x) { return mon(x[2]) != null; }))) d = new Date(today.getFullYear(), mon(m[2]), +m[1]);
+    else if ((m = cut(/\s([a-zäö]{3,9})\.?\s(\d{1,2})(?:st|nd|rd|th)?(?=\s)/i, function (x) { return mon(x[1]) != null; }))) d = new Date(today.getFullYear(), mon(m[1]), +m[2]);
+    if (!d && cut(/\s(today|heute)(?=\s)/i)) d = today;
+    if (!d && cut(/\s(tomorrow|morgen)(?=\s)/i)) d = addDays(today, 1);
+    if (!d && (m = cut(/\sin\s(\d{1,3})\s(days?|tagen?|weeks?|wochen?)(?=\s)/i))) d = addDays(today, +m[1] * (/^w/i.test(m[2]) ? 7 : 1));
+    if (!d && (m = s.match(/\s(?:next\s|nächsten?\s|on\s|am\s)?([a-z]{2,10})(?=\s)/gi))) {
+      for (var i = 0; i < m.length && !d; i++) {
+        var word = m[i].trim().split(' ').pop().toLowerCase();
+        if (WEEKDAYS[word] != null && word.length >= 3) { var add = (WEEKDAYS[word] - today.getDay() + 7) % 7 || 7; d = addDays(today, add); s = s.replace(m[i], ' '); }
+      }
+    }
+    if (d && !isNaN(d) && !/\d{4}/.test(String(text)) && d < today) d = new Date(d.getFullYear() + 1, d.getMonth(), d.getDate()); // a past day means next year
+    if (d && isNaN(d)) d = null;
+    if (/\s(exam|exams|klausur|prüfung|midterm|final|finals|test|oral)\s/i.test(s)) out.kind = 'exam';
+    // course: a known course of the student first (full name or its letter part), else a code like "STAT 201"
+    var known = (opts.courses || []).slice().sort(function (a, b) { return b.length - a.length; });
+    for (var k = 0; k < known.length && !out.course_label; k++) {
+      var label = known[k], esc = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s+/g, '\\s?');
+      var re = new RegExp('\\s' + esc + '(?=\\s)', 'i');
+      if (re.test(s)) { out.course_label = label; s = s.replace(re, ' '); break; }
+      var letters = (label.match(/^[A-Za-zÄÖÜäöü]{2,6}/) || [])[0];
+      if (letters && letters.length >= 2) {
+        var re2 = new RegExp('\\s' + letters + '(?=\\s)', 'i');
+        if (re2.test(s) && known.filter(function (o) { return o.toLowerCase().indexOf(letters.toLowerCase()) === 0; }).length === 1) { out.course_label = label; s = s.replace(re2, ' '); }
+      }
+    }
+    if (!out.course_label && (m = cut(/\s([A-Za-z]{2,6})\s?(\d{2,4}[A-Za-z]?)(?=\s)/))) out.course_label = m[1].toUpperCase() + ' ' + m[2].toUpperCase();
+    s = s.replace(/\s(due|bis|by|deadline|abgabe|on|am|at|um|is|ist|the|for|für)(?=\s)/gi, ' ').replace(/[,;:–-]+/g, ' ').replace(/\s+/g, ' ').trim();
+    out.title = s ? s.charAt(0).toUpperCase() + s.slice(1) : (out.kind === 'exam' ? 'Exam' : '');
+    if (d) out.date = iso(d);
+    if (!out.date) out.missing.push('date');
+    if (!out.title) out.missing.push('title');
+    out.ok = !out.missing.length;
+    return out;
+  }
+
+  // The calendar file for "Add all to my phone calendar". Exams are all-day; work is a 15-minute
+  // reminder at its due time with an alert the day before. Text is escaped and lines folded (RFC 5545).
+  function toICS(rows, opts) {
+    opts = opts || {};
+    var now = opts.now || new Date();
+    function utc(d) { return d.getUTCFullYear() + pad(d.getUTCMonth() + 1) + pad(d.getUTCDate()) + 'T' + pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z'; }
+    function day(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
+    function esc(v) { return String(v == null ? '' : v).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+    function fold(line) { var o = [], b = line; while (b.length > 74) { o.push(b.slice(0, 74)); b = ' ' + b.slice(74); } o.push(b); return o.join('\r\n'); }
+    var L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//UniSkilled//Study HQ//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:' + esc(opts.name || 'Study HQ deadlines')];
+    (rows || []).forEach(function (r) {
+      if (r.group === 'overdue') return;
+      var summary = (r.type === 'exam' ? 'Exam: ' : 'Due: ') + (r.course && r.title.indexOf(r.course) === -1 ? r.course + ' · ' : '') + r.title;
+      L.push('BEGIN:VEVENT', 'UID:' + esc(r.type + '-' + r.id) + '@studyhq.uniskilled.com', 'DTSTAMP:' + utc(now), 'SUMMARY:' + esc(summary));
+      if (r.type === 'exam') { L.push('DTSTART;VALUE=DATE:' + day(r.due), 'DTEND;VALUE=DATE:' + day(addDays(r.due, 1))); }
+      else { L.push('DTSTART:' + utc(new Date(r.due.getTime() - 15 * 60000)), 'DTEND:' + utc(r.due)); }
+      if (r.weight != null) L.push('DESCRIPTION:' + esc(r.weight + '% of the grade'));
+      L.push('BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + esc(summary), 'TRIGGER:-P1D', 'END:VALARM', 'END:VEVENT');
+    });
+    L.push('END:VCALENDAR');
+    return L.map(fold).join('\r\n') + '\r\n';
+  }
+
+  // Tutors for a course, same fair ranking as course.html: rating blended with the platform average
+  // (worth 3 reviews), stars only from 3 reviews; the student's own university first, then verified.
+  // Only tutors who listed the course (tutor_courses) and are active and not suspended (public_tutors).
+  function rankTutors(input) {
+    var rows = input.rows || [], profiles = input.profiles || [], people = {}, rv = {}, all = [];
+    (input.people || []).forEach(function (p) { people[p.id] = p; });
+    (input.reviews || []).forEach(function (r) { (rv[r.tutor_id] = rv[r.tutor_id] || { t: 0, n: 0 }); rv[r.tutor_id].t += r.rating; rv[r.tutor_id].n++; all.push(r.rating); });
+    var mean = all.length ? all.reduce(function (a, b) { return a + b; }, 0) / all.length : 4.5;
+    var myUni = String(input.myUni || '').trim().toLowerCase();
+    return profiles.filter(function (tp) { return tp.is_active !== false && people[tp.user_id] && rows.some(function (r) { return r.tutor_id === tp.user_id; }); })
+      .map(function (tp) {
+        var c = rows.filter(function (r) { return r.tutor_id === tp.user_id; })[0], s = rv[tp.user_id] || { t: 0, n: 0 };
+        var uni = c.university || tp.verified_university || '';
+        return { id: tp.user_id, name: people[tp.user_id].full_name || 'Tutor', avatar: tp.avatar_url || people[tp.user_id].avatar_url || null,
+          course: c.course_code || c.course_name || null, grade: c.grade || null, university: uni, verified: !!tp.university_verified_at,
+          mine: !!myUni && uni.trim().toLowerCase() === myUni, rate: tp.hourly_rate != null ? Number(tp.hourly_rate) : null, currency: tp.currency || 'EUR',
+          reviews: s.n, stars: s.n >= 3 ? Math.round(s.t / s.n * 10) / 10 : null, score: (3 * mean + s.t) / (3 + s.n) };
+      })
+      .sort(function (a, b) { return (b.mine - a.mine) || ((b.verified ? 1 : 0) - (a.verified ? 1 : 0)) || (b.score - a.score) || (b.reviews - a.reviews); });
+  }
+
+  // The "Exam help" box: for the next two exams (within 6 weeks) the best real tutor match or, when
+  // there is none, an "Ask for a tutor" card; plus one "Tutor this course" invite for a finished course.
+  // Wording never says a student is struggling: unsure topics are only ones the student marked.
+  function examHelp(input) {
+    var today = startOfDay(input.now || new Date()), cards = [];
+    (input.exams || []).filter(function (x) { var n = Math.round((parseDay(x.exam_date) - today) / DAY); return n >= 0 && n <= 42; })
+      .slice(0, 2).forEach(function (x) {
+        var key = x.course_key || courseKey(x.course_code || x.title), tutors = (input.tutorsByKey || {})[key] || [];
+        var unsure = []; ((input.tasksByExam || {})[x.id] || []).forEach(function (t) { if (t.unsure && !t.done_at && unsure.indexOf(t.topic) === -1) unsure.push(t.topic); });
+        var base = { exam: x, course: x.course_code || x.title, courseKey: key, days: Math.round((parseDay(x.exam_date) - today) / DAY), unsure: unsure.slice(0, 2) };
+        if (tutors.length) cards.push(Object.assign({ type: 'tutor', tutor: tutors[0] }, base));
+        else cards.push(Object.assign({ type: 'request', requested: (input.requested || []).indexOf(key) !== -1 }, base));
+      });
+    var finished = (input.finished || [])[0] || null;
+    return { cards: cards, invite: finished ? { course: finished } : null };
+  }
+
   var api = {
+    mergeExams: mergeExams, startBy: startBy, deadlineList: deadlineList, busyWeeks: busyWeeks, capReview: capReview,
+    skyPeriod: skyPeriod, parseQuickAdd: parseQuickAdd, toICS: toICS, rankTutors: rankTutors, examHelp: examHelp, startOfWeek: startOfWeek,
     courseKey: courseKey, iso: iso, parseDay: parseDay, startOfDay: startOfDay, addDays: addDays,
     sessionStart: sessionStart, dueOf: dueOf, buildCourses: buildCourses, courseProgress: courseProgress,
     whatNext: whatNext, weekPlan: weekPlan, achievements: achievements, DEFAULT_EST: DEFAULT_EST,
