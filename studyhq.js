@@ -1621,7 +1621,7 @@
     try {
       if (DEMO) {
         demoBar();
-        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js');
+        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=6');
       } else {
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;
