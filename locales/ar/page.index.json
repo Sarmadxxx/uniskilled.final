@@ -99,7 +99,7 @@
   "index.why-uniskilled.arialabel": "لماذا UniSkilled",
   "index.js.heroPlaceholderShort": "المقرر أو المادة أو اسم المدرّس",
   "index.company-details": "تُدار منصة UniSkilled من قِبل شركة UNISKILLED LTD المسجّلة في إنجلترا وويلز، ورقمها لدى سجل الشركات 17574736. العنوان المسجّل: <span dir=\"ltr\">65 London Wall, London EC2M 5TU, United Kingdom</span>.",
-  "index.ws.badge": "<b>جديد</b>UniSkilled StudySpace <small>· اسم مقترح</small>",
+  "index.ws.badge": "<b>جديد</b>Study HQ <small>· من UniSkilled</small>",
   "index.ws.title": "حياتك الجامعية. <em>منظّمة في مكان واحد.</em>",
   "index.ws.lede": "موادك ومواعيد التسليم والامتحانات والملاحظات والمراجعة في مساحة عمل هادئة واحدة تخبرك بما تفعله بعد ذلك. وعندما يقترب الامتحان، تجد بنقرة واحدة مساعدة من طلاب اجتازوا مادتك نفسها.",
   "index.ws.start": "ابدأ مجانًا",
@@ -122,6 +122,5 @@
   "index.ws.m3": "عدّ تنازلي للامتحانات",
   "index.ws.m4": "متابعة التقدّم",
   "index.ws.m5": "تعمل على هاتفك",
-  "index.study-workspace": "مساحة الدراسة",
   "index.js.wsOpen": "افتح مساحة دراستك"
 }

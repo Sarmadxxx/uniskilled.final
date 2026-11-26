@@ -99,7 +99,7 @@
   "index.why-uniskilled.arialabel": "Why UniSkilled",
   "index.js.heroPlaceholderShort": "Course, subject or tutor name",
   "index.company-details": "UniSkilled is operated by UNISKILLED LTD, registered in England and Wales, company number 17574736. Registered office: <span dir=\"ltr\">65 London Wall, London EC2M 5TU, United Kingdom</span>.",
-  "index.ws.badge": "<b>New</b>UniSkilled StudySpace <small>· proposed name</small>",
+  "index.ws.badge": "<b>New</b>Study HQ <small>· by UniSkilled</small>",
   "index.ws.title": "Your university life. <em>Organised in one place.</em>",
   "index.ws.lede": "Courses, deadlines, exams, notes and revision in one calm workspace that tells you what to do next. And when an exam gets close, help from students who passed your course is one click away.",
   "index.ws.start": "Get started free",
@@ -122,6 +122,5 @@
   "index.ws.m3": "Exam countdowns",
   "index.ws.m4": "Progress tracking",
   "index.ws.m5": "Works on your phone",
-  "index.study-workspace": "Study workspace",
   "index.js.wsOpen": "Open your workspace"
 }
