@@ -1093,6 +1093,8 @@
     var d = new Date();
     openItem('note', null, { course_label: course || '', title: (course ? course + ' · ' : '') + T('lecture-on', 'Lecture, {{d}}', { d: fmt(d, { day: 'numeric', month: 'short' }) }), body: 'Q: \nA: \n' });
   }
+  // After Quick add, show the student where their note, photo or PDF went.
+  function goLibrary() { window.scrollTo(0, 0); if (location.hash !== '#/library') location.hash = '#/library'; else render(); }
   function val(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
   function weekdaySelect(cur) { return '<select id="fWd">' + WD().map(function (d, i) { return '<option value="' + (i + 1) + '"' + (cur === i + 1 ? ' selected' : '') + '>' + esc(d) + '</option>'; }).join('') + '</select>'; }
   function openClass() {
@@ -1207,9 +1209,9 @@
   }
 
   /* ---------------------------------------------------------------- files: photos and PDFs */
-  var pendingCourse = '';
+  var pendingCourse = '', pendingQuick = false;
   function fileInput(kind) { return document.getElementById(kind === 'photo' ? 'shqPhoto' : 'shqPdf'); }
-  function pickFile(kind, course) { pendingCourse = course || ''; var i = fileInput(kind); if (i) { i.value = ''; i.click(); } }
+  function pickFile(kind, course, fromQuick) { pendingCourse = course || ''; pendingQuick = !!fromQuick; var i = fileInput(kind); if (i) { i.value = ''; i.click(); } }
   async function head4(file) { var b = new Uint8Array(await file.slice(0, 12).arrayBuffer()); return b; }
   function isPdf(b) { return b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46; }
   function isImg(b) { return (b[0] === 0xFF && b[1] === 0xD8) || (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47) || (b[0] === 0x52 && b[1] === 0x49 && b[8] === 0x57 && b[9] === 0x45); }
@@ -1259,7 +1261,7 @@
       if (usedBytes() + blob.size > 1073741824) { toast(T('e.full', 'Your 1 GB of Study Campus storage is full. Delete some files first.')); return; }
       await store.addFile(blob, meta); await store.log({ type: 'file' });
       track('studyhq_file_added', { kind: kind, searchable: !!meta.text });
-      render(); toast(kind === 'pdf' ? (meta.text ? T('pdf-ok', 'PDF saved and searchable.') : T('pdf-ok2', 'PDF saved.')) : T('photo-ok', 'Photo saved.'));
+      if (pendingQuick) { pendingQuick = false; goLibrary(); } else render(); toast(kind === 'pdf' ? (meta.text ? T('pdf-ok', 'PDF saved and searchable.') : T('pdf-ok2', 'PDF saved.')) : T('photo-ok', 'Photo saved.'));
     } catch (ex) { toast(navigator.onLine === false ? T('e.offline-file', 'You are offline. Files upload once you are back online.') : T('e.save', 'That didn’t save. Please try again.')); }
   }
   ['photo', 'pdf'].forEach(function (k) { var i = fileInput(k); if (i) i.addEventListener('change', function () { handleFile(k, i.files && i.files[0]); }); });
@@ -1363,9 +1365,10 @@
     try {
       if (editing.item) await store.updateItem(editing.item.id, row);
       else { await store.addItem(row); track('studyhq_item_added', { kind: k }); if (k === 'note') await store.log({ type: 'note' }); }
-      dlg.close(); render(); toast(T('saved', 'Saved'));
+      var toLib = editing.fromQuick && !editing.item;
+      dlg.close(); if (toLib) goLibrary(); else render(); toast(T('saved', 'Saved'));
     } catch (ex) {
-      if (k === 'note' && !editing.item && !DEMO) { queueNote(row); dlg.close(); render(); toast(T('saved-local', 'Saved on this device. It syncs when you are back online.')); }
+      if (k === 'note' && !editing.item && !DEMO) { var toLib2 = editing.fromQuick; queueNote(row); dlg.close(); if (toLib2) goLibrary(); else render(); toast(T('saved-local', 'Saved on this device. It syncs when you are back online.')); }
       else err.textContent = T('e.save', 'That didn’t save. Please try again.');
     }
     finally { save.disabled = false; }
@@ -1375,7 +1378,7 @@
     var b = e.target.closest('[data-qc]'); if (!b) return;
     var k = b.getAttribute('data-qc'), course = val('fCourse');
     dlg.close();
-    if (k === 'note') capture(course); else pickFile(k, course);
+    if (k === 'note') { capture(course); editing.fromQuick = true; } else pickFile(k, course, true);
   });
   dlg.addEventListener('close', function () { var sv = document.getElementById('dlgSave'); sv.hidden = false; sv.disabled = false; sv.textContent = T('save', 'Save'); });
   document.getElementById('dlgDelete').addEventListener('click', async function () {
@@ -1624,7 +1627,7 @@
     try {
       if (DEMO) {
         demoBar();
-        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=8');
+        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=9');
       } else {
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;
