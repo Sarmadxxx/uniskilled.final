@@ -34,6 +34,8 @@
 
   /* ---------------------------------------------------------------- icons */
   var I = {
+    moon: '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>',
+    sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
     home: '<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
     book: '<path d="M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2z"/><path d="M4 19V5"/>',
     cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
@@ -1471,6 +1473,7 @@
       else if (act === 'follow') { await store.follow(b.getAttribute('data-label')); render(); toast(T('course-added', 'Course added')); }
       else if (act === 'capture') capture(b.getAttribute('data-course'));
       else if (act === 'quick-capture') openQuick();
+      else if (act === 'theme') { var nt = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', nt); lsSet('shq_theme', nt); render(); toast(nt === 'dark' ? T('dark-on', 'Dark mode on') : T('light-on', 'Light mode on')); }
       else if (act === 'plant-rustle') { var g = b.querySelector('.gd-sway'); if (g) { g.classList.remove('gd-rustle'); void g.getBoundingClientRect(); g.classList.add('gd-rustle'); } }
       else if (act === 'upload') pickFile(b.getAttribute('data-kind'), b.getAttribute('data-course'));
       else if (act === 'file-open') {
@@ -1621,7 +1624,7 @@
     try {
       if (DEMO) {
         demoBar();
-        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=7');
+        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=8');
       } else {
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;
