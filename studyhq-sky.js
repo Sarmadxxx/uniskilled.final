@@ -1,4 +1,4 @@
-/* UniSkilled Study HQ — the greeting sky (morning, afternoon, evening, night).
+/* UniSkilled Study Campus — the greeting sky (morning, afternoon, evening, night).
  *
  * Drawn as an SVG string from the student's own clock: no images, no libraries, nothing loaded.
  * Layers: atmosphere gradient, sun or moon with haze, textured clouds (feTurbulence), stars and a faint

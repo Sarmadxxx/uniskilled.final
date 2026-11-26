@@ -1,6 +1,6 @@
-/* UniSkilled Study HQ — the student's private study workspace (studyhq.html): shared core.
+/* UniSkilled Study Campus — the student's private study workspace (studyhq.html): shared core.
  *
- * ISOLATION: Study HQ only WRITES to its own tables (study_courses, study_timetable, study_items,
+ * ISOLATION: Study Campus only WRITES to its own tables (study_courses, study_timetable, study_items,
  * study_files, study_card_states, study_activity, study_reflections) and its own private storage
  * bucket (study-files). It READS users (name, verification badge), student_profiles and sessions
  * (booked lessons) through their existing policies and never changes them. Booking, payments,
@@ -104,7 +104,7 @@
   }
 
   /* ---------------------------------------------------------------- data */
-  // Study HQ's own connection to the database, created the same way every other UniSkilled page creates one.
+  // Study Campus's own connection to the database, created the same way every other UniSkilled page creates one.
   if (!DEMO && !window._sb && window.supabase && window.USK_CONFIG) {
     window._sb = window.supabase.createClient(window.USK_CONFIG.url, window.USK_CONFIG.anonKey, { realtime: { params: { eventsPerSecond: 0 } } });
   }
@@ -138,14 +138,14 @@
           sb.from('study_activity').select('type,n,right_n,minutes,at').eq('user_id', uid).gte('at', new Date(Date.now() - 120 * 86400000).toISOString()).order('at'),
           sb.from('study_reflections').select('week,went,stuck,aim').eq('user_id', uid),
           sb.from('study_files').select('id,name,path,mime,size_bytes,pages,course_label,course_key,created_at,text_content').eq('user_id', uid).order('created_at', { ascending: false }),
-          // Read-only: exams and revision plans the student made in the Exam planner (Study HQ never changes them)
+          // Read-only: exams and revision plans the student made in the Exam planner (Study Campus never changes them)
           sb.from('student_exams').select('id,title,course_code,course_key,exam_date,topics').eq('student_id', uid).order('exam_date'),
           sb.from('exam_plan_tasks').select('id,exam_id,day,topic,kind,done_at,unsure,created_at').eq('student_id', uid).order('day')
         ]);
         S.user = fail(rs[0]) || {};
         S.profile = rs[1].data || {};
         S.sessions = rs[2].data || [];
-        // Until the Study HQ tables exist (migration not applied yet), show the page read-only.
+        // Until the Study Campus tables exist (migration not applied yet), show the page read-only.
         S.itemsReady = S.dailyReady = !rs[3].error && !rs[4].error;
         if (!S.itemsReady) { S.follows = []; S.items = []; S.exams = []; return; }
         S.follows = (rs[3].data || []).filter(function (c) { return !c.archived; }).map(courseRow);
@@ -167,7 +167,7 @@
         var row = fail(r); S.items = S.items.map(function (x) { return x.id === id ? row : x; });
       },
       deleteItem: async function (id) { fail(await sb.from('study_items').delete().eq('id', id).eq('user_id', S.uid)); S.items = S.items.filter(function (x) { return x.id !== id; }); },
-      // Revision tasks belong to the separate Exam planner; Study HQ does not change them.
+      // Revision tasks belong to the separate Exam planner; Study Campus does not change them.
       setTask: async function () { throw new Error('read only'); },
       // "Exam help": read-only. Tutors who listed one of these courses (same tables and rules as course.html)
       // and the student's own open tutor requests. Nothing is written here.
@@ -365,7 +365,7 @@
   var KINDS = function () { return { learn: T('k.learn', 'Learn'), review: T('k.review', 'Review'), practice: T('k.practice', 'Practice') }; };
   function taskRow(t, x) {
     var done = !!t.done_at;
-    // Revision steps are ticked in the Exam planner (Study HQ only reads them).
+    // Revision steps are ticked in the Exam planner (Study Campus only reads them).
     return '<div class="shq-item' + (done ? ' done' : '') + '"><a class="shq-check' + (done ? ' on' : '') + '" href="exam-planner.html" aria-label="' + esc(T('tick-in-planner', 'Tick “{{t}}” in the Exam planner', { t: t.topic })) + '">' + (done ? ic('tick', 13) : '') + '</a>' +
       '<div class="shq-item-t"><b>' + esc(t.topic) + '</b><div class="shq-meta"><span class="shq-pill info">' + esc(KINDS()[t.kind] || t.kind) + '</span>' + (x ? courseTag(x.course_code || x.title, x.course_key) : '') + (t.unsure ? '<span class="shq-pill warn">' + esc(T('unsure', 'Unsure')) + '</span>' : '') + '</div></div></div>';
   }
@@ -378,12 +378,12 @@
       return { topic: topic, state: unsure ? 'unsure' : learned ? 'learned' : 'todo' };
     });
   }
-  function storageOff() { return S.itemsReady ? '' : ' disabled title="' + esc(T('storage-off', 'Available once Study HQ storage is switched on')) + '"'; }
+  function storageOff() { return S.itemsReady ? '' : ' disabled title="' + esc(T('storage-off', 'Available once Study Campus storage is switched on')) + '"'; }
   function addBtn(kind, label, cls, extra) {
     return '<button type="button" class="' + (cls || 'shq-btn primary') + '" data-act="add" data-kind="' + kind + '"' + (extra || '') + storageOff() + '>' + ic('plus', 15) + '<span>' + esc(label) + '</span></button>';
   }
   function storageNotice() {
-    return S.itemsReady ? '' : '<div class="shq-notice">' + esc(T('storage-notice', 'Courses, exams and lessons are live. Saving assignments, tasks and notes switches on once the Study HQ database update is approved.')) + '</div>';
+    return S.itemsReady ? '' : '<div class="shq-notice">' + esc(T('storage-notice', 'Courses, exams and lessons are live. Saving assignments, tasks and notes switches on once the Study Campus database update is approved.')) + '</div>';
   }
   function reasonText(r) {
     switch (r.k) {
@@ -427,7 +427,7 @@
     var tbe = {}; Object.keys(S.tasksByExam).forEach(function (k) { tbe[k] = S.tasksByExam[k].filter(function (t) { return ui.skipped.indexOf(String(t.id)) === -1; }); });
     var r = H.whatNext({ items: items, exams: S.exams, tasksByExam: tbe, minutesFree: ui.minutes, dailyMinutes: ui.capacity, now: new Date() });
     r.pick = decoStep(r.pick); r.alternates = r.alternates.map(decoStep);
-    r.message = r.state === 'no_items' ? T('wn.none', 'Nothing to plan yet. Add your first assignment or exam and Study HQ will suggest what to do next.')
+    r.message = r.state === 'no_items' ? T('wn.none', 'Nothing to plan yet. Add your first assignment or exam and Study Campus will suggest what to do next.')
       : r.state === 'too_little_time' ? T('wn.short', 'Nothing fits in that time. Pick a longer slot, or take the break.')
       : r.state === 'ahead' ? T('wn.ahead', 'You are ahead: nothing is due in the next week. Review a weak topic, or enjoy the free time.')
       : !r.pick ? T('wn.waiting', 'Everything open is blocked or waiting on someone else.') : '';
@@ -681,7 +681,7 @@
       if (a.key === 'uni_email') { title = T('a.uni', 'University email verified'); text = a.university ? T('a.uni-sub', '{{u}}. Confirmed by UniSkilled’s university email check.', { u: a.university }) : T('a.uni-sub2', 'Confirmed by UniSkilled’s university email check.'); }
       else if (a.key === 'lessons') { title = T('a.lessons', '{{n}} tutoring lessons completed', { n: a.count }); text = T('a.lessons-sub', '{{h}} of lessons, recorded by UniSkilled when each lesson ended.', { h: mins(a.minutes) }); }
       else if (a.key === 'plan_done') { title = T('a.plan', 'Finished a revision plan: {{t}}', { t: a.title }); text = T('a.plan-sub', 'Every revision task ticked off.'); }
-      else if (a.key === 'assignments') { title = T('a.asg', '{{n}} assignments completed', { n: a.count }); text = T('a.asg-sub', 'Ticked off in Study HQ.'); }
+      else if (a.key === 'assignments') { title = T('a.asg', '{{n}} assignments completed', { n: a.count }); text = T('a.asg-sub', 'Ticked off in Study Campus.'); }
       else { title = a.title; text = a.body || ''; }
       return { level: a.level, key: a.key, id: a.id, title: title, text: text, levelName: { verified: T('lv.verified', 'Verified'), record: T('lv.record', 'UniSkilled record'), self: T('lv.self', 'Self-reported') }[a.level] };
     });
@@ -923,18 +923,18 @@
       '<section class="shq-sec"><h2>' + esc(T('timetable', 'Timetable')) + '</h2><p class="shq-d-fine">' + esc(T('tt-help', 'Import the iCal (.ics) file from your campus system (Stud.IP, TUCaN, campo, ZEuS, Moodle…), or add classes by hand.')) + '</p>' +
       '<div class="shq-row"><button type="button" class="shq-btn primary small" data-act="ical"' + storageOff() + '>' + ic('cal', 14) + esc(T('import-tt', 'Import timetable')) + '</button><button type="button" class="shq-btn ghost small" data-act="class-add"' + storageOff() + '>' + ic('plus', 14) + esc(T('add-class', 'Add a class')) + '</button></div>' + classes + '</section>' +
       '<section class="shq-sec"><h2>' + esc(T('courses-exams', 'Courses and exam dates')) + '</h2><p class="shq-d-fine">' + esc(T('exam-help', 'An exam date moves review cards forward and switches Today to exam mode six weeks before.')) + '</p><div class="shq-row"><button type="button" class="shq-btn ghost small" data-act="add-course"' + storageOff() + '>' + ic('plus', 14) + esc(T('add-course', 'Add a course')) + '</button></div>' + courses + '</section>' +
-      '<section class="shq-sec"><h2>' + esc(T('your-data', 'Your data')) + '</h2><p class="shq-d-fine">' + esc(T('data-help', 'Notes, files, cards, timetable and reflections are private to you. Download a copy at any time, or delete everything Study HQ holds about you. Your tutoring account is not affected.')) + '</p>' +
-      '<div class="shq-row"><button type="button" class="shq-btn ghost small" data-act="export">' + ic('upload', 14) + esc(T('export', 'Download my data')) + '</button><button type="button" class="shq-btn ghost small danger" data-act="delete-all"' + storageOff() + '>' + ic('trash', 14) + esc(T('delete-all', 'Delete all Study HQ data')) + '</button></div>' +
+      '<section class="shq-sec"><h2>' + esc(T('your-data', 'Your data')) + '</h2><p class="shq-d-fine">' + esc(T('data-help', 'Notes, files, cards, timetable and reflections are private to you. Download a copy at any time, or delete everything Study Campus holds about you. Your tutoring account is not affected.')) + '</p>' +
+      '<div class="shq-row"><button type="button" class="shq-btn ghost small" data-act="export">' + ic('upload', 14) + esc(T('export', 'Download my data')) + '</button><button type="button" class="shq-btn ghost small danger" data-act="delete-all"' + storageOff() + '>' + ic('trash', 14) + esc(T('delete-all', 'Delete all Study Campus data')) + '</button></div>' +
       '<p class="shq-d-fine">' + esc(T('used-of', '{{u}} of 1 GB used', { u: bytes(usedBytes()) })) + '</p></section>' +
       '<section class="shq-sec"><h2>' + esc(T('ai-h', 'Smart features')) + '</h2><p class="shq-d-fine">' + esc(window.LanguageModel ? T('ai-on', 'This browser can run Chrome’s built-in model on your device. Ask your notes uses it when it is ready; your notes never leave this device for it.') : T('ai-off', 'Card suggestions, review scheduling and search work on every device with fixed rules. No AI service receives your notes.')) + '</p></section></div>';
   }
   function needsOnboarding() { return S.itemsReady && !S.follows.length && !S.timetable.length && !S.items.length && !S.files.length; }
   function onboardingView() {
     var first = String(S.user.full_name || '').trim().split(/\s+/)[0];
-    return '<div class="shq-page shq-onb"><header class="shq-page-h"><div><h1>' + esc(first ? T('onb-h-n', 'Welcome to Study HQ, {{n}}', { n: first }) : T('onb-h', 'Welcome to Study HQ')) + '</h1><p>' + esc(T('onb-sub', 'Three minutes to set up. Then one screen tells you each day what matters: your next class, what to review, what is due.')) + '</p></div></header>' +
+    return '<div class="shq-page shq-onb"><header class="shq-page-h"><div><h1>' + esc(first ? T('onb-h-n', 'Welcome to Study Campus, {{n}}', { n: first }) : T('onb-h', 'Welcome to Study Campus')) + '</h1><p>' + esc(T('onb-sub', 'Three minutes to set up. Then one screen tells you each day what matters: your next class, what to review, what is due.')) + '</p></div></header>' +
       '<ol class="shq-steps"><li><b>' + esc(T('onb-1', 'Bring in your timetable')) + '</b><p>' + esc(T('onb-1s', 'Import the .ics file from your campus system. Your courses are created from it.')) + '</p><div class="shq-row"><button type="button" class="shq-btn primary" data-act="ical">' + ic('cal', 15) + esc(T('import-tt', 'Import timetable')) + '</button><button type="button" class="shq-btn ghost" data-act="add-course">' + esc(T('onb-1b', 'Just type my courses')) + '</button></div></li>' +
       '<li><b>' + esc(T('onb-2', 'Capture one thing from your last class')) + '</b><p>' + esc(T('onb-2s', 'A few lines, a photo of a slide, or the lecture PDF.')) + '</p></li>' +
-      '<li><b>' + esc(T('onb-3', 'Do your first one-minute review')) + '</b><p>' + esc(T('onb-3s', 'Study HQ suggests cards from your notes. You approve each one.')) + '</p></li></ol>' +
+      '<li><b>' + esc(T('onb-3', 'Do your first one-minute review')) + '</b><p>' + esc(T('onb-3s', 'Study Campus suggests cards from your notes. You approve each one.')) + '</p></li></ol>' +
       (S.user.university_email_verified ? '' : '<p class="shq-d-fine">' + esc(T('onb-verify', 'Tip: verifying your university email in your profile unlocks verified-student features later. It is optional.')) + '</p>') +
       '<p class="shq-d-fine">' + esc(T('onb-private', 'Everything you add is private to you.')) + '</p></div>';
   }
@@ -1021,7 +1021,7 @@
       var again = hq.querySelector('[data-act="' + parts[0] + '"][data-id="' + CSS.escape(parts[1]) + '"],[data-act="' + parts[0] + '"][data-v="' + CSS.escape(parts[1]) + '"]');
       if (again) again.focus();
     }
-    document.title = (r.name === 'course' && S.courses.byKey[r.key] ? S.courses.byKey[r.key].label + ' · ' : '') + 'Study HQ — UniSkilled';
+    document.title = (r.name === 'course' && S.courses.byKey[r.key] ? S.courses.byKey[r.key].label + ' · ' : '') + 'Study Campus — UniSkilled';
   }
   window.addEventListener('hashchange', function () { if (route().name !== 'course') ui.courseTab = 'overview'; render(); });
 
@@ -1085,7 +1085,7 @@
     openDialog(T('reflect-title', 'Your week'), field('fWent', T('rf.went', 'What went well?'), '<textarea id="fWent" maxlength="600">' + esc(cur.went || '') + '</textarea>') +
       field('fStuck', T('rf.stuck', 'What is still stuck?'), '<textarea id="fStuck" maxlength="600">' + esc(cur.stuck || '') + '</textarea>') +
       field('fAim', T('rf.aim', 'One aim for next week'), '<input id="fAim" maxlength="200" value="' + esc(cur.aim || '') + '">') +
-      '<p class="hint">' + esc(T('rf.hint', 'Private to you. Study HQ only uses it to show your own term in review. No mood or health questions.')) + '</p>', false);
+      '<p class="hint">' + esc(T('rf.hint', 'Private to you. Study Campus only uses it to show your own term in review. No mood or health questions.')) + '</p>', false);
   }
   function capture(course) {
     var d = new Date();
@@ -1143,7 +1143,7 @@
     fields.innerHTML = (parsed.classes.length ? '<p class="hint">' + esc(T('ics-found', 'Found {{n}} weekly classes. Untick anything that is not yours.', { n: parsed.classes.length })) + '</p><div class="shq-picks">' + rows + '</div>' : '<p class="hint">' + esc(T('ics-none', 'No weekly classes for the current term were found in this file.')) + '</p>') +
       (ex ? '<p class="hint" style="margin-top:12px">' + esc(T('ics-exams', 'Exam dates found:')) + '</p><div class="shq-picks">' + ex + '</div>' : '');
     document.getElementById('dlgTitle').textContent = T('confirm-tt', 'Check your timetable');
-    document.getElementById('dlgSave').textContent = T('add-tt', 'Add to Study HQ');
+    document.getElementById('dlgSave').textContent = T('add-tt', 'Add to Study Campus');
     document.getElementById('dlgSave').disabled = !parsed.classes.length;
   }
   async function readIcal() {
@@ -1189,7 +1189,7 @@
       '<button type="button" data-qc="photo">' + ic('camera', 22) + '<b>' + esc(T('cap-photo', 'Slide photo')) + '</b><small>' + esc(T('cap-photo-s', 'For your own study only')) + '</small></button>' +
       '<button type="button" data-qc="pdf">' + ic('upload', 22) + '<b>' + esc(T('cap-pdf', 'PDF')) + '</b><small>' + esc(T('cap-pdf-s', 'Lecture slides or script')) + '</small></button></div>' +
       field('fCourse', T('f.course', 'Course'), '<input id="fCourse" list="courseList" maxlength="120" value="' + esc(currentClassCourse()) + '">' + courseOptions(), true) +
-      '<p class="hint">' + esc(T('no-audio', 'Study HQ never records audio: recording a lecture without the lecturer’s consent is not allowed in Germany.')) + '</p>', false);
+      '<p class="hint">' + esc(T('no-audio', 'Study Campus never records audio: recording a lecture without the lecturer’s consent is not allowed in Germany.')) + '</p>', false);
     document.getElementById('dlgSave').hidden = true;
   }
   function currentClassCourse() {
@@ -1199,7 +1199,7 @@
   }
   function openDeleteAll() {
     editing = { kind: 'deleteall' };
-    openDialog(T('delete-all', 'Delete all Study HQ data'), '<p class="hint">' + esc(T('del-all-help', 'This deletes your Study HQ courses, timetable, notes, files, cards, review history and reflections. It cannot be undone. Your UniSkilled account, lessons and payments are not affected.')) + '</p>' +
+    openDialog(T('delete-all', 'Delete all Study Campus data'), '<p class="hint">' + esc(T('del-all-help', 'This deletes your Study Campus courses, timetable, notes, files, cards, review history and reflections. It cannot be undone. Your UniSkilled account, lessons and payments are not affected.')) + '</p>' +
       field('fConfirm', T('type-delete', 'Type DELETE to confirm'), '<input id="fConfirm" autocomplete="off" maxlength="10">'), false);
     document.getElementById('dlgSave').textContent = T('delete-all-btn', 'Delete everything');
   }
@@ -1254,7 +1254,7 @@
         if (blob.size > 20 * 1048576) { toast(T('e.big', 'That file is over 20 MB. Please choose a smaller one.')); return; }
         meta = { name: (course ? course + ' · ' : '') + T('slide-on', 'Slide, {{d}}', { d: fmt(new Date(), { day: 'numeric', month: 'short' }) }), ext: '.jpg', mime: 'image/jpeg', course_label: course };
       }
-      if (usedBytes() + blob.size > 1073741824) { toast(T('e.full', 'Your 1 GB of Study HQ storage is full. Delete some files first.')); return; }
+      if (usedBytes() + blob.size > 1073741824) { toast(T('e.full', 'Your 1 GB of Study Campus storage is full. Delete some files first.')); return; }
       await store.addFile(blob, meta); await store.log({ type: 'file' });
       track('studyhq_file_added', { kind: kind, searchable: !!meta.text });
       render(); toast(kind === 'pdf' ? (meta.text ? T('pdf-ok', 'PDF saved and searchable.') : T('pdf-ok2', 'PDF saved.')) : T('photo-ok', 'Photo saved.'));
@@ -1287,7 +1287,7 @@
 
   /* ---------------------------------------------------------------- export */
   function exportData() {
-    var data = { exported_at: new Date().toISOString(), note: 'Your UniSkilled Study HQ data. Files themselves can be opened from Study HQ; this lists them with their text.',
+    var data = { exported_at: new Date().toISOString(), note: 'Your UniSkilled Study Campus data. Files themselves can be opened from Study Campus; this lists them with their text.',
       courses: S.follows.map(function (f) { return { name: f.course_code, exam_date: f.exam_date || null }; }), timetable: S.timetable, items: S.items.filter(function (i) { return !i.pending; }),
       files: S.files.map(function (f) { return { name: f.name, type: f.mime, size_bytes: f.size_bytes, course: f.course_label, added: f.created_at, text: f.text_content || null }; }),
       card_states: S.cardStates, activity: S.log, reflections: S.reflections };
@@ -1332,7 +1332,7 @@
     }
     if (editing.kind === 'deleteall') {
       if (val('fConfirm') !== 'DELETE') { err.textContent = T('e.confirm', 'Type DELETE in capital letters to confirm.'); return; }
-      try { await store.deleteEverything(); lsSet(obKey(), []); dlg.close(); track('studyhq_delete_all', {}); location.hash = '#/overview'; render(); toast(T('deleted-all', 'All Study HQ data deleted.')); }
+      try { await store.deleteEverything(); lsSet(obKey(), []); dlg.close(); track('studyhq_delete_all', {}); location.hash = '#/overview'; render(); toast(T('deleted-all', 'All Study Campus data deleted.')); }
       catch (ex) { err.textContent = T('e.del', 'That didn’t delete. Please try again.'); }
       return;
     }
@@ -1415,7 +1415,7 @@
   }
   function downloadIcs() {
     var L = deadlines();
-    var blob = new Blob([H.toICS(L.rows, { now: new Date(), name: T('ics-name', 'Study HQ deadlines') })], { type: 'text/calendar;charset=utf-8' });
+    var blob = new Blob([H.toICS(L.rows, { now: new Date(), name: T('ics-name', 'Study Campus deadlines') })], { type: 'text/calendar;charset=utf-8' });
     var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'study-hq-deadlines.ics';
     document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
     track('studyhq_ics_download', { n: L.rows.length });
@@ -1507,7 +1507,7 @@
         render(); toast(T('card-added', 'Card added to your note'));
       }
       else if (act === 'unfollow') {
-        if (!confirm(T('confirm-unfollow', 'Remove this course from your list? Its assignments and notes stay in Study HQ.'))) return;
+        if (!confirm(T('confirm-unfollow', 'Remove this course from your list? Its assignments and notes stay in Study Campus.'))) return;
         await store.unfollow(id); location.hash = '#/courses'; render();
       }
     } catch (ex) { toast(T('e.generic', 'Something went wrong. Please try again.')); render(); }
@@ -1627,7 +1627,7 @@
         var session = r.data && r.data.session;
         if (!session) { location.href = 'signin.html?redirect=' + encodeURIComponent(location.pathname + location.search + location.hash); return; }
         // Students and tutors both get their own workspace (tutors are university students too).
-        // Every Study HQ table and file is private to its owner (user_id = auth.uid()), whatever the role.
+        // Every Study Campus table and file is private to its owner (user_id = auth.uid()), whatever the role.
         S.uid = session.user.id;
       }
       await store.load();
@@ -1635,10 +1635,10 @@
       render();
       flushOutbox();
       loadHelp().then(render, function () {});
-      // Installable app + offline: the service worker only controls Study HQ pages (scope /studyhq).
+      // Installable app + offline: the service worker only controls Study Campus pages (scope /studyhq).
       if ('serviceWorker' in navigator && !DEMO && location.protocol === 'https:') { try { navigator.serviceWorker.register('studyhq-sw.js', { scope: './studyhq' }); } catch (e) {} }
     } catch (ex) {
-      hq.innerHTML = '<main id="main" class="shq-solo"><h1>' + esc(T('load-fail', 'Study HQ could not load.')) + '</h1><p>' + esc(T('load-fail-sub', 'Please check your connection and reload the page.')) + '</p><button type="button" class="shq-btn ghost" onclick="location.reload()">' + esc(T('reload', 'Reload')) + '</button></main>';
+      hq.innerHTML = '<main id="main" class="shq-solo"><h1>' + esc(T('load-fail', 'Study Campus could not load.')) + '</h1><p>' + esc(T('load-fail-sub', 'Please check your connection and reload the page.')) + '</p><button type="button" class="shq-btn ghost" onclick="location.reload()">' + esc(T('reload', 'Reload')) + '</button></main>';
       if (window.Sentry && window.Sentry.captureException) try { window.Sentry.captureException(ex); } catch (e2) {}
     }
   })();

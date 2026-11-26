@@ -263,7 +263,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   .vtrust li{font-size:.875rem}
   }
 
-/* ── Study workspace showcase (proposed name: UniSkilled StudySpace) ── */
+/* ── Study Campus showcase ── */
 .ws{position:relative;overflow:hidden;padding:clamp(64px,8vw,120px) var(--gutter) clamp(72px,8vw,120px);background:radial-gradient(1100px 520px at 50% 0%,#e3ecff 0%,rgba(227,236,255,0) 70%),linear-gradient(180deg,#f5f8ff 0%,#fff 62%)}
 .ws .wrap{display:flex;flex-direction:column;align-items:center;gap:clamp(36px,4.5vw,56px)}
 .ws-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;max-width:780px}
@@ -379,7 +379,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 <section class="ws" id="workspace" aria-labelledby="ws-title">
   <div class="wrap">
     <div class="ws-head">
-      <p data-i18n="index.ws.badge" class="ws-badge"><b>New</b>Study HQ <small>· by UniSkilled</small></p>
+      <p data-i18n="index.ws.badge" class="ws-badge"><b>New</b>Study Campus <small>· by UniSkilled</small></p>
       <h2 data-i18n="index.ws.title" class="h2" id="ws-title">Your university life. <em>Organised in one place.</em></h2>
       <p data-i18n="index.ws.lede" class="lede">Courses, deadlines, exams, notes and revision in one calm workspace that tells you what to do next. And when an exam gets close, help from students who passed your course is one click away.</p>
       <div class="ws-ctas">
@@ -395,7 +395,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
           <source media="(max-width: 720px)" srcset="media/workspace/dashboard-focus.webp" type="image/webp">
           <source media="(max-width: 720px)" srcset="media/workspace/dashboard-focus.jpg">
           <source srcset="media/workspace/dashboard-main.webp" type="image/webp">
-          <img data-i18n-attr="alt:index.ws.img-alt" src="media/workspace/dashboard-main.jpg" width="1440" height="968" loading="lazy" decoding="async" alt="The study workspace with sample data: a greeting, a plan for today that fits one hour, exam countdowns, today's classes and busy weeks ahead">
+          <img data-i18n-attr="alt:index.ws.img-alt" src="media/workspace/dashboard-main.jpg" width="1440" height="968" loading="lazy" decoding="async" alt="Study Campus with sample data: a greeting, a plan for today that fits one hour, exam countdowns, today's classes and busy weeks ahead">
         </picture>
       </div>
       <div class="ws-float">
@@ -419,23 +419,6 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
       <li data-i18n="index.ws.m4">Progress tracking</li>
       <li data-i18n="index.ws.m5">Works on your phone</li>
     </ul>
-  </div>
-</section>
-
-<section class="protection" aria-labelledby="protect-title">
-  <div class="wrap">
-    <div class="sec-head">
-      <p data-i18n="index.payment-protection" class="kicker">Payment protection</p>
-      <h2 data-i18n="index.your-money-is-protected" class="h2" id="protect-title">Your money is protected at every step.</h2>
-      <p data-i18n="index.paying-someone-you-havent" class="lede">Paying someone you haven't met should feel safe. Here's exactly what happens to your payment.</p>
-    </div>
-    <ol class="p-grid">
-      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span><h3 data-i18n="index.requests-are-free">Requests are free</h3><p data-i18n="index.sending-a-request-costs">Sending a request costs nothing. You pay by card only after your tutor accepts it.</p></li>
-      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h3 data-i18n="index.held-for-48-hours">Held for 48 hours</h3><p data-i18n="index.your-tutors-payout-stays">Your tutor's payout stays on hold until 48 hours after the lesson.</p></li>
-      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg></span><h3 data-i18n="index.report-a-problem">Report a problem</h3><p data-i18n="index.tutor-didnt-show-up">Tutor didn't show up? Report it within 48 hours. Their payout is paused while we review it, and a no-show is refunded in full.</p></li>
-      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><h3 data-i18n="index.tutor-cancels">Tutor cancels?</h3><p data-i18n="index.youre-refunded-in-full">You're refunded in full, automatically — whenever they cancel.</p></li>
-    </ol>
-    <p data-i18n="index.card-payments-are-processed" class="p-foot"><span>Card payments are processed by Stripe.</span><a href="legal.html#refund">Read the full refund policy</a></p>
   </div>
 </section>
 
@@ -469,6 +452,24 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
     </div>
   </div>
 </section>
+
+<section class="protection" aria-labelledby="protect-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <p data-i18n="index.payment-protection" class="kicker">Payment protection</p>
+      <h2 data-i18n="index.your-money-is-protected" class="h2" id="protect-title">Your money is protected at every step.</h2>
+      <p data-i18n="index.paying-someone-you-havent" class="lede">Paying someone you haven't met should feel safe. Here's exactly what happens to your payment.</p>
+    </div>
+    <ol class="p-grid">
+      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H8l-4 4V4z"/></svg></span><h3 data-i18n="index.requests-are-free">Requests are free</h3><p data-i18n="index.sending-a-request-costs">Sending a request costs nothing. You pay by card only after your tutor accepts it.</p></li>
+      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h3 data-i18n="index.held-for-48-hours">Held for 48 hours</h3><p data-i18n="index.your-tutors-payout-stays">Your tutor's payout stays on hold until 48 hours after the lesson.</p></li>
+      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21V4h11l-1.5 4L16 12H5"/></svg></span><h3 data-i18n="index.report-a-problem">Report a problem</h3><p data-i18n="index.tutor-didnt-show-up">Tutor didn't show up? Report it within 48 hours. Their payout is paused while we review it, and a no-show is refunded in full.</p></li>
+      <li><span class="p-ic"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg></span><h3 data-i18n="index.tutor-cancels">Tutor cancels?</h3><p data-i18n="index.youre-refunded-in-full">You're refunded in full, automatically — whenever they cancel.</p></li>
+    </ol>
+    <p data-i18n="index.card-payments-are-processed" class="p-foot"><span>Card payments are processed by Stripe.</span><a href="legal.html#refund">Read the full refund policy</a></p>
+  </div>
+</section>
+
 
 <section class="how" id="how-it-works" aria-labelledby="how-title">
   <div class="wrap">
@@ -555,13 +556,13 @@ const SUPABASE_URL = USK_CONFIG.url;
 const SUPABASE_ANON_KEY = USK_CONFIG.anonKey;
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// Study workspace showcase: signed-in visitors open their own workspace; others sign up first
+// Study Campus showcase: signed-in visitors open their own workspace; others sign up first
 // and land in it afterwards (onboarding passes the redirect on to sign-in).
 _supabase.auth.getSession().then(function (r) {
   var a = document.getElementById('wsStart');
   if (!a || !(r && r.data && r.data.session)) return;
   a.setAttribute('href', 'studyhq.html');
-  a.textContent = window.I18N ? I18N.t('index.js.wsOpen', 'Open your workspace') : 'Open your workspace';
+  a.textContent = window.I18N ? I18N.t('index.js.wsOpen', 'Open Study Campus') : 'Open Study Campus';
 }).catch(function () {});
 
 function handleSignOut() {

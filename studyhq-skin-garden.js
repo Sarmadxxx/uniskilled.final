@@ -1,4 +1,4 @@
-/* Study HQ design B — Study Garden.
+/* Study Campus design B — Study Garden.
  * Soft sage, lavender, sky and warm neutrals; rounded cards; a light floating side menu on desktop and a
  * bottom tab bar on phones; progress shown as rings, capsules and growing stems. Calm and encouraging,
  * never childish. Layout only: all data and actions come from studyhq.js. */
@@ -408,11 +408,11 @@ button.gd-pillev:hover{filter:brightness(.97)}
     var rest = nav.items.filter(function (n) { return main.indexOf(n.id) === -1; });
     var moreCur = rest.some(function (n) { return n.current; });
     tabbar += '<details' + (moreCur ? ' class="cur"' : '') + '><summary>' + a.ic('more', 20) + a.esc(a.T('more', 'More')) + '</summary><div class="gd-more">' + rest.map(function (n) { return '<a href="' + n.href + '">' + a.ic(n.icon, 18) + a.esc(n.label) + '</a>'; }).join('') + '<a href="student-dashboard.html">' + a.ic('arrow', 18) + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + '</a></div></details>';
-    return '<div class="gd"><div class="gd-app"><aside class="gd-side" aria-label="Study HQ"><div class="gd-brand"><span class="gd-logo">' + a.ic('leaf', 22) + '</span><div><b>Study HQ</b><small>' + a.esc(p.university || a.T('your-workspace', 'Your study space')) + '</small></div></div>' +
-      '<button type="button" class="shq-btn primary gd-capside" data-act="quick-capture">' + a.ic('plus', 16) + a.esc(a.T('capture-h', 'Capture')) + '</button><nav class="gd-nav" aria-label="Study HQ sections">' + items + '</nav><h4>' + a.esc(a.T('my-courses', 'My courses')) + '</h4><nav class="gd-cnav" aria-label="My courses">' + cnav + '</nav>' + termbox +
+    return '<div class="gd"><div class="gd-app"><aside class="gd-side" aria-label="Study Campus"><div class="gd-brand"><span class="gd-logo">' + a.ic('leaf', 22) + '</span><div><b>Study Campus</b><small>' + a.esc(p.university || a.T('your-workspace', 'Your study space')) + '</small></div></div>' +
+      '<button type="button" class="shq-btn primary gd-capside" data-act="quick-capture">' + a.ic('plus', 16) + a.esc(a.T('capture-h', 'Capture')) + '</button><nav class="gd-nav" aria-label="Study Campus sections">' + items + '</nav><h4>' + a.esc(a.T('my-courses', 'My courses')) + '</h4><nav class="gd-cnav" aria-label="My courses">' + cnav + '</nav>' + termbox +
       '<div class="gd-sidelinks"><a href="student-dashboard.html">' + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + ' →</a><a href="find-tutors.html">' + a.esc(a.T('find-a-tutor', 'Find a tutor')) + ' →</a></div></aside>' +
-      '<main id="main" tabindex="-1"><div class="gd-mobilehead"><b><span class="gd-logo">' + a.ic('leaf', 16) + '</span>Study HQ</b>' + (t ? '<span class="gd-chip">' + a.esc(termWord(a, t)) + '</span>' : '<button type="button" class="shq-btn ghost small" data-act="term">' + a.esc(a.T('set-term', 'Set term dates')) + '</button>') + '</div><!--VIEW--></main></div>' +
-      '<nav class="gd-tabbar" aria-label="Study HQ">' + tabbar + '</nav></div>';
+      '<main id="main" tabindex="-1"><div class="gd-mobilehead"><b><span class="gd-logo">' + a.ic('leaf', 16) + '</span>Study Campus</b>' + (t ? '<span class="gd-chip">' + a.esc(termWord(a, t)) + '</span>' : '<button type="button" class="shq-btn ghost small" data-act="term">' + a.esc(a.T('set-term', 'Set term dates')) + '</button>') + '</div><!--VIEW--></main></div>' +
+      '<nav class="gd-tabbar" aria-label="Study Campus">' + tabbar + '</nav></div>';
   }
   function head(a, title, sub, right) {
     return '<div class="gd-head"><div><h1 class="gd-title">' + a.esc(title) + '</h1>' + (sub ? '<p class="gd-sub">' + sub + '</p>' : '') + '</div>' + (right || '') + '</div>';
@@ -445,7 +445,7 @@ button.gd-pillev:hover{filter:brightness(.97)}
     var T = m.today, f = m.focus;
     var q = '<div class="q" role="group" aria-label="' + a.esc(a.T('time-q', 'How much time do you have today?')) + '"><span>' + a.esc(a.T('time-q', 'How much time do you have today?')) + '</span>' + a.timeChoices('shq-time') + '</div>';
     var body = T.plan.steps.length ? '<ol class="gd-steps">' + T.plan.steps.map(function (st) { return stepRow(a, st); }).join('') + '</ol><p class="foot">' + a.esc(a.T('planned-of', '{{u}} of {{m}} min planned, around your classes. Tick things off as you go.', { u: T.plan.used, m: T.plan.minutes })) + '</p>'
-      : '<p class="gd-muted">' + a.esc(f.message || a.T('wn.none', 'Nothing to plan yet. Add your first assignment or exam and Study HQ will suggest what to do next.')) + '</p>' + (f.state === 'no_items' ? '<div style="margin-top:10px"><a class="shq-btn primary" href="#/assignments">' + a.esc(a.T('add-deadline', 'Add a deadline')) + '</a></div>' : '');
+      : '<p class="gd-muted">' + a.esc(f.message || a.T('wn.none', 'Nothing to plan yet. Add your first assignment or exam and Study Campus will suggest what to do next.')) + '</p>' + (f.state === 'no_items' ? '<div style="margin-top:10px"><a class="shq-btn primary" href="#/assignments">' + a.esc(a.T('add-deadline', 'Add a deadline')) + '</a></div>' : '');
     return '<section class="gd-card gd-plan"><h2>' + a.esc(a.T('do-next', 'Do next')) + '</h2>' + q + body + '</section>';
   }
   function catchUp(a, r) {
@@ -539,7 +539,7 @@ button.gd-pillev:hover{filter:brightness(.97)}
     return '<section class="gd-card"><h2>' + a.esc(a.T('coming-up', 'Coming up')) + '<a href="#/assignments">' + a.esc(a.T('all', 'All')) + ' →</a></h2><div class="gd-tl">' + (list.length ? list.slice(0, 6).map(function (e) { return tlRow(a, e); }).join('') : '<p class="gd-muted">' + a.esc(a.T('nothing-10', 'Nothing due in the next 10 days.')) + '</p>') + '</div></section>';
   }
   function help(a, rows) {
-    if (!rows.length) return '<section class="gd-help"><h2>' + a.ic('leaf', 18) + a.esc(a.T('all-good', 'No tricky topics flagged')) + '</h2><p style="margin-top:0">' + a.esc(a.T('flag-hint', 'Mark a topic “unsure” in your revision plan and Study HQ will connect you with tutors for that course.')) + '</p></section>';
+    if (!rows.length) return '<section class="gd-help"><h2>' + a.ic('leaf', 18) + a.esc(a.T('all-good', 'No tricky topics flagged')) + '</h2><p style="margin-top:0">' + a.esc(a.T('flag-hint', 'Mark a topic “unsure” in your revision plan and Study Campus will connect you with tutors for that course.')) + '</p></section>';
     return '<section class="gd-help"><h2>' + a.ic('leaf', 18) + a.esc(a.T('needs-help-gd', 'Topics a tutor could help with')) + '</h2>' + rows.slice(0, 3).map(function (r) {
       return '<div class="gd-help-row"><div><b>' + a.esc(r.topic) + '</b><small>' + a.esc(r.course + ' · ' + r.exam) + '</small></div><a class="shq-btn primary small" href="' + r.tutorHref + '">' + a.esc(a.T('find-tutor-short', 'Find a tutor')) + '</a></div>';
     }).join('') + '<p>' + a.esc(a.T('tutor-note', 'Tutors on the course page teach this course. Booking stays in your tutoring dashboard.')) + '</p></section>';
@@ -733,7 +733,7 @@ button.gd-pillev:hover{filter:brightness(.97)}
       '<section class="gd-card"><h2>' + a.esc(a.T('next-14', 'Next two weeks')) + '</h2><div class="gd-tl">' + (m.next.length ? m.next.slice(0, 8).map(function (e) { return tlRow(a, e); }).join('') : '<p class="gd-muted">' + a.esc(a.T('nothing-14', 'Nothing due in the next two weeks.')) + '</p>') + '</div></section></div>';
     return h;
   }
-  function notFound(a) { return head(a, a.T('not-found', 'Course not found'), a.esc(a.T('not-found-sub', 'This course is not in your Study HQ.'))) + '<a class="shq-btn ghost" href="#/courses">' + a.esc(a.T('back-courses', 'Back to courses')) + '</a>'; }
+  function notFound(a) { return head(a, a.T('not-found', 'Course not found'), a.esc(a.T('not-found-sub', 'This course is not in your Study Campus.'))) + '<a class="shq-btn ghost" href="#/courses">' + a.esc(a.T('back-courses', 'Back to courses')) + '</a>'; }
 
   window.StudyHQSkins = window.StudyHQSkins || {};
   window.StudyHQSkins.garden = { id: 'garden', name: 'Study Garden', palette: PALETTE, css: css, shell: shell,

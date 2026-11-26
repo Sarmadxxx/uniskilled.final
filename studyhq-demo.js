@@ -1,4 +1,4 @@
-/* UniSkilled Study HQ — sample data for the preview (studyhq.html?demo=1).
+/* UniSkilled Study Campus — sample data for the preview (studyhq.html?demo=1).
  * Loaded only in preview mode. Nothing here touches the database: changes live in this browser tab
  * and are gone on reload. All names, courses and dates are invented and placed around today. */
 (function (root) {
@@ -97,7 +97,7 @@
       ],
       exams: exams,
       tasks: tasks,
-      // The Exam planner's exams and plans (read-only in Study HQ) and a course finished last term
+      // The Exam planner's exams and plans (read-only in Study Campus) and a course finished last term
       planner: exams.filter(function (x) { return x.id === 'exam-stat' || x.id === 'exam-econ'; }),
       tasksByExam: tasks.reduce(function (m, x) { (m[x.exam_id] = m[x.exam_id] || []).push(x); return m; }, {}),
       finished: ['MATH 101'],

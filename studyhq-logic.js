@@ -1,10 +1,10 @@
-/* UniSkilled Study HQ — the workspace's logic (used by studyhq.html, tested by tests/site/studyhq-logic.test.mjs).
+/* UniSkilled Study Campus — the workspace's logic (used by studyhq.html, tested by tests/site/studyhq-logic.test.mjs).
  *
  * Pure functions, no network, no page: they take the student's own rows and the current time and
  * return what the page shows. Keeping them here means every rule below is unit-tested.
  *
  *   courseKey()     same normalisation as public.course_key() in the database (Course Hubs)
- *   buildCourses()  one course per key, joining followed courses, exams, Study HQ items and lessons
+ *   buildCourses()  one course per key, joining followed courses, exams, Study Campus items and lessons
  *   courseProgress() done / total work for a course, unsure exam topics, next deadline
  *   whatNext()      the "focus on next" pick: a fixed, explainable score, never a guess about grades
  *   weekPlan()      seven days of deadlines, planned tasks, exam revision and lessons, with minutes
@@ -457,7 +457,7 @@
     return out.slice(0, 5).map(function (c) { c.front = c.front.replace(/\s+\?$/, '?').replace(/\s+/g, ' '); return c; });
   }
 
-  // Approve-first suggestions: Study HQ proposes, the student approves. Fixed rules, in this order.
+  // Approve-first suggestions: Study Campus proposes, the student approves. Fixed rules, in this order.
   function suggestions(input) {
     var now = input.now || new Date(), today = startOfDay(now), out = [];
     (input.classes || []).filter(function (c) { return c.needsCapture; }).forEach(function (c) { out.push({ k: 'capture', id: 'capture:' + c.id, course: c.course }); });
@@ -571,7 +571,7 @@
   /* ================================================================ release 2: exams & deadlines */
 
   // One exam list from the three places a student can give an exam date: the Exam planner (student_exams,
-  // with topics and a plan), a course's exam date in Study HQ (study_courses) and a lesson booking
+  // with topics and a plan), a course's exam date in Study Campus (study_courses) and a lesson booking
   // (sessions.exam_date). The same course on the same day is one exam; the planner's version wins,
   // then the course's (so "change date" still edits the course), then the lesson's.
   function mergeExams(input) {
@@ -749,7 +749,7 @@
     function day(d) { return d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()); }
     function esc(v) { return String(v == null ? '' : v).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
     function fold(line) { var o = [], b = line; while (b.length > 74) { o.push(b.slice(0, 74)); b = ' ' + b.slice(74); } o.push(b); return o.join('\r\n'); }
-    var L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//UniSkilled//Study HQ//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:' + esc(opts.name || 'Study HQ deadlines')];
+    var L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//UniSkilled//Study Campus//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:' + esc(opts.name || 'Study Campus deadlines')];
     (rows || []).forEach(function (r) {
       if (r.group === 'overdue') return;
       var summary = (r.type === 'exam' ? 'Exam: ' : 'Due: ') + (r.course && r.title.indexOf(r.course) === -1 ? r.course + ' · ' : '') + r.title;

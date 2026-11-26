@@ -137,7 +137,7 @@
   var end, mEnd;
   if (user) {
     // Students and tutors (tutors are university students too) each have their own study workspace.
-    var studyItem = role === 'student' || isTutor ? mi('studyhq.html', L('nav.studyWorkspace', 'Study workspace')) : '';
+    var studyItem = role === 'student' || isTutor ? mi('studyhq.html', L('nav.studyWorkspace', 'Study Campus')) : '';
     var menuItems = mi(prof, L('nav.myProfile', 'My profile')) + mi(dash, L('nav.dashboard', 'Dashboard')) + studyItem + mi('calendar.html', L('nav.calendar', 'Calendar')) +
       '<div class="snav-sep" role="separator"></div><button type="button" class="snav-mi snav-out" role="menuitem" data-signout>' + L('nav.signOut', 'Sign out') + '</button>';
     end = (mode === 'public' ? '<a href="' + dash + '" class="snav-text">' + L('nav.dashboard', 'Dashboard') + '</a>' : '') +

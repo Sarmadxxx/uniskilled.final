@@ -1,7 +1,7 @@
 {
   "id": "/studyhq.html",
-  "name": "UniSkilled Study HQ",
-  "short_name": "Study HQ",
+  "name": "UniSkilled Study Campus",
+  "short_name": "Study Campus",
   "description": "Your timetable, notes, files and daily review in one place.",
   "start_url": "/studyhq.html",
   "scope": "/studyhq",
