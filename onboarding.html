@@ -822,7 +822,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   document.getElementById('goSignin').addEventListener('click', function() {
-    window.location.href = 'signin.html';
+    // Pass on where the visitor was heading (e.g. the study workspace); sign-in checks it is a same-site page.
+    const next = new URLSearchParams(window.location.search).get('redirect');
+    window.location.href = next && /^[\w-]+\.html$/.test(next) ? 'signin.html?redirect=' + encodeURIComponent(next) : 'signin.html';
   });
 
 });

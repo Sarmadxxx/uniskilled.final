@@ -262,6 +262,40 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   .vtrust{flex-direction:column;gap:10px;padding-top:16px}
   .vtrust li{font-size:.875rem}
   }
+
+/* ── Study workspace showcase (proposed name: UniSkilled StudySpace) ── */
+.ws{position:relative;overflow:hidden;padding:clamp(64px,8vw,120px) var(--gutter) clamp(72px,8vw,120px);background:radial-gradient(1100px 520px at 50% 0%,#e3ecff 0%,rgba(227,236,255,0) 70%),linear-gradient(180deg,#f5f8ff 0%,#fff 62%)}
+.ws .wrap{display:flex;flex-direction:column;align-items:center;gap:clamp(36px,4.5vw,56px)}
+.ws-head{display:flex;flex-direction:column;align-items:center;text-align:center;gap:18px;max-width:780px}
+.ws-badge{display:inline-flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;background:#fff;border:1px solid #d6e2fb;box-shadow:0 1px 2px rgba(15,36,96,.06);font-size:.875rem;font-weight:700;color:var(--navy)}
+.ws-badge b{background:var(--blue);color:#fff;border-radius:999px;padding:3px 10px;font-size:.75rem;letter-spacing:.04em;text-transform:uppercase}
+.ws-badge small{font-weight:600;color:var(--muted);font-size:.78rem}
+.ws-head h2 em{font-style:normal;color:var(--blue)}
+.ws-head .lede{font-size:clamp(1.02rem,1.35vw,1.15rem);color:var(--text-2);line-height:1.65;max-width:640px}
+.ws-ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+.ws-note{font-size:.85rem;color:var(--muted)}
+.ws-stage{position:relative;width:100%;max-width:1120px;margin:0}
+.ws-frame{position:relative;border-radius:18px;background:#fff;border:1px solid #d9e2f3;box-shadow:0 2px 6px rgba(15,36,96,.06),0 40px 90px -30px rgba(15,36,96,.38);overflow:hidden}
+.ws-bar{display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;background:#f3f6fb;border-bottom:1px solid #e3e9f3}
+.ws-bar i{width:11px;height:11px;border-radius:50%;background:#d5dce8}
+.ws-bar i:nth-child(1){background:#ff6058}.ws-bar i:nth-child(2){background:#ffbd2e}.ws-bar i:nth-child(3){background:#28c941}
+.ws-bar span{margin:0 auto;padding:4px 14px;border-radius:8px;background:#fff;border:1px solid #e3e9f3;font-size:.75rem;font-weight:600;color:var(--muted)}
+.ws-frame picture,.ws-frame img{display:block;width:100%;height:auto}
+.ws-float{position:absolute;right:-28px;bottom:-56px;width:min(46%,500px);border-radius:16px;overflow:hidden;border:1px solid #d9e2f3;background:#fff;box-shadow:0 30px 70px -24px rgba(15,36,96,.45)}
+.ws-float img{display:block;width:100%;height:auto}
+.ws-stage figcaption{margin-top:18px;font-size:.8125rem;color:var(--muted);text-align:left}
+.ws-feats{list-style:none;margin:28px 0 0;padding:0;width:100%;max-width:1120px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.ws-feats li{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 20px;display:flex;flex-direction:column;gap:8px}
+.ws-feats .fi{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--blue-light);color:var(--blue)}
+.ws-feats .fi svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ws-feats h3{font-size:1.02rem;font-weight:800;letter-spacing:-.01em;color:var(--text);margin-top:4px}
+.ws-feats p{font-size:.9rem;line-height:1.55;color:var(--text-2)}
+.ws-more{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.ws-more li{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:.875rem;font-weight:600;color:var(--text-2)}
+.ws-more li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--blue)}
+@media(max-width:1180px){.ws-float{right:-8px}}
+@media(max-width:1020px){.ws-feats{grid-template-columns:repeat(2,minmax(0,1fr))}.ws-float{display:none}}
+@media(max-width:720px){.ws-bar{height:30px}.ws-bar span{display:none}.ws-feats{grid-template-columns:1fr}.ws-ctas{flex-direction:column;align-items:stretch;width:100%}.ws-ctas .btn{width:100%}.ws-feats{margin-top:8px}}
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
@@ -341,6 +375,52 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
   tryPlay();
 })();
 </script>
+
+<section class="ws" id="workspace" aria-labelledby="ws-title">
+  <div class="wrap">
+    <div class="ws-head">
+      <p data-i18n="index.ws.badge" class="ws-badge"><b>New</b>UniSkilled StudySpace <small>· proposed name</small></p>
+      <h2 data-i18n="index.ws.title" class="h2" id="ws-title">Your university life. <em>Organised in one place.</em></h2>
+      <p data-i18n="index.ws.lede" class="lede">Courses, deadlines, exams, notes and revision in one calm workspace that tells you what to do next. And when an exam gets close, help from students who passed your course is one click away.</p>
+      <div class="ws-ctas">
+        <a data-i18n="index.ws.start" id="wsStart" href="onboarding.html?role=student&amp;redirect=studyhq.html" class="btn btn-primary">Get started free</a>
+        <a data-i18n="index.ws.demo" href="studyhq.html?demo=1" class="btn btn-secondary">Explore with sample data</a>
+      </div>
+      <p data-i18n="index.ws.note" class="ws-note">Free for university students and tutors. Your study data stays private to you.</p>
+    </div>
+    <figure class="ws-stage">
+      <div class="ws-frame">
+        <div class="ws-bar" aria-hidden="true"><i></i><i></i><i></i><span>uniskilled.com/studyhq</span></div>
+        <picture>
+          <source media="(max-width: 720px)" srcset="media/workspace/dashboard-focus.webp" type="image/webp">
+          <source media="(max-width: 720px)" srcset="media/workspace/dashboard-focus.jpg">
+          <source srcset="media/workspace/dashboard-main.webp" type="image/webp">
+          <img data-i18n-attr="alt:index.ws.img-alt" src="media/workspace/dashboard-main.jpg" width="1440" height="968" loading="lazy" decoding="async" alt="The study workspace with sample data: a greeting, a plan for today that fits one hour, exam countdowns, today's classes and busy weeks ahead">
+        </picture>
+      </div>
+      <div class="ws-float">
+        <picture>
+          <source srcset="media/workspace/dashboard-help.webp" type="image/webp">
+          <img data-i18n-attr="alt:index.ws.help-alt" src="media/workspace/dashboard-help.jpg" width="800" height="486" loading="lazy" decoding="async" alt="Exam help with sample data: ask for a tutor for an upcoming exam, or book a student who passed the course">
+        </picture>
+      </div>
+      <figcaption data-i18n="index.ws.caption">Product preview with sample data. The student, courses and tutors shown are examples.</figcaption>
+    </figure>
+    <ul class="ws-feats">
+      <li><span class="fi" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16v14H4z"/><path d="M4 10h16M9 3v4M15 3v4"/><path d="M8.5 14.5l2 2 4-4"/></svg></span><h3 data-i18n="index.ws.f1">Every deadline in one list</h3><p data-i18n="index.ws.f1p">Assignments and exams from all your courses, with start-by dates and one tap to add them to your phone calendar.</p></li>
+      <li><span class="fi" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><h3 data-i18n="index.ws.f2">A plan that fits your day</h3><p data-i18n="index.ws.f2p">Say how much time you have. It picks what matters most and plans around your classes.</p></li>
+      <li><span class="fi" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5M9 7h6M9 11h6"/></svg></span><h3 data-i18n="index.ws.f3">Notes, files and smart review</h3><p data-i18n="index.ws.f3p">Keep lecture notes and PDFs by course, and revise with short daily review that never piles up.</p></li>
+      <li><span class="fi" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.4"/><path d="M15.8 14.2c2.5.2 4.2 1.8 4.7 4.8"/></svg></span><h3 data-i18n="index.ws.f4">Help when an exam gets close</h3><p data-i18n="index.ws.f4p">Find a student tutor who passed your exact course, with the same payment protection as every UniSkilled lesson.</p></li>
+    </ul>
+    <ul data-i18n-attr="aria-label:index.ws.more-label" class="ws-more" aria-label="Also included">
+      <li data-i18n="index.ws.m1">Courses and lecture materials</li>
+      <li data-i18n="index.ws.m2">Weekly planner</li>
+      <li data-i18n="index.ws.m3">Exam countdowns</li>
+      <li data-i18n="index.ws.m4">Progress tracking</li>
+      <li data-i18n="index.ws.m5">Works on your phone</li>
+    </ul>
+  </div>
+</section>
 
 <section class="protection" aria-labelledby="protect-title">
   <div class="wrap">
@@ -453,7 +533,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 <footer>
   <div class="ft">
     <div><div class="fl"><img class="fl-icon" src="uniskilled-logo-icon-white.png?v=20261101" alt="" width="28" height="28">UniSkilled</div><p data-i18n="index.university-verified-peer-tutorin" class="fd">University-verified peer tutoring, with real payment protection.</p></div>
-    <div class="fcol"><h5 data-i18n="index.platform">Platform</h5><a data-i18n="index.find-tutors" href="find-tutors.html">Find Tutors</a><a data-i18n="index.start-tutoring-2" href="onboarding.html?role=tutor">Start Tutoring</a><a data-i18n="index.group-sessions" href="group-sessions.html">Group Sessions</a></div>
+    <div class="fcol"><h5 data-i18n="index.platform">Platform</h5><a data-i18n="index.find-tutors" href="find-tutors.html">Find Tutors</a><a data-i18n="index.start-tutoring-2" href="onboarding.html?role=tutor">Start Tutoring</a><a data-i18n="index.group-sessions" href="group-sessions.html">Group Sessions</a><a data-i18n="index.study-workspace" href="index.html#workspace">Study workspace</a></div>
     <div class="fcol"><h5 data-i18n="index.company">Company</h5><a data-i18n="index.about" href="about.html">About</a><a data-i18n="index.partner-with-us" href="about.html">Partner with us</a><a data-i18n="index.contact" href="mailto:info@uniskilled.com">Contact</a></div>
     <div class="fcol"><h5 data-i18n="index.legal">Legal</h5><a data-i18n="index.terms-of-service" href="legal.html">Terms of Service</a><a data-i18n="index.privacy-policy" href="legal.html#privacy">Privacy Policy</a><a data-i18n="index.cookie-policy" href="legal.html#cookies">Cookie Policy</a><a data-i18n="index.refund-policy" href="legal.html#refund">Refund Policy</a><a data-i18n="index.impressum" href="legal.html#impressum">Impressum</a></div>
     <div class="fcol"><h5 data-i18n="index.get-in-touch">Get in touch</h5><a data-i18n="index.infouniskilledcom" href="mailto:info@uniskilled.com">info@uniskilled.com</a><a href="https://www.instagram.com/uni.skilled/" target="_blank" rel="noopener noreferrer" dir="ltr">Instagram</a><a href="https://www.linkedin.com/company/145492362/" target="_blank" rel="noopener noreferrer" dir="ltr">LinkedIn</a></div>
@@ -475,6 +555,15 @@ const SUPABASE_URL = USK_CONFIG.url;
 const SUPABASE_ANON_KEY = USK_CONFIG.anonKey;
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// Study workspace showcase: signed-in visitors open their own workspace; others sign up first
+// and land in it afterwards (onboarding passes the redirect on to sign-in).
+_supabase.auth.getSession().then(function (r) {
+  var a = document.getElementById('wsStart');
+  if (!a || !(r && r.data && r.data.session)) return;
+  a.setAttribute('href', 'studyhq.html');
+  a.textContent = window.I18N ? I18N.t('index.js.wsOpen', 'Open your workspace') : 'Open your workspace';
+}).catch(function () {});
+
 function handleSignOut() {
   _supabase.auth.signOut().then(function() {
     sessionStorage.removeItem('keepSignedIn');
@@ -495,7 +584,7 @@ function handleSignOut() {
     x.target.style.opacity = '1'; x.target.style.transform = 'none';
     io.unobserve(x.target);
   }), { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-  document.querySelectorAll('.p-grid,.path-grid,.steps').forEach(group => {
+  document.querySelectorAll('.p-grid,.path-grid,.steps,.ws-feats').forEach(group => {
     [...group.children].forEach((el, i) => {
       el.style.opacity = '0'; el.style.transform = 'translateY(16px)';
       el.style.transition = `opacity .5s ${Math.min(i, 5) * 0.06}s ease, transform .5s ${Math.min(i, 5) * 0.06}s cubic-bezier(.2,.7,.2,1)`;

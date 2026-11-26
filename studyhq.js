@@ -1626,11 +1626,8 @@
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;
         if (!session) { location.href = 'signin.html?redirect=' + encodeURIComponent(location.pathname + location.search + location.hash); return; }
-        var meta = session.user.user_metadata || {};
-        if (meta.role === 'tutor') {
-          hq.innerHTML = '<main id="main" class="shq-solo"><h1>' + esc(T('students-only', 'Study HQ is for student accounts')) + '</h1><p>' + esc(T('students-only-sub', 'Your tutor tools are in the tutor dashboard.')) + '</p><a class="shq-btn primary" href="tutor-dashboard.html">' + esc(T('to-tutor', 'Go to the tutor dashboard')) + '</a></main>';
-          return;
-        }
+        // Students and tutors both get their own workspace (tutors are university students too).
+        // Every Study HQ table and file is private to its owner (user_id = auth.uid()), whatever the role.
         S.uid = session.user.id;
       }
       await store.load();

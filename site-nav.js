@@ -23,6 +23,8 @@
     '.snav-logo{display:flex;align-items:center;text-decoration:none;flex-shrink:0}' +
     '.snav-logo img{height:38px;width:auto;display:block}' +
     '.snav-links{display:flex;gap:28px;align-items:center;flex:1;justify-content:center;min-width:0}' +
+    // The study-workspace link needs room: on mid-size screens it hides (it stays in the phone menu and on wide screens)
+    '@media(min-width:961px) and (max-width:1199px){.snav-links a[href="index.html#workspace"]{display:none}}' +
     '.snav-links>a{position:relative;font-size:.875rem;font-weight:500;color:rgba(255,255,255,.74);text-decoration:none;padding:8px 0;white-space:nowrap;transition:color .15s}' +
     '.snav-links>a:hover{color:#fff}' +
     '.snav-links>a[aria-current="page"]{color:#fff;font-weight:600}' +
@@ -120,7 +122,7 @@
       ? [[dash, L('nav.dashboard', 'Dashboard')], ['messages.html', L('nav.messages', 'Messages')], ['calendar.html', L('nav.calendar', 'Calendar')], ['manage-availability.html', L('nav.availability', 'Availability')]]
       : [[dash, L('nav.dashboard', 'Dashboard')], ['find-tutors.html', L('nav.findTutors', 'Find Tutors')], ['courses.html', L('nav.courses', 'Courses')], ['messages.html', L('nav.messages', 'Messages')], ['calendar.html', L('nav.calendar', 'Calendar')]];
   } else {
-    items = [['about.html', L('nav.about', 'About')], ['find-tutors.html', L('nav.findTutors', 'Find Tutors')], ['courses.html', L('nav.courses', 'Courses')], ['group-sessions.html', L('nav.groupSessions', 'Group Sessions')], ['index.html#how-it-works', L('nav.howItWorks', 'How it Works')]];
+    items = [['about.html', L('nav.about', 'About')], ['find-tutors.html', L('nav.findTutors', 'Find Tutors')], ['index.html#workspace', L('nav.workspace', 'Study workspace')], ['courses.html', L('nav.courses', 'Courses')], ['group-sessions.html', L('nav.groupSessions', 'Group Sessions')], ['index.html#how-it-works', L('nav.howItWorks', 'How it Works')]];
   }
   var main = items.map(function (i) { return link(i[0], i[1]); }).join('');
 
@@ -136,7 +138,9 @@
 
   var end, mEnd;
   if (user) {
-    var menuItems = mi(prof, L('nav.myProfile', 'My profile')) + mi(dash, L('nav.dashboard', 'Dashboard')) + mi('calendar.html', L('nav.calendar', 'Calendar')) +
+    // Students and tutors (tutors are university students too) each have their own study workspace.
+    var studyItem = role === 'student' || isTutor ? mi('studyhq.html', L('nav.studyWorkspace', 'Study workspace')) : '';
+    var menuItems = mi(prof, L('nav.myProfile', 'My profile')) + mi(dash, L('nav.dashboard', 'Dashboard')) + studyItem + mi('calendar.html', L('nav.calendar', 'Calendar')) +
       '<div class="snav-sep" role="separator"></div><button type="button" class="snav-mi snav-out" role="menuitem" data-signout>' + L('nav.signOut', 'Sign out') + '</button>';
     end = (mode === 'public' ? '<a href="' + dash + '" class="snav-text">' + L('nav.dashboard', 'Dashboard') + '</a>' : '') +
       '<div class="snav-acct"><button type="button" class="snav-acct-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="snavAcctMenu" aria-label="' + esc(L('nav.accountMenuFor', 'Account menu for {{name}}', { name: full || first })) + '">' +
