@@ -279,8 +279,9 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 .ws-bar{display:flex;align-items:center;gap:7px;height:38px;padding:0 14px;background:#f3f6fb;border-bottom:1px solid #e3e9f3}
 .ws-bar i{width:11px;height:11px;border-radius:50%;background:#d5dce8}
 .ws-bar i:nth-child(1){background:#ff6058}.ws-bar i:nth-child(2){background:#ffbd2e}.ws-bar i:nth-child(3){background:#28c941}
-.ws-bar span{margin:0 auto;padding:4px 14px;border-radius:8px;background:#fff;border:1px solid #e3e9f3;font-size:.75rem;font-weight:600;color:var(--muted)}
 .ws-frame picture,.ws-frame img{display:block;width:100%;height:auto}
+.ws-phone{display:none;width:min(340px,88vw);margin:0 auto;padding:10px;border-radius:46px;background:#0b1530;box-shadow:0 2px 6px rgba(15,36,96,.1),0 40px 80px -30px rgba(15,36,96,.5)}
+.ws-phone picture,.ws-phone img{display:block;width:100%;height:auto;border-radius:36px}
 .ws-float{position:absolute;right:-28px;bottom:-56px;width:min(46%,500px);border-radius:16px;overflow:hidden;border:1px solid #d9e2f3;background:#fff;box-shadow:0 30px 70px -24px rgba(15,36,96,.45)}
 .ws-float img{display:block;width:100%;height:auto}
 .ws-stage figcaption{margin-top:18px;font-size:.8125rem;color:var(--muted);text-align:left}
@@ -295,7 +296,7 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
 .ws-more li::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--blue)}
 @media(max-width:1180px){.ws-float{right:-8px}}
 @media(max-width:1020px){.ws-feats{grid-template-columns:repeat(2,minmax(0,1fr))}.ws-float{display:none}}
-@media(max-width:720px){.ws-bar{height:30px}.ws-bar span{display:none}.ws-feats{grid-template-columns:1fr}.ws-ctas{flex-direction:column;align-items:stretch;width:100%}.ws-ctas .btn{width:100%}.ws-feats{margin-top:8px}}
+@media(max-width:720px){.ws-frame{display:none}.ws-phone{display:block}.ws-feats{grid-template-columns:1fr}.ws-ctas{flex-direction:column;align-items:stretch;width:100%}.ws-ctas .btn{width:100%}.ws-feats{margin-top:8px}}
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
@@ -390,12 +391,16 @@ footer{background:var(--ink);padding:4.5rem 6% 2.5rem}
     </div>
     <figure class="ws-stage">
       <div class="ws-frame">
-        <div class="ws-bar" aria-hidden="true"><i></i><i></i><i></i><span>uniskilled.com/studyhq</span></div>
+        <div class="ws-bar" aria-hidden="true"><i></i><i></i><i></i></div>
         <picture>
-          <source media="(max-width: 720px)" srcset="media/workspace/dashboard-focus.webp?v=4" type="image/webp">
-          <source media="(max-width: 720px)" srcset="media/workspace/dashboard-focus.jpg?v=4">
           <source srcset="media/workspace/dashboard-main.webp?v=4" type="image/webp">
           <img data-i18n-attr="alt:index.ws.img-alt" src="media/workspace/dashboard-main.jpg?v=4" width="1440" height="968" loading="lazy" decoding="async" alt="Study Campus with sample data: a morning greeting, a plan for today that fits one hour, exam countdowns, today's classes and busy weeks ahead">
+        </picture>
+      </div>
+      <div class="ws-phone">
+        <picture>
+          <source srcset="media/workspace/dashboard-phone.webp?v=1" type="image/webp">
+          <img data-i18n-attr="alt:index.ws.phone-alt" src="media/workspace/dashboard-phone.jpg?v=1" width="390" height="844" loading="lazy" decoding="async" alt="Study Campus on a phone with sample data: a morning greeting, today's plan, an exam countdown and the menu bar">
         </picture>
       </div>
       <div class="ws-float">
