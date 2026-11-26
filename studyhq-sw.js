@@ -2,8 +2,8 @@
  * Study HQ pages and nothing else on uniskilled.com. It keeps a copy of Study HQ's own files so the
  * page opens offline (notes written offline wait on the device and sync later). It never touches
  * requests to other sites (Supabase, payments, analytics) and never caches API responses. */
-var CACHE = 'studyhq-v1';
-var SHELL = ['studyhq.html', 'studyhq.js', 'studyhq-logic.js', 'studyhq-skin-garden.js', 'studyhq.webmanifest',
+var CACHE = 'studyhq-v2';
+var SHELL = ['studyhq.html', 'studyhq.js', 'studyhq-logic.js', 'studyhq-sky.js', 'studyhq-skin-garden.js', 'studyhq.webmanifest',
   'site.css', 'ui.js', 'site-nav.js', 'supabase-config.js', 'vendor/supabase-js/2.39.3/supabase.js', 'fonts/fonts.css'];
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return Promise.all(SHELL.map(function (u) { return c.add(u).catch(function () {}); })); }).then(function () { return self.skipWaiting(); }));

@@ -299,6 +299,74 @@ button.gd-pillev:hover{filter:brightness(.97)}
 .gd-badge p{font-size:.8rem;color:var(--muted);line-height:1.45}
 .gd-badge .lv{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:999px}
 .gd-badge.verified .lv{background:var(--sage-l);color:var(--sage)}.gd-badge.record .lv{background:var(--sky-l);color:var(--sky)}.gd-badge.self .lv{background:var(--bg);color:var(--muted)}
+
+/* ---- release 2: sky greeting, Do next, exam spotlight, Exam help, busy weeks, Exams & deadlines ---- */
+.gd-sky{position:relative;overflow:hidden;border-radius:28px;min-height:190px;padding:30px clamp(20px,3vw,34px) 28px;color:var(--sky-ink);background:#9CC5EA;box-shadow:0 20px 50px -38px rgba(37,48,43,.6)}
+.gd-sky .shq-sky-art{position:absolute;inset:0;width:100%;height:100%;display:block}
+.gd-sky-txt{position:relative;max-width:620px}
+.gd-sky .date{font-size:.86rem;font-weight:600;color:var(--sky-soft)}
+.gd-sky h1{font-size:clamp(1.6rem,3.2vw,2.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.15;margin:6px 0 4px;text-shadow:0 1px 14px rgba(0,0,0,.08)}
+.gd-sky p{font-size:1rem;font-weight:600;color:var(--sky-soft);margin:0}
+.gd-sky .gd-chip{background:rgba(255,255,255,.88);color:#25302b}
+.gd-sky[data-dark] .gd-chip{background:rgba(255,255,255,.16);color:#fff}
+.gd-sky .gd-chips{margin-top:14px}
+.tw{animation:twk 3.4s ease-in-out infinite}
+@keyframes twk{0%,100%{opacity:.25}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.tw{animation:none}}
+.gd-catch{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--sun-l);border:1px solid #efd9a6;border-radius:18px;padding:12px 16px;font-size:.92rem}
+.gd-catch span{flex:1 1 260px}
+.gd-plan h2{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.gd-plan .q{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:2px 0 14px}
+.gd-plan .q>span{font-size:.9rem;font-weight:700;color:var(--ink2);margin-right:4px}
+.gd-steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.gd-step{display:flex;gap:14px;align-items:center;border:1px solid var(--line);border-radius:16px;padding:12px 14px}
+.gd-step .tx{flex:1;min-width:0}.gd-step .tx b{display:block;font-size:.98rem}.gd-step .tx small{display:block;font-size:.82rem;color:var(--muted);margin-top:2px}
+.gd-step .mn{font-size:.82rem;font-weight:800;color:var(--ink2);white-space:nowrap}
+.gd-step .go{width:28px;height:28px;border-radius:10px;display:grid;place-items:center;background:var(--sage);color:#fff;flex-shrink:0;text-decoration:none}
+.gd-step .skip{border:0;background:none;color:var(--muted);font-size:.78rem;text-decoration:underline;cursor:pointer;padding:4px}
+.gd-plan .foot{font-size:.8rem;color:var(--muted);margin-top:12px}
+.gd a.shq-check{text-decoration:none}.gd a.shq-check.on{background:var(--sage2);border-color:var(--sage2)}
+.gd-spots{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.gd-spot{background:var(--card);border-radius:var(--r);padding:18px;border-top:4px solid var(--lav);box-shadow:0 1px 2px rgba(37,48,43,.05);display:grid;gap:8px}
+.gd-spot .lb{display:flex;justify-content:space-between;gap:8px;font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--lav)}.gd-spot .lb span{color:var(--muted);text-transform:none;letter-spacing:0;font-weight:600}
+.gd-spot .big{display:flex;align-items:baseline;gap:10px}.gd-spot .big b{font-size:2.3rem;font-weight:800;letter-spacing:-.02em}.gd-spot .big span{font-size:.95rem;color:var(--ink2)}
+.gd-spot small{font-size:.82rem;color:var(--muted)}
+.gd-bar{height:8px;border-radius:99px;background:var(--lav-l)}.gd-bar i{display:block;height:8px;border-radius:99px;background:var(--lav)}
+.gd-helpbox h2{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.gd-helpbox h2 button{border:0;background:none;font-size:.8rem;color:var(--muted);text-decoration:underline;cursor:pointer;font-weight:600}
+.gd-helpgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.gd-hc{border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:8px;align-content:start}
+.gd-hc.ask{border-style:dashed;background:#fafbf7}
+.gd-hc .lb{font-size:.72rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--lav)}
+.gd-hc b{font-size:1rem}.gd-hc p{margin:0;font-size:.88rem;color:var(--ink2);line-height:1.45}.gd-hc small{font-size:.78rem;color:var(--muted)}
+.gd-hc .who{display:flex;gap:12px;align-items:center}.gd-hc .av{width:44px;height:44px;border-radius:50%;background:var(--sky-l);color:var(--sky);display:grid;place-items:center;font-weight:800;flex-shrink:0}
+.gd-hc .ok{color:var(--sage);font-weight:700;font-size:.78rem}
+.gd-hc .acts{display:flex;gap:8px;flex-wrap:wrap}
+.gd-invite{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--sage-l);border-radius:16px;padding:12px 14px;margin-top:14px;font-size:.9rem}.gd-invite span{flex:1 1 260px}
+.gd-busy{display:flex;gap:6px;align-items:flex-end;height:92px;margin-top:10px}
+.gd-busy div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.gd-busy i{display:block;width:100%;border-radius:7px;background:#cfe0d4;min-height:4px}.gd-busy .now i{background:var(--sage2)}.gd-busy .hot i{background:#e7b35a}
+.gd-busy b{font-size:.72rem}.gd-busy small{font-size:.68rem;color:var(--muted);white-space:nowrap}
+.gd-qa{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--card);border-radius:18px;padding:12px 14px;margin-bottom:14px;box-shadow:0 1px 2px rgba(37,48,43,.05)}
+.gd-qa input{flex:1 1 280px;border:1px solid var(--line);border-radius:12px;padding:11px 12px;font:inherit;font-size:.95rem;background:#fff;color:var(--ink)}
+.gd-qa input:focus{outline:3px solid var(--sage-l);border-color:var(--sage2)}
+.gd-qa #qaPreview{flex-basis:100%;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.8rem;min-height:22px}
+.shq-qa-hint{color:var(--muted)}.shq-qa-chip{background:var(--sky-l);color:var(--sky);border-radius:999px;padding:3px 10px;font-weight:700}.shq-qa-miss{color:var(--peach);font-weight:700}
+.gd-types{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.gd-types button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 14px;font:inherit;font-size:.84rem;font-weight:700;cursor:pointer;color:var(--ink2)}
+.gd-types button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.gd-dlg h3{font-size:.74rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink2);margin:18px 0 8px}.gd-dlg h3.red{color:var(--peach)}
+.gd-dl{display:flex;gap:14px;align-items:center;background:var(--card);border-radius:16px;padding:12px 14px;border-left:5px solid var(--sky);margin-bottom:8px;box-shadow:0 1px 2px rgba(37,48,43,.05)}
+.gd-dl.t-exam{border-left-color:var(--lav)}.gd-dl.late{border-left-color:#e7b35a}
+.gd-dl .d{width:52px;flex-shrink:0;text-align:center;background:var(--bg);border-radius:12px;padding:5px 0}.gd-dl.late .d{background:var(--sun-l)}
+.gd-dl .d small{display:block;font-size:.68rem;color:var(--muted)}.gd-dl .d b{display:block;font-size:1.3rem;line-height:1.1}
+.gd-dl .b{flex:1;min-width:0}.gd-dl .l1{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.gd-dl .l1>b{font-size:.98rem}
+.gd-dl .ty{font-size:.66rem;font-weight:800;letter-spacing:.06em;border-radius:6px;padding:2px 7px;background:var(--sky-l);color:var(--sky)}.gd-dl.t-exam .ty{background:var(--lav-l);color:var(--lav)}
+.gd-dl .m{font-size:.82rem;color:var(--ink2);margin-top:3px}.gd-dl .s{font-size:.82rem;color:var(--muted);margin-top:2px;font-weight:600}.gd-dl.late .s{color:#9a6b1f}
+.gd-dl .r{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}.gd-dl .w{font-size:.84rem;font-weight:800;color:var(--ink2)}.gd-dl.late .w{color:#9a6b1f}
+.gd-dl .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+@media(max-width:640px){.gd-dl{flex-wrap:wrap}.gd-dl .r{flex-direction:row;width:100%;justify-content:space-between;align-items:center}.gd-sky{min-height:160px;border-radius:22px}}
+.gd-howto{display:grid;gap:10px;font-size:.86rem;color:var(--ink2)}.gd-howto b{color:var(--ink)}
 `;
 
   var PALETTE = ['#5e8b6f', '#8b7bc8', '#4f8cc1', '#c9805f', '#b89036', '#b5739b', '#4a9696', '#7c8c4a'];
@@ -330,9 +398,9 @@ button.gd-pillev:hover{filter:brightness(.97)}
     var cnav = nav.courses.map(function (c) { return '<a href="' + c.href + '"' + (c.current ? ' aria-current="page"' : '') + '><i style="background:' + c.color + '"></i>' + a.esc(c.label) + '</a>'; }).join('') || '<a href="#" data-act="add-course">+ ' + a.esc(a.T('add-course', 'Add a course')) + '</a>';
     var termbox = t ? '<div class="gd-termbox">' + ring(t.pct, '#5e8b6f', 52, a.esc(a.T('term-pct', '{{n}}% of the term', { n: t.pct }))) + '<div><b>' + a.esc(termWord(a, t)) + '</b><small>' + a.esc(t.name) + '</small><button type="button" data-act="term">' + a.esc(a.T('edit-term', 'Edit term')) + '</button></div></div>'
       : '<div class="gd-termbox"><div><b>' + a.esc(a.T('set-term-q', 'When does your term end?')) + '</b><small>' + a.esc(a.T('set-term-sub', 'Add your term dates to see your week.')) + '</small><button type="button" data-act="term">' + a.esc(a.T('set-term', 'Set term dates')) + '</button></div></div>';
-    var main = ['overview', 'courses', 'learn', 'progress'];
+    var main = ['overview', 'assignments', 'learn', 'courses'];
     var tabs = nav.items.filter(function (n) { return main.indexOf(n.id) !== -1; }).map(function (n) {
-      return '<a href="' + n.href + '"' + (n.current ? ' aria-current="page"' : '') + '>' + a.ic(n.icon, 20) + a.esc(n.id === 'overview' ? a.T('today-tab', 'Today') : n.label) + '</a>';
+      return '<a href="' + n.href + '"' + (n.current ? ' aria-current="page"' : '') + '>' + a.ic(n.icon, 20) + a.esc(n.id === 'overview' ? a.T('today-tab', 'Today') : n.id === 'assignments' ? a.T('deadlines-tab', 'Deadlines') : n.label) + (n.id === 'assignments' && n.count ? ' <span class="n">' + n.count + '</span>' : '') + '</a>';
     });
     tabs.splice(2, 0, '<button type="button" class="gd-cap" data-act="quick-capture" aria-label="' + a.esc(a.T('capture-h', 'Capture')) + '">' + a.ic('plus', 24) + '</button>');
     var tabbar = tabs.join('');
@@ -358,21 +426,81 @@ button.gd-pillev:hover{filter:brightness(.97)}
       ring(p.pct, m.color, 54, a.esc(p.pct == null ? a.T('no-work', 'No work yet') : a.T('pct-done', '{{n}}% done', { n: p.pct }))) + '</div><div class="facts">' + facts.join('') + '</div><div class="stem"><i style="width:' + (p.pct || 0) + '%"></i></div></a>';
   }
 
+  function skyHero(a, m, line) {
+    var t = m.term, sk = m.today.sky;
+    return '<section class="gd-sky"' + (sk.ink.dark ? ' data-dark' : '') + ' style="--sky-ink:' + sk.ink.ink + ';--sky-soft:' + sk.ink.soft + '">' + sk.svg +
+      '<div class="gd-sky-txt"><div class="date">' + a.esc(m.dateText) + (t ? ' · ' + a.esc(termWord(a, t)) : '') + '</div><h1>' + a.esc(m.greet + (m.first ? ', ' + m.first : '') + '.') + '</h1><p>' + a.esc(line) + '</p></div></section>';
+  }
+  function stepRow(a, st) {
+    var ctl, extra = '';
+    if (st.type === 'review') ctl = '<a class="go" href="#/learn" aria-label="' + a.esc(a.T('start-review', 'Start review')) + '">' + a.ic('arrow', 14) + '</a>';
+    else if (st.type === 'exam_task') ctl = '<a class="shq-check" href="exam-planner.html" aria-label="' + a.esc(a.T('tick-in-planner', 'Tick “{{t}}” in the Exam planner', { t: st.title })) + '"></a>';
+    else { ctl = a.checkbox('done', st.id, false, a.T('mark-done', 'Mark “{{t}}” done', { t: st.title }), !a.S.itemsReady); extra = '<button type="button" class="skip" data-act="skip" data-id="' + a.esc(st.id) + '">' + a.esc(a.T('not-now', 'Not now')) + '</button>'; }
+    var title = st.type === 'exam_task' ? a.T('revise-topic', 'Revise {{t}}', { t: st.title }) : st.title;
+    var sub = [st.course, st.why].filter(Boolean).join(' · ');
+    return '<li class="gd-step">' + ctl + '<div class="tx"><b>' + a.esc(title) + '</b>' + (sub ? '<small>' + a.esc(sub) + '</small>' : '') + '</div><span class="mn">' + a.esc(a.mins(st.minutes)) + '</span>' + extra + '</li>';
+  }
+  function planCard(a, m) {
+    var T = m.today, f = m.focus;
+    var q = '<div class="q" role="group" aria-label="' + a.esc(a.T('time-q', 'How much time do you have today?')) + '"><span>' + a.esc(a.T('time-q', 'How much time do you have today?')) + '</span>' + a.timeChoices('shq-time') + '</div>';
+    var body = T.plan.steps.length ? '<ol class="gd-steps">' + T.plan.steps.map(function (st) { return stepRow(a, st); }).join('') + '</ol><p class="foot">' + a.esc(a.T('planned-of', '{{u}} of {{m}} min planned, around your classes. Tick things off as you go.', { u: T.plan.used, m: T.plan.minutes })) + '</p>'
+      : '<p class="gd-muted">' + a.esc(f.message || a.T('wn.none', 'Nothing to plan yet. Add your first assignment or exam and Study HQ will suggest what to do next.')) + '</p>' + (f.state === 'no_items' ? '<div style="margin-top:10px"><a class="shq-btn primary" href="#/assignments">' + a.esc(a.T('add-deadline', 'Add a deadline')) + '</a></div>' : '');
+    return '<section class="gd-card gd-plan"><h2>' + a.esc(a.T('do-next', 'Do next')) + '</h2>' + q + body + '</section>';
+  }
+  function catchUp(a, r) {
+    if (!r) return '';
+    return '<div class="gd-catch" role="status"><span><b>' + a.esc(r.title) + '</b>' + (r.course ? ' (' + a.esc(r.course) + ')' : '') + ' · ' + a.esc(r.when) + '. ' + a.esc(a.T('no-stress', 'No stress. What happens next?')) + '</span>' +
+      '<button type="button" class="shq-btn primary small" data-act="move-tomorrow" data-id="' + a.esc(r.id) + '">' + a.esc(a.T('move-tomorrow', 'Move to tomorrow')) + '</button>' +
+      '<button type="button" class="shq-btn ghost small" data-act="done" data-id="' + a.esc(r.id) + '">' + a.esc(a.T('handed-in', 'I handed it in')) + '</button></div>';
+  }
+  function spotlight(a, list) {
+    if (!list.length) return '';
+    return '<div class="gd-spots">' + list.map(function (e, i) {
+      var plan = e.total ? '<div class="gd-bar" role="img" aria-label="' + a.esc(a.T('plan-pct', '{{n}}% of the revision plan done', { n: e.pct })) + '"><i style="width:' + e.pct + '%"></i></div><small>' + a.esc(a.T('plan-steps', 'Revision plan: {{d}} of {{t}} steps', { d: e.done, t: e.total })) + '</small>'
+        : '<a class="shq-btn primary small" style="justify-self:start" href="exam-planner.html?course=' + encodeURIComponent(e.course) + '">' + a.esc(a.T('make-plan', 'Make a revision plan (2 min)')) + '</a>';
+      var big = e.daysLeft === 0 ? '<b>' + a.esc(a.T('today', 'Today')) + '</b><span>' + a.esc(e.title) + '</span>' : '<b>' + e.daysLeft + '</b><span>' + a.esc(e.daysLeft === 1 ? a.T('day-to', 'day to {{t}}', { t: e.title }) : a.T('days-to', 'days to {{t}}', { t: e.title })) + '</span>';
+      return '<article class="gd-spot" style="border-top-color:' + e.color + '"><div class="lb">' + a.esc(i === 0 ? a.T('next-exam', 'Next exam') : a.T('then', 'Then')) + '<span>' + a.esc(a.fmt(e.date, { weekday: 'short', day: 'numeric', month: 'short' })) + '</span></div><div class="big">' + big + '</div>' +
+        (e.title !== e.course ? '<small>' + a.esc(e.course) + '</small>' : '') + plan + (e.unsure ? '<small>' + a.esc(a.T('unsure-n2', 'You marked {{n}} topics unsure', { n: e.unsure })) + '</small>' : '') + '</article>';
+    }).join('') + '</div>';
+  }
+  function helpBox(a, m) {
+    var T = m.today;
+    if (T.hideHelp) return '<p class="gd-muted" style="font-size:.84rem">' + a.esc(a.T('help-hidden', 'Exam help is hidden.')) + ' <button type="button" class="shq-btn ghost small" data-act="help-show">' + a.esc(a.T('show', 'Show')) + '</button></p>';
+    var h = T.help;
+    if (!h || (!h.cards.length && !h.invite)) return '';
+    var cards = h.cards.map(function (c) {
+      var lb = '<span class="lb">' + a.esc(c.course + ' · ' + c.when) + '</span>';
+      if (c.type === 'tutor') {
+        var t = c.tutor, facts = [t.stars != null ? '★ ' + t.stars + ' (' + t.reviews + ')' : a.T('new-tutor', 'New tutor · fewer than 3 reviews'), c.rateText ? a.T('per-h', '{{r}}/h', { r: c.rateText }) : null].filter(Boolean).join(' · ');
+        return '<article class="gd-hc">' + lb + '<div class="who"><span class="av">' + a.esc(c.initials) + '</span><div><b>' + a.esc(t.name) + '</b><br><small>' + (t.verified ? '<span class="ok">✓ ' + a.esc(a.T('uni-verified', 'University verified')) + '</span> · ' : '') + a.esc(a.T('teaches-c', 'Teaches {{c}}', { c: t.course || c.course })) + '</small></div></div>' +
+          (c.unsure.length ? '<p>' + a.esc(a.T('help-unsure', 'You marked {{t}} unsure. A second explanation can help.', { t: c.unsure.join(', ') })) + '</p>' : '') + '<small>' + a.esc(facts) + '</small><small>' + a.esc(a.T('pay-protected', 'Payment is protected until the session happens.')) + '</small>' +
+          '<div class="acts"><a class="shq-btn ghost small" data-act="help-tutor" data-v="profile" href="' + c.profileHref + '">' + a.esc(a.T('view-profile', 'View profile')) + '</a><a class="shq-btn primary small" data-act="help-tutor" data-v="book" href="' + c.bookHref + '">' + a.esc(a.T('book-session', 'Book a session')) + '</a></div></article>';
+      }
+      return '<article class="gd-hc ask">' + lb + '<b>' + a.esc(c.requested ? a.T('req-sent', 'You asked for a {{c}} tutor', { c: c.course }) : a.T('no-tutor-yet', 'No {{c}} tutor yet', { c: c.course })) + '</b>' +
+        '<p>' + a.esc(c.requested ? a.T('req-sent-p', 'We will tell you as soon as someone who teaches it joins. Your revision plan is the best next step meanwhile.') : a.T('ask-p', 'Ask for one and we will tell you when someone who teaches it joins.')) + '</p>' +
+        (c.requested ? '' : '<a class="shq-btn primary small" style="justify-self:start" data-act="help-ask" href="' + c.requestHref + '">' + a.esc(a.T('ask-tutor', 'Ask for a tutor')) + '</a><small>' + a.esc(a.T('ask-note', 'Opens the request form on Find tutors. Tutors on UniSkilled can see requests.')) + '</small>') + '</article>';
+    }).join('');
+    var invite = h.invite ? '<div class="gd-invite"><span>🎓 ' + a.esc(a.T('invite', 'You finished {{c}}. Help other students with it and earn. You set your own price.', { c: h.invite.course })) + '</span><a class="shq-btn primary small" href="' + h.invite.href + '">' + a.esc(a.T('tutor-this', 'Tutor this course')) + '</a></div>' : '';
+    return '<section class="gd-card gd-helpbox"><h2>' + a.esc(a.T('exam-help', 'Exam help')) + '<button type="button" data-act="help-hide">' + a.esc(a.T('hide-box', 'Hide this box')) + '</button></h2>' +
+      '<p class="gd-muted" style="margin:-4px 0 12px;font-size:.84rem">' + a.esc(a.T('help-sub', 'For your next exams. A tutor card appears only when a tutor really teaches the course. We never guess how you are doing.')) + '</p>' +
+      (cards ? '<div class="gd-helpgrid">' + cards + '</div>' : '') + invite + '<a class="gd-link" style="display:inline-block;margin-top:12px" href="find-tutors.html">' + a.esc(a.T('browse-tutors', 'Browse all tutors')) + ' →</a></section>';
+  }
+  function busyCard(a, B, withLink) {
+    return '<section class="gd-card"><h2>' + a.esc(a.T('busy-weeks', 'Busy weeks ahead')) + (withLink ? '<a href="#/assignments">' + a.esc(a.T('all-deadlines', 'All deadlines')) + ' →</a>' : '') + '</h2>' +
+      '<div class="gd-busy" role="img" aria-label="' + a.esc(B.note) + '">' + B.weeks.map(function (w, i) { return '<div class="' + (i === 0 ? 'now' : '') + (w.busy ? ' hot' : '') + '"><b>' + (w.points ? (Math.round(w.points * 10) / 10) : '') + '</b><i style="height:' + Math.max(4, w.pct * 0.62) + 'px"></i><small>' + a.esc(w.label) + '</small></div>'; }).join('') + '</div>' +
+      '<p class="gd-muted" style="font-size:.84rem;margin-top:10px">' + a.esc(B.note) + '</p><p class="gd-muted" style="font-size:.74rem;margin-top:4px">' + a.esc(a.T('busy-key', 'Exams count 2, assignments 1, small tasks ½.')) + '</p></section>';
+  }
   function overview(a, m) {
-    var s = m.stats, t = m.term;
-    var d = m.daily;
-    var hero = '<section class="gd-hero">' + hills() + '<div><div class="date">' + a.esc(m.dateText) + '</div><h1>' + a.esc(m.greet + (m.first ? ', ' + m.first : '')) + '</h1><p>' + a.esc(d.ready ? a.T('gd-daily', 'Ten minutes a day keeps the term calm. Here is today.') : s.dueWeek || s.exams30 ? a.T('gd-sub', 'One small step at a time. Here is how your week looks.') : a.T('gd-calm', 'A calm week. A good moment to get ahead.')) + '</p>' +
-      '<div class="gd-chips">' + (d.ready ? '<span class="gd-chip"><b>' + d.classes.length + '</b>' + a.esc(d.classes.length === 1 ? a.T('class-today-1', 'class today') : a.T('classes-today', 'classes today')) + '</span><span class="gd-chip"><b>' + d.queue.total + '</b>' + a.esc(a.T('cards-review', 'cards to review')) + '</span>' : '') + '<span class="gd-chip"><b>' + s.dueWeek + '</b>' + a.esc(a.T('due-this-week', 'due this week')) + '</span>' + (d.ready ? '' : '<span class="gd-chip"><b>' + s.exams30 + '</b>' + a.esc(a.T('exams-30', 'exams in 30 days')) + '</span>') + '</div></div>' +
-      (t ? '<div class="gd-termring">' + ring(t.pct, '#5e8b6f', 64, a.esc(a.T('term-pct', '{{n}}% of the term', { n: t.pct }))) + '<div><b>' + a.esc(termWord(a, t)) + '</b><small>' + a.esc(t.name) + '</small><small>' + a.esc(a.T('days-left-term', '{{n}} days left', { n: t.daysLeft })) + '</small></div></div>' : '') + '</section>';
-    var html;
-    if (d.ready) {
-      var today = '<div class="gd-pair"><section class="gd-card"><h2>' + a.esc(a.T('today-classes', 'Today’s classes')) + '<a href="#/settings">' + a.esc(a.T('timetable', 'Timetable')) + ' →</a></h2>' + a.classesBlock(d) + '</section>' +
-        '<section class="gd-card gd-rv"><h2>' + a.esc(a.T('today-review', 'Today’s review')) + '<a href="#/learn">' + a.esc(a.T('nav.review', 'Review')) + ' →</a></h2>' + a.reviewBlock(d) + '</section></div>';
-      var sugg = d.suggestions.length ? '<section class="gd-card"><h2>' + a.esc(a.T('suggested', 'Suggested for today')) + '</h2>' + a.suggestBlock(d, 3) + '</section>' : '';
-      var rec = '<section class="gd-card"><h2>' + a.esc(a.T('this-week-rec', 'Your week so far')) + '<a href="#/progress">' + a.esc(a.T('nav.week', 'Week')) + ' →</a></h2>' + a.recordBlock(d.record) + '</section>';
-      html = hero + '<div style="height:22px"></div>' + a.storageNotice() + '<div class="gd-two"><div class="gd-grid">' + today + coming(a, m.upcoming) + focus(a, m.focus) + '</div><div class="gd-grid">' + sugg + rec + courseTiles(a, m.courses) + '</div></div>';
-    } else html = hero + '<div style="height:22px"></div>' + a.storageNotice() + '<div class="gd-two"><div class="gd-grid">' + focus(a, m.focus) + week(a, m) + courseTiles(a, m.courses) + '</div><div class="gd-grid">' + coming(a, m.upcoming) + help(a, m.attention) + '</div></div>';
-    return html;
+    var d = m.daily, T = m.today;
+    // Review is already the first step of Do next, so the assistant does not repeat it here.
+    var sugg = (d.suggestions || []).filter(function (x) { return x.k !== 'review'; });
+    var line = T.left ? a.T(T.left === 1 ? 'one-thing' : 'n-things', T.left === 1 ? 'One thing to do today.' : '{{n}} things to do today.', { n: T.left }) : a.T('calm-day', 'Nothing urgent today. A good moment to get ahead.');
+    var left = catchUp(a, T.late) + planCard(a, m) + spotlight(a, T.spotlight) + helpBox(a, m) + courseTiles(a, m.courses);
+    var right = (d.ready ? '<section class="gd-card"><h2>' + a.esc(a.T('today-classes', 'Today’s classes')) + '<a href="#/settings">' + a.esc(a.T('timetable', 'Timetable')) + ' →</a></h2>' + a.classesBlock(d) + '</section>' : '') +
+      busyCard(a, T.busy, true) +
+      (d.ready && sugg.length ? '<section class="gd-card"><h2>' + a.esc(a.T('assistant', 'Study assistant')) + '</h2><p class="gd-muted" style="font-size:.8rem;margin:-4px 0 10px">' + a.esc(a.T('assistant-sub', 'Uses only your notes and dates. Suggests, never acts without you.')) + '</p>' + a.suggestBlock({ ready: true, suggestions: sugg }, 3) + '</section>' : '') +
+      (d.ready ? '<section class="gd-card"><h2>' + a.esc(a.T('this-week-rec', 'Your week so far')) + '<a href="#/progress">' + a.esc(a.T('your-plant', 'Your plant')) + ' →</a></h2>' + a.recordBlock(d.record) + '</section>' : coming(a, m.upcoming));
+    return skyHero(a, m, line) + '<div style="height:18px"></div>' + a.storageNotice() + '<div class="gd-two"><div class="gd-grid">' + left + '</div><div class="gd-grid">' + right + '</div></div>';
   }
   function focus(a, f) {
     var top = '<div class="top"><span class="lbl">' + a.esc(a.T('focus-next-gd', 'Your next step')) + '</span><div class="times" role="group" aria-label="' + a.esc(a.T('time-free', 'Time you have now')) + '">' + a.timeChoices('shq-time') + '</div></div>';
@@ -489,13 +617,41 @@ button.gd-pillev:hover{filter:brightness(.97)}
     return '<div class="gd-filters" role="group" aria-label="' + a.esc(a.T('filter-course', 'Filter by course')) + '"><button type="button" data-act="' + act + '" data-v="all" aria-pressed="' + (cur === 'all') + '">' + a.esc(a.T('all', 'All')) + '</button>' +
       list.map(function (f) { return '<button type="button" data-act="' + act + '" data-v="' + a.esc(f.key) + '" aria-pressed="' + (cur === f.key) + '"><i class="shq-dot" style="background:' + f.color + '"></i>' + a.esc(f.label) + '</button>'; }).join('') + '</div>';
   }
+  function dlRowHtml(a, r) {
+    var acts = '';
+    if (r.type === 'exam') {
+      acts = '<a class="shq-btn ghost small" href="' + r.planHref + '">' + a.esc(r.plan ? a.T('open-plan-btn', 'Open revision plan') : a.T('make-plan-s', 'Make a plan')) + '</a>' +
+        (r.courseId ? '<button type="button" class="shq-btn ghost small" data-act="exam" data-id="' + a.esc(r.courseId) + '">' + a.esc(a.T('change-date', 'Change date')) + '</button>' : '') +
+        '<a class="shq-btn ghost small" data-act="help-ask" href="' + r.helpHref + '">' + a.esc(a.T('get-help', 'Get help')) + '</a>';
+    } else if (r.late) {
+      acts = '<button type="button" class="shq-btn primary small" data-act="move-tomorrow" data-id="' + a.esc(r.id) + '"' + a.storageOff() + '>' + a.esc(a.T('move-tomorrow', 'Move to tomorrow')) + '</button><button type="button" class="shq-btn ghost small" data-act="done" data-id="' + a.esc(r.id) + '"' + a.storageOff() + '>' + a.esc(a.T('handed-in', 'I handed it in')) + '</button>';
+    } else {
+      acts = a.editBtn(r.ref) + a.checkbox('done', r.id, false, a.T('mark-done', 'Mark “{{t}}” done', { t: r.title }), !a.S.itemsReady);
+    }
+    var sub = r.type === 'exam' ? r.meta.join(' · ') : r.startText;
+    return '<article class="gd-dl ' + (r.type === 'exam' ? 't-exam' : 't-work') + (r.late ? ' late' : '') + '"><div class="d" aria-hidden="true"><small>' + a.esc(r.dateParts.wd) + '</small><b>' + r.dateParts.day + '</b><small>' + a.esc(r.dateParts.mon) + '</small></div>' +
+      '<div class="b"><div class="l1"><span class="ty">' + a.esc(r.type === 'exam' ? a.T('exam-up', 'EXAM') : r.type === 'task' ? a.T('task-up', 'TASK') : a.T('asg-up', 'ASSIGNMENT')) + '</span><b>' + a.esc(r.title) + '</b>' + (r.course && r.course !== r.title ? a.courseTag(r.course, r.key) : '') + '</div>' +
+      (r.type !== 'exam' && r.meta.length ? '<div class="m">' + a.esc(r.meta.join(' · ')) + '</div>' : '') + (sub ? '<div class="s">' + a.esc(sub) + '</div>' : '') +
+      (r.type === 'exam' ? '<div class="acts" style="justify-content:flex-start;margin-top:8px">' + acts + '</div>' : '') + '</div>' +
+      '<div class="r"><span class="w">' + a.esc(r.when) + '</span>' + (r.type === 'exam' ? '' : '<div class="acts">' + acts + '</div>') + '</div></article>';
+  }
   function assignments(a, m) {
-    var h = head(a, a.T('asg-title', 'Assignments'), a.esc(a.T('asg-sub', '{{n}} still open. You’ve got this.', { n: m.open })), a.addBtn('assignment', a.T('add-assignment', 'Add an assignment')));
-    h += a.storageNotice() + filters(a, m.filters, m.filter, 'asg-filter');
-    if (!m.groups.length) return h + '<div class="gd-empty">' + sprout() + '<b>' + a.esc(a.T('no-asg', 'No assignments yet')) + '</b>' + a.esc(a.T('no-asg-sub', 'Add essays, problem sets and projects with their due dates.')) + '</div>';
-    return h + '<section class="gd-card">' + m.groups.map(function (g) {
-      return '<div class="gd-group"><h3' + (g.key === 'overdue' ? ' class="red"' : '') + '>' + a.esc(g.name) + '<span>' + g.count + '</span></h3>' + g.items.map(function (i) { return a.itemRow(i); }).join('') + '</div>';
-    }).join('') + '</section>';
+    var right = '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="shq-btn ghost" data-act="ics">' + a.ic('cal', 15) + a.esc(a.T('add-to-cal', 'Add all to my calendar')) + '</button><a class="shq-btn ghost" href="exam-planner.html">' + a.ic('plus', 15) + a.esc(a.T('add-exam-plan', 'Exam with a plan')) + '</a></div>';
+    var h = head(a, a.T('dl-title', 'Exams & deadlines'), a.esc(a.T('dl-sub', 'Every exam and assignment from all your courses, in one list.')), right) + a.storageNotice();
+    h += '<form class="gd-qa" data-form="qa" autocomplete="off"><label for="qaInput" class="sr">' + a.esc(a.T('qa-label', 'Add a deadline or exam in one line')) + '</label><input id="qaInput" type="text" maxlength="200" placeholder="' + a.esc(a.T('qa-ph', 'Add one: “EUS essay due 18 Dec 30%”')) + '"' + (a.S.itemsReady ? '' : ' disabled') + '><button type="submit" class="shq-btn primary"' + a.storageOff() + '>' + a.esc(a.T('add', 'Add')) + '</button><div id="qaPreview" aria-live="polite">' + a.qaPreview('') + '</div></form>';
+    var types = [['all', a.T('all', 'All'), m.counts.all], ['exam', a.T('exams', 'Exams'), m.counts.exam], ['work', a.T('assignments', 'Assignments'), m.counts.work]];
+    h += '<div class="gd-types" role="group" aria-label="' + a.esc(a.T('filter-type', 'Show')) + '">' + types.map(function (t) { return '<button type="button" data-act="dl-type" data-v="' + t[0] + '" aria-pressed="' + (m.type === t[0]) + '">' + a.esc(t[1]) + ' · ' + t[2] + '</button>'; }).join('') + '</div>' + filters(a, m.filters, m.filter, 'asg-filter');
+    var list = m.groups.length ? m.groups.map(function (g) { return '<h3' + (g.key === 'overdue' ? ' class="red"' : '') + '>' + a.esc(g.name) + '</h3>' + g.rows.map(function (r) { return dlRowHtml(a, r); }).join(''); }).join('')
+      : '<div class="gd-empty">' + sprout() + '<b>' + a.esc(a.T('no-dl', 'No deadlines yet')) + '</b>' + a.esc(a.T('no-dl-sub', 'Type one in the box above, in your own words. Exams from the Exam planner and your courses appear here on their own.')) + '</div>';
+    if (m.oldOverdue) list += '<p class="gd-muted" style="font-size:.82rem;margin-top:8px">' + a.esc(a.T('old-overdue', '{{n}} older items are more than 30 days late and hidden here. Find them under Courses.', { n: m.oldOverdue })) + '</p>';
+    if (m.nodate.length) list += '<h3>' + a.esc(a.T('g.nodate', 'No due date')) + '</h3><section class="gd-card">' + m.nodate.map(function (i) { return a.itemRow(i); }).join('') + '</section>';
+    if (m.done.length) list += '<details style="margin-top:14px"><summary class="gd-muted" style="cursor:pointer;font-weight:700">' + a.esc(a.T('g.done-recent', 'Done recently')) + ' (' + m.done.length + ')</summary><section class="gd-card" style="margin-top:8px">' + m.done.map(function (i) { return a.itemRow(i); }).join('') + '</section></details>';
+    var side = busyCard(a, m.busy, false) + '<section class="gd-card"><h2>' + a.esc(a.T('how-helps', 'How this list helps')) + '</h2><div class="gd-howto">' +
+      '<div><b>' + a.esc(a.T('h1', 'Start-by dates.')) + '</b> ' + a.esc(a.T('h1s', 'Each assignment shows when to start, from your time estimate.')) + '</div>' +
+      '<div><b>' + a.esc(a.T('h2', 'Exam countdowns.')) + '</b> ' + a.esc(a.T('h2s', 'Linked to your revision plan in the Exam planner.')) + '</div>' +
+      '<div><b>' + a.esc(a.T('h3', 'In your calendar.')) + '</b> ' + a.esc(a.T('h3s', 'One button adds every date, so your phone reminds you the day before.')) + '</div>' +
+      '<div><b>' + a.esc(a.T('h4', 'Nothing shaming.')) + '</b> ' + a.esc(a.T('h4s', 'A missed date gets a “move” button, not red warnings.')) + '</div></div></section>';
+    return h + '<div class="gd-two"><div class="gd-dlg">' + list + '</div><div class="gd-grid">' + side + '</div></div>';
   }
   function exams(a, m) {
     var h = head(a, a.T('exams-title', 'Exams'), a.esc(a.T('exams-sub', 'Exams and revision plans come from your Exam planner, so nothing is entered twice.')), '<a class="shq-btn primary" href="exam-planner.html">' + a.ic('plus', 15) + a.esc(a.T('add-exam', 'Add an exam')) + '</a>');

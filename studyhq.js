@@ -75,14 +75,16 @@
 
   /* ---------------------------------------------------------------- state */
   var S = { uid: null, user: {}, profile: {}, follows: [], exams: [], tasksByExam: {}, sessions: [], items: [], itemsReady: true, courses: null, demoTerm: null,
-    dailyReady: false, timetable: [], cardStates: {}, log: [], reflections: [], files: [] };
+    dailyReady: false, timetable: [], cardStates: {}, log: [], reflections: [], files: [],
+    planner: [], finished: [], help: { tutorsByKey: {}, requested: [], ready: false } };
   var ui = {
-    minutes: lsGet('shq_minutes', 60),
+    minutes: [30, 60, 120].reduce(function (best, m) { var v = lsGet('shq_minutes', 60); return Math.abs(m - v) < Math.abs(best - v) ? m : best; }, 60),
     capacity: lsGet('shq_capacity', 120),
     weekOffset: 0, noteFilter: 'all', asgFilter: 'all', noteSel: null, courseTab: 'overview',
     skipped: lsGet('shq_skip_' + H.iso(new Date()), []),
     dismissed: lsGet('shq_dismiss_' + H.iso(new Date()), []),
-    review: null, ask: null, focus: null, libQ: ''
+    review: null, ask: null, focus: null, libQ: '',
+    dlType: 'all', hideHelp: lsGet('shq_hide_help', false), reviewCap: 15
   };
 
   /* Course colours: muted by default (each skin can supply its own palette of the same length). */
@@ -106,15 +108,21 @@
   if (!DEMO && !window._sb && window.supabase && window.USK_CONFIG) {
     window._sb = window.supabase.createClient(window.USK_CONFIG.url, window.USK_CONFIG.anonKey, { realtime: { params: { eventsPerSecond: 0 } } });
   }
+  // One exam list from the Exam planner, course exam dates and lesson bookings (see H.mergeExams).
+  function mergeAllExams() {
+    S.exams = H.mergeExams({
+      planner: S.planner,
+      courses: S.follows.filter(function (f) { return f.exam_date; }).map(function (f) { return { id: 'exam-' + f.id, courseId: f.id, title: f.course_code, course_code: f.course_code, course_key: f.course_key, exam_date: f.exam_date }; }),
+      sessions: S.sessions
+    });
+  }
   var store = DEMO ? demoStore() : liveStore();
 
   function liveStore() {
     var sb = window._sb;
     function fail(r) { if (r.error) throw r.error; return r.data; }
     function courseRow(c) { return { id: c.id, course_code: c.name, course_key: c.course_key, exam_date: c.exam_date }; }
-    function examsFromCourses() {
-      S.exams = S.follows.filter(function (f) { return f.exam_date; }).map(function (f) { return { id: 'exam-' + f.id, courseId: f.id, title: f.course_code, course_code: f.course_code, course_key: f.course_key, exam_date: f.exam_date, topics: [] }; });
-    }
+    function examsFromCourses() { mergeAllExams(); }
     function classRow(r) { return { id: r.id, course_label: r.course_label, kind: r.kind, room: r.room, weekday: r.weekday, start: r.start_hm, end: r.end_hm, source: r.source }; }
     var api2 = {
       load: async function () {
@@ -122,14 +130,17 @@
         var rs = await Promise.all([
           sb.from('users').select('id,full_name,university_email_verified').eq('id', uid).maybeSingle(),
           sb.from('student_profiles').select('university,degree,year_of_study').eq('user_id', uid).maybeSingle(),
-          sb.from('sessions').select('id,subject,tutor_id,tutor_name,status,starts_at,scheduled_date,scheduled_time,duration_minutes,completed_at').eq('student_id', uid).order('created_at', { ascending: false }).limit(300),
+          sb.from('sessions').select('id,subject,tutor_id,tutor_name,status,starts_at,scheduled_date,scheduled_time,duration_minutes,completed_at,exam_date').eq('student_id', uid).order('created_at', { ascending: false }).limit(300),
           sb.from('study_courses').select('id,name,course_key,exam_date,archived').eq('user_id', uid).order('created_at'),
           sb.from('study_items').select('*').eq('user_id', uid).order('created_at'),
           sb.from('study_timetable').select('*').eq('user_id', uid),
           sb.from('study_card_states').select('card_id,box,due,reviews,right_n,last').eq('user_id', uid),
           sb.from('study_activity').select('type,n,right_n,minutes,at').eq('user_id', uid).gte('at', new Date(Date.now() - 120 * 86400000).toISOString()).order('at'),
           sb.from('study_reflections').select('week,went,stuck,aim').eq('user_id', uid),
-          sb.from('study_files').select('id,name,path,mime,size_bytes,pages,course_label,course_key,created_at,text_content').eq('user_id', uid).order('created_at', { ascending: false })
+          sb.from('study_files').select('id,name,path,mime,size_bytes,pages,course_label,course_key,created_at,text_content').eq('user_id', uid).order('created_at', { ascending: false }),
+          // Read-only: exams and revision plans the student made in the Exam planner (Study HQ never changes them)
+          sb.from('student_exams').select('id,title,course_code,course_key,exam_date,topics').eq('student_id', uid).order('exam_date'),
+          sb.from('exam_plan_tasks').select('id,exam_id,day,topic,kind,done_at,unsure,created_at').eq('student_id', uid).order('day')
         ]);
         S.user = fail(rs[0]) || {};
         S.profile = rs[1].data || {};
@@ -138,8 +149,11 @@
         S.itemsReady = S.dailyReady = !rs[3].error && !rs[4].error;
         if (!S.itemsReady) { S.follows = []; S.items = []; S.exams = []; return; }
         S.follows = (rs[3].data || []).filter(function (c) { return !c.archived; }).map(courseRow);
-        examsFromCourses();
+        S.finished = (rs[3].data || []).filter(function (c) { return c.archived; }).map(function (c) { return c.name; });
+        S.planner = rs[10].error ? [] : (rs[10].data || []);
         S.tasksByExam = {};
+        if (!rs[11].error) (rs[11].data || []).forEach(function (t) { (S.tasksByExam[t.exam_id] = S.tasksByExam[t.exam_id] || []).push(t); });
+        examsFromCourses();
         S.items = rs[4].data || [];
         S.timetable = (rs[5].data || []).map(classRow);
         S.cardStates = {}; (rs[6].data || []).forEach(function (c) { S.cardStates[c.card_id] = { box: c.box, due: c.due, reviews: c.reviews, right: c.right_n, last: c.last }; });
@@ -155,6 +169,30 @@
       deleteItem: async function (id) { fail(await sb.from('study_items').delete().eq('id', id).eq('user_id', S.uid)); S.items = S.items.filter(function (x) { return x.id !== id; }); },
       // Revision tasks belong to the separate Exam planner; Study HQ does not change them.
       setTask: async function () { throw new Error('read only'); },
+      // "Exam help": read-only. Tutors who listed one of these courses (same tables and rules as course.html)
+      // and the student's own open tutor requests. Nothing is written here.
+      loadHelp: async function (keys) {
+        var out = { tutorsByKey: {}, requested: [], ready: true };
+        try {
+          var req = await sb.from('subject_requests').select('subject,status').eq('student_id', S.uid).eq('status', 'open').limit(50);
+          out.requested = (req.data || []).map(function (r) { return H.courseKey(r.subject); }).filter(Boolean);
+          if (keys.length) {
+            var tc = await sb.from('tutor_courses').select('tutor_id,course_code,course_name,course_key,university,grade').in('course_key', keys).limit(200);
+            var rows = tc.data || [], ids = rows.map(function (r) { return r.tutor_id; }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+            if (ids.length) {
+              var r3 = await Promise.all([
+                sb.from('tutor_profiles').select('user_id,hourly_rate,currency,is_active,university_verified_at,verified_university,avatar_url').in('user_id', ids),
+                sb.from('public_tutors').select('id,full_name,avatar_url').in('id', ids),
+                sb.from('reviews').select('tutor_id,rating').in('tutor_id', ids)
+              ]);
+              keys.forEach(function (k) {
+                out.tutorsByKey[k] = H.rankTutors({ rows: rows.filter(function (r) { return r.course_key === k; }), profiles: r3[0].data || [], people: r3[1].data || [], reviews: r3[2].data || [], myUni: (S.profile || {}).university });
+              });
+            }
+          }
+        } catch (e) { /* help is a nice-to-have: never block the page */ }
+        S.help = out;
+      },
       follow: async function (label) {
         var r = await sb.from('study_courses').insert({ user_id: S.uid, name: label }).select('id,name,course_key,exam_date').single();
         S.follows.push(courseRow(fail(r))); examsFromCourses();
@@ -211,8 +249,9 @@
     var seq = 0, blobs = {};
     function nid() { seq += 1; return 'new-' + seq; }
     function withDone(row) { row.done_at = row.status === 'done' ? (row.done_at || new Date().toISOString()) : null; row.updated_at = new Date().toISOString(); return row; }
-    function examsFromCourses() { S.exams = S.follows.filter(function (f) { return f.exam_date; }).map(function (f) { return { id: 'exam-' + f.id, courseId: f.id, title: f.course_code, course_code: f.course_code, course_key: f.course_key, exam_date: f.exam_date, topics: [] }; }); }
+    function examsFromCourses() { mergeAllExams(); }
     return {
+      loadHelp: async function () { S.help = window.StudyHQDemo.help ? window.StudyHQDemo.help() : { tutorsByKey: {}, requested: [], ready: true }; },
       load: async function () {
         var d = window.StudyHQDemo.build(new Date());
         S.user = d.user; S.profile = d.profile; S.sessions = d.sessions; S.items = d.items; S.itemsReady = true;
@@ -220,7 +259,9 @@
           var x = d.exams.filter(function (e) { return (e.course_key || H.courseKey(e.course_code)) === (f.course_key || H.courseKey(f.course_code)); })[0];
           return Object.assign({}, f, { exam_date: x ? x.exam_date : null });
         });
-        examsFromCourses(); S.tasksByExam = {};
+        S.planner = d.planner || []; S.finished = d.finished || [];
+        S.tasksByExam = d.tasksByExam || {};
+        examsFromCourses();
         S.demoTerm = d.term || null;
         S.timetable = d.timetable || []; S.cardStates = d.cardStates || {}; S.log = d.log || []; S.reflections = d.reflections || []; S.files = d.files || []; S.dailyReady = true;
       },
@@ -324,7 +365,8 @@
   var KINDS = function () { return { learn: T('k.learn', 'Learn'), review: T('k.review', 'Review'), practice: T('k.practice', 'Practice') }; };
   function taskRow(t, x) {
     var done = !!t.done_at;
-    return '<div class="shq-item' + (done ? ' done' : '') + '">' + checkbox('task-done', t.id, done, T('mark-revised', 'Mark “{{t}}” revised', { t: t.topic })) +
+    // Revision steps are ticked in the Exam planner (Study HQ only reads them).
+    return '<div class="shq-item' + (done ? ' done' : '') + '"><a class="shq-check' + (done ? ' on' : '') + '" href="exam-planner.html" aria-label="' + esc(T('tick-in-planner', 'Tick “{{t}}” in the Exam planner', { t: t.topic })) + '">' + (done ? ic('tick', 13) : '') + '</a>' +
       '<div class="shq-item-t"><b>' + esc(t.topic) + '</b><div class="shq-meta"><span class="shq-pill info">' + esc(KINDS()[t.kind] || t.kind) + '</span>' + (x ? courseTag(x.course_code || x.title, x.course_key) : '') + (t.unsure ? '<span class="shq-pill warn">' + esc(T('unsure', 'Unsure')) + '</span>' : '') + '</div></div></div>';
   }
   function topicState(x) {
@@ -361,7 +403,7 @@
     var pri = cls.primary || 'shq-btn primary', sec = cls.secondary || 'shq-btn ghost';
     if (!p) return '';
     var fbtn = S.dailyReady ? '<button type="button" class="' + sec + '" data-act="focus-start" data-v="25" data-t="' + esc(p.title) + '">' + ic('timer', 14) + esc(T('focus-25', 'Focus 25 min')) + '</button>' : '';
-    if (p.type === 'exam_task') return '<button type="button" class="' + pri + '" data-act="task-done" data-id="' + esc(p.id) + '">' + esc(T('mark-revised-btn', 'Mark revised')) + '</button>' + fbtn +
+    if (p.type === 'exam_task') return '<a class="' + pri + '" href="exam-planner.html">' + esc(T('open-plan-btn', 'Open revision plan')) + '</a>' + fbtn +
       '<button type="button" class="' + sec + '" data-act="skip" data-id="' + esc(p.id) + '">' + esc(T('not-now', 'Not now')) + '</button>';
     var off = S.itemsReady ? '' : ' disabled';
     return (p.ref.status !== 'doing' ? '<button type="button" class="' + pri + '" data-act="start" data-id="' + esc(p.id) + '"' + off + '>' + esc(T('start', 'Start now')) + '</button>' : '') +
@@ -369,8 +411,8 @@
       '<button type="button" class="' + sec + '" data-act="skip" data-id="' + esc(p.id) + '">' + esc(T('not-now', 'Not now')) + '</button>';
   }
   function timeChoices(cls) {
-    return [15, 30, 60, 90].map(function (m) {
-      var label = m < 60 ? m + ' min' : m === 60 ? T('1h', '1 hour') : T('90m', '1½ hours');
+    return [30, 60, 120].map(function (m) {
+      var label = m < 60 ? m + ' min' : m === 60 ? T('1h', '1 hour') : T('2h', '2 hours');
       return '<button type="button" class="' + (cls || 'shq-time') + '" data-act="minutes" data-v="' + m + '" aria-pressed="' + (ui.minutes === m) + '">' + esc(label) + '</button>';
     }).join('');
   }
@@ -384,16 +426,7 @@
     var items = S.items.filter(function (i) { return ui.skipped.indexOf(String(i.id)) === -1; });
     var tbe = {}; Object.keys(S.tasksByExam).forEach(function (k) { tbe[k] = S.tasksByExam[k].filter(function (t) { return ui.skipped.indexOf(String(t.id)) === -1; }); });
     var r = H.whatNext({ items: items, exams: S.exams, tasksByExam: tbe, minutesFree: ui.minutes, dailyMinutes: ui.capacity, now: new Date() });
-    function deco(p) {
-      if (!p) return null;
-      p.courseKey = p.course ? H.courseKey(p.course) : null;
-      p.color = colorOf(p.courseKey);
-      p.what = p.type === 'exam_task' ? T('revise-for', 'Revise for {{e}}', { e: p.examTitle }) : p.type === 'assignment' ? T('assignment', 'Assignment') : T('task', 'Task');
-      p.headline = p.type === 'exam_task' ? p.title : p.title;
-      p.reasonTexts = p.reasons.map(function (x) { return { k: x.k, text: reasonText(x), risk: x.k === 'at_risk' || x.k === 'overdue' }; });
-      return p;
-    }
-    r.pick = deco(r.pick); r.alternates = r.alternates.map(deco);
+    r.pick = decoStep(r.pick); r.alternates = r.alternates.map(decoStep);
     r.message = r.state === 'no_items' ? T('wn.none', 'Nothing to plan yet. Add your first assignment or exam and Study HQ will suggest what to do next.')
       : r.state === 'too_little_time' ? T('wn.short', 'Nothing fits in that time. Pick a longer slot, or take the break.')
       : r.state === 'ahead' ? T('wn.ahead', 'You are ahead: nothing is due in the next week. Review a weak topic, or enjoy the free time.')
@@ -401,6 +434,103 @@
     r.heldRows = r.held.slice(0, 3).map(function (x) { return { title: x.item.title, why: x.reason === 'blocked' ? (x.item.body || T('blocked', 'Blocked')) : T('confirm', 'Overdue over a week: still needed?') }; });
     return r;
   }
+  function decoStep(p) {
+    if (!p) return null;
+    p.courseKey = p.course ? H.courseKey(p.course) : null;
+    p.color = colorOf(p.courseKey);
+    p.what = p.type === 'exam_task' ? T('revise-for', 'Revise for {{e}}', { e: p.examTitle }) : p.type === 'assignment' ? T('assignment', 'Assignment') : T('task', 'Task');
+    p.headline = p.title;
+    p.reasonTexts = p.reasons.map(function (x) { return { k: x.k, text: reasonText(x), risk: x.k === 'at_risk' || x.k === 'overdue' }; });
+    return p;
+  }
+
+  /* ---------------------------------------------------------------- release 2: today + exams & deadlines */
+  function skyModel() {
+    var period = H.skyPeriod(new Date().getHours()), K = window.StudyHQSky;
+    return { period: period, svg: K ? K.scene(period) : '', ink: K ? K.ink(period) : { ink: '#1f2a24', soft: '#5d6b63', dark: false } };
+  }
+  function deadlines() { return H.deadlineList({ items: S.items, exams: S.exams, tasksByExam: S.tasksByExam, now: new Date(), dailyMinutes: ui.capacity }); }
+  function dlRow(r) {
+    var now = new Date(), d = r.due, key = r.courseKey;
+    r.key = key; r.color = colorOf(key);
+    r.dateParts = { wd: fmt(d, { weekday: 'short' }), day: d.getDate(), mon: fmt(d, { month: 'short' }) };
+    if (r.type === 'exam') {
+      r.when = countdown(r.days);
+      r.meta = [r.plan ? T('plan-steps', 'Revision plan: {{d}} of {{t}} steps', { d: r.plan.done, t: r.plan.total }) : T('no-plan-yet', 'No revision plan yet')].concat(r.unsure.length ? [T('you-marked-unsure', 'You marked {{t}} unsure', { t: r.unsure.slice(0, 2).join(', ') })] : []);
+      r.planHref = 'exam-planner.html' + (r.plan ? '' : '?course=' + encodeURIComponent(r.course || ''));
+      r.helpHref = 'find-tutors.html?q=' + encodeURIComponent(r.course || '') + '#request';
+      r.courseId = r.ref.courseId || null;
+    } else {
+      var late = d < now;
+      r.when = late ? T('was-due', 'Was due {{d}}', { d: relDay(d) }) : relDay(d) + (d.getHours() !== 23 || d.getMinutes() !== 59 ? ' · ' + fmtTime(d) : '');
+      r.meta = [r.weight != null ? T('weight', '{{n}}% of grade', { n: r.weight }) : null, r.estimate ? T('about', 'about {{m}}', { m: mins(r.estimate) }) : null, r.status === 'doing' ? T('in-progress', 'in progress') : null].filter(Boolean);
+      r.startText = r.startBy ? T('start-by', 'Start by {{d}}', { d: fmt(r.startBy.date, { weekday: 'short', day: 'numeric', month: 'short' }) }) : '';
+      r.late = late;
+    }
+    return r;
+  }
+  function busyModel(rows) {
+    var B = H.busyWeeks({ rows: rows, now: new Date() }), max = Math.max(4, B.max);
+    B.weeks.forEach(function (w, i) { w.label = i === 0 ? T('this-wk', 'This wk') : fmt(w.start, { day: 'numeric', month: 'short' }); w.pct = Math.round(w.points / max * 100); });
+    var b = B.busiest != null ? B.weeks[B.busiest] : null;
+    B.note = b ? T('busiest', 'Busiest: week of {{d}} ({{x}}). Starting early spreads it out.', { d: fmt(b.start, { day: 'numeric', month: 'short' }), x: b.titles.slice(0, 3).join(', ') }) : T('calm-weeks', 'No crowded weeks ahead.');
+    return B;
+  }
+  function deadlinesModel() {
+    var L = deadlines(), now = new Date();
+    var rows = L.rows.filter(function (r) { return (ui.dlType === 'all' || (ui.dlType === 'exam' ? r.type === 'exam' : r.type !== 'exam')) && (ui.asgFilter === 'all' || r.courseKey === ui.asgFilter); }).map(dlRow);
+    var wk = H.startOfWeek(now), names = {
+      overdue: T('g.decide', 'Needs a decision'), week: T('g.thisweek', 'This week'),
+      next: T('g.nextweek', 'Next week · {{a}} – {{b}}', { a: fmt(H.addDays(wk, 7), { day: 'numeric', month: 'short' }), b: fmt(H.addDays(wk, 13), { day: 'numeric', month: 'short' }) }), later: T('g.later', 'Later')
+    };
+    var groups = ['overdue', 'week', 'next', 'later'].map(function (g) { return { key: g, name: names[g], rows: rows.filter(function (r) { return r.group === g; }) }; }).filter(function (g) { return g.rows.length; });
+    var work = S.items.filter(function (i) { return i.kind === 'assignment' || i.kind === 'task'; });
+    return {
+      groups: groups, counts: L.counts, busy: busyModel(L.rows), oldOverdue: L.oldOverdue, doneThisWeek: L.doneThisWeek,
+      nodate: work.filter(function (i) { return i.status !== 'done' && !i.due_at; }),
+      done: work.filter(function (i) { return i.status === 'done'; }).sort(function (a, b) { return String(b.done_at || '').localeCompare(String(a.done_at || '')); }).slice(0, 8),
+      type: ui.dlType, filters: filterList(work.concat(S.exams.map(function (x) { return { course_label: x.course_code || x.title, course_key: keyOf(x) }; }))), filter: ui.asgFilter,
+      courses: S.courses.list.map(function (c) { return c.label; })
+    };
+  }
+  function todayModel(daily) {
+    var now = new Date(), L = deadlines();
+    var plan = H.dayPlan({ items: S.items, exams: S.exams, tasksByExam: S.tasksByExam, minutes: ui.minutes, reviewCount: daily.ready ? daily.queue.total : 0,
+      reviewMinutes: daily.queue.minutes, dailyMinutes: ui.capacity, now: now, skip: ui.skipped });
+    plan.steps = plan.steps.map(function (st) {
+      if (st.type === 'review') return { type: 'review', id: 'review', title: T('review-n', 'Review {{n}} cards', { n: st.n }), minutes: st.minutes,
+        why: daily.queue.waiting ? T('review-why-cap', 'Capped at {{c}} today so it never piles up. {{w}} more wait for days with time.', { c: ui.reviewCap, w: daily.queue.waiting }) : T('review-why', 'Spaced review keeps what you learned.') };
+      var d = decoStep(st);
+      d.why = d.reasonTexts.map(function (x) { return x.text; }).slice(0, 2).join(' · ');
+      return d;
+    });
+    var late = (L.groups[0] || { rows: [] }).rows.filter(function (r) { return r.type !== 'exam'; }).map(dlRow)[0] || null;
+    var today = H.startOfDay(now);
+    var spotlight = S.exams.filter(function (x) { return H.parseDay(x.exam_date) >= today; }).slice(0, 2).map(examModel);
+    var help = null;
+    if (!ui.hideHelp) {
+      help = H.examHelp({ exams: S.exams, tutorsByKey: S.help.tutorsByKey, tasksByExam: S.tasksByExam, requested: S.help.requested, finished: S.finished, now: now });
+      help.ready = S.help.ready;
+      help.cards.forEach(function (c) {
+        c.when = countdown(c.days);
+        c.requestHref = 'find-tutors.html?q=' + encodeURIComponent(c.course || '') + '#request';
+        if (c.tutor) {
+          var t = c.tutor;
+          c.profileHref = 'tutor-profile.html?id=' + encodeURIComponent(t.id);
+          c.bookHref = 'book-session.html?tutor=' + encodeURIComponent(t.id) + '&name=' + encodeURIComponent(t.name) + '&subject=' + encodeURIComponent(t.course || c.course || '');
+          if (DEMO) c.profileHref = c.bookHref = 'find-tutors.html'; // the preview's tutor is invented
+          c.rateText = t.rate != null ? (t.currency === 'EUR' ? '€' : t.currency === 'USD' ? '$' : t.currency === 'GBP' ? '£' : (t.currency || '') + ' ') + t.rate : '';
+          c.initials = String(t.name).split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+        }
+      });
+      if (help.invite) help.invite.href = 'onboarding.html?role=tutor';
+    }
+    return {
+      sky: skyModel(), plan: plan, left: plan.steps.length, late: late, spotlight: spotlight, help: help, hideHelp: ui.hideHelp,
+      busy: busyModel(L.rows), soon: L.counts.soon
+    };
+  }
+
   function upcoming(daysAhead) {
     var now = new Date(), end = H.addDays(H.startOfDay(now), daysAhead + 1), out = [];
     S.items.forEach(function (i) { var d = H.dueOf(i); if (i.kind === 'assignment' && i.status !== 'done' && d && d < end && d >= H.addDays(H.startOfDay(now), -7)) out.push({ at: d, type: 'due', title: i.title, course: i.course_label, key: keyOf(i), late: d < now, weight: i.weight_pct, item: i }); });
@@ -438,6 +568,7 @@
         plannedWeek: week.reduce(function (a, d) { return a + d.minutes; }, 0)
       },
       focus: focusModel(), daily: dailyModel(),
+      get today() { return todayModel(this.daily); },
       week: week, capacity: ui.capacity,
       upcoming: upcoming(10),
       courses: S.courses.list.map(courseModel),
@@ -574,7 +705,15 @@
   /* ---------------------------------------------------------------- daily learning (prototype) */
   function allCards() { return S.items.filter(function (i) { return i.kind === 'note'; }).reduce(function (a, n) { return a.concat(H.parseCards(n)); }, []); }
   function weekKey() { var d = H.startOfDay(new Date()); return H.iso(H.addDays(d, -((d.getDay() + 6) % 7))); }
-  function queueNow(cards) { return H.reviewQueue({ cards: cards, states: S.cardStates, exams: S.exams, now: new Date() }); }
+  // Today's review, capped (15 cards) so it never turns into a backlog; the rest wait for days with time.
+  function queueNow(cards) {
+    var q = H.reviewQueue({ cards: cards, states: S.cardStates, exams: S.exams, now: new Date() });
+    var cap = ui.reviewCap, all = q.total, dueN = Math.min(q.due.length, cap), freshN = Math.min(q.fresh.length, cap - dueN);
+    q.waiting = (q.due.length - dueN) + (q.fresh.length - freshN);
+    q.due = q.due.slice(0, dueN); q.fresh = q.fresh.slice(0, freshN);
+    q.total = dueN + freshN; q.minutes = q.total ? Math.max(1, Math.round(q.minutes * q.total / all)) : 0;
+    return q;
+  }
   function sugText(x) {
     switch (x.k) {
       case 'capture': return { title: T('sg.capture', 'Capture today’s {{c}} class', { c: x.course }), why: T('sg.capture-why', 'Three key points while they are fresh. They become review cards.'), ok: T('sg.capture-ok', 'Write notes') };
@@ -799,11 +938,6 @@
       (S.user.university_email_verified ? '' : '<p class="shq-d-fine">' + esc(T('onb-verify', 'Tip: verifying your university email in your profile unlocks verified-student features later. It is optional.')) + '</p>') +
       '<p class="shq-d-fine">' + esc(T('onb-private', 'Everything you add is private to you.')) + '</p></div>';
   }
-  function examBanner() {
-    var e = H.examMode({ exams: S.exams, now: new Date() });
-    if (!e.on) return '';
-    return '<div class="shq-exam-banner" role="status">' + ic('exam', 16) + '<span><b>' + esc(T('exam-mode', 'Exam period')) + '</b> · ' + esc(T('exam-mode-s', '{{c}}: {{w}}. Review now brings that course’s cards forward.', { c: e.next.exam.title, w: countdown(e.next.days) })) + '</span></div>';
-  }
 
   var api = {
     H: H, S: S, ui: ui, T: T, esc: esc, ic: ic, I: I, fmt: fmt, fmtTime: fmtTime, relDay: relDay, dueText: dueText, mins: mins, hours: hours, daysUntil: daysUntil,
@@ -814,7 +948,8 @@
     courseModel: courseModel, progress: progressModel, weekEntries: weekEntries, examModel: examModel, demo: DEMO, KINDS: KINDS, STATUS: STATUS,
     daily: dailyModel, learn: learnModel, classesBlock: classesBlock, reviewBlock: reviewBlock, suggestBlock: suggestBlock, recordBlock: recordBlock,
     reviewSession: reviewSession, askBlock: askBlock, conceptsBlock: conceptsBlock, decksBlock: decksBlock, ideasBlock: ideasBlock, formatHelp: formatHelp, learnView: learnView, capWord: capWord,
-    filesBlock: filesBlock, fileRow: fileRow, captureButtons: captureButtons, bytes: bytes
+    filesBlock: filesBlock, fileRow: fileRow, captureButtons: captureButtons, bytes: bytes,
+    deadlines: deadlinesModel, qaPreview: qaPreview
   };
 
   /* ---------------------------------------------------------------- skins */
@@ -835,7 +970,7 @@
     ['learn', 'brain', function () { return T('nav.review', 'Review'); }],
     ['library', 'note', function () { return T('nav.library', 'Notes & files'); }],
     ['progress', 'chart', function () { return T('nav.week', 'Week'); }],
-    ['assignments', 'check', function () { return T('nav.deadlines', 'Deadlines'); }],
+    ['assignments', 'check', function () { return T('nav.exams-deadlines', 'Exams & deadlines'); }],
     ['planner', 'cal', function () { return T('nav.planner', 'Planner'); }],
     ['settings', 'gear', function () { return T('nav.settings', 'Settings'); }]
   ];
@@ -855,12 +990,13 @@
     return {
       items: NAV.map(function (n) {
         return { id: n[0], icon: n[1], label: n[2](), href: '#/' + n[0], current: r.name === n[0] || (r.name === 'course' && n[0] === 'courses'),
-          count: n[0] === 'assignments' ? overdue : n[0] === 'exams' ? upExams : n[0] === 'learn' && S.dailyReady ? queueNow(allCards()).total : 0, warn: n[0] === 'assignments' && overdue > 0 };
+          count: n[0] === 'assignments' ? soonCount() : n[0] === 'exams' ? upExams : n[0] === 'learn' && S.dailyReady ? queueNow(allCards()).total : 0, warn: n[0] === 'assignments' && overdue > 0 };
       }),
       courses: S.courses.list.map(function (c) { return { key: c.key, label: c.label, color: colorOf(c.key), href: courseHref(c.key), current: r.name === 'course' && r.key === c.key }; }),
       route: r, term: term(), profile: S.profile, user: S.user
     };
   }
+  function soonCount() { try { return deadlines().counts.soon; } catch (e) { return 0; } }
   var lastRoute = null;
   function focusSig(el) { return el && el.getAttribute && el.getAttribute('data-act') ? el.getAttribute('data-act') + '|' + (el.getAttribute('data-id') || el.getAttribute('data-v') || el.getAttribute('data-kind') || '') : null; }
   function render() {
@@ -874,8 +1010,7 @@
     else if (r.name === 'library') html = libraryView(libraryModel());
     else if (r.name === 'settings') html = settingsView();
     else if (r.name === 'overview' && needsOnboarding()) html = onboardingView();
-    else html = (v[r.name] || v.overview)(api, ({ overview: overviewModel, courses: function () { return { courses: S.courses.list.map(courseModel), suggestions: S.courses.suggestions }; }, planner: plannerModel, assignments: assignmentsModel, exams: examsModel, notes: notesModel, progress: progressModel })[r.name]());
-    if (r.name === 'overview' && !needsOnboarding()) html = examBanner() + html;
+    else html = (v[r.name] || v.overview)(api, ({ overview: overviewModel, courses: function () { return { courses: S.courses.list.map(courseModel), suggestions: S.courses.suggestions }; }, planner: plannerModel, assignments: deadlinesModel, exams: examsModel, notes: notesModel, progress: progressModel })[r.name]());
     hq.innerHTML = skin.shell(api, navModel(r)).replace('<!--VIEW-->', function () { return html; });
     var key = r.name + (r.key || '');
     if (key !== lastRoute) {
@@ -1249,6 +1384,50 @@
   });
 
   /* ---------------------------------------------------------------- actions */
+  /* ---------------------------------------------------------------- one-line add + calendar file */
+  function qaParse(text) { return H.parseQuickAdd(text, { now: new Date(), courses: S.courses.list.map(function (c) { return c.label; }) }); }
+  function qaPreview(text) {
+    if (!String(text || '').trim()) return '<span class="shq-qa-hint">' + esc(T('qa-hint', 'Try: “ECON essay due 12 Dec 20%” or “STAT exam 8.12. 10:00”')) + '</span>';
+    var q = qaParse(text), chips = [];
+    if (q.course_label) chips.push(q.course_label);
+    chips.push(q.kind === 'exam' ? T('exam', 'Exam') : T('assignment', 'Assignment'));
+    if (q.title && q.kind !== 'exam') chips.push(q.title);
+    if (q.date) chips.push(fmt(H.parseDay(q.date), { weekday: 'short', day: 'numeric', month: 'short' }) + (q.time ? ' · ' + q.time : ''));
+    if (q.weight_pct != null) chips.push(T('weight', '{{n}}% of grade', { n: q.weight_pct }));
+    var miss = q.missing.indexOf('date') !== -1 ? '<span class="shq-qa-miss">' + esc(T('qa-need-date', 'Add a date, like “Fri”, “18 Dec” or “18.12.”')) + '</span>' : '';
+    return '<span class="shq-qa-hint">' + esc(T('qa-understood', 'Understood as:')) + '</span>' + chips.map(function (c) { return '<span class="shq-qa-chip">' + esc(c) + '</span>'; }).join('') + miss;
+  }
+  async function qaAdd(text) {
+    var q = qaParse(text);
+    if (!q.ok) { var pv = document.getElementById('qaPreview'); if (pv) pv.innerHTML = qaPreview(text); var inp = document.getElementById('qaInput'); if (inp) inp.focus(); return; }
+    if (q.kind === 'exam') {
+      var label = q.course_label || q.title, key = H.courseKey(label);
+      var f = S.follows.filter(function (x) { return (x.course_key || H.courseKey(x.course_code)) === key; })[0];
+      if (!f) { await store.follow(label); f = S.follows.filter(function (x) { return (x.course_key || H.courseKey(x.course_code)) === key; })[0]; }
+      if (f) await store.setExam(f.id, q.date);
+    } else {
+      var t = (q.time || '23:59').split(':'), d = H.parseDay(q.date); d.setHours(+t[0], +t[1], 0, 0);
+      await store.addItem({ kind: 'assignment', title: q.title.slice(0, 200), course_label: q.course_label, due_at: d.toISOString(), weight_pct: q.weight_pct });
+    }
+    track('studyhq_quick_add', { kind: q.kind });
+    render(); toast(q.kind === 'exam' ? T('exam-added', 'Exam added') : T('deadline-added', 'Deadline added'));
+    var again = document.getElementById('qaInput'); if (again) again.focus();
+  }
+  function downloadIcs() {
+    var L = deadlines();
+    var blob = new Blob([H.toICS(L.rows, { now: new Date(), name: T('ics-name', 'Study HQ deadlines') })], { type: 'text/calendar;charset=utf-8' });
+    var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'study-hq-deadlines.ics';
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    track('studyhq_ics_download', { n: L.rows.length });
+    toast(T('ics-done', 'Calendar file downloaded. Open it to add the dates to your phone or laptop calendar.'));
+  }
+  async function loadHelp() {
+    if (!store.loadHelp) return;
+    var today = H.startOfDay(new Date()), keys = [];
+    S.exams.forEach(function (x) { var n = Math.round((H.parseDay(x.exam_date) - today) / 86400000); var k = keyOf(x); if (n >= 0 && n <= 42 && k && keys.indexOf(k) === -1) keys.push(k); });
+    await store.loadHelp(keys.slice(0, 6));
+  }
+
   function findItem(id) { return S.items.filter(function (i) { return String(i.id) === String(id); })[0]; }
   function findTask(id) { var f = null; Object.keys(S.tasksByExam).forEach(function (k) { S.tasksByExam[k].forEach(function (t) { if (String(t.id) === String(id)) f = t; }); }); return f; }
   hq.addEventListener('click', async function (e) {
@@ -1268,11 +1447,21 @@
         render(); toast(was === 'done' ? T('reopened', 'Reopened') : T('nice', 'Done. Nice work.'));
       } else if (act === 'start') { await store.updateItem(id, { status: 'doing' }); render(); }
       else if (act === 'task-done') {
-        var t = findTask(id); if (!t) return;
-        var wasDone = !!t.done_at;
-        await store.setTask(id, { done_at: wasDone ? null : new Date().toISOString() });
-        render(); if (!wasDone) toast(T('revised', 'Revised. One step closer.'));
+        location.href = 'exam-planner.html'; // revision steps are ticked in the Exam planner
       } else if (act === 'skip') { ui.skipped.push(String(id)); lsSet('shq_skip_' + H.iso(new Date()), ui.skipped); render(); }
+      else if (act === 'move-tomorrow') {
+        var mv = findItem(id); if (!mv) return;
+        var old = new Date(mv.due_at), nd = H.addDays(H.startOfDay(new Date()), 1); nd.setHours(old.getHours(), old.getMinutes(), 0, 0);
+        await store.updateItem(id, { due_at: nd.toISOString() });
+        track('studyhq_move_tomorrow', {}); render(); toast(T('moved', 'Moved to tomorrow.'));
+      }
+      else if (act === 'dl-type') { ui.dlType = b.getAttribute('data-v'); render(); }
+      else if (act === 'help-hide') { ui.hideHelp = true; lsSet('shq_hide_help', true); render(); }
+      else if (act === 'help-show') { ui.hideHelp = false; lsSet('shq_hide_help', false); render(); }
+      else if (act === 'help-ask') { track('studyhq_help_request', {}); }
+      else if (act === 'help-tutor') { track('studyhq_help_tutor', { action: b.getAttribute('data-v') }); }
+      else if (act === 'ics') downloadIcs();
+      else if (act === 'qa-add') { var qi = document.getElementById('qaInput'); if (qi) await qaAdd(qi.value); }
       else if (act === 'minutes') { ui.minutes = +b.getAttribute('data-v'); lsSet('shq_minutes', ui.minutes); render(); }
       else if (act === 'week') { var v = +b.getAttribute('data-v'); ui.weekOffset = v === 0 ? 0 : ui.weekOffset + v; render(); }
       else if (act === 'asg-filter') { ui.asgFilter = b.getAttribute('data-v'); render(); }
@@ -1369,7 +1558,12 @@
     render();
     track('studyhq_ask', { mode: ui.ask.mode });
   }
+  hq.addEventListener('input', function (e) {
+    if (e.target && e.target.id === 'qaInput') { var pv = document.getElementById('qaPreview'); if (pv) pv.innerHTML = qaPreview(e.target.value); }
+  });
   hq.addEventListener('submit', function (e) {
+    var qf = e.target.closest('[data-form="qa"]');
+    if (qf) { e.preventDefault(); qaAdd(qf.querySelector('input').value); return; }
     var lf = e.target.closest('[data-form="lib"]');
     if (lf) { e.preventDefault(); ui.libQ = lf.querySelector('input').value.trim().slice(0, 200); render(); track('studyhq_search', {}); var li = document.getElementById('libQ'); if (li) li.focus(); return; }
     var f = e.target.closest('[data-form="ask"]'); if (!f) return;
@@ -1443,6 +1637,7 @@
       if (!DEMO) S.items = S.items.concat(outbox());
       render();
       flushOutbox();
+      loadHelp().then(render, function () {});
       // Installable app + offline: the service worker only controls Study HQ pages (scope /studyhq).
       if ('serviceWorker' in navigator && !DEMO && location.protocol === 'https:') { try { navigator.serviceWorker.register('studyhq-sw.js', { scope: './studyhq' }); } catch (e) {} }
     } catch (ex) {

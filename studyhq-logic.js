@@ -801,7 +801,30 @@
     return { cards: cards, invite: finished ? { course: finished } : null };
   }
 
+  // "How much time do you have today?": a short list that fits the time. Review comes first (it is
+  // short and capped), then the explainable whatNext() pick, again and again, until the time is used
+  // or four steps are planned. Nothing is invented: each step is the student's own work.
+  function dayPlan(input) {
+    var minutes = input.minutes == null ? 60 : input.minutes, left = minutes, steps = [], taken = {};
+    if (input.reviewCount > 0 && input.reviewMinutes > 0 && left >= 5) {
+      var rm = Math.min(input.reviewMinutes, left);
+      steps.push({ type: 'review', id: 'review', title: null, n: input.reviewCount, minutes: rm, reasons: [] });
+      left -= rm;
+    }
+    var skip = input.skip || [];
+    for (var i = 0; i < 6 && steps.length < 4 && left >= MIN_SESSION; i++) {
+      var items = (input.items || []).filter(function (x) { return !taken[String(x.id)] && skip.indexOf(String(x.id)) === -1; });
+      var tbe = {}; Object.keys(input.tasksByExam || {}).forEach(function (k) { tbe[k] = input.tasksByExam[k].filter(function (t) { return !taken[String(t.id)] && skip.indexOf(String(t.id)) === -1; }); });
+      var r = whatNext({ items: items, exams: input.exams, tasksByExam: tbe, minutesFree: left, dailyMinutes: input.dailyMinutes, now: input.now });
+      if (!r.pick) break;
+      taken[r.pick.id] = 1; steps.push(r.pick); left -= r.pick.minutes;
+      if (r.state === 'ahead') break;
+    }
+    return { steps: steps, minutes: minutes, used: minutes - left };
+  }
+
   var api = {
+    dayPlan: dayPlan,
     mergeExams: mergeExams, startBy: startBy, deadlineList: deadlineList, busyWeeks: busyWeeks, capReview: capReview,
     skyPeriod: skyPeriod, parseQuickAdd: parseQuickAdd, toICS: toICS, rankTutors: rankTutors, examHelp: examHelp, startOfWeek: startOfWeek,
     courseKey: courseKey, iso: iso, parseDay: parseDay, startOfDay: startOfDay, addDays: addDays,

@@ -39,6 +39,7 @@
         item({ kind: 'assignment', course_label: 'ECON 110', title: 'Essay: price controls in practice', due_at: at(6, 12), weight_pct: 30, estimate_min: 480 }),
         item({ kind: 'assignment', course_label: 'CS 102', title: 'Project 2: text adventure in Python', due_at: at(12, 23, 59), weight_pct: 25, estimate_min: 600 }),
         item({ kind: 'assignment', course_label: 'HIST 230', title: 'Reading response, week 7', due_at: at(1, 9), weight_pct: 5, estimate_min: 60 }),
+        item({ kind: 'assignment', course_label: 'CS 102', title: 'Lab 6 reflection', due_at: at(-2, 23, 59), weight_pct: 2, estimate_min: 20 }),
         item({ kind: 'assignment', course_label: 'CS 102', title: 'Lab 5: lists and loops', due_at: at(-3, 23, 59), weight_pct: 3, estimate_min: 90, status: 'done', done_at: at(-4, 20) }),
         item({ kind: 'assignment', course_label: 'HIST 230', title: 'Source analysis: 1916 letters', due_at: at(-8, 12), weight_pct: 10, estimate_min: 240, status: 'done', done_at: at(-9, 16) }),
         item({ kind: 'task', course_label: 'ECON 110', title: 'Outline essay arguments', planned_for: day(0), estimate_min: 45 }),
@@ -96,6 +97,10 @@
       ],
       exams: exams,
       tasks: tasks,
+      // The Exam planner's exams and plans (read-only in Study HQ) and a course finished last term
+      planner: exams.filter(function (x) { return x.id === 'exam-stat' || x.id === 'exam-econ'; }),
+      tasksByExam: tasks.reduce(function (m, x) { (m[x.exam_id] = m[x.exam_id] || []).push(x); return m; }, {}),
+      finished: ['MATH 101'],
       sessions: [
         { id: 's1', subject: 'STAT 201', tutor_name: 'Omar K.', tutor_id: 'tutor-1', status: 'completed', starts_at: at(-6, 17), duration_minutes: 60 },
         { id: 's2', subject: 'STAT 201', tutor_name: 'Omar K.', tutor_id: 'tutor-1', status: 'confirmed', starts_at: at(2, 17), duration_minutes: 60 },
@@ -111,5 +116,9 @@
       ]
     };
   }
-  root.StudyHQDemo = { build: build };
+  // "Exam help" in the preview: one invented tutor teaches STAT 201; ECON 110 has none yet.
+  function help() {
+    return { ready: true, requested: [], tutorsByKey: { stat201: [{ id: 'demo-tutor', name: 'Jonas Weber', course: 'STAT 201', university: 'Demo University', verified: true, mine: true, rate: 22, currency: 'EUR', reviews: 14, stars: 4.9, score: 4.8 }] } };
+  }
+  root.StudyHQDemo = { build: build, help: help };
 })(typeof window !== 'undefined' ? window : globalThis);

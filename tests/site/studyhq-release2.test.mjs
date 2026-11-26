@@ -189,3 +189,19 @@ test('examHelp: a tutor card only on a real match, otherwise an ask-for-a-tutor 
   assert.equal(far.cards.length, 0, 'nothing for exams more than 6 weeks away');
   assert.ok(!/struggl|behind|failing|weak/i.test(JSON.stringify(E)));
 });
+
+/* ------------------------------------------------------------ dayPlan */
+test('dayPlan fills the chosen time: review first, then the explainable picks, never over the time', () => {
+  const items = ITEMS.filter(i => i.kind === 'assignment' && i.status !== 'done' && i.id !== 'old');
+  const p30 = H.dayPlan({ items, exams: EXAMS, tasksByExam: {}, minutes: 30, reviewCount: 15, reviewMinutes: 8, now: NOW });
+  same(p30.steps.map(s => s.type), ['review', 'assignment']);
+  assert.ok(p30.used <= 30);
+  const p120 = H.dayPlan({ items, exams: EXAMS, tasksByExam: {}, minutes: 120, reviewCount: 15, reviewMinutes: 8, now: NOW });
+  assert.ok(p120.steps.length >= 3 && p120.steps.length <= 4);
+  assert.ok(p120.used <= 120);
+  assert.equal(new Set(p120.steps.map(s => s.id)).size, p120.steps.length, 'no step twice');
+  const none = H.dayPlan({ items: [], exams: [], minutes: 60, reviewCount: 0, now: NOW });
+  same(none.steps, []);
+  const skipped = H.dayPlan({ items, exams: EXAMS, minutes: 60, reviewCount: 0, now: NOW, skip: ['ps7'] });
+  assert.ok(!skipped.steps.some(s => s.id === 'ps7'));
+});
