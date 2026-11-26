@@ -1184,7 +1184,7 @@
   }
   function openQuick() {
     editing = { kind: 'quick' };
-    openDialog(T('capture-h', 'Capture'), '<div class="shq-quick">' +
+    openDialog(T('capture-h', 'Quick add'), '<div class="shq-quick">' +
       '<button type="button" data-qc="note">' + ic('pen', 22) + '<b>' + esc(T('cap-note', 'Note')) + '</b><small>' + esc(T('cap-note-s', 'Type key points')) + '</small></button>' +
       '<button type="button" data-qc="photo">' + ic('camera', 22) + '<b>' + esc(T('cap-photo', 'Slide photo')) + '</b><small>' + esc(T('cap-photo-s', 'For your own study only')) + '</small></button>' +
       '<button type="button" data-qc="pdf">' + ic('upload', 22) + '<b>' + esc(T('cap-pdf', 'PDF')) + '</b><small>' + esc(T('cap-pdf-s', 'Lecture slides or script')) + '</small></button></div>' +
@@ -1621,7 +1621,7 @@
     try {
       if (DEMO) {
         demoBar();
-        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=6');
+        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=7');
       } else {
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;
