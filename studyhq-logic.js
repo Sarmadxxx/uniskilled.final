@@ -162,7 +162,7 @@
         cands.push({
           type: 'exam_task', id: String(t.id), title: t.topic, course: x.course_code || x.title, due: examDay,
           weight: null, remaining: DEFAULT_EST.exam, estKnown: false, unsure: !!unsureTopics[t.topic] && (examDay - today) / DAY <= 21,
-          doing: false, created: t.created_at ? new Date(t.created_at).getTime() : 0, kind: t.kind, examTitle: x.title, ref: t
+          doing: false, behind: day < today, created: t.created_at ? new Date(t.created_at).getTime() : 0, kind: t.kind, examTitle: x.title, ref: t
         });
       });
     });
@@ -176,17 +176,19 @@
       if (session < MIN_SESSION) return;
       var daysLeft = c.due ? (c.due - now) / DAY : null;
       var U = c.due == null ? 0.1 : daysLeft <= 0 ? 1 : clamp(1 - daysLeft / 14, 0, 1);
+      if (c.behind) U = Math.max(U, 0.9); // a revision step whose day has passed: catch up first (matches the early warning)
       var W = c.weight == null ? 0.15 : clamp(c.weight / 50, 0, 1);
       var capacityMin = c.due == null ? Infinity : Math.max(daysLeft, 0) * (input.dailyMinutes || 120);
       var P = c.due == null ? 0 : clamp(c.remaining / Math.max(capacityMin, 1), 0, 1);
       var T = c.unsure ? 1 : 0, M = c.doing ? 1 : 0, F = session >= c.remaining ? 1 : 0.6;
-      var score = round4(0.35 * U + 0.25 * W + 0.20 * P + 0.10 * T + 0.05 * M + 0.05 * F);
+      var score = round4(0.35 * U + 0.25 * W + 0.20 * P + 0.10 * T + 0.05 * M + 0.05 * F + (input.pin && input.pin === c.id ? 1 : 0));
       var reasons = [];
       var calDays = c.due ? Math.round((startOfDay(c.due) - today) / DAY) : null; // calendar days, for the wording
       if (c.planned) reasons.push({ k: 'planned', days: calDays });
       else if (c.due && c.due < now) reasons.push({ k: 'overdue' });
       else if (c.due && calDays <= 14) reasons.push({ k: 'due', days: calDays });
       if (c.weight != null && c.weight >= 20) reasons.push({ k: 'weight', pct: c.weight });
+      if (c.behind) reasons.push({ k: 'behind' });
       if (c.unsure) reasons.push({ k: 'unsure' });
       if (c.doing) reasons.push({ k: 'started' });
       if (P >= 1 && c.due) reasons.push({ k: 'at_risk' });
@@ -861,6 +863,37 @@
   // "How much time do you have today?": a short list that fits the time. Review comes first (it is
   // short and capped), then the explainable whatNext() pick, again and again, until the time is used
   // or four steps are planned. Nothing is invented: each step is the student's own work.
+
+  /* ---------------------------------------------------------------- early warning
+   * One calm warning at most, only when the student is really falling behind, judged from their
+   * own plan, never from a guess: revision steps whose day has passed (exam in 21 days or less),
+   * or three or more things that slipped in the last 7 days. The most urgent exam wins. */
+  function earlyWarning(input) {
+    var now = input.now || new Date(), today = startOfDay(now), weekAgo = addDays(today, -7);
+    var tbe = input.tasksByExam || {}, best = null;
+    (input.exams || []).forEach(function (x) {
+      if (!x.exam_date) return;
+      var examDay = parseDay(x.exam_date), daysLeft = Math.round((examDay - today) / DAY);
+      if (daysLeft < 0 || daysLeft > 21) return;
+      var tasks = tbe[x.id] || [];
+      var behind = tasks.filter(function (t) { return !t.done_at && parseDay(t.day) < today; });
+      if (!(behind.length >= 2 || (behind.length >= 1 && daysLeft <= 7))) return;
+      var w = { kind: 'exam', title: x.title, course: x.course_code || x.title, daysLeft: daysLeft, behind: behind.length,
+        open: tasks.filter(function (t) { return !t.done_at; }).length, total: tasks.length, first: behind[0].topic, firstId: String(behind[0].id), level: daysLeft <= 7 ? 'high' : 'medium' };
+      if (!best || w.daysLeft < best.daysLeft) best = w;
+    });
+    if (best) return best;
+    var slipped = (input.items || []).filter(function (i) {
+      if ((i.kind !== 'task' && i.kind !== 'assignment') || i.status === 'done') return false;
+      var due = i.due_at ? new Date(i.due_at) : null;
+      if (due) return due < now && due >= weekAgo;
+      if (i.planned_for) { var d = parseDay(i.planned_for); return d < today && d >= weekAgo; }
+      return false;
+    }).sort(function (a, b) { return String(a.due_at || a.planned_for).localeCompare(String(b.due_at || b.planned_for)); });
+    if (slipped.length >= 3) return { kind: 'slipped', n: slipped.length, titles: slipped.slice(0, 2).map(function (i) { return i.title; }), level: 'medium' };
+    return null;
+  }
+
   function dayPlan(input) {
     var minutes = input.minutes == null ? 60 : input.minutes, left = minutes, steps = [], taken = {};
     if (input.reviewCount > 0 && input.reviewMinutes > 0 && left >= 5) {
@@ -872,7 +905,7 @@
     for (var i = 0; i < 6 && steps.length < 4 && left >= MIN_SESSION; i++) {
       var items = (input.items || []).filter(function (x) { return !taken[String(x.id)] && skip.indexOf(String(x.id)) === -1; });
       var tbe = {}; Object.keys(input.tasksByExam || {}).forEach(function (k) { tbe[k] = input.tasksByExam[k].filter(function (t) { return !taken[String(t.id)] && skip.indexOf(String(t.id)) === -1; }); });
-      var r = whatNext({ items: items, exams: input.exams, tasksByExam: tbe, minutesFree: left, dailyMinutes: input.dailyMinutes, now: input.now });
+      var r = whatNext({ items: items, exams: input.exams, tasksByExam: tbe, minutesFree: left, dailyMinutes: input.dailyMinutes, now: input.now, pin: input.pin });
       if (!r.pick) break;
       taken[r.pick.id] = 1; steps.push(r.pick); left -= r.pick.minutes;
       if (r.state === 'ahead') break;
@@ -881,7 +914,7 @@
   }
 
   var api = {
-    dayPlan: dayPlan,
+    dayPlan: dayPlan, earlyWarning: earlyWarning,
     mergeExams: mergeExams, startBy: startBy, deadlineList: deadlineList, busyWeeks: busyWeeks, capReview: capReview,
     skyPeriod: skyPeriod, productivity: productivity, accomplishments: accomplishments, researchList: researchList, parseQuickAdd: parseQuickAdd, toICS: toICS, rankTutors: rankTutors, examHelp: examHelp, startOfWeek: startOfWeek,
     courseKey: courseKey, iso: iso, parseDay: parseDay, startOfDay: startOfDay, addDays: addDays,
