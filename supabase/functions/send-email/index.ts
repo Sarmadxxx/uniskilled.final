@@ -739,6 +739,32 @@ function build(type: string, d: any, f: Facts, role: 'student' | 'tutor' | null,
       };
     }
 
+    case 'study_daily': {
+      // Study Campus morning email (sent by studyhq-reminders, only to students who turned it on).
+      const lines: any[] = Array.isArray(d.lines) ? d.lines.slice(0, 8) : [];
+      const dayWord = (n: number) => n === 0 ? t`today` : n === 1 ? t`tomorrow` : n > 1 ? t`in ${n} days` : n === -1 ? t`was due yesterday` : t`was due ${-n} days ago`;
+      const rows: [string, string][] = lines.map((l: any) => {
+        const n = Number(l.days) || 0;
+        const what = l.kind === 'exam' ? t`Exam: ${l.title}` : `${l.title}${l.course ? ` · ${l.course}` : ''}`;
+        const when = l.kind === 'task' ? (n < 0 ? t`still open` : t`planned for today`) : l.kind === 'exam' ? dayWord(n) : (n < 0 ? dayWord(n) : t`due ${dayWord(n)}`);
+        return [what, when];
+      });
+      const total = Number(d.total) || rows.length;
+      const studyLink = `${SITE}/studyhq.html`;
+      return {
+        subject: total === 1 ? t`Today in Study Campus: 1 thing to do` : t`Today in Study Campus: ${total} things to do`,
+        preheader: rows.length ? `${strip(String(rows[0][0]))} – ${strip(String(rows[0][1]))}` : t`Your plan for today`,
+        tone: 'info', label: t`Study Campus`, title: t`Your day at a glance`,
+        greeting: first(d.recipientName),
+        intro: [t`Here is what is coming up, from your own tasks, deadlines and exam dates.`],
+        details: rows,
+        detailsTitle: t`To do`,
+        ...(Number(d.more) > 0 ? { callout: { tone: 'info' as Tone, text: t`And ${Number(d.more)} more in Study Campus.` } } : {}),
+        cta: { label: t`Open Study Campus`, url: studyLink },
+        secondary: [t`You get this email because you turned on the morning email in Study Campus. You can turn it off or change the time in <a href="${studyLink}#/settings" style="color:#1a6bff;">Study Campus settings</a>. Days with nothing due send nothing.`],
+      };
+    }
+
     case 'referral_qualified':
       return {
         subject: t`You earned €${d.amount} in UniSkilled credit`,

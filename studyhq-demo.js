@@ -53,7 +53,15 @@
         item({ kind: 'note', course_label: 'HIST 230', title: '1916 letters: context #primary-sources', created_at: at(-9, 11), body: 'Primary source :: a document created at the time by someone involved\nQ: Which three questions do we ask of every source?\nA: Who wrote it, for whom, and why then?\nThe Sykes-Picot agreement was signed in {{1916}}.' }),
         item({ kind: 'note', course_label: 'ECON 110', title: 'Essay feedback from last term', body: 'Lead with the claim. One example per paragraph. Cite the data source under every chart.' }),
         item({ kind: 'resource', course_label: 'CS 102', title: 'Python tutorial (official docs)', url: 'https://docs.python.org/3/tutorial/' }),
-        item({ kind: 'resource', course_label: 'STAT 201', title: 'Seeing Theory: visual probability', url: 'https://seeing-theory.brown.edu/' })
+        item({ kind: 'resource', course_label: 'STAT 201', title: 'Seeing Theory: visual probability', url: 'https://seeing-theory.brown.edu/' }),
+        // Finished work, so "My progress" has something real to show.
+        item({ kind: 'task', course_label: 'STAT 201', title: 'Redo week 6 practice questions', status: 'done', done_at: at(-1, 17), created_at: at(-3, 9) }),
+        item({ kind: 'task', course_label: 'ECON 110', title: 'Find three sources on rent caps', status: 'done', done_at: at(-2, 14), created_at: at(-4, 9) }),
+        item({ kind: 'task', course_label: 'HIST 230', title: 'Read chapter 6 (Hourani)', status: 'done', done_at: at(-8, 19), created_at: at(-10, 9) }),
+        item({ kind: 'task', course_label: 'CS 102', title: 'Set up Python on laptop', status: 'done', done_at: at(-9, 20), created_at: at(-11, 9) }),
+        item({ kind: 'achievement', title: 'Presented my group’s HIST 230 seminar', body: '15-minute talk on the 1916 letters.', created_at: at(-5, 15) }),
+        item({ kind: 'research', course_label: 'ECON 110', title: 'Do rent caps reduce housing supply? (essay)', url: 'https://www.oecd.org/housing/', body: 'https://www.oecd.org/housing/\nhttps://www.diw.de/en\nBerlin rent cap 2020–21: supply of rental flats fell while it applied.', created_at: at(-6, 10), updated_at: at(-2, 14) }),
+        item({ kind: 'research', course_label: 'STAT 201', title: 'Which test for small samples?', body: 'https://seeing-theory.brown.edu/', status: 'done', done_at: at(-7, 18), created_at: at(-12, 10) })
     ];
 
     var monday = H.addDays(d0, -((d0.getDay() + 6) % 7));
@@ -83,6 +91,7 @@
       log.push({ at: new Date(base.getTime() + 8.5 * 3600000).toISOString(), type: 'review', n: 8 + k * 2, right: 6 + k });
       log.push({ at: new Date(base.getTime() + 16 * 3600000).toISOString(), type: 'focus', minutes: k % 2 ? 50 : 25 });
     }
+    [1, 2, 4].forEach(function (k) { var b = H.addDays(monday, k - 7); log.push({ at: new Date(b.getTime() + 9 * 3600000).toISOString(), type: 'review', n: 6 + k, right: 4 + k }); });
     var reflections = [{ week: H.iso(H.addDays(monday, -7)), went: 'Finished problem set 3 two days early.', stuck: 'Regression output: which number answers the question?', aim: 'Start the economics essay outline before Thursday.' }];
     return {
       timetable: timetable, cardStates: cardStates, log: log, reflections: reflections,

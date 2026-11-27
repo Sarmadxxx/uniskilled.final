@@ -161,3 +161,9 @@ verify_jwt = true
 
 [functions.verify-university]
 verify_jwt = false
+
+[functions.studyhq-reminders]
+verify_jwt = false
+
+[functions.studyhq-calendar]
+verify_jwt = false
