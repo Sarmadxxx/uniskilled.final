@@ -398,11 +398,69 @@ html[data-theme="dark"] .gd-sky{filter:brightness(.82) saturate(.9)}
 html[data-theme="dark"] .gd img{opacity:.92}
 .gd-theme{display:flex;align-items:center;gap:10px;border:0;background:none;cursor:pointer;font-size:.82rem;font-weight:700;color:var(--ink2);padding:8px 10px;border-radius:10px;text-align:left;width:100%;margin-top:6px;border-top:1px solid var(--line);border-radius:0 0 10px 10px;padding-top:12px}
 .gd-theme:hover{background:var(--bg)}.gd-theme span{flex:1}
-.gd-sw{width:38px;height:22px;border-radius:999px;background:#cfd3c8;position:relative;flex:none;transition:background .2s}.gd-sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
+.gd-sw{display:block;width:38px;height:22px;border-radius:999px;background:#cfd3c8;position:relative;flex:none;transition:background .2s}.gd-sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .2s}
 .gd-theme[aria-checked="true"] .gd-sw{background:var(--btn)}.gd-theme[aria-checked="true"] .gd-sw::after{transform:translateX(16px)}
 @media(prefers-reduced-motion:reduce){.gd-sw,.gd-sw::after{transition:none}}
 .gd-more .gd-theme{font-size:.88rem;padding:10px 12px;color:var(--ink2)}
 
+.gd-prod{margin-bottom:0}
+.gd-prod-h h2{margin:0}.gd-prod-h p{margin:4px 0 0;font-size:.85rem}
+.gd-prod-empty{margin:14px 0 0;padding:18px;border-radius:16px;background:var(--bg);color:var(--ink2);font-size:.9rem}
+.gd-prod-grid{display:grid;grid-template-columns:1fr 260px;gap:22px;margin-top:16px;align-items:end}
+.gd-pstats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.gd-pstat{border-radius:18px;padding:14px;background:var(--bg);display:flex;flex-direction:column;gap:3px;min-width:0}
+.gd-pstat .ic{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;margin-bottom:6px}
+.gd-pstat.g .ic{background:var(--sage-l);color:var(--sage)}.gd-pstat.s .ic{background:var(--sun-l);color:var(--sun)}.gd-pstat.k .ic{background:var(--sky-l);color:var(--sky)}.gd-pstat.l .ic{background:var(--lav-l);color:var(--lav)}
+.gd-pstat b{font-size:1.5rem;font-weight:800;line-height:1.1;color:var(--ink)}
+.gd-pstat .lb{font-size:.8rem;font-weight:700;color:var(--ink2)}
+.gd-pstat small{font-size:.74rem;color:var(--muted)}
+.gd-pbars{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;height:150px}
+.gd-pbar{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.gd-pbar span{flex:1;width:100%;max-width:26px;background:var(--bg);border-radius:9px;display:flex;align-items:flex-end;overflow:hidden}
+.gd-pbar i{display:block;width:100%;background:var(--sage2);border-radius:9px;opacity:.55}
+.gd-pbar.today i{opacity:1;background:var(--sage)}
+.gd-pbar.later span{opacity:.5}
+.gd-pbar b{font-size:.72rem;font-weight:800;color:var(--ink2);min-height:1em}
+.gd-pbar small{font-size:.7rem;color:var(--muted);font-weight:700}
+.gd-pbar.today small{color:var(--sage)}
+.gd-card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}.gd-card-h h2{margin:0}
+.gd-sub-h{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px;font-weight:800}
+.gd-done-row{display:grid;grid-template-columns:36px 1fr auto auto;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.gd-done-row:last-child{border-bottom:0}
+.gd-done-row .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--sage-l);color:var(--sage)}
+.gd-done-row.achievement .ic{background:var(--sun-l);color:var(--sun)}.gd-done-row.research .ic{background:var(--lav-l);color:var(--lav)}.gd-done-row.plan .ic{background:var(--peach-l);color:var(--peach)}.gd-done-row.lesson .ic{background:var(--sky-l);color:var(--sky)}
+.gd-done-row b{display:block;font-size:.88rem;font-weight:800;line-height:1.3}
+.gd-done-row small{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:2px}
+.gd-done-row .src{font-weight:700;color:var(--sage)}.gd-done-row .src.late{color:var(--peach)}
+.gd-done-row .when{font-size:.75rem;font-weight:800;color:var(--ink2);white-space:nowrap}
+.gd-iconbtn{border:0;background:none;color:var(--muted);cursor:pointer;padding:6px;border-radius:9px}.gd-iconbtn:hover{background:var(--bg);color:var(--ink)}
+.gd-more-done summary{cursor:pointer;font-size:.82rem;font-weight:800;color:var(--sage);padding:10px 0}
+.gd-rs-row{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;width:100%;text-align:left;border:0;background:none;padding:10px 8px;margin:0 -8px;border-radius:14px;cursor:pointer;color:inherit;font:inherit}
+.gd-rs-row:hover{background:var(--bg)}
+.gd-rs-row .ic{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:var(--lav-l);color:var(--lav)}
+.gd-rs-row b{display:block;font-size:.88rem;font-weight:800;line-height:1.3}
+.gd-rs-row small{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px;margin-top:2px}
+.gd-rs-st{font-size:.72rem;font-weight:800;padding:5px 10px;border-radius:999px;background:var(--sun-l);color:var(--sun);white-space:nowrap}
+.gd-rs-st.done{background:var(--sage-l);color:var(--sage)}
+@media(max-width:1100px){.gd-prod-grid{grid-template-columns:1fr}.gd-pbars{height:120px}}
+@media(max-width:720px){.gd-pstats{grid-template-columns:1fr 1fr}.gd-pstat b{font-size:1.3rem}.gd-done-row{grid-template-columns:32px 1fr auto}.gd-done-row .gd-iconbtn{display:none}.gd-card-h{flex-wrap:wrap}}
+
+.gd .shq-rem{display:flex;gap:18px;align-items:flex-start;justify-content:space-between;padding:16px 0;border-top:1px solid var(--line)}
+.gd .shq-rem:first-of-type{border-top:0}
+.gd .shq-rem-t{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.gd .shq-rem-t>b{display:flex;align-items:center;gap:8px;font-size:.95rem;font-weight:800;color:var(--ink)}
+.gd .shq-rem-t>b svg{color:var(--sage)}
+.gd .shq-rem-t>small{font-size:.84rem;color:var(--ink2);line-height:1.5;max-width:60ch}
+.gd .shq-rem-hour{display:flex;align-items:center;gap:8px;font-size:.84rem;font-weight:700;color:var(--ink2);margin-top:4px}
+.gd .shq-rem-hour select{border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--card);color:var(--ink);font:inherit}
+.gd .shq-switch{border:0;background:none;padding:4px;cursor:pointer;flex:none}
+.gd .shq-switch[aria-checked="true"] .gd-sw{background:var(--btn)}.gd .shq-switch[aria-checked="true"] .gd-sw::after{transform:translateX(16px)}
+.gd .shq-rem-link{display:flex;gap:8px;margin-top:6px;max-width:640px}
+.gd .shq-rem-link input{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:9px 12px;background:var(--bg);color:var(--ink2);font:inherit;font-size:.8rem}
+.gd .shq-rem .shq-row{margin-top:6px;flex-wrap:wrap}
+.gd .shq-rem-note{font-size:.78rem;color:var(--muted)}
+
+.gd-tabbar a,.gd-tabbar summary{white-space:nowrap}
 `;
   function themeBtn(a) {
     var dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -475,7 +533,7 @@ html[data-theme="dark"] .gd img{opacity:.92}
   }
   function stepRow(a, st) {
     var ctl, extra = '';
-    if (st.type === 'review') ctl = '<a class="go" href="#/learn" aria-label="' + a.esc(a.T('start-review', 'Start review')) + '">' + a.ic('arrow', 14) + '</a>';
+    if (st.type === 'review') ctl = '<a class="go" href="#/learn" aria-label="' + a.esc(a.T('start-review', 'Start Quiz me')) + '">' + a.ic('arrow', 14) + '</a>';
     else if (st.type === 'exam_task') ctl = '<a class="shq-check" href="exam-planner.html" aria-label="' + a.esc(a.T('tick-in-planner', 'Tick “{{t}}” in the Exam planner', { t: st.title })) + '"></a>';
     else { ctl = a.checkbox('done', st.id, false, a.T('mark-done', 'Mark “{{t}}” done', { t: st.title }), !a.S.itemsReady); extra = '<button type="button" class="skip" data-act="skip" data-id="' + a.esc(st.id) + '">' + a.esc(a.T('not-now', 'Not now')) + '</button>'; }
     var title = st.type === 'exam_task' ? a.T('revise-topic', 'Revise {{t}}', { t: st.title }) : st.title;
@@ -524,7 +582,7 @@ html[data-theme="dark"] .gd img{opacity:.92}
     }).join('');
     var invite = h.invite ? '<div class="gd-invite"><span>🎓 ' + a.esc(a.T('invite', 'You finished {{c}}. Help other students with it and earn. You set your own price.', { c: h.invite.course })) + '</span><a class="shq-btn primary small" href="' + h.invite.href + '">' + a.esc(a.T('tutor-this', 'Tutor this course')) + '</a></div>' : '';
     return '<section class="gd-card gd-helpbox"><h2>' + a.esc(a.T('exam-help', 'Exam help')) + '<button type="button" data-act="help-hide">' + a.esc(a.T('hide-box', 'Hide this box')) + '</button></h2>' +
-      '<p class="gd-muted" style="margin:-4px 0 12px;font-size:.84rem">' + a.esc(a.T('help-sub', 'For your next exams. A tutor card appears only when a tutor really teaches the course. We never guess how you are doing.')) + '</p>' +
+      '<p class="gd-muted" style="margin:-4px 0 12px;font-size:.84rem">' + a.esc(a.T('help-sub', 'For your next exams. A tutor is suggested only when one really teaches the course. We never guess how you are doing.')) + '</p>' +
       (cards ? '<div class="gd-helpgrid">' + cards + '</div>' : '') + invite + '<a class="gd-link" style="display:inline-block;margin-top:12px" href="find-tutors.html">' + a.esc(a.T('browse-tutors', 'Browse all tutors')) + ' →</a></section>';
   }
   function busyCard(a, B, withLink) {
@@ -617,7 +675,7 @@ html[data-theme="dark"] .gd img{opacity:.92}
       (m.notes.length ? '<div class="gd-notes" style="columns:220px">' + m.notes.map(function (x) { return noteCard(a, x.n, x.url, m.color); }).join('') + '</div>' : '<p class="gd-muted">' + a.esc(a.T('no-notes-c', 'Keep what the lecturer stressed and links worth revisiting.')) + '</p>') + '</section>';
     var cls = m.classes.length ? '<p class="gd-muted" style="margin-top:10px;font-size:.84rem">' + a.esc(m.classes.map(function (c) { return ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'][c.weekday - 1] + ' ' + c.start + (c.room ? ' · ' + c.room : ''); }).join('  ·  ')) + '</p>' : '';
     var exams = '<section class="gd-card"><h2>' + a.esc(a.T('exam-h', 'Exam')) + (m.followed && a.S.itemsReady ? '<button type="button" class="shq-btn ghost small" data-act="exam" data-id="' + a.esc(m.followId) + '">' + a.esc(m.examDate ? a.T('change-date', 'Change date') : a.T('set-exam', 'Set exam date')) + '</button>' : '') + '</h2>' +
-      (m.exams.length ? m.exams.map(function (e) { return examCard(a, e, false); }).join('') : '<p class="gd-muted">' + a.esc(a.T('no-exam-d', 'No exam date yet. Add it and review cards for this course are brought forward before the exam.')) + '</p>') + cls + '</section>';
+      (m.exams.length ? m.exams.map(function (e) { return examCard(a, e, false); }).join('') : '<p class="gd-muted">' + a.esc(a.T('no-exam-d', 'No exam date yet. Add it and Quiz me questions for this course are brought forward before the exam.')) + '</p>') + cls + '</section>';
     var files = '<section class="gd-card"><h2>' + a.esc(a.T('files', 'Files')) + '</h2>' + a.filesBlock(m) + '</section>';
     var tutor = '<section class="gd-card"><h2>' + a.esc(a.T('tutoring', 'Tutoring')) + '</h2>' + (m.lessons.length ? m.lessons.slice(0, 4).map(function (l) {
       var ini = String(l.tutor).split(/\s+/).map(function (w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
@@ -761,15 +819,59 @@ html[data-theme="dark"] .gd img{opacity:.92}
       '<g class="gd-sway">' + sprout + stem + leaves + bud + flower + '</g></svg></button>' +
       '<div class="gd-pdays">' + dots + '</div><p>' + a.esc(say) + '</p><small>' + a.esc(a.T('plant-fresh', 'A new plant every Monday.')) + '</small></div>';
   }
+  function weekWord(a, x, y) {
+    if (x > y) return a.T('pr-more', '{{n}} more than last week', { n: x - y });
+    if (x < y) return a.T('pr-fewer', '{{n}} fewer than last week', { n: y - x });
+    return a.T('pr-same', 'Same as last week');
+  }
+  function prodBlock(a, p) {
+    var t = p.thisWeek, l = p.lastWeek, max = Math.max(1, Math.max.apply(null, t.days.concat(l.days)));
+    var dn = [a.T('d.mo', 'M'), a.T('d.tu', 'T'), a.T('d.we', 'W'), a.T('d.th', 'T'), a.T('d.fr', 'F'), a.T('d.sa', 'S'), a.T('d.su', 'S')];
+    var bars = '<div class="gd-pbars" role="img" aria-label="' + a.esc(a.T('pr-bars-l', 'Things done each day this week')) + '">' + t.days.map(function (n, i) {
+      var cls = i === p.dayOfWeek ? ' today' : i > p.dayOfWeek ? ' later' : '';
+      return '<div class="gd-pbar' + cls + '"><span><i style="height:' + (i > p.dayOfWeek ? 0 : Math.max(n ? 12 : 4, Math.round(n / max * 100))) + '%"></i></span><b>' + (i > p.dayOfWeek ? '' : n) + '</b><small>' + a.esc(dn[i]) + '</small></div>';
+    }).join('') + '</div>';
+    function stat(ic, cls, big, label, sub) { return '<div class="gd-pstat ' + cls + '"><span class="ic">' + a.ic(ic, 18) + '</span><b>' + big + '</b><span class="lb">' + a.esc(label) + '</span><small>' + a.esc(sub) + '</small></div>'; }
+    var h = '<section class="gd-card gd-prod"><div class="gd-prod-h"><div><h2>' + a.esc(a.T('pr-h', 'This week')) + '</h2><p class="gd-muted">' + a.esc(a.T('pr-sub', 'Monday to today, next to last week. Counted only from what you did here.')) + '</p></div></div>';
+    if (p.empty) return h + '<p class="gd-prod-empty">' + a.esc(a.T('pr-empty', 'Your week starts here. Tick off a task, write a note or answer a few Quiz me questions, and it shows up here.')) + '</p></section>';
+    h += '<div class="gd-prod-grid"><div class="gd-pstats">' +
+      stat('check', 'g', t.done, a.T('pr-done', 'Tasks done'), weekWord(a, t.done, l.done)) +
+      stat('flag', 's', t.due ? a.T('pr-ontime-n', '{{a}} of {{b}}', { a: t.onTime, b: t.due }) : '–', a.T('pr-ontime', 'Deadlines met on time'), t.due ? (t.onTime === t.due ? a.T('pr-all-on', 'All on time') : a.T('pr-some-late', '{{n}} handed in late or still open', { n: t.due - t.onTime })) : a.T('pr-no-due', 'No deadlines so far this week')) +
+      stat('cal', 'k', a.T('pr-days-n', '{{n}} of {{d}}', { n: t.studyDays, d: p.dayOfWeek + 1 }), a.T('pr-days', 'Days you studied'), weekWord(a, t.studyDays, l.studyDays)) +
+      stat('brain', 'l', t.quiz, a.T('pr-quiz', 'Quiz me questions answered'), weekWord(a, t.quiz, l.quiz)) +
+      '</div>' + bars + '</div></section>';
+    return h;
+  }
+  function doneRow(a, e) {
+    var ic = { task: 'check', assignment: 'check', achievement: 'star', research: 'search', plan: 'flag', lesson: 'cap' }[e.type] || 'check';
+    var src = e.source === 'self' ? a.T('src-self', 'Added by you') : e.source === 'record' ? a.T('src-record', 'UniSkilled lesson') : e.type === 'assignment' ? (e.onTime ? a.T('src-ontime', 'On time') : a.T('src-late', 'Handed in late')) : e.type === 'plan' ? a.T('src-plan', 'Revision plan finished') : e.type === 'research' ? a.T('src-research', 'Research finished') : a.T('src-ticked', 'Ticked off');
+    var title = e.type === 'lesson' ? a.T('lesson-t', 'Tutoring lesson: {{s}}', { s: e.title || '' }) : e.title;
+    return '<div class="gd-done-row ' + e.type + '"><span class="ic">' + a.ic(ic, 17) + '</span><div><b>' + a.esc(title) + '</b><small>' + (e.course ? '<i class="shq-dot" style="background:' + e.color + '"></i>' + a.esc(e.course) + ' · ' : '') + '<span class="src' + (e.onTime === false ? ' late' : '') + '">' + a.esc(src) + '</span></small></div><span class="when">' + a.esc(e.when) + '</span>' +
+      (e.edit ? '<button type="button" class="gd-iconbtn" data-act="edit" data-id="' + a.esc(e.edit) + '" aria-label="' + a.esc(a.T('edit', 'Edit')) + '">' + a.ic('edit', 15) + '</button>' : '') + '</div>';
+  }
   function progress(a, m) {
-    var h = head(a, a.T('week-title', 'Your week'), a.esc(a.T('week-sub', 'An honest record to plan the next one. No scores, no comparisons.')), m.daily.ready ? '<button type="button" class="shq-btn ghost" data-act="reflect">' + a.ic('leaf', 15) + a.esc(a.T('reflect-btn', 'Reflect on this week')) + '</button>' : '');
+    var h = head(a, a.T('prog-title', 'My progress'), a.esc(a.T('prog-sub', 'What you got done and what you are researching. Private to you: no scores, no comparisons with others.')), m.daily.ready ? '<button type="button" class="shq-btn ghost" data-act="reflect">' + a.ic('leaf', 15) + a.esc(a.T('reflect-btn', 'Reflect on this week')) + '</button>' : '');
+    h += prodBlock(a, m.prod);
+    var wk = m.done.filter(function (e) { return e.thisWeek; }), older = m.done.filter(function (e) { return !e.thisWeek; });
+    h += '<div class="gd-two gd-acc" style="margin:22px 0">' +
+      '<section class="gd-card"><div class="gd-card-h"><h2>' + a.esc(a.T('acc-h', 'What I accomplished')) + '</h2>' + a.addBtn('achievement', a.T('acc-add', 'Add something I did'), 'shq-btn ghost small') + '</div>' +
+      (m.done.length ? (wk.length ? '<h3 class="gd-sub-h">' + a.esc(a.T('acc-week', 'This week')) + '</h3>' + wk.map(function (e) { return doneRow(a, e); }).join('') : '') +
+        (older.length ? '<h3 class="gd-sub-h">' + a.esc(a.T('acc-earlier', 'Earlier')) + '</h3>' + older.slice(0, 6).map(function (e) { return doneRow(a, e); }).join('') +
+          (older.length > 6 ? '<details class="gd-more-done"><summary>' + a.esc(a.T('acc-all', 'Show {{n}} more', { n: older.length - 6 })) + '</summary>' + older.slice(6).map(function (e) { return doneRow(a, e); }).join('') + '</details>' : '') : '')
+        : '<p class="gd-muted">' + a.esc(a.T('acc-empty', 'Finished tasks, deadlines and revision plans collect here. You can also add things you did outside Study Campus, like a presentation or a lab report.')) + '</p>') +
+      '</section>' +
+      '<section class="gd-card"><div class="gd-card-h"><h2>' + a.esc(a.T('rs-h', 'My research')) + '</h2>' + a.addBtn('research', a.T('rs-add', 'Add research'), 'shq-btn ghost small') + '</div>' +
+      (m.research.length ? m.research.map(function (r) {
+        return '<button type="button" class="gd-rs-row" data-act="edit" data-id="' + a.esc(r.id) + '"><span class="ic">' + a.ic('search', 17) + '</span><span class="tx"><b>' + a.esc(r.title) + '</b><small>' + (r.course ? '<i class="shq-dot" style="background:' + r.color + '"></i>' + a.esc(r.course) + ' · ' : '') + a.esc(r.sources === 1 ? a.T('rs-src1', '1 source') : a.T('rs-srcn', '{{n}} sources', { n: r.sources })) + '</small></span><span class="gd-rs-st' + (r.done ? ' done' : '') + '">' + a.esc(r.done ? a.T('rs.done', 'Finished') : a.T('rs.open', 'Working on it')) + '</span></button>';
+      }).join('') : '<p class="gd-muted">' + a.esc(a.T('rs-empty', 'Keep each research topic in one place: the question, your sources and what you found. Good for essays, theses and lab reports.')) + '</p>') +
+      '</section></div>';
     h += a.storageNotice();
     var lr = m.daily.lastReflection;
     h += '<div class="gd-two" style="margin-bottom:22px"><section class="gd-card"><h2>' + a.esc(a.T('your-plant', 'Your study plant')) + '</h2>' + plant(a, m.daily.record) + '</section><section class="gd-card"><h2>' + a.esc(a.T('learning-week', 'Learning this week')) + '</h2>' + a.recordBlock(m.daily.record) + '</section></div>' +
       '<div class="gd-two" style="margin-bottom:22px">' +
       '<section class="gd-card"><h2>' + a.esc(a.T('last-reflect', 'Your last reflection')) + '</h2>' + (lr ? '<dl class="gd-rf"><dt>' + a.esc(a.T('rf.went', 'What went well?')) + '</dt><dd>' + a.esc(lr.went || '–') + '</dd><dt>' + a.esc(a.T('rf.stuck', 'What is still stuck?')) + '</dt><dd>' + a.esc(lr.stuck || '–') + '</dd><dt>' + a.esc(a.T('rf.aim', 'One aim for next week')) + '</dt><dd>' + a.esc(lr.aim || '–') + '</dd></dl>' : '<p class="gd-muted">' + a.esc(a.T('no-reflect', 'Nothing yet. Three questions at the end of each week, private to you.')) + '</p>') + '</section></div>';
     h += '<div class="gd-two"><section class="gd-card"><h2>' + a.esc(a.T('by-course-week', 'This week, course by course')) + '</h2>' + (m.weekRows.length ? '<div class="gd-wk">' + m.weekRows.map(function (r) {
-      return '<div class="gd-wkrow' + (r.quiet ? ' quiet' : '') + '" style="--c:' + r.color + '"><a href="' + r.href + '"><i class="shq-dot" style="background:' + r.color + '"></i>' + a.esc(r.label) + '</a><span>' + a.esc(a.T('wk-line', '{{n}} notes · {{f}} files · {{c}} cards', { n: r.notes, f: r.files, c: r.cards })) + '</span>' + (r.quiet ? '<small>' + a.esc(a.T('wk-quiet', 'Nothing captured yet this week')) + '</small>' : '') + '</div>';
+      return '<div class="gd-wkrow' + (r.quiet ? ' quiet' : '') + '" style="--c:' + r.color + '"><a href="' + r.href + '"><i class="shq-dot" style="background:' + r.color + '"></i>' + a.esc(r.label) + '</a><span>' + a.esc(a.T('wk-line', '{{n}} notes · {{f}} files · {{c}} quiz questions', { n: r.notes, f: r.files, c: r.cards })) + '</span>' + (r.quiet ? '<small>' + a.esc(a.T('wk-quiet', 'Nothing captured yet this week')) + '</small>' : '') + '</div>';
     }).join('') + '</div>' : '<p class="gd-muted">' + a.esc(a.T('no-courses-s', 'No courses yet.')) + '</p>') + '</section>' +
       '<section class="gd-card"><h2>' + a.esc(a.T('next-14', 'Next two weeks')) + '</h2><div class="gd-tl">' + (m.next.length ? m.next.slice(0, 8).map(function (e) { return tlRow(a, e); }).join('') : '<p class="gd-muted">' + a.esc(a.T('nothing-14', 'Nothing due in the next two weeks.')) + '</p>') + '</div></section></div>';
     return h;

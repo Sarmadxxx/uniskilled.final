@@ -282,6 +282,63 @@
     return out;
   }
 
+
+  /* ---------------------------------------------------------------- progress: what got done
+   * Productivity is measured only from things the student really did in Study Campus: tasks and
+   * assignments ticked off, deadlines met, quiz questions answered, notes written. No scores,
+   * no guessing, no comparison with other students. */
+  function inRange(t, a, b) { if (!t) return false; var d = new Date(t); return d >= a && d < b; }
+  function weekStats(input, from) {
+    var to = addDays(from, 7), items = input.items || [], log = input.log || [];
+    var work = items.filter(function (i) { return i.kind === 'task' || i.kind === 'assignment'; });
+    var done = work.filter(function (i) { return i.status === 'done' && inRange(i.done_at, from, to); });
+    var due = items.filter(function (i) { return i.kind === 'assignment' && inRange(i.due_at, from, to) && new Date(i.due_at) <= (input.now || new Date()); });
+    var onTime = due.filter(function (i) { return i.status === 'done' && i.done_at && new Date(i.done_at) <= new Date(i.due_at); });
+    var quiz = 0, days = [0, 0, 0, 0, 0, 0, 0];
+    function mark(t) { if (inRange(t, from, to)) days[Math.floor((startOfDay(new Date(t)) - from) / 86400000 + 0.5)] += 1; }
+    log.forEach(function (l) { if (!inRange(l.at, from, to)) return; if (l.type === 'review') quiz += l.n || 0; mark(l.at); });
+    done.forEach(function (i) { mark(i.done_at); });
+    var notes = items.filter(function (i) { return i.kind === 'note' && inRange(i.created_at, from, to); });
+    notes.forEach(function (i) { if (!log.some(function (l) { return l.type === 'note' && Math.abs(new Date(l.at) - new Date(i.created_at)) < 60000; })) mark(i.created_at); });
+    var focus = log.filter(function (l) { return l.type === 'focus' && inRange(l.at, from, to); }).reduce(function (a, l) { return a + (l.minutes || 0); }, 0);
+    return { done: done.length, due: due.length, onTime: onTime.length, quiz: quiz, notes: notes.length, focus: focus,
+      studyDays: days.filter(function (n) { return n > 0; }).length, days: days };
+  }
+  function productivity(input) {
+    var now = input.now || new Date(), mon = startOfWeek(now);
+    var a = weekStats(Object.assign({}, input, { now: now }), mon), b = weekStats(Object.assign({}, input, { now: now }), addDays(mon, -7));
+    function trend(x, y) { return x > y ? 'up' : x < y ? 'down' : 'same'; }
+    return { thisWeek: a, lastWeek: b, dayOfWeek: (now.getDay() + 6) % 7,
+      trend: { done: trend(a.done, b.done), quiz: trend(a.quiz, b.quiz), studyDays: trend(a.studyDays, b.studyDays), notes: trend(a.notes, b.notes) },
+      empty: !a.done && !a.quiz && !a.notes && !a.due && !b.done && !b.quiz && !b.notes };
+  }
+  // Everything the student finished, newest first: work, revision plans, tutoring lessons and
+  // things they added themselves. Each entry says where it came from.
+  function accomplishments(input) {
+    var out = [];
+    (input.items || []).forEach(function (i) {
+      if ((i.kind === 'task' || i.kind === 'assignment') && i.status === 'done' && i.done_at) out.push({ type: i.kind, title: i.title, course: i.course_label || null, at: i.done_at, onTime: i.kind === 'assignment' && i.due_at ? new Date(i.done_at) <= new Date(i.due_at) : null, source: 'ticked' });
+      else if (i.kind === 'achievement') out.push({ type: 'achievement', title: i.title, body: i.body || null, at: i.done_at || i.created_at, id: i.id, source: 'self' });
+      else if (i.kind === 'research' && i.status === 'done') out.push({ type: 'research', title: i.title, course: i.course_label || null, at: i.done_at || i.updated_at || i.created_at, source: 'ticked' });
+    });
+    (input.exams || []).forEach(function (x) {
+      var t = (input.tasksByExam || {})[x.id] || [];
+      if (t.length && t.every(function (k) { return !!k.done_at; })) out.push({ type: 'plan', title: x.title, at: t.map(function (k) { return k.done_at; }).sort().pop(), source: 'ticked' });
+    });
+    (input.sessions || []).filter(function (s) { return s.status === 'completed'; }).forEach(function (s) {
+      out.push({ type: 'lesson', title: s.subject || '', minutes: s.duration_minutes || 60, at: s.completed_at || s.starts_at || s.scheduled_date, source: 'record' });
+    });
+    return out.filter(function (e) { return e.at; }).sort(function (x, y) { return new Date(y.at) - new Date(x.at); });
+  }
+  // Research the student is working on: a question or topic, its sources (links) and notes.
+  function researchList(items) {
+    return (items || []).filter(function (i) { return i.kind === 'research'; }).map(function (i) {
+      var links = String(i.body || '').match(/https:\/\/[^\s<>"']+/g) || [];
+      if (i.url && links.indexOf(i.url) < 0) links.unshift(i.url);
+      return { id: i.id, title: i.title, course: i.course_label || null, done: i.status === 'done', sources: links.length, at: i.updated_at || i.created_at };
+    }).sort(function (x, y) { return (x.done - y.done) || (new Date(y.at) - new Date(x.at)); });
+  }
+
   /* ---------------------------------------------------------------- daily learning (prototype)
    * The daily loop: Plan (today's classes) -> Capture (notes after class) -> Recall (review cards
    * made from the student's own notes, spaced out) -> Reflect (the week's honest record).
@@ -826,7 +883,7 @@
   var api = {
     dayPlan: dayPlan,
     mergeExams: mergeExams, startBy: startBy, deadlineList: deadlineList, busyWeeks: busyWeeks, capReview: capReview,
-    skyPeriod: skyPeriod, parseQuickAdd: parseQuickAdd, toICS: toICS, rankTutors: rankTutors, examHelp: examHelp, startOfWeek: startOfWeek,
+    skyPeriod: skyPeriod, productivity: productivity, accomplishments: accomplishments, researchList: researchList, parseQuickAdd: parseQuickAdd, toICS: toICS, rankTutors: rankTutors, examHelp: examHelp, startOfWeek: startOfWeek,
     courseKey: courseKey, iso: iso, parseDay: parseDay, startOfDay: startOfDay, addDays: addDays,
     sessionStart: sessionStart, dueOf: dueOf, buildCourses: buildCourses, courseProgress: courseProgress,
     whatNext: whatNext, weekPlan: weekPlan, achievements: achievements, DEFAULT_EST: DEFAULT_EST,

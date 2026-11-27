@@ -236,11 +236,24 @@
         fail(await sb.from('study_files').delete().eq('id', f.id).eq('user_id', S.uid));
         S.files = S.files.filter(function (x) { return x.id !== f.id; });
       },
+      // Reminders (Settings). Until the reminders update is live the table does not exist: then the
+      // section explains that reminders are coming, and nothing breaks.
+      loadReminders: async function () {
+        var r = await sb.from('study_reminders').select('email_daily,email_hour,tz,cal_token').eq('user_id', S.uid).maybeSingle();
+        if (r.error) { S.remReady = false; return; }
+        S.rem = r.data || { email_daily: false, email_hour: 8, cal_token: null }; S.remReady = true;
+      },
+      saveReminders: async function (patch) {
+        var row = Object.assign({ user_id: S.uid, email_daily: S.rem.email_daily, email_hour: S.rem.email_hour, cal_token: S.rem.cal_token, tz: (function () { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Berlin'; } catch (e) { return 'Europe/Berlin'; } })() }, patch);
+        var r = await sb.from('study_reminders').upsert(row).select('email_daily,email_hour,tz,cal_token').single();
+        S.rem = fail(r);
+      },
       deleteEverything: async function () {
         var paths = S.files.map(function (f) { return f.path; });
         for (var i = 0; i < paths.length; i += 100) fail(await sb.storage.from('study-files').remove(paths.slice(i, i + 100)));
         var tables = ['study_files', 'study_items', 'study_timetable', 'study_card_states', 'study_activity', 'study_reflections', 'study_courses'];
         for (var j = 0; j < tables.length; j++) fail(await sb.from(tables[j]).delete().eq('user_id', S.uid));
+        if (S.remReady) { fail(await sb.from('study_reminders').delete().eq('user_id', S.uid)); S.rem = { email_daily: false, email_hour: 8, cal_token: null }; }
         S.follows = []; S.exams = []; S.items = []; S.timetable = []; S.cardStates = {}; S.log = []; S.reflections = []; S.files = [];
       }
     };
@@ -267,6 +280,8 @@
         S.demoTerm = d.term || null;
         S.timetable = d.timetable || []; S.cardStates = d.cardStates || {}; S.log = d.log || []; S.reflections = d.reflections || []; S.files = d.files || []; S.dailyReady = true;
       },
+      loadReminders: async function () { S.rem = { email_daily: false, email_hour: 8, cal_token: null }; S.remReady = true; },
+      saveReminders: async function (patch) { S.rem = Object.assign({}, S.rem, patch); },
       addItem: async function (row) { var x = withDone(Object.assign({ id: nid(), status: 'todo', created_at: new Date().toISOString() }, row)); S.items.push(x); return x; },
       updateItem: async function (id, patch) { S.items = S.items.map(function (x) { return x.id === id ? withDone(Object.assign({}, x, patch)) : x; }); },
       deleteItem: async function (id) { S.items = S.items.filter(function (x) { return x.id !== id; }); },
@@ -500,8 +515,8 @@
     var plan = H.dayPlan({ items: S.items, exams: S.exams, tasksByExam: S.tasksByExam, minutes: ui.minutes, reviewCount: daily.ready ? daily.queue.total : 0,
       reviewMinutes: daily.queue.minutes, dailyMinutes: ui.capacity, now: now, skip: ui.skipped });
     plan.steps = plan.steps.map(function (st) {
-      if (st.type === 'review') return { type: 'review', id: 'review', title: T('review-n', 'Review {{n}} cards', { n: st.n }), minutes: st.minutes,
-        why: daily.queue.waiting ? T('review-why-cap', 'Capped at {{c}} today so it never piles up. {{w}} more wait for days with time.', { c: ui.reviewCap, w: daily.queue.waiting }) : T('review-why', 'Spaced review keeps what you learned.') };
+      if (st.type === 'review') return { type: 'review', id: 'review', title: T('review-n', 'Quiz me: {{n}} questions', { n: st.n }), minutes: st.minutes,
+        why: daily.queue.waiting ? T('review-why-cap', 'Capped at {{c}} today so it never piles up. {{w}} more wait for days with time.', { c: ui.reviewCap, w: daily.queue.waiting }) : T('review-why', 'A few questions a day keep what you learned.') };
       var d = decoStep(st);
       d.why = d.reasonTexts.map(function (x) { return x.text; }).slice(0, 2).join(' · ');
       return d;
@@ -700,7 +715,13 @@
       var cards = cardsAll.filter(function (x) { return H.courseKey(x.course) === c.key && reviewedBy[x.id]; }).length;
       return { label: c.label, key: c.key, color: colorOf(c.key), href: courseHref(c.key), notes: notes, files: files, cards: cards, quiet: !notes && !files };
     });
-    return { weekRows: weekRows, next: upcoming(14), rows: rows, asgDone: asgDone, asgAll: asgAll, revDone: revDone, revAll: revAll, lessons: lessons.length, minutes: minutes, achievements: ach, overall: totalAll ? Math.round(totalDone / totalAll * 100) : null, term: term(),
+    var prod = H.productivity({ items: S.items, log: S.log, now: new Date() });
+    var done = H.accomplishments({ items: S.items, exams: S.exams, tasksByExam: S.tasksByExam, sessions: S.sessions }).slice(0, 40).map(function (e) {
+      var item = e.id ? S.items.filter(function (x) { return x.id === e.id; })[0] : null;
+      return Object.assign({}, e, { when: fmt(new Date(e.at), { day: 'numeric', month: 'short' }), thisWeek: new Date(e.at) >= monday, color: e.course ? colorOf(H.courseKey(e.course)) : null, edit: item ? item.id : null });
+    });
+    var research = H.researchList(S.items).map(function (r) { return Object.assign({}, r, { color: r.course ? colorOf(H.courseKey(r.course)) : null }); });
+    return { prod: prod, done: done, research: research, weekRows: weekRows, next: upcoming(14), rows: rows, asgDone: asgDone, asgAll: asgAll, revDone: revDone, revAll: revAll, lessons: lessons.length, minutes: minutes, achievements: ach, overall: totalAll ? Math.round(totalDone / totalAll * 100) : null, term: term(),
       daily: { ready: S.dailyReady, record: lm.record, concepts: lm.concepts, lastReflection: dailyModel().lastReflection } };
   }
 
@@ -718,8 +739,8 @@
   }
   function sugText(x) {
     switch (x.k) {
-      case 'capture': return { title: T('sg.capture', 'Capture today’s {{c}} class', { c: x.course }), why: T('sg.capture-why', 'Three key points while they are fresh. They become review cards.'), ok: T('sg.capture-ok', 'Write notes') };
-      case 'review': return { title: T('sg.review', 'Review {{n}} cards', { n: x.n }), why: T('sg.review-why', 'About {{m}} min. Spaced review is how lectures stick.', { m: x.minutes }), ok: T('sg.review-ok', 'Start review') };
+      case 'capture': return { title: T('sg.capture', 'Capture today’s {{c}} class', { c: x.course }), why: T('sg.capture-why', 'Three key points while they are fresh. They become Quiz me questions.'), ok: T('sg.capture-ok', 'Write notes') };
+      case 'review': return { title: T('sg.review', 'Quiz me: {{n}} questions', { n: x.n }), why: T('sg.review-why', 'About {{m}} min. Spaced review is how lectures stick.', { m: x.minutes }), ok: T('sg.review-ok', 'Start Quiz me') };
       case 'plan': return { title: T('sg.plan', 'Draft a revision plan for {{e}}', { e: x.exam }), why: T('sg.plan-why', '{{n}} days to go and no plan yet. You approve every day of it.', { n: x.days }), ok: T('sg.plan-ok', 'Draft it') };
       case 'rescue': return { title: T('sg.rescue', 'Get 15 minutes on “{{t}}”', { t: x.topic }), why: T('sg.rescue-why', 'Marked unsure, exam in {{n}} days. A verified student who passed {{c}} can help.', { n: x.days, c: x.course }), ok: T('sg.rescue-ok', 'See who can help') };
       case 'reflect': return { title: T('sg.reflect', 'Look back on your week'), why: T('sg.reflect-why', 'Three short questions. Your answers stay private.'), ok: T('sg.reflect-ok', 'Reflect') };
@@ -770,7 +791,7 @@
   /* shared blocks for the daily loop: class names start with shq-d so each design can restyle them */
   function capWord(s) { s = String(s || ''); return s.charAt(0).toUpperCase() + s.slice(1); }
   function classesBlock(d) {
-    if (!d.ready) return '<p class="shq-d-muted">' + esc(T('daily-off', 'Your timetable, review cards and weekly record arrive with the daily-learning update.')) + '</p>';
+    if (!d.ready) return '<p class="shq-d-muted">' + esc(T('daily-off', 'Your timetable, Quiz me questions and weekly record arrive with the daily-learning update.')) + '</p>';
     if (!d.classes.length) return '<p class="shq-d-muted">' + esc(d.weekday === 0 || d.weekday === 6 ? T('no-class-we', 'No classes today. A good day for a short review, or a real break.') : T('no-class', 'No classes today.')) + '</p>';
     return '<ol class="shq-d-classes">' + d.classes.map(function (c) {
       var st = { done: T('cl.done', 'Done'), now: T('cl.now', 'Now'), next: T('cl.next', 'Later') }[c.state];
@@ -782,10 +803,10 @@
   function reviewBlock(d, cls) {
     if (!d.ready) return '';
     var q = d.queue;
-    if (!q.total) return '<div class="shq-d-review empty"><b>' + esc(T('rv-none', 'No cards due today')) + '</b><p>' + esc(d.cards ? T('rv-none-sub', 'You are up to date. New cards appear as you write notes.') : T('rv-first', 'Write a note with “Q:” and “A:” lines and it becomes a review card.')) + '</p></div>';
-    return '<div class="shq-d-review"><div class="n"><b>' + q.total + '</b><span>' + esc(T('rv-cards', 'cards today')) + '</span></div><div class="x"><p>' + esc(T('rv-time', 'About {{m}} min · {{d}} due again, {{f}} new', { m: q.minutes, d: q.due.length, f: q.fresh.length })) + '</p>' +
+    if (!q.total) return '<div class="shq-d-review empty"><b>' + esc(T('rv-none', 'No questions due today')) + '</b><p>' + esc(d.cards ? T('rv-none-sub', 'You are up to date. New questions appear as you write notes.') : T('rv-first', 'Write a note with “Q:” and “A:” lines and it becomes a Quiz me question.')) + '</p></div>';
+    return '<div class="shq-d-review"><div class="n"><b>' + q.total + '</b><span>' + esc(T('rv-cards', 'questions today')) + '</span></div><div class="x"><p>' + esc(T('rv-time', 'About {{m}} min · {{d}} due again, {{f}} new', { m: q.minutes, d: q.due.length, f: q.fresh.length })) + '</p>' +
       '<div class="chips">' + d.reviewCourses.map(function (c) { return '<span><i class="shq-dot" style="background:' + c.color + '"></i>' + esc(c.label) + ' ' + c.n + '</span>'; }).join('') + '</div></div>' +
-      '<a class="' + (cls || 'shq-btn primary') + '" href="#/learn" data-act="rv-start">' + ic('play', 14) + esc(T('rv-start', 'Start review')) + '</a></div>';
+      '<a class="' + (cls || 'shq-btn primary') + '" href="#/learn" data-act="rv-start">' + ic('play', 14) + esc(T('rv-start', 'Start Quiz me')) + '</a></div>';
   }
   function suggestBlock(d, max) {
     if (!d.ready || !d.suggestions.length) return '';
@@ -798,18 +819,18 @@
     var wd = [T('wd.mo', 'Mo'), T('wd.tu', 'Tu'), T('wd.we', 'We'), T('wd.th', 'Th'), T('wd.fr', 'Fr'), T('wd.sa', 'Sa'), T('wd.su', 'Su')];
     return '<div class="shq-d-record"><div class="days" role="img" aria-label="' + esc(T('rec-aria', 'Studied on {{n}} of 7 days this week', { n: r.activeDays })) + '">' + r.days.map(function (d, i) {
       return '<span class="' + (d.active ? 'on' : d.future ? 'fut' : '') + (H.iso(new Date()) === d.iso ? ' today' : '') + '"><i></i>' + esc(wd[i]) + '</span>';
-    }).join('') + '</div><div class="figs"><span><b>' + r.activeDays + '/7</b>' + esc(T('rec-days', 'days studied')) + '</span><span><b>' + esc(mins(r.focusMinutes)) + '</b>' + esc(T('rec-focus', 'focused')) + '</span><span><b>' + r.reviewed + '</b>' + esc(T('rec-cards', 'cards reviewed')) + '</span><span><b>' + (r.recall == null ? '–' : r.recall + '%') + '</b>' + esc(T('rec-recall', 'remembered')) + '</span></div></div>';
+    }).join('') + '</div><div class="figs"><span><b>' + r.activeDays + '/7</b>' + esc(T('rec-days', 'days studied')) + '</span><span><b>' + esc(mins(r.focusMinutes)) + '</b>' + esc(T('rec-focus', 'focused')) + '</span><span><b>' + r.reviewed + '</b>' + esc(T('rec-cards', 'questions answered')) + '</span><span><b>' + (r.recall == null ? '–' : r.recall + '%') + '</b>' + esc(T('rec-recall', 'remembered')) + '</span></div></div>';
   }
   function reviewSession(m) {
     var r = m.review;
-    if (!m.ready) return '<p class="shq-d-muted">' + esc(T('daily-off', 'Your timetable, review cards and weekly record arrive with the daily-learning update.')) + '</p>';
-    if (r && r.finished) return '<div class="shq-d-card done"><b>' + esc(T('rv-done', 'Done for today')) + '</b><p>' + esc(T('rv-done-sub', '{{n}} cards, {{k}} remembered. The ones you missed come back tomorrow.', { n: r.n, k: r.right })) + '</p><button type="button" class="shq-btn ghost small" data-act="rv-close">' + esc(T('rv-close', 'Close')) + '</button></div>';
+    if (!m.ready) return '<p class="shq-d-muted">' + esc(T('daily-off', 'Your timetable, Quiz me questions and weekly record arrive with the daily-learning update.')) + '</p>';
+    if (r && r.finished) return '<div class="shq-d-card done"><b>' + esc(T('rv-done', 'Done for today')) + '</b><p>' + esc(T('rv-done-sub', '{{n}} questions, {{k}} remembered. The ones you missed come back tomorrow.', { n: r.n, k: r.right })) + '</p><button type="button" class="shq-btn ghost small" data-act="rv-close">' + esc(T('rv-close', 'Close')) + '</button></div>';
     if (!r || !m.current) {
-      return m.queue.total ? '<div class="shq-d-card start"><b>' + esc(T('rv-ready', '{{n}} cards ready', { n: m.queue.total })) + '</b><p>' + esc(T('rv-ready-sub', 'About {{m}} minutes. Say the answer to yourself, then reveal it.', { m: m.queue.minutes })) + '</p><button type="button" class="shq-btn primary" data-act="rv-start">' + ic('play', 14) + esc(T('rv-start', 'Start review')) + '</button></div>'
-        : '<div class="shq-d-card start"><b>' + esc(T('rv-none', 'No cards due today')) + '</b><p>' + esc(T('rv-none-sub', 'You are up to date. New cards appear as you write notes.')) + '</p></div>';
+      return m.queue.total ? '<div class="shq-d-card start"><b>' + esc(T('rv-ready', '{{n}} questions ready', { n: m.queue.total })) + '</b><p>' + esc(T('rv-ready-sub', 'About {{m}} minutes. Say the answer to yourself, then reveal it.', { m: m.queue.minutes })) + '</p><button type="button" class="shq-btn primary" data-act="rv-start">' + ic('play', 14) + esc(T('rv-start', 'Start Quiz me')) + '</button></div>'
+        : '<div class="shq-d-card start"><b>' + esc(T('rv-none', 'No questions due today')) + '</b><p>' + esc(T('rv-none-sub', 'You are up to date. New questions appear as you write notes.')) + '</p></div>';
     }
     var c = m.current, pos = r.i + 1, tot = r.ids.length;
-    return '<div class="shq-d-card live" style="--c:' + colorOf(H.courseKey(c.course)) + '"><div class="top"><span>' + courseTag(c.course, H.courseKey(c.course)) + '</span><span class="shq-d-prog" role="progressbar" aria-valuemin="0" aria-valuemax="' + tot + '" aria-valuenow="' + r.i + '" aria-label="' + esc(T('rv-prog', 'Card {{i}} of {{n}}', { i: pos, n: tot })) + '"><i style="width:' + Math.round(r.i / tot * 100) + '%"></i></span><small>' + pos + ' / ' + tot + '</small></div>' +
+    return '<div class="shq-d-card live" style="--c:' + colorOf(H.courseKey(c.course)) + '"><div class="top"><span>' + courseTag(c.course, H.courseKey(c.course)) + '</span><span class="shq-d-prog" role="progressbar" aria-valuemin="0" aria-valuemax="' + tot + '" aria-valuenow="' + r.i + '" aria-label="' + esc(T('rv-prog', 'Question {{i}} of {{n}}', { i: pos, n: tot })) + '"><i style="width:' + Math.round(r.i / tot * 100) + '%"></i></span><small>' + pos + ' / ' + tot + '</small></div>' +
       '<p class="front">' + esc(c.front) + '</p>' + (r.shown ? '<p class="back">' + esc(c.back) + '</p>' : '') +
       '<div class="acts">' + (r.shown
         ? '<button type="button" class="shq-btn ghost" data-act="rv-grade" data-v="0">' + esc(T('rv-no', 'Not yet')) + ' <kbd>1</kbd></button><button type="button" class="shq-btn primary" data-act="rv-grade" data-v="1">' + esc(T('rv-yes', 'I knew it')) + ' <kbd>2</kbd></button>'
@@ -829,24 +850,24 @@
     if (!m.concepts.length) return '<p class="shq-d-muted">' + esc(T('cx-none', 'Tag ideas in your notes with #tags or [[links]] and they connect here across courses.')) + '</p>';
     return '<div class="shq-d-concepts">' + m.concepts.map(function (c) {
       var s = c.strength == null ? null : c.strength;
-      return '<span class="cx" title="' + esc(T('cx-title', '{{n}} notes · {{c}} cards', { n: c.notes, c: c.cards })) + '"><b>' + esc(capWord(c.label)) + '</b><small>' + esc(c.courses.join(' · ') || T('no-course', 'No course')) + '</small><i class="bar"><i style="width:' + (s || 0) + '%"></i></i><em>' + (s == null ? esc(T('cx-nocards', 'no cards yet')) : esc(T('cx-held', '{{s}}% held', { s: s }))) + '</em></span>';
+      return '<span class="cx" title="' + esc(T('cx-title', '{{n}} notes · {{c}} questions', { n: c.notes, c: c.cards })) + '"><b>' + esc(capWord(c.label)) + '</b><small>' + esc(c.courses.join(' · ') || T('no-course', 'No course')) + '</small><i class="bar"><i style="width:' + (s || 0) + '%"></i></i><em>' + (s == null ? esc(T('cx-nocards', 'no questions yet')) : esc(T('cx-held', '{{s}}% held', { s: s }))) + '</em></span>';
     }).join('') + '</div>';
   }
   function decksBlock(m) {
-    return '<div class="shq-d-decks">' + m.decks.map(function (d) { return '<div class="dk" style="--c:' + d.color + '"><b>' + esc(d.label) + '</b><span>' + esc(T('dk-line', '{{t}} cards · {{d}} today · {{k}} well known', { t: d.total, d: d.due, k: d.known })) + '</span></div>'; }).join('') + '</div>';
+    return '<div class="shq-d-decks">' + m.decks.map(function (d) { return '<div class="dk" style="--c:' + d.color + '"><b>' + esc(d.label) + '</b><span>' + esc(T('dk-line', '{{t}} questions · {{d}} today · {{k}} well known', { t: d.total, d: d.due, k: d.known })) + '</span></div>'; }).join('') + '</div>';
   }
   function ideasBlock(m) {
     if (!m.ideas.length) return '';
-    return '<div class="shq-d-ideas">' + m.ideas.map(function (x) { return '<div class="idea"><div><b>' + esc(x.idea.front) + '</b><small>' + esc(x.idea.back) + '</small><span class="src">' + courseTag(x.note.course_label, keyOf(x.note)) + ' ' + esc(x.note.title) + '</span></div><button type="button" class="shq-btn ghost small" data-act="idea-add" data-id="' + esc(x.note.id) + '" data-v="' + x.ix + '">' + ic('plus', 13) + esc(T('idea-add', 'Add card')) + '</button></div>'; }).join('') + '</div>';
+    return '<div class="shq-d-ideas">' + m.ideas.map(function (x) { return '<div class="idea"><div><b>' + esc(x.idea.front) + '</b><small>' + esc(x.idea.back) + '</small><span class="src">' + courseTag(x.note.course_label, keyOf(x.note)) + ' ' + esc(x.note.title) + '</span></div><button type="button" class="shq-btn ghost small" data-act="idea-add" data-id="' + esc(x.note.id) + '" data-v="' + x.ix + '">' + ic('plus', 13) + esc(T('idea-add', 'Add question')) + '</button></div>'; }).join('') + '</div>';
   }
   function formatHelp() {
-    return '<details class="shq-d-help"><summary>' + esc(T('fmt-title', 'How notes become cards')) + '</summary><ul><li><code>Q: …</code> ' + esc(T('fmt-qa', 'then a line')) + ' <code>A: …</code></li><li><code>' + esc(T('fmt-term', 'term :: definition')) + '</code></li><li>' + esc(T('fmt-cloze', 'A sentence with')) + ' <code>{{' + esc(T('fmt-hidden', 'hidden words')) + '}}</code></li><li><code>#tag</code> ' + esc(T('fmt-or', 'or')) + ' <code>[[' + esc(T('fmt-concept', 'concept')) + ']]</code> ' + esc(T('fmt-links', 'link ideas across courses')) + '</li></ul></details>';
+    return '<details class="shq-d-help"><summary>' + esc(T('fmt-title', 'How notes become questions')) + '</summary><ul><li><code>Q: …</code> ' + esc(T('fmt-qa', 'then a line')) + ' <code>A: …</code></li><li><code>' + esc(T('fmt-term', 'term :: definition')) + '</code></li><li>' + esc(T('fmt-cloze', 'A sentence with')) + ' <code>{{' + esc(T('fmt-hidden', 'hidden words')) + '}}</code></li><li><code>#tag</code> ' + esc(T('fmt-or', 'or')) + ' <code>[[' + esc(T('fmt-concept', 'concept')) + ']]</code> ' + esc(T('fmt-links', 'link ideas across courses')) + '</li></ul></details>';
   }
   // A default Learn screen: designs can replace it with their own layout of the same blocks.
   function learnView(a, m) {
-    return '<div class="shq-learn"><header class="shq-learn-h"><h1>' + esc(T('learn-h', 'Learn')) + '</h1><p>' + esc(T('learn-sub', 'Review cards made from your own notes, ask your notes a question, and see which ideas are holding.')) + '</p></header>' +
-      '<div class="shq-learn-grid"><section class="shq-learn-main"><h2>' + esc(T('today-review', 'Today’s review')) + '</h2>' + reviewSession(m) + '<h2>' + esc(T('ask-h', 'Ask your notes')) + '</h2>' + askBlock(m) + '</section>' +
-      '<aside class="shq-learn-side"><h2>' + esc(T('decks', 'Your decks')) + '</h2>' + decksBlock(m) + (m.ideas.length ? '<h2>' + esc(T('ideas', 'Card ideas from your notes')) + '</h2>' + ideasBlock(m) : '') + formatHelp() + '</aside></div>' +
+    return '<div class="shq-learn"><header class="shq-learn-h"><h1>' + esc(T('learn-h', 'Learn')) + '</h1><p>' + esc(T('learn-sub', 'Questions made from your own notes, to test what you remember. Ask your notes anything and see which ideas are holding.')) + '</p></header>' +
+      '<div class="shq-learn-grid"><section class="shq-learn-main"><h2>' + esc(T('today-review', 'Today’s questions')) + '</h2>' + reviewSession(m) + '<h2>' + esc(T('ask-h', 'Ask your notes')) + '</h2>' + askBlock(m) + '</section>' +
+      '<aside class="shq-learn-side"><h2>' + esc(T('decks', 'Your decks')) + '</h2>' + decksBlock(m) + (m.ideas.length ? '<h2>' + esc(T('ideas', 'Question ideas from your notes')) + '</h2>' + ideasBlock(m) : '') + formatHelp() + '</aside></div>' +
       '<section class="shq-learn-cx"><h2>' + esc(T('cx-h', 'Concepts across your courses')) + '</h2>' + conceptsBlock(m) + '</section></div>';
   }
 
@@ -912,6 +933,25 @@
     return '<div class="shq-page"><header class="shq-page-h"><div><h1>' + esc(T('lib-h', 'Notes & files')) + '</h1><p>' + esc(T('lib-sub', 'Everything you captured, searchable in one place. Private to you: tutors, other students and UniSkilled staff cannot see it.')) + '</p></div>' + captureButtons('') + '</header>' +
       storageNotice() + search + chips + body + '</div>';
   }
+  /* ---------------------------------------------------------------- reminders (Settings) */
+  function calUrl() { return S.rem && S.rem.cal_token ? String((window.USK_CONFIG || {}).url || 'https://orghkbbohnabcietidiv.supabase.co') + '/functions/v1/studyhq-calendar?t=' + S.rem.cal_token : ''; }
+  function newToken() { var b = new Uint8Array(32); crypto.getRandomValues(b); return btoa(String.fromCharCode.apply(null, b)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function remindersSection() {
+    var h = '<section class="shq-sec" id="reminders"><h2>' + esc(T('rem-h', 'Reminders')) + '</h2><p class="shq-d-fine">' + esc(T('rem-sub', 'Get reminded of your tasks, deadlines and exams. Everything stays off until you turn it on.')) + '</p>';
+    if (!S.remReady) return h + '<p class="shq-notice">' + esc(T('rem-soon', 'Email and calendar reminders are coming to Study Campus soon.')) + '</p></section>';
+    var r = S.rem, on = !!r.email_daily, url = calUrl();
+    h += '<div class="shq-rem"><div class="shq-rem-t"><b>' + ic('clock', 16) + esc(T('rem-email', 'Morning email')) + '</b><small>' + esc(T('rem-email-s', 'One short email on days with something due: today’s tasks, deadlines in the next two days and exams in the next week. Days with nothing due send nothing.')) + '</small>' +
+      (on ? '<label class="shq-rem-hour">' + esc(T('rem-at', 'Send at')) + ' <select id="remHour" data-act="rem-hour">' + [6, 7, 8, 9, 10].map(function (x) { return '<option value="' + x + '"' + (r.email_hour === x ? ' selected' : '') + '>' + (x < 10 ? '0' : '') + x + ':00</option>'; }).join('') + '</select></label>' : '') + '</div>' +
+      '<button type="button" class="shq-switch" role="switch" aria-checked="' + on + '" data-act="rem-email" aria-label="' + esc(T('rem-email', 'Morning email')) + '"><i class="gd-sw" aria-hidden="true"></i></button></div>';
+    h += '<div class="shq-rem"><div class="shq-rem-t"><b>' + ic('cal', 16) + esc(T('rem-cal', 'Your calendar')) + '</b><small>' + esc(T('rem-cal-s', 'Your tasks, deadlines and exam dates appear in Google, Apple or Outlook Calendar with reminders, and update by themselves.')) + '</small>';
+    if (!url) h += '<div class="shq-row"><button type="button" class="shq-btn primary small" data-act="rem-cal">' + ic('link', 14) + esc(T('rem-cal-make', 'Create my calendar link')) + '</button></div>';
+    else h += '<div class="shq-rem-link"><input readonly value="' + esc(url) + '" aria-label="' + esc(T('rem-cal', 'Your calendar')) + '" onclick="this.select()"><button type="button" class="shq-btn ghost small" data-act="rem-copy">' + esc(T('copy', 'Copy')) + '</button></div>' +
+      '<div class="shq-row"><a class="shq-btn primary small" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/r?cid=' + encodeURIComponent(url.replace(/^https:/, 'webcal:')) + '">' + esc(T('rem-google', 'Add to Google Calendar')) + '</a>' +
+      '<a class="shq-btn ghost small" href="' + esc(url.replace(/^https:/, 'webcal:')) + '">' + esc(T('rem-apple', 'Add to Apple or Outlook')) + '</a>' +
+      '<button type="button" class="shq-btn ghost small" data-act="rem-reset">' + esc(T('rem-reset', 'Reset link')) + '</button></div>' +
+      '<small class="shq-rem-note">' + esc(T('rem-private', 'Keep this link private: anyone with it can see your task titles. Reset it and the old link stops working.')) + '</small>';
+    return h + '</div></div></section>';
+  }
   function settingsView() {
     var wd = WD();
     var tt = S.timetable.slice().sort(function (a, b) { return a.weekday - b.weekday || (a.start < b.start ? -1 : 1); });
@@ -921,14 +961,15 @@
     var courses = S.follows.length ? '<ul class="shq-list">' + S.follows.map(function (f) {
       return '<li><span class="shq-dot" style="background:' + colorOf(f.course_key || H.courseKey(f.course_code)) + '"></span><span class="grow"><b>' + esc(f.course_code) + '</b><small>' + esc(f.exam_date ? T('exam-on-d', 'Exam {{d}}', { d: fmt(H.parseDay(f.exam_date), { day: 'numeric', month: 'long', year: 'numeric' }) }) : T('no-exam-date', 'No exam date')) + '</small></span><button type="button" class="shq-btn ghost small" data-act="exam" data-id="' + esc(f.id) + '">' + esc(f.exam_date ? T('change-date', 'Change date') : T('set-exam', 'Set exam date')) + '</button></li>';
     }).join('') + '</ul>' : '<p class="shq-d-muted">' + esc(T('no-courses-s', 'No courses yet.')) + '</p>';
-    return '<div class="shq-page"><header class="shq-page-h"><div><h1>' + esc(T('set-h', 'Settings')) + '</h1><p>' + esc(T('set-sub', 'Your timetable, courses and data.')) + '</p></div></header>' + storageNotice() +
+    return '<div class="shq-page"><header class="shq-page-h"><div><h1>' + esc(T('set-h', 'Settings')) + '</h1><p>' + esc(T('set-sub', 'Reminders, your timetable, courses and data.')) + '</p></div></header>' + storageNotice() +
+      remindersSection() +
       '<section class="shq-sec"><h2>' + esc(T('timetable', 'Timetable')) + '</h2><p class="shq-d-fine">' + esc(T('tt-help', 'Import the iCal (.ics) file from your campus system (Stud.IP, TUCaN, campo, ZEuS, Moodle…), or add classes by hand.')) + '</p>' +
       '<div class="shq-row"><button type="button" class="shq-btn primary small" data-act="ical"' + storageOff() + '>' + ic('cal', 14) + esc(T('import-tt', 'Import timetable')) + '</button><button type="button" class="shq-btn ghost small" data-act="class-add"' + storageOff() + '>' + ic('plus', 14) + esc(T('add-class', 'Add a class')) + '</button></div>' + classes + '</section>' +
-      '<section class="shq-sec"><h2>' + esc(T('courses-exams', 'Courses and exam dates')) + '</h2><p class="shq-d-fine">' + esc(T('exam-help', 'An exam date moves review cards forward and switches Today to exam mode six weeks before.')) + '</p><div class="shq-row"><button type="button" class="shq-btn ghost small" data-act="add-course"' + storageOff() + '>' + ic('plus', 14) + esc(T('add-course', 'Add a course')) + '</button></div>' + courses + '</section>' +
-      '<section class="shq-sec"><h2>' + esc(T('your-data', 'Your data')) + '</h2><p class="shq-d-fine">' + esc(T('data-help', 'Notes, files, cards, timetable and reflections are private to you. Download a copy at any time, or delete everything Study Campus holds about you. Your tutoring account is not affected.')) + '</p>' +
+      '<section class="shq-sec"><h2>' + esc(T('courses-exams', 'Courses and exam dates')) + '</h2><p class="shq-d-fine">' + esc(T('exam-help', 'An exam date moves Quiz me questions forward and switches Today to exam mode six weeks before.')) + '</p><div class="shq-row"><button type="button" class="shq-btn ghost small" data-act="add-course"' + storageOff() + '>' + ic('plus', 14) + esc(T('add-course', 'Add a course')) + '</button></div>' + courses + '</section>' +
+      '<section class="shq-sec"><h2>' + esc(T('your-data', 'Your data')) + '</h2><p class="shq-d-fine">' + esc(T('data-help', 'Notes, files, Quiz me questions, timetable and reflections are private to you. Download a copy at any time, or delete everything Study Campus holds about you. Your tutoring account is not affected.')) + '</p>' +
       '<div class="shq-row"><button type="button" class="shq-btn ghost small" data-act="export">' + ic('upload', 14) + esc(T('export', 'Download my data')) + '</button><button type="button" class="shq-btn ghost small danger" data-act="delete-all"' + storageOff() + '>' + ic('trash', 14) + esc(T('delete-all', 'Delete all Study Campus data')) + '</button></div>' +
       '<p class="shq-d-fine">' + esc(T('used-of', '{{u}} of 1 GB used', { u: bytes(usedBytes()) })) + '</p></section>' +
-      '<section class="shq-sec"><h2>' + esc(T('ai-h', 'Smart features')) + '</h2><p class="shq-d-fine">' + esc(window.LanguageModel ? T('ai-on', 'This browser can run Chrome’s built-in model on your device. Ask your notes uses it when it is ready; your notes never leave this device for it.') : T('ai-off', 'Card suggestions, review scheduling and search work on every device with fixed rules. No AI service receives your notes.')) + '</p></section></div>';
+      '<section class="shq-sec"><h2>' + esc(T('ai-h', 'Smart features')) + '</h2><p class="shq-d-fine">' + esc(window.LanguageModel ? T('ai-on', 'This browser can run Chrome’s built-in model on your device. Ask your notes uses it when it is ready; your notes never leave this device for it.') : T('ai-off', 'Question suggestions, quiz scheduling and search work on every device with fixed rules. No AI service receives your notes.')) + '</p></section></div>';
   }
   function needsOnboarding() { return S.itemsReady && !S.follows.length && !S.timetable.length && !S.items.length && !S.files.length; }
   function onboardingView() {
@@ -936,7 +977,7 @@
     return '<div class="shq-page shq-onb"><header class="shq-page-h"><div><h1>' + esc(first ? T('onb-h-n', 'Welcome to Study Campus, {{n}}', { n: first }) : T('onb-h', 'Welcome to Study Campus')) + '</h1><p>' + esc(T('onb-sub', 'Three minutes to set up. Then one screen tells you each day what matters: your next class, what to review, what is due.')) + '</p></div></header>' +
       '<ol class="shq-steps"><li><b>' + esc(T('onb-1', 'Bring in your timetable')) + '</b><p>' + esc(T('onb-1s', 'Import the .ics file from your campus system. Your courses are created from it.')) + '</p><div class="shq-row"><button type="button" class="shq-btn primary" data-act="ical">' + ic('cal', 15) + esc(T('import-tt', 'Import timetable')) + '</button><button type="button" class="shq-btn ghost" data-act="add-course">' + esc(T('onb-1b', 'Just type my courses')) + '</button></div></li>' +
       '<li><b>' + esc(T('onb-2', 'Capture one thing from your last class')) + '</b><p>' + esc(T('onb-2s', 'A few lines, a photo of a slide, or the lecture PDF.')) + '</p></li>' +
-      '<li><b>' + esc(T('onb-3', 'Do your first one-minute review')) + '</b><p>' + esc(T('onb-3s', 'Study Campus suggests cards from your notes. You approve each one.')) + '</p></li></ol>' +
+      '<li><b>' + esc(T('onb-3', 'Do your first one-minute review')) + '</b><p>' + esc(T('onb-3s', 'Study Campus suggests questions from your notes. You approve each one.')) + '</p></li></ol>' +
       (S.user.university_email_verified ? '' : '<p class="shq-d-fine">' + esc(T('onb-verify', 'Tip: verifying your university email in your profile unlocks verified-student features later. It is optional.')) + '</p>') +
       '<p class="shq-d-fine">' + esc(T('onb-private', 'Everything you add is private to you.')) + '</p></div>';
   }
@@ -969,9 +1010,9 @@
   var NAV = [
     ['overview', 'home', function () { return T('nav.overview', 'Today'); }],
     ['courses', 'book', function () { return T('nav.courses', 'Courses'); }],
-    ['learn', 'brain', function () { return T('nav.review', 'Review'); }],
+    ['learn', 'brain', function () { return T('nav.quiz', 'Quiz me'); }],
     ['library', 'note', function () { return T('nav.library', 'Notes & files'); }],
-    ['progress', 'chart', function () { return T('nav.week', 'Week'); }],
+    ['progress', 'chart', function () { return T('nav.progress', 'My progress'); }],
     ['assignments', 'check', function () { return T('nav.exams-deadlines', 'Exams & deadlines'); }],
     ['planner', 'cal', function () { return T('nav.planner', 'Planner'); }],
     ['settings', 'gear', function () { return T('nav.settings', 'Settings'); }]
@@ -1034,7 +1075,7 @@
   function datePart(iso) { return iso ? H.iso(new Date(iso)) : ''; }
   function timePart(iso) { if (!iso) return ''; var d = new Date(iso); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
   function field(id, label, input, opt) { return '<div class="f"><label for="' + id + '">' + esc(label) + (opt ? ' <span class="opt">(' + esc(T('optional', 'optional')) + ')</span>' : '') + '</label>' + input + '</div>'; }
-  var TITLES = function () { return { assignment: T('d.assignment', 'assignment'), task: T('d.task', 'task'), note: T('d.note', 'note'), resource: T('d.resource', 'link'), achievement: T('d.achievement', 'achievement') }; };
+  var TITLES = function () { return { assignment: T('d.assignment', 'assignment'), task: T('d.task', 'task'), note: T('d.note', 'note'), resource: T('d.resource', 'link'), achievement: T('d.achievement', 'something you did'), research: T('d.research', 'research') }; };
   function estSelect(cur) {
     var opts = [15, 30, 45, 60, 90, 120, 180, 240, 360, 480, 720, 960];
     if (cur && opts.indexOf(cur) === -1) { opts.push(cur); opts.sort(function (a, b) { return a - b; }); }
@@ -1051,7 +1092,7 @@
   function openItem(kind, item, defaults) {
     editing = { kind: kind, item: item || null };
     var v = Object.assign({}, defaults || {}, item || {});
-    var f = field('fTitle', kind === 'resource' ? T('f.name', 'Name') : T('f.title', 'Title'), '<input id="fTitle" maxlength="200" required value="' + esc(v.title || '') + '" placeholder="' + esc(kind === 'assignment' ? T('ph.asg', 'e.g. Problem set 4') : kind === 'task' ? T('ph.task', 'e.g. Read chapter 3') : kind === 'achievement' ? T('ph.ach', 'e.g. Dean’s list, winter term') : '') + '">');
+    var f = field('fTitle', kind === 'resource' ? T('f.name', 'Name') : kind === 'research' ? T('f.topic', 'Research question or topic') : T('f.title', 'Title'), '<input id="fTitle" maxlength="200" required value="' + esc(v.title || '') + '" placeholder="' + esc(kind === 'assignment' ? T('ph.asg', 'e.g. Problem set 4') : kind === 'task' ? T('ph.task', 'e.g. Read chapter 3') : kind === 'achievement' ? T('ph.ach', 'e.g. Dean’s list, winter term') : '') + '">');
     if (kind !== 'achievement') f += field('fCourse', T('f.course', 'Course'), '<input id="fCourse" list="courseList" maxlength="120" value="' + esc(v.course_label || '') + '" placeholder="' + esc(T('ph.course', 'e.g. STAT 201')) + '">' + courseOptions(), true);
     if (kind === 'assignment') {
       f += '<div class="f2">' + field('fDue', T('f.due', 'Due date'), '<input id="fDue" type="date" value="' + esc(datePart(v.due_at)) + '">') + field('fDueT', T('f.time', 'Time'), '<input id="fDueT" type="time" value="' + esc(timePart(v.due_at) || '23:59') + '">') + '</div>';
@@ -1062,11 +1103,16 @@
       var st = STATUS();
       f += field('fStatus', T('f.status', 'Status'), '<select id="fStatus">' + ['todo', 'doing', 'blocked', 'done'].map(function (k) { return '<option value="' + k + '"' + ((v.status || 'todo') === k ? ' selected' : '') + '>' + esc(st[k]) + '</option>'; }).join('') + '</select>');
     }
+    if (kind === 'research') {
+      f += field('fUrl', T('f.main-src', 'Main source link'), '<input id="fUrl" type="url" maxlength="1000" placeholder="https://" value="' + esc(v.url || '') + '">', true);
+      f += field('fStatus', T('f.status', 'Status'), '<select id="fStatus"><option value="todo"' + (v.status !== 'done' ? ' selected' : '') + '>' + esc(T('rs.open', 'Working on it')) + '</option><option value="done"' + (v.status === 'done' ? ' selected' : '') + '>' + esc(T('rs.done', 'Finished')) + '</option></select>');
+    }
     if (kind === 'resource') f += field('fUrl', T('f.url', 'Web address'), '<input id="fUrl" type="url" maxlength="1000" placeholder="https://" value="' + esc(v.url || '') + '">');
-    var lbl = kind === 'note' ? T('f.note', 'Note') : kind === 'achievement' ? T('f.ach', 'What you did') : (kind === 'task' || kind === 'assignment') ? T('f.details', 'Details or why it is blocked') : T('f.why', 'Why it is useful');
+    var lbl = kind === 'note' ? T('f.note', 'Note') : kind === 'achievement' ? T('f.ach', 'What you did') : kind === 'research' ? T('f.rs-notes', 'Sources and findings') : (kind === 'task' || kind === 'assignment') ? T('f.details', 'Details or why it is blocked') : T('f.why', 'Why it is useful');
     f += field('fBody', lbl, '<textarea id="fBody" maxlength="20000"' + (kind === 'note' ? ' class="tall"' : '') + '>' + esc(v.body || '') + '</textarea>', kind !== 'note');
-    if (kind === 'achievement') f += '<p class="hint">' + esc(T('ach-self', 'This shows on your Progress page as self-reported.')) + '</p>';
-    if (kind === 'note' && S.dailyReady) f += '<p class="hint">' + esc(T('note-cards', 'Lines like “Q: … / A: …”, “term :: definition” or a sentence with {{hidden words}} become review cards. #tags and [[links]] connect ideas across courses.')) + '</p>';
+    if (kind === 'achievement') f += '<p class="hint">' + esc(T('ach-self', 'This shows in My progress, marked as added by you.')) + '</p>';
+    if (kind === 'research') f += '<p class="hint">' + esc(T('rs-help', 'Paste each source link on its own line. Mark it Finished when you are done and it moves to What I accomplished.')) + '</p>';
+    if (kind === 'note' && S.dailyReady) f += '<p class="hint">' + esc(T('note-cards', 'Lines like “Q: … / A: …”, “term :: definition” or a sentence with {{hidden words}} become Quiz me questions. #tags and [[links]] connect ideas across courses.')) + '</p>';
     openDialog(item ? T('edit-x', 'Edit {{k}}', { k: TITLES()[kind] }) : T('add-x', 'Add {{k}}', { k: TITLES()[kind] }), f, !!item);
   }
   function openCourse() {
@@ -1107,7 +1153,7 @@
     var f = S.follows.filter(function (x) { return x.id === id; })[0]; if (!f) return;
     editing = { kind: 'exam', id: id };
     openDialog(T('exam-for', 'Exam date: {{c}}', { c: f.course_code }), field('fExam', T('f.exam-date', 'Exam date'), '<input id="fExam" type="date" value="' + esc(f.exam_date || '') + '">') +
-      '<p class="hint">' + esc(T('exam-help', 'An exam date moves review cards forward and switches Today to exam mode six weeks before.')) + '</p>', false);
+      '<p class="hint">' + esc(T('exam-help', 'An exam date moves Quiz me questions forward and switches Today to exam mode six weeks before.')) + '</p>', false);
   }
   function openIcal() {
     editing = { kind: 'ical' };
@@ -1203,7 +1249,7 @@
   }
   function openDeleteAll() {
     editing = { kind: 'deleteall' };
-    openDialog(T('delete-all', 'Delete all Study Campus data'), '<p class="hint">' + esc(T('del-all-help', 'This deletes your Study Campus courses, timetable, notes, files, cards, review history and reflections. It cannot be undone. Your UniSkilled account, lessons and payments are not affected.')) + '</p>' +
+    openDialog(T('delete-all', 'Delete all Study Campus data'), '<p class="hint">' + esc(T('del-all-help', 'This deletes your Study Campus courses, timetable, notes, files, Quiz me questions, quiz history and reflections. It cannot be undone. Your UniSkilled account, lessons and payments are not affected.')) + '</p>' +
       field('fConfirm', T('type-delete', 'Type DELETE to confirm'), '<input id="fConfirm" autocomplete="off" maxlength="10">'), false);
     document.getElementById('dlgSave').textContent = T('delete-all-btn', 'Delete everything');
   }
@@ -1359,6 +1405,7 @@
     }
     if (k === 'task') row.planned_for = val('fPlan') || null;
     if (k === 'assignment' || k === 'task') { row.estimate_min = val('fEst') ? +val('fEst') : null; row.status = val('fStatus') || 'todo'; }
+    if (k === 'research') { row.url = val('fUrl') || null; if (row.url && !safeUrl(row.url)) { err.textContent = T('e.url', 'Please enter a web address starting with https://'); return; } row.status = val('fStatus') || 'todo'; }
     if (k === 'resource') { row.url = val('fUrl'); if (!safeUrl(row.url)) { err.textContent = T('e.url', 'Please enter a web address starting with https://'); return; } }
     if (document.getElementById('fBody')) row.body = val('fBody') || null;
     var save = document.getElementById('dlgSave'); save.disabled = true;
@@ -1476,6 +1523,13 @@
       else if (act === 'follow') { await store.follow(b.getAttribute('data-label')); render(); toast(T('course-added', 'Course added')); }
       else if (act === 'capture') capture(b.getAttribute('data-course'));
       else if (act === 'quick-capture') openQuick();
+      else if (act === 'rem-email' || act === 'rem-cal' || act === 'rem-reset') {
+        if (act === 'rem-reset' && !confirm(T('rem-reset-q', 'Reset your calendar link? The old link stops working, and you add the new one to your calendar again.'))) return;
+        var patch = act === 'rem-email' ? { email_daily: !S.rem.email_daily } : { cal_token: newToken() };
+        try { await store.saveReminders(patch); render(); toast(act === 'rem-email' ? (S.rem.email_daily ? T('rem-on', 'Morning email on. It comes on days with something due.') : T('rem-off', 'Morning email off.')) : act === 'rem-cal' ? T('rem-made', 'Your calendar link is ready. Add it to your calendar below.') : T('rem-reset-ok', 'New link made. The old one no longer works.')); track('studyhq_reminder', { kind: act }); }
+        catch (ex) { toast(T('e.save', 'That didn’t save. Please try again.')); }
+      }
+      else if (act === 'rem-copy') { try { await navigator.clipboard.writeText(calUrl()); toast(T('copied', 'Link copied')); } catch (ex) { var inp = document.querySelector('.shq-rem-link input'); if (inp) inp.select(); } }
       else if (act === 'theme') { var nt = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', nt); lsSet('shq_theme', nt); render(); toast(nt === 'dark' ? T('dark-on', 'Dark mode on') : T('light-on', 'Light mode on')); }
       else if (act === 'plant-rustle') { var g = b.querySelector('.gd-sway'); if (g) { g.classList.remove('gd-rustle'); void g.getBoundingClientRect(); g.classList.add('gd-rustle'); } }
       else if (act === 'upload') pickFile(b.getAttribute('data-kind'), b.getAttribute('data-course'));
@@ -1510,7 +1564,7 @@
         var nt = findItem(id), idea = nt && H.suggestCards(nt.body)[+b.getAttribute('data-v')];
         if (!idea) return;
         await store.updateItem(id, { body: String(nt.body || '').replace(/\s+$/, '') + '\nQ: ' + idea.front + '\nA: ' + idea.back });
-        render(); toast(T('card-added', 'Card added to your note'));
+        render(); toast(T('card-added', 'Question added to your note'));
       }
       else if (act === 'unfollow') {
         if (!confirm(T('confirm-unfollow', 'Remove this course from your list? Its assignments and notes stay in Study Campus.'))) return;
@@ -1609,6 +1663,8 @@
     var s = e.target;
     if (s.matches('select[data-act="status"]')) {
       try { await store.updateItem(s.getAttribute('data-id'), { status: s.value }); render(); } catch (ex) { toast(T('e.generic', 'Something went wrong. Please try again.')); render(); }
+    } else if (s.matches('select[data-act="rem-hour"]')) {
+      try { await store.saveReminders({ email_hour: +s.value }); toast(T('rem-hour-ok', 'Morning email at {{h}}:00.', { h: (s.value < 10 ? '0' : '') + s.value })); } catch (ex) { toast(T('e.save', 'That didn’t save. Please try again.')); render(); }
     } else if (s.matches('select[data-act="capacity"]')) { ui.capacity = +s.value; lsSet('shq_capacity', ui.capacity); render(); }
   });
 
@@ -1627,7 +1683,7 @@
     try {
       if (DEMO) {
         demoBar();
-        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=9');
+        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=11');
       } else {
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;
@@ -1641,6 +1697,7 @@
       render();
       flushOutbox();
       loadHelp().then(render, function () {});
+      if (store.loadReminders) store.loadReminders().then(render, function () { S.remReady = false; });
       // Installable app + offline: the service worker only controls Study Campus pages (scope /studyhq).
       if ('serviceWorker' in navigator && !DEMO && location.protocol === 'https:') { try { navigator.serviceWorker.register('studyhq-sw.js', { scope: './studyhq' }); } catch (e) {} }
     } catch (ex) {
