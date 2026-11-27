@@ -40,7 +40,7 @@ test('every Arabic text keeps the values, links and formatting of the English te
     for (const f of Object.values(forms)) {
       assert.ok(placeholders(f!).every((p) => placeholders(en).includes(p)), `unknown value in: ${f}`);
       assert.deepEqual(tagNames(f!), tagNames(en), `tags in: ${en}`);
-      assert.ok(!/[A-Za-z]{4,}/.test(f!.replace(/<[^>]+>|\{\{\d+\}\}|UniSkilled|Study Campus|Stripe Express|Stripe|Google Calendar|Apple|Outlook|nbsp/g, '')), `left in English: ${f}`);
+      assert.ok(!/[A-Za-z]{4,}/.test(f!.replace(/<[^>]+>|\{\{\d+\}\}|UniSkilled|Stripe Express|Stripe|Google Calendar|Apple|Outlook|nbsp/g, '')), `left in English: ${f}`);
       assert.ok(!/معلّم|ضمان استرداد/.test(f!), `glossary: ${f}`);
     }
   }

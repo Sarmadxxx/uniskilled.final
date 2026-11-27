@@ -12,7 +12,7 @@ import { withSentry } from './sentry.ts';
 // The link holds a random secret (study_reminders.cal_token). Resetting it in Settings stops the
 // old link at once. The feed shows only titles, course names and times: never note contents.
 //
-// NOT DEPLOYED. Deploy only after approval, after the 20261127120000 migration.
+// Deployed 27 Nov 2026 after approval (needs the 20261127120000 migration).
 
 const SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const SITE = 'https://uniskilled.com';
@@ -21,7 +21,7 @@ const TOKEN = /^[A-Za-z0-9_-]{32,64}$/;
 const stamp = (d: Date) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
 const ymd = (s: string) => String(s).slice(0, 10).replace(/-/g, '');
 const nextDay = (s: string) => new Date(Date.parse(String(s).slice(0, 10) + 'T12:00:00Z') + 86400000).toISOString().slice(0, 10).replace(/-/g, '');
-const icsText = (s: string) => String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
+const icsText = (s: string) => String(s || '').replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n');
 function fold(line: string): string {
   const enc = new TextEncoder();
   if (enc.encode(line).length <= 75) return line;

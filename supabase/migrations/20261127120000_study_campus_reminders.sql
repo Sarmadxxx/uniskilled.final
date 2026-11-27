@@ -1,6 +1,6 @@
 -- Study Campus: reminders, "My progress" and research.
--- NOT APPLIED. Apply only after approval, together with the studyhq-reminders and
--- studyhq-calendar functions and the new study_daily email template.
+-- Applied 27 Nov 2026 after approval, together with the studyhq-reminders and
+-- studyhq-calendar functions.
 --
 -- 1. study_items may now hold "achievement" (something the student did) and "research"
 --    (a research topic with its sources). The "Add something I did" button already existed
