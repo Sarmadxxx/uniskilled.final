@@ -260,19 +260,21 @@ document.getElementById('signinForm').addEventListener('submit', async (e) => {
 
   // Return people to the page that sent them here (booking, payment link, ...), same site only
   const back = safeRedirect(new URLSearchParams(location.search).get('redirect'));
-  if (back) { window.location.href = back; return; }
+  if (back) { window.location.replace(back); return; }
 
   // Get role from auth metadata - no DB query needed
   const meta = data.user.user_metadata || {};
   const role = meta.role || 'student';
   if (role === 'tutor') {
-    window.location.href = 'tutor-dashboard.html';
+    window.location.replace('tutor-dashboard.html');
   } else if (role === 'admin') {
-    window.location.href = 'admin.html';
+    window.location.replace('admin.html');
   } else if (role === 'business') {
-    window.location.href = 'business-dashboard.html';
+    window.location.replace('business-dashboard.html');
   } else {
-    window.location.href = 'student-dashboard.html';
+    // Students start in Study Campus (their tutoring dashboard is in its menu).
+    // replace(): Back from the app does not return to the sign-in form.
+    window.location.replace('studyhq.html');
   }});
 
 // Forgot password

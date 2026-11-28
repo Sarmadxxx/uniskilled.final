@@ -1,7 +1,7 @@
 {
   "exam-planner.title": "Exam planner — UniSkilled",
   "exam-planner.skip-to-content": "Skip to content",
-  "exam-planner.dashboard": "<a href=\"student-dashboard.html\">← Dashboard</a>",
+  "exam-planner.dashboard": "<a href=\"studyhq.html#/exams\">← Study Campus</a>",
   "exam-planner.exam-planner": "Exam planner",
   "exam-planner.add-an-exam-and": "Add an exam and the topics it covers. You get a day-by-day revision plan up to the exam date, and you can change it any time.",
   "exam-planner.add-an-exam": "Add an exam",

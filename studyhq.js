@@ -1103,6 +1103,7 @@
     document.getElementById('dlgDelete').hidden = !canDelete;
     err.textContent = '';
     dlg.showModal();
+    if (!hist.popping) pushOverlay('shqDlg');
     setTimeout(function () { var t = fields.querySelector('input,select,textarea'); t && t.focus(); }, 30);
   }
   function openItem(kind, item, defaults) {
@@ -1156,7 +1157,7 @@
     openItem('note', null, { course_label: course || '', title: (course ? course + ' · ' : '') + T('lecture-on', 'Lecture, {{d}}', { d: fmt(d, { day: 'numeric', month: 'short' }) }), body: 'Q: \nA: \n' });
   }
   // After Quick add, show the student where their note, photo or PDF went.
-  function goLibrary() { window.scrollTo(0, 0); if (location.hash !== '#/library') location.hash = '#/library'; else render(); }
+  function goLibrary() { window.scrollTo(0, 0); go('#/library'); }
   function val(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
   function weekdaySelect(cur) { return '<select id="fWd">' + WD().map(function (d, i) { return '<option value="' + (i + 1) + '"' + (cur === i + 1 ? ' selected' : '') + '>' + esc(d) + '</option>'; }).join('') + '</select>'; }
   function openClass() {
@@ -1244,7 +1245,7 @@
       await store.addClasses(rows);
       for (var j = 0; j < exams.length; j++) { var f = known[H.courseKey(exams[j].course)]; if (f && !f.exam_date) await store.setExam(f.id, exams[j].date); }
       dlg.close(); track('studyhq_ical_import', { classes: rows.length, exams: exams.length });
-      location.hash = '#/overview'; render(); toast(T('tt-added', 'Timetable added: {{n}} classes.', { n: rows.length }));
+      go('#/overview'); toast(T('tt-added', 'Timetable added: {{n}} classes.', { n: rows.length }));
     } catch (ex) { err.textContent = T('e.save', 'That didn’t save. Please try again.'); }
     finally { save.disabled = false; }
   }
@@ -1366,7 +1367,7 @@
     var label = val('fCourseNew');
     if (!label || !H.courseKey(label)) { err.textContent = T('e.course', 'Please enter a course code or name.'); return; }
     if (S.follows.some(function (f) { return (f.course_key || H.courseKey(f.course_code)) === H.courseKey(label); })) { err.textContent = T('e.dup', 'That course is already in your list.'); return; }
-    try { await store.follow(label); dlg.close(); track('studyhq_course_added', {}); location.hash = courseHref(H.courseKey(label)); render(); }
+    try { await store.follow(label); dlg.close(); track('studyhq_course_added', {}); go(courseHref(H.courseKey(label))); }
     catch (ex) { err.textContent = T('e.save', 'That didn’t save. Please try again.'); }
   }
   function saveTerm() {
@@ -1398,7 +1399,7 @@
     }
     if (editing.kind === 'deleteall') {
       if (val('fConfirm') !== 'DELETE') { err.textContent = T('e.confirm', 'Type DELETE in capital letters to confirm.'); return; }
-      try { await store.deleteEverything(); lsSet(obKey(), []); dlg.close(); track('studyhq_delete_all', {}); location.hash = '#/overview'; render(); toast(T('deleted-all', 'All Study Campus data deleted.')); }
+      try { await store.deleteEverything(); lsSet(obKey(), []); dlg.close(); track('studyhq_delete_all', {}); go('#/overview'); toast(T('deleted-all', 'All Study Campus data deleted.')); }
       catch (ex) { err.textContent = T('e.del', 'That didn’t delete. Please try again.'); }
       return;
     }
@@ -1443,6 +1444,61 @@
     dlg.close();
     if (k === 'note') { capture(course); editing.fromQuick = true; } else pickFile(k, course, true);
   });
+  /* ---------------------------------------------------------------- the Back button
+     Back (phone gesture or browser button) first closes what is open in Study Campus: a form, the
+     More menu, a course tab. Only then does it go to the previous page. Each of these adds one
+     history entry with the same address, and removes it again when it is closed another way. */
+  var hist = { popping: false, after: null };
+  function overlay() { var st = history.state || {}; return st.shqDlg ? 'shqDlg' : st.shqMore ? 'shqMore' : null; }
+  function pushOverlay(kind) { try { var o = {}; o[kind] = 1; history.pushState(o, ''); } catch (e) { /* history blocked: Back just leaves, as before */ } }
+  function popOverlay(then) { hist.popping = true; hist.after = then || null; history.back(); }
+  function go(h) {
+    if (hist.popping) { hist.after = h; return; } // a form is closing: go there once its history entry is gone
+    if (location.hash !== h) location.hash = h; else render();
+  }
+  function setCourseTab(v) {
+    if (v === ui.courseTab) return;
+    var onTab = (history.state || {}).tab;
+    try {
+      if (v === 'overview' && onTab) { history.back(); return; } // popstate shows Overview
+      if (onTab) history.replaceState({ tab: v }, ''); else history.pushState({ tab: v }, '');
+    } catch (e) { /* ignore */ }
+    ui.courseTab = v; render();
+  }
+  window.addEventListener('popstate', function (e) {
+    var st = e.state || {};
+    if (hist.popping) { // our own Back after a form or menu closed
+      hist.popping = false;
+      var t = hist.after; hist.after = null;
+      if (dlg.open && !st.shqDlg) pushOverlay('shqDlg'); // a new form opened meanwhile (Quick add → Note)
+      if (t && t.charAt(0) === '#') go(t); else if (t) location.href = t;
+      return;
+    }
+    if (dlg.open && !st.shqDlg) dlg.close();
+    var more = document.querySelector('.gd-tabbar details[open]');
+    if (more && !st.shqMore) more.open = false;
+    if (route().name === 'course') { var tab = st.tab || 'overview'; if (tab !== ui.courseTab) { ui.courseTab = tab; render(); } }
+  });
+  // dlg.close() leaves the form's history entry straight away (the close event comes too late: by then
+  // a following go() would already have added the next page after it). Esc still closes via the event.
+  function leftForm() { if (overlay() === 'shqDlg' && !hist.popping) popOverlay(); }
+  var nativeClose = dlg.close.bind(dlg);
+  dlg.close = function (v) { var was = dlg.open; nativeClose(v); if (was) leftForm(); };
+  dlg.addEventListener('close', leftForm);
+  // The More menu on phones
+  document.addEventListener('toggle', function (e) {
+    var d = e.target;
+    if (!d.matches || !d.matches('.gd-tabbar details')) return;
+    if (d.open && overlay() !== 'shqMore') pushOverlay('shqMore');
+    else if (!d.open && overlay() === 'shqMore' && !hist.popping) popOverlay();
+  }, true);
+  document.addEventListener('click', function (e) {
+    var l = e.target.closest && e.target.closest('.gd-tabbar .gd-more a[href]');
+    if (!l || overlay() !== 'shqMore') return;
+    e.preventDefault(); popOverlay(l.getAttribute('href')); // leave the menu's entry first, then go
+  }, true);
+  // Coming back to Study Campus from another page: a menu or form entry left behind is just a page.
+  if (overlay()) { try { history.replaceState(null, ''); } catch (e) { /* ignore */ } }
   dlg.addEventListener('close', function () { var sv = document.getElementById('dlgSave'); sv.hidden = false; sv.disabled = false; sv.textContent = T('save', 'Save'); });
   document.getElementById('dlgDelete').addEventListener('click', async function () {
     if (!editing || !editing.item) return;
@@ -1535,7 +1591,7 @@
       else if (act === 'asg-filter') { ui.asgFilter = b.getAttribute('data-v'); render(); }
       else if (act === 'note-filter') { ui.noteFilter = b.getAttribute('data-v'); ui.noteSel = null; render(); }
       else if (act === 'note-sel') { ui.noteSel = id; render(); }
-      else if (act === 'course-tab') { ui.courseTab = b.getAttribute('data-v'); render(); }
+      else if (act === 'course-tab') { setCourseTab(b.getAttribute('data-v')); }
       else if (act === 'follow') { await store.follow(b.getAttribute('data-label')); render(); toast(T('course-added', 'Course added')); }
       else if (act === 'capture') capture(b.getAttribute('data-course'));
       else if (act === 'quick-capture') openQuick();
@@ -1701,11 +1757,11 @@
     try {
       if (DEMO) {
         demoBar();
-        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=13');
+        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=14');
       } else {
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;
-        if (!session) { location.href = 'signin.html?redirect=' + encodeURIComponent(location.pathname + location.search + location.hash); return; }
+        if (!session) { location.replace('signin.html?redirect=' + encodeURIComponent(location.pathname + location.search + location.hash)); return; }
         // Students and tutors both get their own workspace (tutors are university students too).
         // Every Study Campus table and file is private to its owner (user_id = auth.uid()), whatever the role.
         S.uid = session.user.id;

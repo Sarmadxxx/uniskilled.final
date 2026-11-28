@@ -1,7 +1,7 @@
 {
   "exam-planner.title": "مخطط الاختبارات — UniSkilled",
   "exam-planner.skip-to-content": "الانتقال إلى المحتوى",
-  "exam-planner.dashboard": "<a href=\"student-dashboard.html\">→ لوحة التحكم</a>",
+  "exam-planner.dashboard": "<a href=\"studyhq.html#/exams\">→ Study Campus</a>",
   "exam-planner.exam-planner": "مخطط الاختبارات",
   "exam-planner.add-an-exam-and": "أضف اختباراً والموضوعات التي يشملها، وستحصل على خطة مراجعة يومية حتى موعد الاختبار، ويمكنك تعديلها في أي وقت.",
   "exam-planner.add-an-exam": "إضافة اختبار",

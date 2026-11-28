@@ -100,6 +100,10 @@
   var role = meta.role || 'student';
   var isTutor = role === 'tutor';
   var dash = isTutor ? 'tutor-dashboard.html' : 'student-dashboard.html';
+  // Students start in Study Campus; their tutoring dashboard (bookings, sessions) sits next to it.
+  var isStudent = role === 'student';
+  var home = isStudent ? 'studyhq.html' : dash;
+  var homeLabel = isStudent ? L('nav.studyWorkspace', 'Study Campus') : L('nav.dashboard', 'Dashboard');
   var prof = isTutor ? 'tutor-profile.html' : 'student-profile.html';
   if (current === 'DASH') current = dash;
   var full = String(meta.full_name || '').trim();
@@ -118,6 +122,7 @@
   if (mode === 'app' && user) {
     items = isTutor
       ? [[dash, L('nav.dashboard', 'Dashboard')], ['messages.html', L('nav.messages', 'Messages')], ['calendar.html', L('nav.calendar', 'Calendar')], ['manage-availability.html', L('nav.availability', 'Availability')]]
+      : isStudent ? [['studyhq.html', L('nav.studyWorkspace', 'Study Campus')], [dash, L('nav.tutoring', 'Tutoring')], ['find-tutors.html', L('nav.findTutors', 'Find Tutors')], ['courses.html', L('nav.courses', 'Courses')], ['messages.html', L('nav.messages', 'Messages')], ['calendar.html', L('nav.calendar', 'Calendar')]]
       : [[dash, L('nav.dashboard', 'Dashboard')], ['find-tutors.html', L('nav.findTutors', 'Find Tutors')], ['courses.html', L('nav.courses', 'Courses')], ['messages.html', L('nav.messages', 'Messages')], ['calendar.html', L('nav.calendar', 'Calendar')]];
   } else {
     items = [['about.html', L('nav.about', 'About')], ['find-tutors.html', L('nav.findTutors', 'Find Tutors')], ['courses.html', L('nav.courses', 'Courses')], ['group-sessions.html', L('nav.groupSessions', 'Group Sessions')], ['index.html#how-it-works', L('nav.howItWorks', 'How it Works')]];
@@ -138,13 +143,13 @@
   if (user) {
     // Students and tutors (tutors are university students too) each have their own study workspace.
     var studyItem = role === 'student' || isTutor ? mi('studyhq.html', L('nav.studyWorkspace', 'Study Campus')) : '';
-    var menuItems = mi(prof, L('nav.myProfile', 'My profile')) + mi(dash, L('nav.dashboard', 'Dashboard')) + studyItem + mi('calendar.html', L('nav.calendar', 'Calendar')) +
+    var menuItems = mi(prof, L('nav.myProfile', 'My profile')) + (isStudent ? studyItem + mi(dash, L('nav.tutoringDashboard', 'Tutoring dashboard')) : mi(dash, L('nav.dashboard', 'Dashboard')) + studyItem) + mi('calendar.html', L('nav.calendar', 'Calendar')) +
       '<div class="snav-sep" role="separator"></div><button type="button" class="snav-mi snav-out" role="menuitem" data-signout>' + L('nav.signOut', 'Sign out') + '</button>';
-    end = (mode === 'public' ? '<a href="' + dash + '" class="snav-text">' + L('nav.dashboard', 'Dashboard') + '</a>' : '') +
+    end = (mode === 'public' ? '<a href="' + home + '" class="snav-text">' + homeLabel + '</a>' : '') +
       '<div class="snav-acct"><button type="button" class="snav-acct-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="snavAcctMenu" aria-label="' + esc(L('nav.accountMenuFor', 'Account menu for {{name}}', { name: full || first })) + '">' +
         '<span class="snav-av" aria-hidden="true">' + esc(initials) + '</span><span class="nm">' + esc(first) + '</span>' + CHEV + '</button>' +
         '<div class="snav-menu" id="snavAcctMenu" role="menu" aria-label="' + esc(L('nav.account', 'Account')) + '" hidden>' + who + menuItems + '</div></div>';
-    var mAcct = (mode === 'public' ? link(dash, L('nav.dashboard', 'Dashboard')) : '') + who + link(prof, L('nav.myProfile', 'My profile')) +
+    var mAcct = (mode === 'public' ? link(home, homeLabel) : '') + who + link(prof, L('nav.myProfile', 'My profile')) +
       (mode === 'public' ? link('calendar.html', L('nav.calendar', 'Calendar')) : '');
     mEnd = mAcct + '<button type="button" class="snav-out" data-signout>' + L('nav.signOut', 'Sign out') + '</button>';
     document.body.classList.add('signed-in');

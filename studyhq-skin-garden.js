@@ -44,6 +44,7 @@ body[data-concept="garden"] .shq-d-card,body[data-concept="garden"] .shq-d-conce
 .gd-nav a{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:16px;text-decoration:none;font-size:.9rem;font-weight:700;color:var(--ink2);min-height:46px}
 .gd-nav a .ib{width:32px;height:32px;border-radius:11px;display:grid;place-items:center;background:var(--bg);color:var(--muted);flex-shrink:0}
 .gd-nav a:hover{background:var(--bg)}
+.gd-nav a.gd-navext{margin-top:8px;border-top:1px solid var(--line);border-radius:0 0 16px 16px;padding-top:14px}
 .gd-nav a[aria-current="page"]{background:var(--sage-l);color:var(--sage)}
 .gd-nav a[aria-current="page"] .ib{background:var(--btn);color:#fff}
 .gd-nav .n{margin-left:auto;font-size:.72rem;font-weight:800;background:var(--bg);color:var(--ink2);border-radius:999px;padding:2px 8px}
@@ -536,10 +537,10 @@ html[data-theme="dark"] .gd-sky-next{background:rgba(18,24,21,.72);color:#e4ebe6
     var tabbar = tabs.join('');
     var rest = nav.items.filter(function (n) { return main.indexOf(n.id) === -1; });
     var moreCur = rest.some(function (n) { return n.current; });
-    tabbar += '<details' + (moreCur ? ' class="cur"' : '') + '><summary>' + a.ic('more', 20) + a.esc(a.T('more', 'More')) + '</summary><div class="gd-more">' + rest.map(function (n) { return '<a href="' + n.href + '">' + a.ic(n.icon, 18) + a.esc(n.label) + '</a>'; }).join('') + '<a href="student-dashboard.html">' + a.ic('arrow', 18) + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + '</a>' + themeBtn(a) + '</div></details>';
+    tabbar += '<details' + (moreCur ? ' class="cur"' : '') + '><summary>' + a.ic('more', 20) + a.esc(a.T('more', 'More')) + '</summary><div class="gd-more">' + rest.map(function (n) { return '<a href="' + n.href + '">' + a.ic(n.icon, 18) + a.esc(n.label) + '</a>'; }).join('') + '<a href="student-dashboard.html">' + a.ic('user', 18) + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + '</a>' + themeBtn(a) + '</div></details>';
     return '<div class="gd"><div class="gd-app"><aside class="gd-side" aria-label="Study Campus"><div class="gd-brand"><span class="gd-logo">' + a.ic('leaf', 22) + '</span><div><b>Study Campus</b><small>' + a.esc(p.university || a.T('your-workspace', 'Your study space')) + '</small></div></div>' +
-      '<button type="button" class="shq-btn primary gd-capside" data-act="quick-capture">' + a.ic('plus', 16) + a.esc(a.T('capture-h', 'Quick add')) + '</button><nav class="gd-nav" aria-label="Study Campus sections">' + items + '</nav><h4>' + a.esc(a.T('my-courses', 'My courses')) + '</h4><nav class="gd-cnav" aria-label="My courses">' + cnav + '</nav>' + termbox +
-      '<div class="gd-sidelinks"><a href="student-dashboard.html">' + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + ' →</a><a href="find-tutors.html">' + a.esc(a.T('find-a-tutor', 'Find a tutor')) + ' →</a>' + themeBtn(a) + '</div></aside>' +
+      '<button type="button" class="shq-btn primary gd-capside" data-act="quick-capture">' + a.ic('plus', 16) + a.esc(a.T('capture-h', 'Quick add')) + '</button><nav class="gd-nav" aria-label="Study Campus sections">' + items + '<a href="student-dashboard.html" class="gd-navext"><span class="ib">' + a.ic('user', 17) + '</span>' + a.esc(a.T('tutoring-dashboard', 'Tutoring dashboard')) + '</a></nav><h4>' + a.esc(a.T('my-courses', 'My courses')) + '</h4><nav class="gd-cnav" aria-label="My courses">' + cnav + '</nav>' + termbox +
+      '<div class="gd-sidelinks"><a href="find-tutors.html">' + a.esc(a.T('find-a-tutor', 'Find a tutor')) + ' →</a>' + themeBtn(a) + '</div></aside>' +
       '<main id="main" tabindex="-1"><div class="gd-mobilehead"><b><span class="gd-logo">' + a.ic('leaf', 16) + '</span>Study Campus</b>' + (t ? '<span class="gd-chip">' + a.esc(termWord(a, t)) + '</span>' : '<button type="button" class="shq-btn ghost small" data-act="term">' + a.esc(a.T('set-term', 'Set term dates')) + '</button>') + '</div><!--VIEW--></main></div>' +
       '<nav class="gd-tabbar" aria-label="Study Campus">' + tabbar + '</nav></div>';
   }
