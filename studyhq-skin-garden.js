@@ -461,6 +461,36 @@ html[data-theme="dark"] .gd img{opacity:.92}
 .gd .shq-rem-note{font-size:.78rem;color:var(--muted)}
 
 .gd-tabbar a,.gd-tabbar summary{white-space:nowrap}
+.gd-sky-next{display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px;padding:8px 8px 8px 16px;border-radius:999px;background:rgba(255,255,255,.72);color:#25302b;font-size:.88rem;box-shadow:0 6px 18px -12px rgba(0,0,0,.35);max-width:100%}
+.gd-sky-next b{font-weight:800}
+.gd-sky-go{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:8px 14px;background:var(--btn);color:#fff;font:inherit;font-weight:800;font-size:.84rem;cursor:pointer;text-decoration:none}
+.gd-sky-go:hover{filter:brightness(1.08)}
+.gd-warn{display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start;padding:18px 20px;border-radius:var(--r);background:var(--card);border:1px solid var(--line);border-left:5px solid var(--sun);box-shadow:0 20px 50px -40px rgba(37,48,43,.5)}
+.gd-warn.high{border-left-color:var(--peach)}
+.gd-warn .ic{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:var(--sun-l);color:var(--sun)}
+.gd-warn.high .ic{background:var(--peach-l);color:var(--peach)}
+.gd-warn b{display:block;font-size:1rem;font-weight:800;color:var(--ink)}
+.gd-warn p{margin:4px 0 12px;font-size:.88rem;line-height:1.5;color:var(--ink2)}
+.gd-warn .acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.gd-warn-x{border:0;background:none;color:var(--muted);font:inherit;font-size:.82rem;font-weight:700;cursor:pointer;padding:6px 8px;text-decoration:underline}
+html[data-theme="dark"] .gd-sky-next{background:rgba(18,24,21,.72);color:#e4ebe6}
+@media(max-width:720px){.gd-sky-next{border-radius:18px;padding:10px 12px}.gd-warn{grid-template-columns:1fr;padding:16px}.gd-warn .ic{width:38px;height:38px}}
+
+.gd-plan>h2{display:flex;align-items:center;justify-content:space-between}
+.gd-plan .gd-catch{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;margin:4px 0 12px;padding:10px 12px;border-radius:14px;background:var(--bg);border:0;font-size:.86rem}
+.gd-plan .gd-catch .ic{color:var(--peach)}
+.gd-plan .gd-catch .tx b{font-weight:800}
+.gd-plan .gd-catch .tx small{display:block;color:var(--muted);font-size:.76rem;margin-top:1px}
+.gd-slip{display:flex;align-items:center;gap:8px;margin:10px 0 0;padding-top:12px;border-top:1px solid var(--line);font-size:.82rem;color:var(--ink2)}
+.gd-slip svg{color:var(--muted)}.gd-slip span{flex:1}.gd-slip a{font-weight:800;color:var(--sage);text-decoration:none;white-space:nowrap}
+.gd-exams{display:flex;flex-direction:column;gap:10px}
+.gd-sec-h{display:flex;align-items:center;justify-content:space-between;margin:6px 2px 0;font-size:1.05rem}
+.gd-sec-h a{font-size:.8rem;font-weight:800;color:var(--sky);text-decoration:none}
+.gd-spot-catch{margin:6px 0 0;font-size:.8rem;font-weight:700;color:var(--ink2)}
+.gd-spot-catch a{color:var(--sage);font-weight:800}
+@media(max-width:720px){.gd-plan .gd-catch{grid-template-columns:auto 1fr}.gd-plan .gd-catch .shq-btn{grid-column:span 1}}
+
+@media(max-width:720px){.gd-step{flex-wrap:wrap;row-gap:4px}.gd-step .tx{flex:1 1 calc(100% - 60px)}.gd-step .mn{margin-left:42px}.gd-step .skip{margin-left:auto}}
 `;
   function themeBtn(a) {
     var dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -529,7 +559,33 @@ html[data-theme="dark"] .gd img{opacity:.92}
   function skyHero(a, m, line) {
     var t = m.term, sk = m.today.sky;
     return '<section class="gd-sky"' + (sk.ink.dark ? ' data-dark' : '') + ' style="--sky-ink:' + sk.ink.ink + ';--sky-soft:' + sk.ink.soft + '">' + sk.svg +
-      '<div class="gd-sky-txt"><div class="date">' + a.esc(m.dateText) + (t ? ' · ' + a.esc(termWord(a, t)) : '') + '</div><h1>' + a.esc(m.greet + (m.first ? ', ' + m.first : '') + '.') + '</h1><p>' + a.esc(line) + '</p></div></section>';
+      '<div class="gd-sky-txt"><div class="date">' + a.esc(m.dateText) + (t ? ' · ' + a.esc(termWord(a, t)) : '') + '</div><h1>' + a.esc(m.greet + (m.first ? ', ' + m.first : '') + '.') + '</h1><p>' + a.esc(line) + '</p>' + heroNext(a, m.today.first) + '</div></section>';
+  }
+  function heroNext(a, st) {
+    if (!st) return '';
+    var title = st.type === 'exam_task' ? a.T('revise-topic', 'Revise {{t}}', { t: st.title }) : st.title;
+    var btn = st.type === 'review' ? '<a class="gd-sky-go" href="#/learn">' + a.esc(a.T('start', 'Start')) + a.ic('arrow', 14) + '</a>'
+      : st.type === 'exam_task' ? '<a class="gd-sky-go" href="exam-planner.html">' + a.esc(a.T('start', 'Start')) + a.ic('arrow', 14) + '</a>'
+      : '<button type="button" class="gd-sky-go" data-act="goto-plan">' + a.esc(a.T('start', 'Start')) + a.ic('arrow', 14) + '</button>';
+    return '<div class="gd-sky-next"><span>' + a.esc(a.T('start-with', 'Start with')) + ' <b>' + a.esc(title) + '</b>' + (st.course ? ' · ' + a.esc(st.course) : '') + ' · ' + a.esc(a.mins(st.minutes)) + '</span>' + btn + '</div>';
+  }
+  function warningCard(a, w) {
+    if (!w) return '';
+    var h, p, acts;
+    if (w.kind === 'exam') {
+      h = a.T('warn-exam-h', 'You are falling behind in {{c}}', { c: w.course });
+      p = (w.daysLeft === 0 ? a.T('warn-exam-today', '{{t}} is today.', { t: w.title }) : w.daysLeft === 1 ? a.T('warn-exam-1', '{{t}} is tomorrow.', { t: w.title }) : a.T('warn-exam-n', '{{t}} is in {{n}} days.', { t: w.title, n: w.daysLeft })) + ' ' +
+        (w.behind === 1 ? a.T('warn-behind-1', '1 revision step is overdue ({{f}}).', { f: w.first }) : a.T('warn-behind-n', '{{n}} revision steps are overdue, starting with {{f}}.', { n: w.behind, f: w.first })) + ' ' +
+        a.T('warn-fix', 'One catch-up session today gets you back on track.');
+      acts = '<a class="shq-btn primary small" href="' + a.esc(w.planHref) + '">' + a.esc(a.T('catch-up', 'Catch up today')) + '</a>' +
+        '<a class="shq-btn ghost small" href="' + a.esc(w.helpHref) + '">' + a.esc(w.hasTutor ? a.T('warn-tutor', 'See a tutor for {{c}}', { c: w.course }) : a.T('ask-tutor', 'Ask for a tutor')) + '</a>';
+    } else {
+      h = a.T('warn-slip-h', '{{n}} things slipped this week', { n: w.n });
+      p = a.T('warn-slip-p', '{{a}}, {{b}} and more are still open. Give each a new day, so nothing is forgotten.', { a: w.titles[0], b: w.titles[1] });
+      acts = '<a class="shq-btn primary small" href="#/planner">' + a.esc(a.T('plan-week', 'Plan this week')) + '</a>';
+    }
+    return '<section class="gd-warn ' + w.level + '" role="status"' + (w.color ? ' style="--wc:' + w.color + '"' : '') + '><span class="ic">' + a.ic('alert', 20) + '</span><div class="tx"><b>' + a.esc(h) + '</b><p>' + a.esc(p) + '</p><div class="acts">' + acts +
+      '<button type="button" class="gd-warn-x" data-act="hide-warning">' + a.esc(a.T('not-now', 'Not now')) + '</button></div></div></section>';
   }
   function stepRow(a, st) {
     var ctl, extra = '';
@@ -542,26 +598,29 @@ html[data-theme="dark"] .gd img{opacity:.92}
   }
   function planCard(a, m) {
     var T = m.today, f = m.focus;
-    var q = '<div class="q" role="group" aria-label="' + a.esc(a.T('time-q', 'How much time do you have today?')) + '"><span>' + a.esc(a.T('time-q', 'How much time do you have today?')) + '</span>' + a.timeChoices('shq-time') + '</div>';
-    var body = T.plan.steps.length ? '<ol class="gd-steps">' + T.plan.steps.map(function (st) { return stepRow(a, st); }).join('') + '</ol><p class="foot">' + a.esc(a.T('planned-of', '{{u}} of {{m}} min planned, around your classes. Tick things off as you go.', { u: T.plan.used, m: T.plan.minutes })) + '</p>'
+    // An overdue item already in the list is not shown twice.
+    var q = T.late && !T.plan.steps.some(function (st) { return String(st.id) === String(T.late.id); }) ? catchUp(a, T.late) : '';
+    var body = T.plan.steps.length ? '<ol class="gd-steps">' + T.plan.steps.map(function (st) { return stepRow(a, st); }).join('') + '</ol><p class="foot">' + a.esc(a.T('planned-about2', 'About {{u}}, planned around your classes. Tick things off as you go.', { u: a.mins(Math.round(T.plan.used / 5) * 5) })) + '</p>'
       : '<p class="gd-muted">' + a.esc(f.message || a.T('wn.none', 'Nothing to plan yet. Add your first assignment or exam and Study Campus will suggest what to do next.')) + '</p>' + (f.state === 'no_items' ? '<div style="margin-top:10px"><a class="shq-btn primary" href="#/assignments">' + a.esc(a.T('add-deadline', 'Add a deadline')) + '</a></div>' : '');
-    return '<section class="gd-card gd-plan"><h2>' + a.esc(a.T('do-next', 'Do next')) + '</h2>' + q + body + '</section>';
+    var slip = T.warning && T.warning.kind === 'slipped' ? '<p class="gd-slip">' + a.ic('clock', 14) + '<span>' + a.esc(a.T('slip-line', '{{n}} things from this week are still open.', { n: T.warning.n })) + '</span><a href="#/planner">' + a.esc(a.T('plan-week', 'Plan this week')) + ' →</a></p>' : '';
+    return '<section class="gd-card gd-plan"><h2>' + a.esc(a.T('todo-today', 'Today’s to-do')) + '<a href="#/planner">' + a.esc(a.T('planner', 'Planner')) + ' →</a></h2>' + q + body + slip + '</section>';
   }
   function catchUp(a, r) {
     if (!r) return '';
-    return '<div class="gd-catch" role="status"><span><b>' + a.esc(r.title) + '</b>' + (r.course ? ' (' + a.esc(r.course) + ')' : '') + ' · ' + a.esc(r.when) + '. ' + a.esc(a.T('no-stress', 'No stress. What happens next?')) + '</span>' +
+    return '<div class="gd-catch" role="status"><span class="ic">' + a.ic('clock', 16) + '</span><span class="tx"><b>' + a.esc(r.title) + '</b>' + (r.course ? ' · ' + a.esc(r.course) : '') + '<small>' + a.esc(r.when) + '</small></span>' +
       '<button type="button" class="shq-btn primary small" data-act="move-tomorrow" data-id="' + a.esc(r.id) + '">' + a.esc(a.T('move-tomorrow', 'Move to tomorrow')) + '</button>' +
       '<button type="button" class="shq-btn ghost small" data-act="done" data-id="' + a.esc(r.id) + '">' + a.esc(a.T('handed-in', 'I handed it in')) + '</button></div>';
   }
-  function spotlight(a, list) {
+  function spotlight(a, list, w) {
     if (!list.length) return '';
-    return '<div class="gd-spots">' + list.map(function (e, i) {
+    return '<section class="gd-exams"><h2 class="gd-sec-h">' + a.esc(a.T('upcoming-exams', 'Upcoming exams')) + '<a href="#/exams">' + a.esc(a.T('all-exams', 'All exams')) + ' →</a></h2><div class="gd-spots">' + list.map(function (e, i) {
+      var catchLine = w && w.kind === 'exam' && w.course === e.course ? '<p class="gd-spot-catch">' + a.esc(w.behind === 1 ? a.T('catch-1', '1 revision step to catch up') : a.T('catch-n', '{{n}} revision steps to catch up', { n: w.behind })) + ' · <a href="' + a.esc(w.planHref) + '">' + a.esc(a.T('catch-up', 'Catch up')) + '</a></p>' : '';
       var plan = e.total ? '<div class="gd-bar" role="img" aria-label="' + a.esc(a.T('plan-pct', '{{n}}% of the revision plan done', { n: e.pct })) + '"><i style="width:' + e.pct + '%"></i></div><small>' + a.esc(a.T('plan-steps', 'Revision plan: {{d}} of {{t}} steps', { d: e.done, t: e.total })) + '</small>'
         : '<a class="shq-btn primary small" style="justify-self:start" href="exam-planner.html?course=' + encodeURIComponent(e.course) + '">' + a.esc(a.T('make-plan', 'Make a revision plan (2 min)')) + '</a>';
       var big = e.daysLeft === 0 ? '<b>' + a.esc(a.T('today', 'Today')) + '</b><span>' + a.esc(e.title) + '</span>' : '<b>' + e.daysLeft + '</b><span>' + a.esc(e.daysLeft === 1 ? a.T('day-to', 'day to {{t}}', { t: e.title }) : a.T('days-to', 'days to {{t}}', { t: e.title })) + '</span>';
       return '<article class="gd-spot" style="border-top-color:' + e.color + '"><div class="lb">' + a.esc(i === 0 ? a.T('next-exam', 'Next exam') : a.T('then', 'Then')) + '<span>' + a.esc(a.fmt(e.date, { weekday: 'short', day: 'numeric', month: 'short' })) + '</span></div><div class="big">' + big + '</div>' +
-        (e.title !== e.course ? '<small>' + a.esc(e.course) + '</small>' : '') + plan + (e.unsure ? '<small>' + a.esc(a.T('unsure-n2', 'You marked {{n}} topics unsure', { n: e.unsure })) + '</small>' : '') + '</article>';
-    }).join('') + '</div>';
+        (e.title !== e.course ? '<small>' + a.esc(e.course) + '</small>' : '') + plan + (e.unsure ? '<small>' + a.esc(a.T('unsure-n2', 'You marked {{n}} topics unsure', { n: e.unsure })) + '</small>' : '') + catchLine + '</article>';
+    }).join('') + '</div></section>';
   }
   function helpBox(a, m) {
     var T = m.today;
@@ -595,11 +654,12 @@ html[data-theme="dark"] .gd img{opacity:.92}
     // Review is already the first step of Do next, so the assistant does not repeat it here.
     var sugg = (d.suggestions || []).filter(function (x) { return x.k !== 'review'; });
     var line = T.left ? a.T(T.left === 1 ? 'one-thing' : 'n-things', T.left === 1 ? 'One thing to do today.' : '{{n}} things to do today.', { n: T.left }) : a.T('calm-day', 'Nothing urgent today. A good moment to get ahead.');
-    var left = catchUp(a, T.late) + planCard(a, m) + spotlight(a, T.spotlight) + helpBox(a, m) + courseTiles(a, m.courses);
+    var left = planCard(a, m) + spotlight(a, T.spotlight, T.warning) + courseTiles(a, m.courses) + helpBox(a, m);
     var right = (d.ready ? '<section class="gd-card"><h2>' + a.esc(a.T('today-classes', 'Today’s classes')) + '<a href="#/settings">' + a.esc(a.T('timetable', 'Timetable')) + ' →</a></h2>' + a.classesBlock(d) + '</section>' : '') +
       busyCard(a, T.busy, true) +
+      (d.ready ? '<section class="gd-card"><h2>' + a.esc(a.T('this-week-rec', 'Your week so far')) + '<a href="#/progress">' + a.esc(a.T('my-progress', 'My progress')) + ' →</a></h2>' + a.recordBlock(d.record) + '</section>' : coming(a, m.upcoming)) +
       (d.ready && sugg.length ? '<section class="gd-card"><h2>' + a.esc(a.T('assistant', 'Study assistant')) + '</h2><p class="gd-muted" style="font-size:.8rem;margin:-4px 0 10px">' + a.esc(a.T('assistant-sub', 'Uses only your notes and dates. Suggests, never acts without you.')) + '</p>' + a.suggestBlock({ ready: true, suggestions: sugg }, 3) + '</section>' : '') +
-      (d.ready ? '<section class="gd-card"><h2>' + a.esc(a.T('this-week-rec', 'Your week so far')) + '<a href="#/progress">' + a.esc(a.T('your-plant', 'Your plant')) + ' →</a></h2>' + a.recordBlock(d.record) + '</section>' : coming(a, m.upcoming));
+      '';
     return skyHero(a, m, line) + '<div style="height:18px"></div>' + a.storageNotice() + '<div class="gd-two"><div class="gd-grid">' + left + '</div><div class="gd-grid">' + right + '</div></div>';
   }
   function focus(a, f) {

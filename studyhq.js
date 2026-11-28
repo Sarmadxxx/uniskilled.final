@@ -80,7 +80,8 @@
     dailyReady: false, timetable: [], cardStates: {}, log: [], reflections: [], files: [],
     planner: [], finished: [], help: { tutorsByKey: {}, requested: [], ready: false } };
   var ui = {
-    minutes: [30, 60, 120].reduce(function (best, m) { var v = lsGet('shq_minutes', 60); return Math.abs(m - v) < Math.abs(best - v) ? m : best; }, 60),
+    // Today's to-do is sized to the student's daily study time (Settings), at most 2 hours: no chooser on Today.
+    minutes: Math.min(120, Math.max(30, lsGet('shq_capacity', 120))),
     capacity: lsGet('shq_capacity', 120),
     weekOffset: 0, noteFilter: 'all', asgFilter: 'all', noteSel: null, courseTab: 'overview',
     skipped: lsGet('shq_skip_' + H.iso(new Date()), []),
@@ -239,13 +240,13 @@
       // Reminders (Settings). Until the reminders update is live the table does not exist: then the
       // section explains that reminders are coming, and nothing breaks.
       loadReminders: async function () {
-        var r = await sb.from('study_reminders').select('email_daily,email_hour,tz,cal_token').eq('user_id', S.uid).maybeSingle();
+        var r = await sb.from('study_reminders').select('email_daily,email_hour,weekly_email,tz,cal_token').eq('user_id', S.uid).maybeSingle();
         if (r.error) { S.remReady = false; return; }
-        S.rem = r.data || { email_daily: false, email_hour: 8, cal_token: null }; S.remReady = true;
+        S.rem = r.data || { email_daily: false, email_hour: 8, weekly_email: false, cal_token: null }; S.remReady = true;
       },
       saveReminders: async function (patch) {
-        var row = Object.assign({ user_id: S.uid, email_daily: S.rem.email_daily, email_hour: S.rem.email_hour, cal_token: S.rem.cal_token, tz: (function () { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Berlin'; } catch (e) { return 'Europe/Berlin'; } })() }, patch);
-        var r = await sb.from('study_reminders').upsert(row).select('email_daily,email_hour,tz,cal_token').single();
+        var row = Object.assign({ user_id: S.uid, email_daily: S.rem.email_daily, email_hour: S.rem.email_hour, weekly_email: !!S.rem.weekly_email, cal_token: S.rem.cal_token, tz: (function () { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Berlin'; } catch (e) { return 'Europe/Berlin'; } })() }, patch);
+        var r = await sb.from('study_reminders').upsert(row).select('email_daily,email_hour,weekly_email,tz,cal_token').single();
         S.rem = fail(r);
       },
       deleteEverything: async function () {
@@ -253,7 +254,7 @@
         for (var i = 0; i < paths.length; i += 100) fail(await sb.storage.from('study-files').remove(paths.slice(i, i + 100)));
         var tables = ['study_files', 'study_items', 'study_timetable', 'study_card_states', 'study_activity', 'study_reflections', 'study_courses'];
         for (var j = 0; j < tables.length; j++) fail(await sb.from(tables[j]).delete().eq('user_id', S.uid));
-        if (S.remReady) { fail(await sb.from('study_reminders').delete().eq('user_id', S.uid)); S.rem = { email_daily: false, email_hour: 8, cal_token: null }; }
+        if (S.remReady) { fail(await sb.from('study_reminders').delete().eq('user_id', S.uid)); S.rem = { email_daily: false, email_hour: 8, weekly_email: false, cal_token: null }; }
         S.follows = []; S.exams = []; S.items = []; S.timetable = []; S.cardStates = {}; S.log = []; S.reflections = []; S.files = [];
       }
     };
@@ -280,7 +281,7 @@
         S.demoTerm = d.term || null;
         S.timetable = d.timetable || []; S.cardStates = d.cardStates || {}; S.log = d.log || []; S.reflections = d.reflections || []; S.files = d.files || []; S.dailyReady = true;
       },
-      loadReminders: async function () { S.rem = { email_daily: false, email_hour: 8, cal_token: null }; S.remReady = true; },
+      loadReminders: async function () { S.rem = { email_daily: false, email_hour: 8, weekly_email: false, cal_token: null }; S.remReady = true; },
       saveReminders: async function (patch) { S.rem = Object.assign({}, S.rem, patch); },
       addItem: async function (row) { var x = withDone(Object.assign({ id: nid(), status: 'todo', created_at: new Date().toISOString() }, row)); S.items.push(x); return x; },
       updateItem: async function (id, patch) { S.items = S.items.map(function (x) { return x.id === id ? withDone(Object.assign({}, x, patch)) : x; }); },
@@ -408,6 +409,7 @@
       case 'due': return r.days === 0 ? T('r.today', 'Due today') : r.days === 1 ? T('r.tomorrow', 'Due tomorrow') : T('r.days', 'Due in {{n}} days', { n: r.days });
       case 'planned': return r.days <= 0 ? T('r.planned-today', 'Planned for today') : T('r.planned', 'Planned for {{d}}', { d: relDay(H.addDays(H.startOfDay(new Date()), r.days)) });
       case 'weight': return T('r.weight', '{{n}}% of the grade', { n: r.pct });
+      case 'behind': return T('r.behind', 'Its revision day has passed');
       case 'unsure': return T('r.unsure', 'A topic you marked unsure');
       case 'started': return T('r.started', 'Already started');
       case 'at_risk': return T('r.risk', 'Tight: less time left than it needs');
@@ -512,7 +514,10 @@
   }
   function todayModel(daily) {
     var now = new Date(), L = deadlines();
-    var plan = H.dayPlan({ items: S.items, exams: S.exams, tasksByExam: S.tasksByExam, minutes: ui.minutes, reviewCount: daily.ready ? daily.queue.total : 0,
+    // The early warning's first overdue revision step is pinned into Do next, so the two agree.
+    var warn = H.earlyWarning({ items: S.items, exams: S.exams, tasksByExam: S.tasksByExam, now: now });
+    if (warn && lsGet('shq_warn_hidden') === H.iso(now) + ':' + warn.kind + ':' + (warn.course || '')) warn = null;
+    var plan = H.dayPlan({ pin: warn && warn.firstId, items: S.items, exams: S.exams, tasksByExam: S.tasksByExam, minutes: ui.minutes, reviewCount: daily.ready ? daily.queue.total : 0,
       reviewMinutes: daily.queue.minutes, dailyMinutes: ui.capacity, now: now, skip: ui.skipped });
     plan.steps = plan.steps.map(function (st) {
       if (st.type === 'review') return { type: 'review', id: 'review', title: T('review-n', 'Quiz me: {{n}} questions', { n: st.n }), minutes: st.minutes,
@@ -542,7 +547,15 @@
       });
       if (help.invite) help.invite.href = 'onboarding.html?role=tutor';
     }
+    if (warn && warn.kind === 'exam') {
+      var wk = H.courseKey(warn.course), tl = (S.help.tutorsByKey || {})[wk] || [];
+      warn.color = colorOf(wk);
+      warn.planHref = 'exam-planner.html?course=' + encodeURIComponent(warn.course);
+      warn.helpHref = tl.length ? (DEMO ? 'find-tutors.html' : 'tutor-profile.html?id=' + encodeURIComponent(tl[0].id)) : 'find-tutors.html?q=' + encodeURIComponent(warn.course) + '#request';
+      warn.hasTutor = !!tl.length;
+    }
     return {
+      warning: warn, first: plan.steps[0] || null,
       sky: skyModel(), plan: plan, left: plan.steps.length, late: late, spotlight: spotlight, help: help, hideHelp: ui.hideHelp,
       busy: busyModel(L.rows), soon: L.counts.soon
     };
@@ -943,6 +956,9 @@
     h += '<div class="shq-rem"><div class="shq-rem-t"><b>' + ic('clock', 16) + esc(T('rem-email', 'Morning email')) + '</b><small>' + esc(T('rem-email-s', 'One short email on days with something due: today’s tasks, deadlines in the next two days and exams in the next week. Days with nothing due send nothing.')) + '</small>' +
       (on ? '<label class="shq-rem-hour">' + esc(T('rem-at', 'Send at')) + ' <select id="remHour" data-act="rem-hour">' + [6, 7, 8, 9, 10].map(function (x) { return '<option value="' + x + '"' + (r.email_hour === x ? ' selected' : '') + '>' + (x < 10 ? '0' : '') + x + ':00</option>'; }).join('') + '</select></label>' : '') + '</div>' +
       '<button type="button" class="shq-switch" role="switch" aria-checked="' + on + '" data-act="rem-email" aria-label="' + esc(T('rem-email', 'Morning email')) + '"><i class="gd-sw" aria-hidden="true"></i></button></div>';
+    var wk = !!r.weekly_email;
+    h += '<div class="shq-rem"><div class="shq-rem-t"><b>' + ic('chart', 16) + esc(T('rem-week', 'Sunday summary')) + '</b><small>' + esc(T('rem-week-s', 'Every Sunday at 18:00: what you got done this week, what is coming next week, and one suggestion.')) + '</small></div>' +
+      '<button type="button" class="shq-switch" role="switch" aria-checked="' + wk + '" data-act="rem-week" aria-label="' + esc(T('rem-week', 'Sunday summary')) + '"><i class="gd-sw" aria-hidden="true"></i></button></div>';
     h += '<div class="shq-rem"><div class="shq-rem-t"><b>' + ic('cal', 16) + esc(T('rem-cal', 'Your calendar')) + '</b><small>' + esc(T('rem-cal-s', 'Your tasks, deadlines and exam dates appear in Google, Apple or Outlook Calendar with reminders, and update by themselves.')) + '</small>';
     if (!url) h += '<div class="shq-row"><button type="button" class="shq-btn primary small" data-act="rem-cal">' + ic('link', 14) + esc(T('rem-cal-make', 'Create my calendar link')) + '</button></div>';
     else h += '<div class="shq-rem-link"><input readonly value="' + esc(url) + '" aria-label="' + esc(T('rem-cal', 'Your calendar')) + '" onclick="this.select()"><button type="button" class="shq-btn ghost small" data-act="rem-copy">' + esc(T('copy', 'Copy')) + '</button></div>' +
@@ -1523,13 +1539,15 @@
       else if (act === 'follow') { await store.follow(b.getAttribute('data-label')); render(); toast(T('course-added', 'Course added')); }
       else if (act === 'capture') capture(b.getAttribute('data-course'));
       else if (act === 'quick-capture') openQuick();
-      else if (act === 'rem-email' || act === 'rem-cal' || act === 'rem-reset') {
+      else if (act === 'rem-email' || act === 'rem-week' || act === 'rem-cal' || act === 'rem-reset') {
         if (act === 'rem-reset' && !confirm(T('rem-reset-q', 'Reset your calendar link? The old link stops working, and you add the new one to your calendar again.'))) return;
-        var patch = act === 'rem-email' ? { email_daily: !S.rem.email_daily } : { cal_token: newToken() };
-        try { await store.saveReminders(patch); render(); toast(act === 'rem-email' ? (S.rem.email_daily ? T('rem-on', 'Morning email on. It comes on days with something due.') : T('rem-off', 'Morning email off.')) : act === 'rem-cal' ? T('rem-made', 'Your calendar link is ready. Add it to your calendar below.') : T('rem-reset-ok', 'New link made. The old one no longer works.')); track('studyhq_reminder', { kind: act }); }
+        var patch = act === 'rem-email' ? { email_daily: !S.rem.email_daily } : act === 'rem-week' ? { weekly_email: !S.rem.weekly_email } : { cal_token: newToken() };
+        try { await store.saveReminders(patch); render(); toast(act === 'rem-week' ? (S.rem.weekly_email ? T('rem-week-on', 'Sunday summary on. The first one comes this Sunday at 18:00.') : T('rem-week-off', 'Sunday summary off.')) : act === 'rem-email' ? (S.rem.email_daily ? T('rem-on', 'Morning email on. It comes on days with something due.') : T('rem-off', 'Morning email off.')) : act === 'rem-cal' ? T('rem-made', 'Your calendar link is ready. Add it to your calendar below.') : T('rem-reset-ok', 'New link made. The old one no longer works.')); track('studyhq_reminder', { kind: act }); }
         catch (ex) { toast(T('e.save', 'That didn’t save. Please try again.')); }
       }
       else if (act === 'rem-copy') { try { await navigator.clipboard.writeText(calUrl()); toast(T('copied', 'Link copied')); } catch (ex) { var inp = document.querySelector('.shq-rem-link input'); if (inp) inp.select(); } }
+      else if (act === 'hide-warning') { var w0 = H.earlyWarning({ items: S.items, exams: S.exams, tasksByExam: S.tasksByExam, now: new Date() }); if (w0) lsSet('shq_warn_hidden', H.iso(new Date()) + ':' + w0.kind + ':' + (w0.course || '')); render(); }
+      else if (act === 'goto-plan') { var pc = document.querySelector('.gd-plan'); if (pc) pc.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       else if (act === 'theme') { var nt = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', nt); lsSet('shq_theme', nt); render(); toast(nt === 'dark' ? T('dark-on', 'Dark mode on') : T('light-on', 'Light mode on')); }
       else if (act === 'plant-rustle') { var g = b.querySelector('.gd-sway'); if (g) { g.classList.remove('gd-rustle'); void g.getBoundingClientRect(); g.classList.add('gd-rustle'); } }
       else if (act === 'upload') pickFile(b.getAttribute('data-kind'), b.getAttribute('data-course'));
@@ -1665,7 +1683,7 @@
       try { await store.updateItem(s.getAttribute('data-id'), { status: s.value }); render(); } catch (ex) { toast(T('e.generic', 'Something went wrong. Please try again.')); render(); }
     } else if (s.matches('select[data-act="rem-hour"]')) {
       try { await store.saveReminders({ email_hour: +s.value }); toast(T('rem-hour-ok', 'Morning email at {{h}}:00.', { h: (s.value < 10 ? '0' : '') + s.value })); } catch (ex) { toast(T('e.save', 'That didn’t save. Please try again.')); render(); }
-    } else if (s.matches('select[data-act="capacity"]')) { ui.capacity = +s.value; lsSet('shq_capacity', ui.capacity); render(); }
+    } else if (s.matches('select[data-act="capacity"]')) { ui.capacity = +s.value; ui.minutes = Math.min(120, Math.max(30, ui.capacity)); lsSet('shq_capacity', ui.capacity); render(); }
   });
 
   /* ---------------------------------------------------------------- preview: concept switcher */
@@ -1683,7 +1701,7 @@
     try {
       if (DEMO) {
         demoBar();
-        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=11');
+        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=13');
       } else {
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;

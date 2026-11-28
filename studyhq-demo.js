@@ -23,7 +23,8 @@
       tasks.push({ id: id('task'), exam_id: exam, day: day(dayN), topic: topic, kind: kind, done_at: done ? at(dayN, 18) : null, unsure: !!unsure, created_at: at(-10, 9) });
     }
     t('exam-stat', -4, 'Sampling distributions', 'learn', true);
-    t('exam-stat', -2, 'Confidence intervals', 'learn', true, true);
+    t('exam-stat', -2, 'Confidence intervals', 'learn', false, true); // slipped: shows the early warning in the preview
+    t('exam-stat', -1, 'Practice set: sampling', 'practice', false);
     t('exam-stat', 0, 'Hypothesis tests', 'learn', false, true);
     t('exam-stat', 1, 'Confidence intervals', 'review', false, true);
     t('exam-stat', 3, 'Regression', 'learn', false);
