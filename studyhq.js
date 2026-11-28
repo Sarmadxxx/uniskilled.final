@@ -80,7 +80,8 @@
     dailyReady: false, timetable: [], cardStates: {}, log: [], reflections: [], files: [],
     planner: [], finished: [], help: { tutorsByKey: {}, requested: [], ready: false } };
   var ui = {
-    minutes: [30, 60, 120].reduce(function (best, m) { var v = lsGet('shq_minutes', 60); return Math.abs(m - v) < Math.abs(best - v) ? m : best; }, 60),
+    // Today's to-do is sized to the student's daily study time (Settings), at most 2 hours: no chooser on Today.
+    minutes: Math.min(120, Math.max(30, lsGet('shq_capacity', 120))),
     capacity: lsGet('shq_capacity', 120),
     weekOffset: 0, noteFilter: 'all', asgFilter: 'all', noteSel: null, courseTab: 'overview',
     skipped: lsGet('shq_skip_' + H.iso(new Date()), []),
@@ -1682,7 +1683,7 @@
       try { await store.updateItem(s.getAttribute('data-id'), { status: s.value }); render(); } catch (ex) { toast(T('e.generic', 'Something went wrong. Please try again.')); render(); }
     } else if (s.matches('select[data-act="rem-hour"]')) {
       try { await store.saveReminders({ email_hour: +s.value }); toast(T('rem-hour-ok', 'Morning email at {{h}}:00.', { h: (s.value < 10 ? '0' : '') + s.value })); } catch (ex) { toast(T('e.save', 'That didn’t save. Please try again.')); render(); }
-    } else if (s.matches('select[data-act="capacity"]')) { ui.capacity = +s.value; lsSet('shq_capacity', ui.capacity); render(); }
+    } else if (s.matches('select[data-act="capacity"]')) { ui.capacity = +s.value; ui.minutes = Math.min(120, Math.max(30, ui.capacity)); lsSet('shq_capacity', ui.capacity); render(); }
   });
 
   /* ---------------------------------------------------------------- preview: concept switcher */
@@ -1700,7 +1701,7 @@
     try {
       if (DEMO) {
         demoBar();
-        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=12');
+        if (!window.StudyHQDemo) await loadScript('studyhq-demo.js?v=13');
       } else {
         var r = await window._sb.auth.getSession();
         var session = r.data && r.data.session;
