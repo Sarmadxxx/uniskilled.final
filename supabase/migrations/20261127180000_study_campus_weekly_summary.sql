@@ -1,5 +1,5 @@
 -- Study Campus: the Sunday summary email.
--- NOT APPLIED. Apply only after approval, together with the updated studyhq-reminders function.
+-- Applied 28 Nov 2026 after approval, together with the updated studyhq-reminders function.
 --
 -- weekly_email:   the student turned on the Sunday summary (off by default).
 -- weekly_sent_on: the local date the last summary went out; only the server job sets it.

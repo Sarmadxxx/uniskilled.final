@@ -15,7 +15,7 @@ import { withSentry } from './sentry.ts';
 // The Sunday summary (weekly_email): Sunday at 18:00 in the student's time zone, what they got done
 // this week and what is coming next week. Same claim-first rule (weekly_sent_on), so never twice.
 //
-// Deployed 27 Nov 2026 after approval. The email is built here (same look as the other UniSkilled
+// Deployed 27 Nov 2026 after approval (Sunday summary added 28 Nov 2026). The email is built here (same look as the other UniSkilled
 // emails) and sent with Resend, so the booking and payment emails in send-email are not touched.
 // Study Campus is in English, so is this email.
 
